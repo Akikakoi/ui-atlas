@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>战术 HUD 2 · 控制台版式 · UI 样例</title>
+<style>
+:root{--bg:#08090a;--surface:rgba(20,22,24,.72);--ink:#e9f2e6;--muted:#7d8a80;--accent:#c8ff2e;--accent-ink:#0b0b0b;--line:rgba(200,255,46,.28);--radius:0px;--radius-sm:0px;--font:'Segoe UI',Consolas,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.75}
+.term{height:100vh;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--line);
+  font-size:11.5px;color:var(--muted);letter-spacing:.04em}
+.dots{display:flex;gap:5px}
+.dots i{width:9px;height:9px;border:1px solid currentColor;border-radius:50%;opacity:.55}
+.bar .path{margin-left:auto}
+.body{flex:1;padding:20px 24px;overflow:hidden}
+.ln{margin:0;white-space:pre-wrap}
+.p{color:var(--accent)}
+.c{color:var(--ink)}
+.o{color:var(--muted)}
+.tbl{display:grid;grid-template-columns:132px 132px auto;gap:0 18px;width:max-content;
+  min-width:392px;color:var(--muted);padding:2px 0}
+.tbl .ok{color:var(--accent)}
+.cursor{display:inline-block;width:9px;height:16px;background:var(--ink);vertical-align:-3px;
+  animation:blink 1.05s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.status{display:flex;justify-content:space-between;padding:6px 16px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--muted);letter-spacing:.08em}
+@media (prefers-reduced-motion:reduce){.cursor{animation:none}}
+
+body{background:
+  linear-gradient(rgba(200,255,46,.045) 1px,transparent 1px) 0 0/24px 24px,
+  linear-gradient(90deg,rgba(200,255,46,.045) 1px,transparent 1px) 0 0/24px 24px,
+  radial-gradient(70% 50% at 50% -10%,rgba(200,255,46,.10),transparent 60%),
+  #08090a}
+.hero h1{text-transform:uppercase;letter-spacing:.05em;font-weight:800;font-size:clamp(28px,4.2vw,48px)}
+.hero h1::before{content:"// ";color:#c8ff2e}
+.eyebrow{color:#c8ff2e;letter-spacing:.5em}
+.eyebrow::before{content:"[ "}
+.eyebrow::after{content:" ]"}
+.card,.panel{background:rgba(20,22,24,.72);border:1px solid rgba(200,255,46,.28);border-radius:0;
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+.card .k{color:#c8ff2e;letter-spacing:.3em}
+.btn{background:#c8ff2e;color:#08120a;border-radius:0;letter-spacing:.1em;text-transform:uppercase;font-weight:800;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.btn.ghost{background:transparent;color:#e9f2e6;border:1px solid rgba(200,255,46,.4)}
+.nav{border-bottom:1px solid rgba(200,255,46,.28)}
+input,select{background:#0d0f10;color:#e9f2e6;border:1px solid rgba(200,255,46,.28);border-radius:0}
+</style>
+</head>
+<body>
+<div class="term">
+  <div class="bar">
+    <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span>TAC//OPS</span>
+    <span class="path">TAC//OPS · uplink</span>
+  </div>
+  <div class="body">
+    <p class="ln"><span class="p">$</span> <span class="c">tac status</span></p>
+    <p class="ln o">uplink ok · sig 92% · 4 units online</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="c">tac grid --lock</span></p>
+    <p class="ln o">──────────────────────────────────────────────</p>
+    <div class="tbl"><span>UNIT</span><span>SIG</span><span>LOCK</span><span>alpha</span><span class="ok">92%</span><span>locked</span><span>bravo</span><span class="ok">88%</span><span>locked</span><span>charlie</span><span class="ok">61%</span><span>scanning</span></div>
+    <p class="ln o">──────────────────────────────────────────────</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="c">tac log --tail 4</span></p>
+    <p class="ln o">[T-12] alpha  handshake ok</p>
+    <p class="ln o">[T-09] charlie re-acquire</p>
+    <p class="ln p">[T-04] charlie sig 61% · below 70%</p>
+    <p class="ln o">[T-01] delta   standby</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="c">cat BRIEF</span></p>
+    <p class="ln c">目标：可读，且快</p>
+    <p class="ln o">信息密度优先，装饰只是刻度。</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="cursor" aria-hidden="true"></span></p>
+  </div>
+  <div class="status"><span>-- ARMED --</span><span>sig · 92% · 4/4</span></div>
+</div>
+</body>
+</html>

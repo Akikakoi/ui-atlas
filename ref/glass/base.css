@@ -1,0 +1,99 @@
+/* ============================================================================
+   Glass · 参考实现 —— 基础层
+   reset + 背景光斑 + 排版基线 + 焦点环 + 无障碍。只依赖 tokens.css。
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--text-base);
+  line-height: var(--lh-base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 背景光斑：玻璃面板的可透内容。固定在视口，页面滚动时面板会「流动」 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -10%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 36% at 14% 6%, var(--bg-tint-1), transparent 68%),
+    radial-gradient(38% 34% at 84% 12%, var(--bg-tint-2), transparent 70%),
+    radial-gradient(46% 40% at 62% 96%, var(--bg-tint-3), transparent 70%);
+  filter: saturate(112%);
+}
+
+h1, h2, h3, h4, p, ul, ol, figure, blockquote { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+h1 { font-size: var(--text-2xl); line-height: var(--lh-tight); letter-spacing: -.02em; font-weight: 700; }
+h2 { font-size: var(--text-xl); line-height: var(--lh-tight); letter-spacing: -.015em; font-weight: 650; }
+h3 { font-size: var(--text-md); line-height: 1.35; font-weight: 600; }
+h4 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+code, kbd, samp { font-family: var(--font-mono); font-size: .92em; }
+code {
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-xs);
+  padding: .1em .38em;
+}
+
+::selection { background: var(--accent-weak); color: var(--ink); }
+
+/* 焦点环：键盘可见，鼠标不打扰 */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-line);
+  border-radius: var(--radius-xs);
+}
+
+/* 滚动条：细、半透明、不抢 */
+* { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: var(--radius-pill);
+}
+*::-webkit-scrollbar-thumb:hover { background-color: var(--muted); }
+
+/* 辅助文本 */
+.sr {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+.t-muted { color: var(--muted); }
+.t-sm { font-size: var(--text-sm); }
+.t-xs { font-size: var(--text-xs); }
+.t-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.t-num { font-variant-numeric: tabular-nums; }
+.t-eyebrow {
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide-xl);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* 尊重系统偏好：所有过渡与动画直接归零，不是「变快」 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

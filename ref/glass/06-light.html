@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass 参考实现 · 06 浅色</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body class="ref">
+
+<nav class="refnav" aria-label="参考实现页面">
+  <a href="01-workbench.html">01 工作台</a>
+  <a href="02-record.html">02 详情</a>
+  <a href="03-form.html">03 表单</a>
+  <a href="04-states.html">04 状态</a>
+  <a href="05-dialog.html">05 弹窗</a>
+  <a href="06-light.html" class="is-active">06 浅色</a>
+  <a href="07-anti.html">07 反例</a>
+  <a href="08-marketing.html">08 营销</a>
+  <a href="09-auth.html">09 登录</a>
+  <a href="10-mobile.html">10 移动</a>
+  <span class="tag">glass · light theme</span>
+</nav>
+
+<div class="app">
+  <aside class="side">
+    <div class="side-brand"><span class="mark">◆</span> Northwind</div>
+    <div class="side-sec">经营</div>
+    <a class="side-link is-active" href="#">总览</a>
+    <a class="side-link" href="#">会员 <span class="count">3,182</span></a>
+    <a class="side-link" href="#">订单 <span class="count">128</span></a>
+    <a class="side-link" href="#">内容</a>
+    <a class="side-link" href="#">工单 <span class="count">12</span></a>
+    <div class="side-sec">设置</div>
+    <a class="side-link" href="#">团队</a>
+    <a class="side-link" href="#">账单</a>
+    <div class="side-foot">
+      <a class="side-link" href="#"><span class="avatar accent">陈</span> 陈布凡 <span class="count">▾</span></a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb">经营 <span>/</span> <b>总览</b></div>
+      <div class="grow"></div>
+      <div class="search"><span aria-hidden="true">⌕</span> 搜索会员、订单 <span class="kbd">/</span></div>
+      <button class="btn sm">导出</button>
+      <button class="btn primary sm">新建订单</button>
+    </header>
+
+    <div class="content">
+      <div class="page-head">
+        <div class="grow">
+          <h1>浅色主题</h1>
+          <p>同一份 HTML、同一份 components.css，只把 <code>data-theme</code> 换成 light。</p>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="ic" aria-hidden="true">i</span>
+        <span>如果这一页按钮、表格、表单都没有「塌」，说明 token 层抽象住了；塌了，就回去改 token，不要在页面里打补丁。</span>
+      </div>
+
+      <section class="stats" aria-label="关键指标">
+        <div class="card stat">
+          <div class="label">经常性收入</div>
+          <div class="value">¥ 248,600</div>
+          <div class="delta up">▲ 12.4% 环比</div>
+        </div>
+        <div class="card stat">
+          <div class="label">活跃会员</div>
+          <div class="value">3,182</div>
+          <div class="delta up">▲ 6.1% 环比</div>
+        </div>
+        <div class="card stat">
+          <div class="label">月度流失率</div>
+          <div class="value">2.4%</div>
+          <div class="delta">▼ 0.3pt 环比</div>
+        </div>
+        <div class="card stat">
+          <div class="label">待处理工单</div>
+          <div class="value">12</div>
+          <div class="delta down">3 条已超时</div>
+        </div>
+      </section>
+
+      <div class="split">
+        <section class="card">
+          <div class="panel-head">
+            <h3>最近订单</h3>
+            <div class="grow"></div>
+            <button class="chip is-active">全部</button>
+            <button class="chip">待付款</button>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">客户</th>
+                <th scope="col">方案</th>
+                <th scope="col" class="num">金额</th>
+                <th scope="col">状态</th>
+                <th scope="col">日期</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="is-selected">
+                <td><div class="cell-user"><span class="avatar accent">林</span><div><div class="name">林见夏</div><div class="sub">lin@studio.cn</div></div></div></td>
+                <td>团队版 · 12 席</td>
+                <td class="num">¥ 4,960.00</td>
+                <td><span class="badge ok">已续费</span></td>
+                <td class="muted t-num">11-08</td>
+              </tr>
+              <tr>
+                <td><div class="cell-user"><span class="avatar">周</span><div><div class="name">周叙</div><div class="sub">zhou@atelier.com</div></div></div></td>
+                <td>专业版 · 3 席</td>
+                <td class="num">¥ 1,280.00</td>
+                <td><span class="badge warn">待付款</span></td>
+                <td class="muted t-num">11-08</td>
+              </tr>
+              <tr>
+                <td><div class="cell-user"><span class="avatar">黄</span><div><div class="name">黄侃</div><div class="sub">huang@kanso.design</div></div></div></td>
+                <td>个人版</td>
+                <td class="num">¥ 98.00</td>
+                <td><span class="badge danger">已流失</span></td>
+                <td class="muted t-num">11-07</td>
+              </tr>
+              <tr>
+                <td><div class="cell-user"><span class="avatar">钱</span><div><div class="name">钱立言</div><div class="sub">qian@northfield.cn</div></div></div></td>
+                <td>专业版 · 5 席</td>
+                <td class="num">¥ 2,140.00</td>
+                <td><span class="badge info">试用中</span></td>
+                <td class="muted t-num">11-07</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="panel-foot pager">
+            <span>显示 1–4 / 128</span>
+            <span class="grow"></span>
+            <button disabled>‹</button><button class="is-active">1</button><button>2</button><button>›</button>
+          </div>
+        </section>
+
+        <div class="stack">
+          <section class="card">
+            <div class="panel-head"><h3>换成浅色，动了什么</h3></div>
+            <div class="pad stack">
+              <div class="row"><span class="badge plain">surface</span><span class="t-sm t-muted t-num">5.5% / 9% / 14% → 55% / 72% / 88%</span></div>
+              <div class="row"><span class="badge plain">accent</span><span class="t-sm t-muted">#7aa2ff → <span class="t-mono">#2a5bd7</span>（浅底上必须更深）</span></div>
+              <div class="row"><span class="badge plain">shadow</span><span class="t-sm t-muted">深色靠黑影 → 浅色只能靠很淡的蓝灰影</span></div>
+              <div class="row"><span class="badge plain">光斑</span><span class="t-sm t-muted">透明度反而要更高，否则面板变成一片奶白</span></div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="panel-head"><h3>表单在同主题下</h3></div>
+            <div class="pad stack">
+              <div class="field">
+                <label class="label" for="l1">邮箱</label>
+                <input class="input" id="l1" value="lin@studio.cn">
+              </div>
+              <div class="field">
+                <label class="label" for="l2">方案</label>
+                <select class="select" id="l2"><option>团队版 · 12 席</option><option>专业版 · 3 席</option></select>
+              </div>
+              <label class="switch"><input type="checkbox" checked><span class="track"></span> 自动续费</label>
+              <div class="row">
+                <button class="btn primary sm">保存</button>
+                <button class="btn sm">取消</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <p class="note">
+        <b>浅色玻璃比深色难。</b>
+        深色靠「白上叠白」自然分层；浅色必须在白上叠白的同时加蓝灰色偏移，
+        否则所有面板糊成一片奶白。这也是为什么 token 里要有
+        <code>--surface-1/2/3</code> 三档而不是一个透明度——
+        切主题时真正变化的是这三档的<b>关系</b>，不是某个色值。
+      </p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

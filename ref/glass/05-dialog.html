@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass 参考实现 · 05 弹窗</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body class="ref">
+
+<nav class="refnav" aria-label="参考实现页面">
+  <a href="01-workbench.html">01 工作台</a>
+  <a href="02-record.html">02 详情</a>
+  <a href="03-form.html">03 表单</a>
+  <a href="04-states.html">04 状态</a>
+  <a href="05-dialog.html" class="is-active">05 弹窗</a>
+  <a href="06-light.html">06 浅色</a>
+  <a href="07-anti.html">07 反例</a>
+  <a href="08-marketing.html">08 营销</a>
+  <a href="09-auth.html">09 登录</a>
+  <a href="10-mobile.html">10 移动</a>
+  <span class="tag">glass · 参考实现</span>
+</nav>
+
+<div class="app">
+  <aside class="side">
+    <div class="side-brand"><span class="mark">◆</span> Northwind</div>
+    <div class="side-sec">经营</div>
+    <a class="side-link" href="#">总览</a>
+    <a class="side-link is-active" href="#">会员 <span class="count">3,182</span></a>
+    <a class="side-link" href="#">订单 <span class="count">128</span></a>
+    <a class="side-link" href="#">内容</a>
+    <a class="side-link" href="#">工单 <span class="count">12</span></a>
+    <div class="side-sec">设置</div>
+    <a class="side-link" href="#">团队</a>
+    <a class="side-link" href="#">账单</a>
+    <div class="side-foot">
+      <a class="side-link" href="#"><span class="avatar accent">陈</span> 陈布凡 <span class="count">▾</span></a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb">会员 <span>/</span> <b>林见夏</b></div>
+      <div class="grow"></div>
+      <button class="btn sm">发送邮件</button>
+      <button class="icon-btn" aria-label="更多操作">⋯</button>
+    </header>
+
+    <div class="content">
+      <div class="page-head">
+        <div class="grow">
+          <h1>林见夏</h1>
+          <div class="row" style="margin-top:var(--space-2)">
+            <span class="badge ok">已续费</span>
+            <span class="badge plain">团队版 · 12 席</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn sm">变更方案</button>
+        </div>
+      </div>
+
+      <section class="card">
+        <div class="panel-head"><h3>最近订单</h3></div>
+        <table class="table">
+          <thead>
+            <tr><th scope="col">订单号</th><th scope="col">方案</th><th scope="col" class="num">金额</th><th scope="col">状态</th><th scope="col">日期</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="t-mono">NW-1183</td><td>团队版 · 12 席</td><td class="num">¥ 4,960.00</td><td><span class="badge ok">已支付</span></td><td class="muted t-num">2026-11-08</td></tr>
+            <tr><td class="t-mono">NW-1102</td><td>团队版 · 12 席</td><td class="num">¥ 4,960.00</td><td><span class="badge ok">已支付</span></td><td class="muted t-num">2026-10-08</td></tr>
+            <tr><td class="t-mono">NW-1040</td><td>团队版 · 8 席</td><td class="num">¥ 3,310.00</td><td><span class="badge plain">已退款</span></td><td class="muted t-num">2026-09-08</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <p class="note">
+        这一页的主体被 <code>--overlay</code> 压暗并 <code>blur(4px)</code>——
+        注意：<b>遮罩只糊、不换色</b>。玻璃风格的弹窗如果背景变纯黑，
+        前后景的层次就断了；保留背景的色斑，弹窗才像浮在这套材质里。
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dlg-title" aria-describedby="dlg-desc">
+    <div class="modal-head">
+      <h2 id="dlg-title">删除这位客户的账户？</h2>
+      <p id="dlg-desc">林见夏 · 团队版 12 席 · 已合作 4 年 2 个月</p>
+    </div>
+
+    <div class="modal-body stack">
+      <div class="callout danger">
+        <span class="ic" aria-hidden="true">×</span>
+        <span>以下数据会被<strong>永久删除</strong>，且不能恢复。</span>
+      </div>
+      <ul class="stack" style="gap:var(--space-2);font-size:var(--text-sm);color:var(--ink-2)">
+        <li>· 14 笔订单与全部发票（含 3 张待开）</li>
+        <li>· 12 个席位的使用记录与登录日志</li>
+        <li>· 内部备注 7 条、工单 2 条</li>
+      </ul>
+      <div class="field">
+        <label class="label" for="confirm-name">输入「林见夏」以确认</label>
+        <input class="input" id="confirm-name" type="text" placeholder="林见夏" autocomplete="off">
+      </div>
+      <label class="check"><input type="checkbox"><span>我已导出所需的对账单</span></label>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn quiet" type="button">取消</button>
+      <button class="btn danger" type="button">永久删除</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

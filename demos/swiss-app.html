@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>瑞士国际主义 · App · UI 样例</title>
+<style>
+:root{--bg:#ffffff;--surface:#ffffff;--ink:#111111;--muted:#6b6b6b;--accent:#e2001a;--accent-ink:#ffffff;--line:#111111;--radius:0px;--radius-sm:0px;--font:'Helvetica Neue',Arial,'PingFang SC',sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);display:grid;place-items:center;
+  min-height:100vh;padding:16px 0}
+.device{width:375px;height:min(812px,calc(100vh - 32px));background:var(--bg);border:9px solid #17181b;
+  border-radius:44px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 26px 60px rgba(0,0,0,.35)}
+.statusbar{display:flex;align-items:center;justify-content:space-between;padding:12px 22px 6px;
+  font-size:11.5px;color:var(--muted)}
+.statusbar b{color:var(--ink);font-weight:600}
+.appbar{display:flex;align-items:center;gap:10px;padding:4px 18px 12px}
+.appbar h1{margin:0;font-size:19px;letter-spacing:-.01em}
+.appbar .back{width:26px;height:26px;border-radius:999px;border:1px solid var(--line);display:grid;
+  place-items:center;color:var(--muted);font-size:13px;flex:0 0 auto}
+.appbar .act{font-size:12.5px;color:var(--accent);font-weight:600}
+.sp{flex:1}
+.srch{margin:0 18px 12px;display:flex;align-items:center;gap:8px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);padding:9px 12px;font-size:12.5px;color:var(--muted)}
+.chips{display:flex;gap:7px;padding:0 18px 12px;overflow:hidden}
+.chips span{font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);
+  color:var(--muted);white-space:nowrap}
+.chips span.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.list{flex:1;overflow:hidden;padding:0 18px}
+.item{display:flex;gap:11px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.thumb{width:50px;height:50px;border-radius:var(--radius);background:var(--surface);
+  border:1px solid var(--line);display:grid;place-items:center;font-size:14px;color:var(--accent);flex:0 0 auto}
+.item .tt{margin:0 0 2px;font-size:13.5px;font-weight:600}
+.item .mm{margin:0;font-size:11.5px;color:var(--muted)}
+.item .rt{margin-left:auto;text-align:right;font-size:12px;color:var(--ink);
+  white-space:nowrap;font-variant-numeric:tabular-nums}
+.tabbar{display:flex;border-top:1px solid var(--line);background:var(--surface);padding:9px 0 14px}
+.tabbar a{flex:1;text-align:center;text-decoration:none;color:var(--muted);font-size:10.5px;
+  display:grid;gap:4px;justify-items:center}
+.tabbar a i{width:17px;height:17px;border:1px solid currentColor;border-radius:5px;display:block}
+.tabbar a.on{color:var(--accent);font-weight:600}
+.tabbar a.on i{background:currentColor;border-color:currentColor}
+
+body{background:#fff}
+.hero h1{font-size:clamp(44px,7vw,88px);font-weight:700;letter-spacing:-.04em;line-height:.98}
+.eyebrow{color:#e2001a;letter-spacing:.3em}
+.cards{gap:0;border-top:2px solid #111}
+.card{border:0;border-right:1px solid #111;border-radius:0;padding:26px 22px}
+.card:last-child{border-right:0}
+.btn,.btn.ghost{border-radius:0;background:#111;color:#fff;border:0;padding:12px 24px}
+.btn.ghost{background:#fff;color:#111;border:2px solid #111}
+.nav{border-bottom:2px solid #111}
+.panel{border:0;border-top:2px solid #111;border-radius:0;padding:34px 0}
+input,select{border-radius:0;border:1px solid #111}
+
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="statusbar"><b>9:41</b><span>⇥ 5G ▮▮▮</span></div>
+  <div class="appbar"><span class="back">‹</span><h1>我的订单</h1><span class="sp"></span><span class="act">筛选</span></div>
+  <div class="srch"><span>⌕</span><span>搜索商品或订单号</span></div>
+  <div class="chips"><span class="on">全部</span><span>待付款</span><span>待收货</span><span>已完成</span></div>
+  <div class="list">
+      <div class="item"><div class="thumb">衣</div><div><p class="tt">亚麻衬衫 · 米白</p><p class="mm">M / 2 件 · 已发货</p></div><div class="rt">¥ 636</div></div>
+      <div class="item"><div class="thumb">食</div><div><p class="tt">单一产地咖啡豆</p><p class="mm">250g · 待付款</p></div><div class="rt">¥ 128</div></div>
+      <div class="item"><div class="thumb">住</div><div><p class="tt">灰釉陶瓷马克杯</p><p class="mm">1 只 · 已签收</p></div><div class="rt">¥ 168</div></div>
+      <div class="item"><div class="thumb">行</div><div><p class="tt">原色帆布托特包</p><p class="mm">1 只 · 运输中</p></div><div class="rt">¥ 219</div></div>
+      <div class="item"><div class="thumb">书</div><div><p class="tt">《字体排印基础》</p><p class="mm">第 3 版 · 已完成</p></div><div class="rt">¥ 88</div></div>
+      <div class="item"><div class="thumb">茶</div><div><p class="tt">耐热玻璃茶壶</p><p class="mm">600ml · 待收货</p></div><div class="rt">¥ 249</div></div>
+      <div class="item"><div class="thumb">器</div><div><p class="tt">黄铜刻字书签</p><p class="mm">2 枚 · 已完成</p></div><div class="rt">¥ 96</div></div>
+  </div>
+  <nav class="tabbar">
+    <a class="on" href="#"><i></i>订单</a>
+    <a href="#"><i></i>分类</a>
+    <a href="#"><i></i>收藏</a>
+    <a href="#"><i></i>我的</a>
+  </nav>
+</div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全息 HUD · 控制台版式 · UI 样例</title>
+<style>
+:root{--bg:#03121c;--surface:rgba(10,40,56,.55);--ink:#cdf6ff;--muted:#6fa8bd;--accent:#3ce0ff;--accent-ink:#0b0b0b;--line:rgba(60,224,255,.32);--radius:2px;--radius-sm:2px;--font:Consolas,'Cascadia Mono',monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.75}
+.term{height:100vh;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--line);
+  font-size:11.5px;color:var(--muted);letter-spacing:.04em}
+.dots{display:flex;gap:5px}
+.dots i{width:9px;height:9px;border:1px solid currentColor;border-radius:50%;opacity:.55}
+.bar .path{margin-left:auto}
+.body{flex:1;padding:20px 24px;overflow:hidden}
+.ln{margin:0;white-space:pre-wrap}
+.p{color:var(--accent)}
+.c{color:var(--ink)}
+.o{color:var(--muted)}
+.tbl{display:grid;grid-template-columns:132px 132px auto;gap:0 18px;width:max-content;
+  min-width:392px;color:var(--muted);padding:2px 0}
+.tbl .ok{color:var(--accent)}
+.cursor{display:inline-block;width:9px;height:16px;background:var(--ink);vertical-align:-3px;
+  animation:blink 1.05s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.status{display:flex;justify-content:space-between;padding:6px 16px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--muted);letter-spacing:.08em}
+@media (prefers-reduced-motion:reduce){.cursor{animation:none}}
+
+body{background:
+  radial-gradient(60% 50% at 50% 0%,rgba(60,224,255,.14),transparent 60%),
+  linear-gradient(rgba(60,224,255,.06) 1px,transparent 1px) 0 0/32px 32px,
+  #03121c}
+.hero h1{color:#cdf6ff;text-shadow:0 0 16px rgba(60,224,255,.55);font-family:inherit;letter-spacing:.04em}
+.eyebrow{color:#3ce0ff;letter-spacing:.4em}
+.card,.panel{background:rgba(10,40,56,.5);border:1px solid rgba(60,224,255,.32);border-radius:2px;
+  box-shadow:inset 0 0 28px rgba(60,224,255,.10)}
+.card{position:relative}
+.card::after{content:"";position:absolute;right:8px;top:8px;width:10px;height:10px;
+  border-top:1px solid #3ce0ff;border-right:1px solid #3ce0ff}
+.card .k{color:#3ce0ff;letter-spacing:.3em}
+.btn{background:transparent;border:1px solid #3ce0ff;color:#9fe9f7;border-radius:2px;
+  box-shadow:inset 0 0 14px rgba(60,224,255,.18),0 0 14px rgba(60,224,255,.25);font-family:inherit}
+.btn.ghost{border-color:rgba(60,224,255,.45);color:#6fa8bd;box-shadow:none}
+.nav{border-bottom:1px solid rgba(60,224,255,.3)}
+input,select{background:rgba(3,18,28,.8);color:#cdf6ff;border:1px solid rgba(60,224,255,.3);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="term">
+  <div class="bar">
+    <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span>ORBITAL-9</span>
+    <span class="path">ORB-9 · projection</span>
+  </div>
+  <div class="body">
+    <p class="ln"><span class="p">$</span> <span class="c">orbital scan</span></p>
+    <p class="ln o">projection 41% · est. 12s remaining</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="c">orbital lock</span></p>
+    <p class="ln o">──────────────────────────────────────────────</p>
+    <div class="tbl"><span>TARGET</span><span>RANGE</span><span>STATE</span><span>KX-118</span><span class="ok">2.4 km</span><span>locked</span><span>VX-042</span><span class="ok">8.1 km</span><span>pending</span><span>—</span><span class="ok">—</span><span>lost</span></div>
+    <p class="ln o">──────────────────────────────────────────────</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="c">orbital log</span></p>
+    <p class="ln o">[orb] KX-118  vector stable</p>
+    <p class="ln o">[orb] VX-042  drift 0.3°</p>
+    <p class="ln p">[orb] VX-042  signal lost</p>
+    <p class="ln o">[orb] holding projection</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="c">cat manifest</span></p>
+    <p class="ln c">读取中：目标已锁定</p>
+    <p class="ln o">界面是一层投影，随时会消失。</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="cursor" aria-hidden="true"></span></p>
+  </div>
+  <div class="status"><span>-- 投影中 --</span><span>41% · 12s</span></div>
+</div>
+</body>
+</html>

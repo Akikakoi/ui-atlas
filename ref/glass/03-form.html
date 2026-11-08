@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass 参考实现 · 03 表单</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body class="ref">
+
+<nav class="refnav" aria-label="参考实现页面">
+  <a href="01-workbench.html">01 工作台</a>
+  <a href="02-record.html">02 详情</a>
+  <a href="03-form.html" class="is-active">03 表单</a>
+  <a href="04-states.html">04 状态</a>
+  <a href="05-dialog.html">05 弹窗</a>
+  <a href="06-light.html">06 浅色</a>
+  <a href="07-anti.html">07 反例</a>
+  <a href="08-marketing.html">08 营销</a>
+  <a href="09-auth.html">09 登录</a>
+  <a href="10-mobile.html">10 移动</a>
+  <span class="tag">glass · 参考实现</span>
+</nav>
+
+<div class="app">
+  <aside class="side">
+    <div class="side-brand"><span class="mark">◆</span> Northwind</div>
+    <div class="side-sec">经营</div>
+    <a class="side-link" href="#">总览</a>
+    <a class="side-link" href="#">会员 <span class="count">3,182</span></a>
+    <a class="side-link is-active" href="#">订单 <span class="count">128</span></a>
+    <a class="side-link" href="#">内容</a>
+    <a class="side-link" href="#">工单 <span class="count">12</span></a>
+    <div class="side-sec">设置</div>
+    <a class="side-link" href="#">团队</a>
+    <a class="side-link" href="#">账单</a>
+    <div class="side-foot">
+      <a class="side-link" href="#"><span class="avatar accent">陈</span> 陈布凡 <span class="count">▾</span></a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb">订单 <span>/</span> <b>新建订阅</b></div>
+      <div class="grow"></div>
+      <button class="btn quiet sm">放弃</button>
+      <button class="btn primary sm">创建订单</button>
+    </header>
+
+    <div class="content narrow">
+      <div class="page-head">
+        <div class="grow">
+          <h1>新建订阅</h1>
+          <p>为客户开通席位并生成首笔账单。带 <span style="color:var(--danger)">*</span> 的字段必填。</p>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <span class="ic" aria-hidden="true">!</span>
+        <span><strong>有 2 个字段需要修正：</strong>公司名称未填、折扣码已过期。修正后即可提交。</span>
+      </div>
+
+      <form class="card" onsubmit="return false">
+        <div class="panel-head"><h3>客户信息</h3></div>
+        <div class="pad stack">
+          <div class="grid-2">
+            <div class="field is-ok">
+              <label class="label" for="f-email">邮箱 <span class="req" aria-hidden="true">*</span></label>
+              <input class="input" id="f-email" type="email" value="lin@studio.cn" aria-describedby="h-email">
+              <span class="help" id="h-email">✓ 已在系统中，将沿用原有账户</span>
+            </div>
+            <div class="field is-error">
+              <label class="label" for="f-company">公司名称 <span class="req" aria-hidden="true">*</span></label>
+              <input class="input" id="f-company" type="text" value="" placeholder="例如：林间设计工作室"
+                     aria-invalid="true" aria-describedby="h-company">
+              <span class="help" id="h-company">公司名称不能为空</span>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label class="label" for="f-plan">方案</label>
+              <select class="select" id="f-plan">
+                <option>团队版 · ¥ 620 / 席 / 月</option>
+                <option>专业版 · ¥ 420 / 席 / 月</option>
+                <option>个人版 · ¥ 98 / 月</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="label" for="f-seats">席位数</label>
+              <input class="input t-num" id="f-seats" type="number" value="12" min="1" max="50">
+              <span class="help">可随时增减，按日折算。</span>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field is-error">
+              <label class="label" for="f-code">折扣码 <span class="opt">选填</span></label>
+              <div class="row" style="flex-wrap:nowrap;gap:var(--space-2)">
+                <input class="input" id="f-code" type="text" value="YEAREND24" aria-invalid="true" aria-describedby="h-code">
+                <button class="btn sm" type="button">应用</button>
+              </div>
+              <span class="help" id="h-code">该折扣码已于 2024-12-31 过期</span>
+            </div>
+            <div class="field">
+              <label class="label" for="f-readonly">订单号 <span class="opt">系统生成</span></label>
+              <input class="input t-mono" id="f-readonly" type="text" value="NW-1184" readonly>
+              <span class="help">提交后不可修改。</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="f-note">备注 <span class="opt">选填</span></label>
+            <textarea class="textarea" id="f-note" placeholder="给客户的说明，会出现在发票附言里"></textarea>
+          </div>
+        </div>
+
+        <div class="panel-head" style="border-top:1px solid var(--line-soft)"><h3>通知与确认</h3></div>
+        <div class="pad stack">
+          <label class="check"><input type="checkbox" checked><span>创建后立即向客户发送账单邮件</span></label>
+          <label class="check"><input type="checkbox"><span>同时给财务邮箱抄送一份</span></label>
+          <label class="switch"><input type="checkbox" checked><span class="track"></span> 开启自动续费</label>
+          <div class="field">
+            <label class="label" for="f-disabled">客户经理 <span class="opt">由权限决定</span></label>
+            <input class="input" id="f-disabled" type="text" value="陈布凡" disabled>
+            <span class="help">你没有变更客户经理的权限。</span>
+          </div>
+        </div>
+
+        <div class="panel-foot row" style="justify-content:flex-end">
+          <button class="btn quiet" type="button">取消</button>
+          <button class="btn" type="button">保存草稿</button>
+          <button class="btn primary" type="submit">创建订单</button>
+        </div>
+      </form>
+
+      <p class="note">
+        <b>错误态不能只变红。</b>
+        这里同时改了四处：边框 <code>--danger</code>、外环 <code>--danger-weak</code>、
+        文案从灰变红并写明原因、<code>aria-invalid</code> 与 <code>aria-describedby</code> 指向错误说明。
+        顶部的 <code>.callout.danger</code> 做汇总，免得用户在长表单里找不到出错的那一格。
+      </p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

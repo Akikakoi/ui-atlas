@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>杂志编辑风 · 长文版式 · UI 样例</title>
+<style>
+:root{--bg:#fbf7ef;--surface:#fffdf8;--ink:#1a1713;--muted:#6b6357;--accent:#8a1f11;--accent-ink:#ffffff;--line:#ddd4c4;--radius:2px;--radius-sm:2px;--font:Georgia,'Songti SC',serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15.5px;line-height:1.85}
+.wrap{max-width:1040px;margin:0 auto;padding:22px 28px 36px;display:grid;
+  grid-template-columns:104px minmax(0,1fr);gap:0 40px}
+.mast{grid-column:1/-1;display:flex;align-items:baseline;gap:14px;padding-bottom:12px;
+  border-bottom:1px solid var(--line);margin-bottom:28px}
+.mast .b{font-weight:700;font-size:16px}
+.mast nav{margin-left:auto;display:flex;gap:16px;font-size:12px;color:var(--muted)}
+a{color:inherit;text-decoration:none}
+.rail{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  display:grid;gap:8px;align-content:start;padding-top:8px}
+.art{min-width:0;max-width:60ch}
+.eyebrow{margin:0 0 14px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent)}
+h1{margin:0 0 18px;font-size:clamp(28px,4vw,46px);line-height:1.18;letter-spacing:-.02em;font-weight:700;
+  text-wrap:balance}
+.stand{margin:0 0 22px;font-size:17px;line-height:1.8;color:var(--muted)}
+.rule{border:0;border-top:1px solid var(--line);margin:0 0 26px}
+.sec{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;margin:0 0 20px}
+.sec .n{font-size:11px;color:var(--accent);padding-top:7px;font-variant-numeric:tabular-nums}
+.sec p{margin:0;font-size:15px;line-height:1.9}
+.art h2{margin:30px 0 12px;font-size:16px;font-weight:600;letter-spacing:.01em}
+.art .body{margin:0 0 18px;font-size:15.5px;line-height:1.95}
+.art .cols{column-count:2;column-gap:32px;column-rule:1px solid var(--line);max-width:none}
+.art .cols h2{margin-top:0}
+.art:has(.cols){max-width:none}
+.pull{margin:30px 0;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  font-size:17px;line-height:1.75;letter-spacing:-.01em;color:var(--muted)}
+.pull-k{display:block;margin-bottom:8px;font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent)}
+.colophon{grid-column:1/-1;margin-top:34px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--muted);display:flex;gap:14px}
+@media (max-width:820px){
+  .wrap{grid-template-columns:1fr;padding:18px 20px}
+  .rail{grid-auto-flow:column;justify-content:start;gap:14px;padding:0 0 18px}
+  .art{max-width:none}
+}
+
+.hero h1{font-family:Georgia,'Songti SC',serif;font-weight:400;letter-spacing:-.02em;line-height:1.08}
+.hero .lede{font-size:18px;line-height:1.9}
+.hero{max-width:820px}
+.hero h1::first-letter{font-size:1.1em}
+.eyebrow{letter-spacing:.4em;color:#8a1f11;font-size:11px}
+.card{border:0;border-top:2px solid #1a1713;border-radius:0;background:transparent;padding:22px 0 0}
+.row .btn{background:#1a1713;border-radius:0;padding:12px 22px;letter-spacing:.08em;font-size:13px}
+.row .btn.ghost{background:transparent;border:1px solid #1a1713}
+.nav{border-bottom:2px solid #1a1713}
+.panel{border:0;border-top:1px solid #ddd4c4;border-bottom:1px solid #ddd4c4;border-radius:0;background:transparent}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast"><span class="b">纪事 · CHRONICLE</span><nav><a href="#">目录</a><a href="#">归档</a><a href="#">关于</a></nav></header>
+  <aside class="rail"><span>Editorial</span><span>2015–</span><span>8 分钟</span></aside>
+  <article class="art">
+    <p class="eyebrow">杂志编辑风</p>
+    <h1>我们为什么还在做纸质杂志</h1>
+    <p class="stand">第十二期：关于慢下来的那点手艺。</p>
+    <hr class="rule">
+      <p class="body">编辑部在城北一栋老厂房的三层，冬天暖气不热。每期开工那天，我们把上一期的样刊摊满长桌，从第一页翻到最后一页，只用红笔圈出两样东西：哪里读不下去，哪里翻得太快。</p>
+      <p class="body">剩下的活都是慢的。纸选 80g 轻涂，翻页时不该有声音；油墨只用两种，多一种就抢戏；栏宽定死在六十二字，因为再宽一点，眼睛就得回头找下一行。</p>
+      <h2>一期刊物要过多少只手</h2>
+      <p class="body">编辑、校对、印厂师傅、装订工，最后是邮局。每一道都有人签字，签完这一页才算完。有人说这是浪费，我们觉得，签过字的东西才有分量。</p>
+    <p class="pull"><span class="pull-k">别用在这</span>需要快速扫读的数据页：衬线 + 宽字距会拖慢速度。</p>
+  </article>
+  <footer class="colophon"><span>© 2026 纪事 · CHRONICLE</span><span>风格样例 · 非真实刊物</span></footer>
+</div>
+</body>
+</html>

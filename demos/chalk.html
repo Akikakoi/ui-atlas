@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>黑板粉笔 · 海报版式 · UI 样例</title>
+<style>
+:root{--bg:#20302a;--surface:#26382f;--ink:#eef3ea;--muted:#9fb2a6;--accent:#f2d68a;--accent-ink:#0b0b0b;--line:rgba(238,243,234,.28);--radius:2px;--radius-sm:2px;--font:'Segoe UI','PingFang SC',sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font)}
+.poster{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto;padding:24px 40px 22px}
+.p-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:16px;padding-bottom:10px;
+  border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.p-top .b{color:var(--ink);letter-spacing:.1em}
+.p-main{display:grid;grid-template-columns:52px minmax(0,1fr) 176px;gap:20px;align-content:center;padding:34px 0 30px}
+.num{font-size:11.5px;letter-spacing:.12em;color:var(--muted);padding-top:18px}
+h1{margin:0;font-size:clamp(52px,10.4vw,140px);line-height:1.08;letter-spacing:-.05em;font-weight:700;
+  overflow-wrap:anywhere}
+h1 span{display:block}
+.p-side{align-self:end;display:grid;gap:10px;font-size:11.5px;line-height:1.75;color:var(--muted)}
+.p-side .first{color:var(--ink);font-size:12.5px;line-height:1.6}
+.p-rule{height:11px;background:var(--accent);margin-bottom:12px}
+.p-bottom{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;font-size:11px;color:var(--muted)}
+.p-bottom b{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);margin-bottom:4px}
+.sw{display:inline-block;width:10px;height:10px;background:var(--accent);margin-right:6px;vertical-align:-1px}
+@media (max-width:820px){
+  .poster{padding:18px 20px}
+  .p-main{grid-template-columns:1fr;gap:12px}
+  .num{padding-top:0}
+  .p-bottom{grid-template-columns:repeat(2,1fr)}
+}
+
+body{background:
+  radial-gradient(rgba(238,243,234,.07) 1px,transparent 1.5px) 0 0/7px 7px,
+  radial-gradient(80% 60% at 40% 20%,#2c4038,#1a2620 80%)}
+.hero h1{font-weight:400;letter-spacing:.02em;text-shadow:0 0 1px rgba(255,255,255,.4)}
+.hero h1 span{color:#f2d68a}
+.card,.panel{background:transparent;border:1px solid rgba(238,243,234,.28);border-radius:2px;box-shadow:none}
+.card .k{color:#f2d68a}
+.btn{background:#f2d68a;color:#1a2620;border-radius:2px;font-family:inherit}
+.btn.ghost{background:transparent;color:#eef3ea;border:1px solid rgba(238,243,234,.5)}
+.nav{border-bottom:1px solid rgba(238,243,234,.28)}
+.panel{background:rgba(238,243,234,.04)}
+input,select{background:rgba(238,243,234,.06);color:#eef3ea;border:1px solid rgba(238,243,234,.3);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="p-top">
+    <span class="b">黑板 · 04</span>
+    <span>Chalkboard</span>
+    <span>—</span>
+    <span>No.01 / A1</span>
+  </div>
+  <div class="p-main">
+    <div class="num">01</div>
+    <h1><span>今日只剩三样</span></h1>
+    <div class="p-side">
+      <p class="first">南瓜汤、酸面包、手冲。</p>
+      <p>今日 11:00–14:00 · 只做午市</p>
+      <p>主办 / 黑板 · 04</p>
+    </div>
+  </div>
+  <div class="p-rule" aria-hidden="true"></div>
+  <div class="p-bottom">
+    <div><b>字体</b>Segoe UI</div>
+    <div><b>字距</b>−0.05em</div>
+    <div><b>强调色</b><span class="sw"></span>#f2d68a</div>
+    <div><b>版式</b>黑板粉笔</div>
+  </div>
+</div>
+</body>
+</html>

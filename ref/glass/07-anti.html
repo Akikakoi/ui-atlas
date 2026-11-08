@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass 参考实现 · 07 反例</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  /* 这一页的色值故意写死：反例就是「不守 token」的样子。
+     正式页面里出现硬编码颜色，就算 bug。 */
+  .anti { display: grid; gap: var(--space-5); }
+  .case { display: grid; gap: var(--space-3); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+  .cell { border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--line-soft); background: var(--surface-1); }
+  .cell .cap {
+    display: flex; align-items: center; gap: var(--space-2);
+    padding: 6px var(--space-3);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--muted);
+  }
+  .cell.bad .cap { color: var(--danger); }
+  .cell.good .cap { color: var(--ok); }
+  .stage { padding: var(--space-4); min-height: 140px; display: grid; place-items: center; gap: var(--space-2); }
+  .stage.flat { background: #1b1e2b; }
+  .stage.blob {
+    background:
+      radial-gradient(60% 70% at 20% 10%, #3b6bff, transparent 70%),
+      radial-gradient(60% 70% at 85% 90%, #8b5cf6, transparent 70%),
+      #0a0d18;
+  }
+  .pane {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: #eef2ff;
+  }
+  .verdict { font-size: var(--text-sm); color: var(--ink-2); }
+  .verdict b { color: var(--ink); }
+  .verdict .fix { color: var(--ok); }
+  .verdict .why { color: var(--danger); }
+  .rules { display: grid; gap: var(--space-3); counter-reset: r; }
+  .rules li {
+    counter-increment: r;
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+    line-height: var(--lh-loose);
+  }
+  .rules li::before {
+    content: counter(r, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--accent);
+    padding-top: 3px;
+  }
+  .rules b { color: var(--ink); }
+  @media (max-width: 900px) { .pair { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="ref">
+
+<nav class="refnav" aria-label="参考实现页面">
+  <a href="01-workbench.html">01 工作台</a>
+  <a href="02-record.html">02 详情</a>
+  <a href="03-form.html">03 表单</a>
+  <a href="04-states.html">04 状态</a>
+  <a href="05-dialog.html">05 弹窗</a>
+  <a href="06-light.html">06 浅色</a>
+  <a href="07-anti.html" class="is-active">07 反例</a>
+  <a href="08-marketing.html">08 营销</a>
+  <a href="09-auth.html">09 登录</a>
+  <a href="10-mobile.html">10 移动</a>
+  <span class="tag">glass · 反例</span>
+</nav>
+
+<div class="app">
+  <aside class="side">
+    <div class="side-brand"><span class="mark">◆</span> Northwind</div>
+    <div class="side-sec">参考</div>
+    <a class="side-link" href="01-workbench.html">工作台</a>
+    <a class="side-link" href="04-states.html">状态样张</a>
+    <a class="side-link is-active" href="07-anti.html">反例</a>
+    <div class="side-foot">
+      <a class="side-link" href="#"><span class="avatar accent">陈</span> 陈布凡 <span class="count">▾</span></a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb">参考 <span>/</span> <b>反例</b></div>
+      <div class="grow"></div>
+      <span class="badge danger">故意做坏</span>
+    </header>
+
+    <div class="content">
+      <div class="page-head">
+        <div class="grow">
+          <h1>六个做坏的玻璃</h1>
+          <p>左错右对，每一组只差一条规则。这一页的颜色全部硬编码——反例不配用 token。</p>
+        </div>
+      </div>
+
+      <div class="anti">
+
+        <section class="card pad case">
+          <div class="pair">
+            <div class="cell bad">
+              <div class="cap">错 · 纯色底</div>
+              <div class="stage flat">
+                <div class="pane" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(18px)">会员总览 · 3,182</div>
+              </div>
+            </div>
+            <div class="cell good">
+              <div class="cap">对 · 有光斑</div>
+              <div class="stage blob">
+                <div class="pane" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(18px)">会员总览 · 3,182</div>
+              </div>
+            </div>
+          </div>
+          <p class="verdict"><span class="why">坑 01 · 没有可透的内容。</span> 玻璃是把背后的东西磨砂化，背后什么都没有时，它就只是一块更脏的灰。 <span class="fix">修：背景铺两到三团低饱和彩色光斑，且面板要真的压在上面。</span></p>
+        </section>
+
+        <section class="card pad case">
+          <div class="pair">
+            <div class="cell bad">
+              <div class="cap">错 · blur 46 / 边框 .6</div>
+              <div class="stage blob">
+                <div class="pane" style="background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.62);backdrop-filter:blur(46px)">这张卡片的边在哪？</div>
+              </div>
+            </div>
+            <div class="cell good">
+              <div class="cap">对 · blur 18 / 边框 .14</div>
+              <div class="stage blob">
+                <div class="pane" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(18px)">这张卡片的边很清楚</div>
+              </div>
+            </div>
+          </div>
+          <p class="verdict"><span class="why">坑 02 · 两个极端都会毁掉边界。</span> blur 太大，面板和背景糊成一片；边框太亮，眼睛先看到描边，材质反而消失。 <span class="fix">修：blur 12–32px，边框亮度 .10–.24。</span></p>
+        </section>
+
+        <section class="card pad case">
+          <div class="pair">
+            <div class="cell bad">
+              <div class="cap">错 · 三层玻璃叠</div>
+              <div class="stage blob">
+                <div class="pane" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);padding:10px">
+                  <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:10px">
+                    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:8px">包了三层，越里越灰</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="cell good">
+              <div class="cap">对 · 一层玻璃 + 一个实心</div>
+              <div class="stage blob">
+                <div class="pane" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);padding:10px">
+                  <div style="background:#101426;border:1px solid rgba(255,255,255,.10);border-radius:8px;padding:10px">里层用不透明锚点</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="verdict"><span class="why">坑 03 · 半透明叠加是乘法，不是加法。</span> 三层 6% 叠起来是 17%，但每层的模糊各自作用，结果既不通透也不干净。 <span class="fix">修：一屏最多三层玻璃，第三层换 <code>--surface-solid</code>。</span></p>
+        </section>
+
+        <section class="card pad case">
+          <div class="pair">
+            <div class="cell bad">
+              <div class="cap">错 · 白字</div>
+              <div class="stage blob">
+                <button type="button" style="background:#7aa2ff;color:#fff;border:0;border-radius:8px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer">保存更改 · 2.4:1</button>
+              </div>
+            </div>
+            <div class="cell good">
+              <div class="cap">对 · 深字</div>
+              <div class="stage blob">
+                <button type="button" style="background:#7aa2ff;color:#05122e;border:0;border-radius:8px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer">保存更改 · 7.8:1</button>
+              </div>
+            </div>
+          </div>
+          <p class="verdict"><span class="why">坑 04 · 「浅色主色 + 白字」是默认反射，也是默认错误。</span> #7aa2ff 的亮度不低，白字压不住。 <span class="fix">修：主色上放字用 <code>--accent-ink</code>，按亮度取黑或白，别硬编码 #fff。</span></p>
+        </section>
+
+        <section class="card pad case">
+          <div class="pair">
+            <div class="cell bad">
+              <div class="cap">错 · 全部半透明</div>
+              <div class="stage blob">
+                <div style="width:100%;font-size:12px;color:#8b96b8">
+                  <div style="display:flex;justify-content:space-between;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px">
+                    <span>林见夏</span><span>¥ 4,960.00</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px;margin-top:4px">
+                    <span>周叙</span><span>¥ 1,280.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="cell good">
+              <div class="cap">对 · 有不透明锚点</div>
+              <div class="stage blob">
+                <div style="width:100%;font-size:12px;color:#eef2ff;background:#101426;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 4px">
+                  <div style="display:flex;justify-content:space-between;padding:6px 10px"><span>林见夏</span><span>¥ 4,960.00</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:6px 10px;border-top:1px solid rgba(255,255,255,.08)"><span>周叙</span><span>¥ 1,280.00</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="verdict"><span class="why">坑 05 · 数字是最先糊的东西。</span> 表格、金额、时间这类需要精确识别的内容，压在半透明底 + 二级灰字上，每天都在被误读。 <span class="fix">修：数据区用不透明底 + 一级文字色，玻璃留给容器。</span></p>
+        </section>
+
+        <section class="card pad case">
+          <div class="pair">
+            <div class="cell bad">
+              <div class="cap">错 · 三件套齐上</div>
+              <div class="stage blob">
+                <div class="pane" style="background:linear-gradient(135deg,rgba(122,162,255,.55),rgba(192,132,252,.55));border:1px solid rgba(255,255,255,.5);border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.65),0 0 40px rgba(122,162,255,.35);backdrop-filter:blur(24px)">渐变 + 强投影 + 亮边框</div>
+              </div>
+            </div>
+            <div class="cell good">
+              <div class="cap">对 · 只留材质</div>
+              <div class="stage blob">
+                <div class="pane" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.34)">只留磨砂与一条细边</div>
+              </div>
+            </div>
+          </div>
+          <p class="verdict"><span class="why">坑 06 · 三个强调等于没有强调。</span> 渐变、强投影、亮边框同时上，就是「AI 生成落地页」的味道：第一眼惊艳，第三眼廉价。 <span class="fix">修：玻璃只用 blur + 低亮边框 + 一档柔影；颜色留给内容。</span></p>
+        </section>
+      </div>
+
+      <section class="card">
+        <div class="panel-head">
+          <h3>可判定规则</h3>
+          <div class="grow"></div>
+          <span class="badge plain">照着能吵架的那种</span>
+        </div>
+        <div class="pad">
+          <ol class="rules">
+            <li><span>背景至少一处<strong>低饱和彩色光斑</strong>，覆盖 ≥ 25% 面积。纯色底不做玻璃。</span></li>
+            <li><span><strong>blur 12–32px</strong>。低于 12 看不出材质，高于 32 面板边界消失。</span></li>
+            <li><span>面板边框亮度 <strong>rgba(255,255,255,.10–.24)</strong>。> .3 变成描边插画，< .08 变成糊。</span></li>
+            <li><span>一屏最多 <strong>3 层</strong>玻璃；第三层起用 <code>--surface-solid</code> 做锚点。</span></li>
+            <li><span>至少要有一个<strong>不透明锚点</strong>（主按钮 / 图表 / 图片 / 头像），否则整页发飘。</span></li>
+            <li><span>文字对比度按<strong>面板叠底后</strong>的颜色算：正文 ≥ 4.5:1，18px 以上 ≥ 3:1。</span></li>
+            <li><span>阴影只用<strong>大扩散、低透明度</strong>（0 24px 64px rgba(0,0,0,.4) 这一档），不用方向明确的硬投影。</span></li>
+          </ol>
+        </div>
+        <div class="panel-foot t-sm t-muted">
+          反过来，这些场景<b>不要</b>用玻璃：高密度数据录入、低端设备（blur 是 GPU 活）、长文阅读、背景无可透内容。
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

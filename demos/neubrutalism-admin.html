@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新粗野主义 · 后台 · UI 样例</title>
+<style>
+:root{--bg:#f4f0e6;--surface:#fffdf6;--ink:#141414;--muted:#5a564c;--accent:#ff5252;--accent-ink:#ffffff;--line:#141414;--radius:0px;--radius-sm:0px;--font:'Segoe UI','PingFang SC',sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.55}
+.shell{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+.side{background:var(--surface);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:2px}
+.side .brand{font-weight:800;font-size:15.5px;display:flex;gap:9px;align-items:center;padding:6px 10px 4px;color:var(--ink)}
+.side .brand i{width:22px;height:22px;border-radius:var(--radius-sm);background:var(--accent);display:inline-block;flex:0 0 auto}
+.side .grouplbl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);padding:16px 10px 6px}
+.side a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;
+  border-radius:var(--radius-sm);color:var(--muted);text-decoration:none;font-size:13.5px}
+.side a:hover{background:var(--hover,rgba(125,125,125,.14));color:var(--ink)}
+.side a.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.side a em{font-style:normal;font-size:11px;opacity:.7}
+.side .fill{flex:1}
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:12px;padding:16px 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.topbar h1{margin:0;font-size:18.5px;letter-spacing:-.01em}
+.topbar .sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.sp{flex:1}
+.searchbox{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);
+  border-radius:var(--radius-sm);padding:7px 11px;color:var(--muted);font-size:12.5px}
+.body{padding:20px 24px 34px;display:grid;gap:16px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px}
+.stat .lbl{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.stat .num{font-size:25px;font-weight:700;letter-spacing:-.02em;margin:7px 0 3px;font-variant-numeric:tabular-nums}
+.stat .dlt{font-size:11.5px;color:var(--accent)}
+.tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.tbar{display:flex;align-items:center;gap:9px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tbar h2{margin:0;font-size:14px}
+.filt{font:inherit;font-size:12.5px;color:var(--ink);background:var(--field,transparent);
+  border:1px solid var(--line);border-radius:var(--radius-sm);padding:6px 9px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  font-weight:600;padding:10px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--hover,rgba(125,125,125,.10))}
+.who{display:flex;align-items:center;gap:9px}
+.av{width:25px;height:25px;border-radius:999px;background:var(--accent);color:var(--accent-ink);
+  display:grid;place-items:center;font-size:11px;font-weight:700;flex:0 0 auto}
+.num{font-variant-numeric:tabular-nums}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;
+  border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.badge.ok{border-color:var(--accent);color:var(--accent)}
+.badge.warn{border-style:dashed}
+.pager{display:flex;align-items:center;gap:5px;padding:11px 16px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted)}
+.pager button{font:inherit;font-size:12px;min-width:26px;height:26px;border:1px solid var(--line);
+  background:transparent;color:var(--ink);border-radius:var(--radius-sm);cursor:pointer;padding:0 6px}
+.pager button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn{font:inherit;font-size:12.5px;font-weight:600;border:0;background:var(--accent);
+  color:var(--accent-ink);padding:8px 14px;border-radius:var(--radius-sm);cursor:pointer}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);font-weight:500}
+@media (max-width:900px){.shell{grid-template-columns:1fr}.side{display:none}.stats{grid-template-columns:repeat(2,1fr)}}
+
+body{background:#f4f0e6}
+.card,.panel{border:3px solid #141414;box-shadow:6px 6px 0 #141414;border-radius:0}
+.card:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 #141414}
+.btn{border:3px solid #141414;box-shadow:4px 4px 0 #141414;border-radius:0;color:#141414;background:#ffd24a;font-weight:800}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #141414}
+.btn.ghost{background:#fff;border:3px solid #141414}
+.hero h1{font-weight:900;letter-spacing:-.03em;text-transform:uppercase}
+.nav{border-bottom:3px solid #141414}
+
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="brand"><i></i>BRUTAL/01</div>
+    <div class="grouplbl">工作台</div>
+    <a class="on" href="#">总览 <em>24</em></a>
+    <a href="#">订单 <em>1.2k</em></a>
+    <a href="#">客户</a>
+    <a href="#">商品</a>
+    <div class="grouplbl">设置</div>
+    <a href="#">团队成员</a>
+    <a href="#">账单</a>
+    <div class="fill"></div>
+    <a href="#">帮助与反馈</a>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div><h1>订单管理</h1><div class="sub">2026 年 11 月 · 共 1,284 笔</div></div>
+      <div class="sp"></div>
+      <div class="searchbox"><span>⌕</span><span>搜索订单号 / 客户</span></div>
+      <button class="btn ghost">导出 CSV</button>
+      <button class="btn">新建订单</button>
+    </header>
+    <div class="body">
+      <section class="stats">
+        <div class="stat"><div class="lbl">本月 GMV</div><div class="num">¥ 2,418,600</div><div class="dlt">+12.4% 环比</div></div>
+        <div class="stat"><div class="lbl">订单数</div><div class="num">1,284</div><div class="dlt">+6.1% 环比</div></div>
+        <div class="stat"><div class="lbl">客单价</div><div class="num">¥ 1,883</div><div class="dlt">−2.3% 环比</div></div>
+        <div class="stat"><div class="lbl">退款率</div><div class="num">0.82%</div><div class="dlt">−0.14pt</div></div>
+      </section>
+      <section class="tablewrap">
+        <div class="tbar"><h2>最近订单</h2><div class="sp"></div>
+          <select class="filt"><option>全部状态</option><option>待付款</option><option>已发货</option></select>
+          <select class="filt"><option>最近 7 天</option><option>最近 30 天</option></select>
+        </div>
+        <table>
+          <thead><tr><th>客户</th><th>订单号</th><th>金额</th><th>状态</th><th>时间</th></tr></thead>
+          <tbody>
+        <tr><td><span class="who"><span class="av">陈</span>陈一舟</span></td><td class="num">A-2481</td><td class="num">¥ 1,280.00</td><td><span class="badge ok">已付款</span></td><td class="num">11-08 09:12</td></tr>
+        <tr><td><span class="who"><span class="av">林</span>林见夏</span></td><td class="num">A-2480</td><td class="num">¥ 320.00</td><td><span class="badge warn">待付款</span></td><td class="num">11-08 08:47</td></tr>
+        <tr><td><span class="who"><span class="av">周</span>周叙</span></td><td class="num">A-2479</td><td class="num">¥ 4,960.00</td><td><span class="badge ok">已发货</span></td><td class="num">11-07 22:05</td></tr>
+        <tr><td><span class="who"><span class="av">黄</span>黄侃</span></td><td class="num">A-2478</td><td class="num">¥ 88.00</td><td><span class="badge ">已退款</span></td><td class="num">11-07 19:31</td></tr>
+        <tr><td><span class="who"><span class="av">吴</span>吴小满</span></td><td class="num">A-2477</td><td class="num">¥ 2,140.00</td><td><span class="badge ok">已付款</span></td><td class="num">11-07 16:02</td></tr>
+        <tr><td><span class="who"><span class="av">钱</span>钱立言</span></td><td class="num">A-2476</td><td class="num">¥ 640.00</td><td><span class="badge warn">待发货</span></td><td class="num">11-07 11:24</td></tr>
+          </tbody>
+        </table>
+        <div class="pager"><span>显示 1–6 / 1,284</span><div class="sp"></div>
+          <button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>›</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>

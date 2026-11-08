@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI Atlas · 网页 UI 风格图鉴</title>
+<meta name="description" content="60 个网页 UI 风格样例：落地页 / 后台 / App 三种形态，全部颜色与圆角写成 CSS 变量，可实时改、可分享、可导出 Tailwind / shadcn。">
+<link rel="stylesheet" href="site.css?v=11">
+</head>
+<body>
+<a class="skip" href="#grid">跳到图鉴</a>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">◆</span>
+      <div>
+        <h1>UI Atlas</h1>
+        <p><span id="n-sub">60</span> 个 UI 风格样例 · 落地页 / 后台 / App</p>
+      </div>
+    </div>
+    <div class="tools">
+      <input id="q" type="search" placeholder="搜：玻璃、圆角0、深色、等宽…" aria-label="搜索风格、特征或 token">
+      <span class="spacer"></span>
+      <span class="picked" id="picked-info" aria-live="polite">未选</span>
+      <button class="btn primary" id="compare-btn" disabled>对比</button>
+    </div>
+  </div>
+  <div class="filterbar">
+    <div class="fgroup" role="group" aria-label="按分组筛选">
+      <span class="flabel">分组</span>
+      <button class="chip" data-k="group" data-v="" aria-pressed="true">全部 <small id="n-all"></small></button>
+      <button class="chip" data-k="group" data-v="classic" aria-pressed="false">经典 UI <small id="n-classic"></small></button>
+      <button class="chip" data-k="group" data-v="shift" aria-pressed="false">风格平移 <small id="n-shift"></small></button>
+    </div>
+    <div class="fgroup" role="group" aria-label="按形态筛选">
+      <span class="flabel">形态</span>
+      <button class="chip" data-k="form" data-v="" aria-pressed="true">全部 <small id="n-form-all"></small></button>
+      <button class="chip" data-k="form" data-v="landing" aria-pressed="false">落地页 <small id="n-landing"></small></button>
+      <button class="chip" data-k="form" data-v="admin" aria-pressed="false">后台 <small id="n-admin"></small></button>
+      <button class="chip" data-k="form" data-v="app" aria-pressed="false">App <small id="n-app"></small></button>
+    </div>
+    <div class="fgroup" role="group" aria-label="按版式筛选">
+      <span class="flabel">版式</span>
+      <button class="chip" data-k="layout" data-v="" aria-pressed="true">全部</button>
+      <button class="chip" data-k="layout" data-v="landing" aria-pressed="false">落地页 <small id="n-lay-landing"></small></button>
+      <button class="chip" data-k="layout" data-v="grid" aria-pressed="false">网格 <small id="n-lay-grid"></small></button>
+      <button class="chip" data-k="layout" data-v="poster" aria-pressed="false">海报 <small id="n-lay-poster"></small></button>
+      <button class="chip" data-k="layout" data-v="console" aria-pressed="false">控制台 <small id="n-lay-console"></small></button>
+      <button class="chip" data-k="layout" data-v="article" aria-pressed="false">长文 <small id="n-lay-article"></small></button>
+    </div>
+    <div class="fgroup" role="group" aria-label="个人筛选">
+      <span class="flabel">我的</span>
+      <button class="chip" data-k="fav" data-v="1" aria-pressed="false">收藏 <small id="n-fav">0</small></button>
+      <button class="chip" data-k="recent" data-v="1" aria-pressed="false">最近 <small id="n-recent">0</small></button>
+    </div>
+    <span class="spacer"></span>
+    <a class="ref-link" href="ref.html">参考实现 · Glass →</a>
+    <span class="count" id="count-info"></span>
+  </div>
+</header>
+
+<main id="grid" class="grid" aria-live="polite"></main>
+
+<footer class="foot">
+  <p>每个样例都是零依赖单文件 HTML，复制即可用；tokens 与提示词按同一套命名。样例由 <code>tools/gen_demos.py</code> 生成，数据由 <code>tools/check.py</code> 校验。</p>
+  <p>内容为学习与设计参考：所有样例均为本站自行实现，未复制任何第三方站点的代码或素材。</p>
+</footer>
+
+<!-- 详情 -->
+<div class="overlay" id="detail" hidden>
+  <div class="detail-box" role="dialog" aria-modal="true" aria-labelledby="d-name">
+    <header class="detail-head">
+      <div class="detail-title">
+        <h2 id="d-name"></h2>
+        <p id="d-sub"></p>
+      </div>
+      <div class="detail-actions">
+        <a class="btn" id="d-open" target="_blank" rel="noopener">新窗口打开</a>
+        <button class="btn" id="d-share">复制分享链接</button>
+        <button class="btn" id="d-export-btn" aria-expanded="false" aria-controls="d-export">导出 ▾</button>
+        <button class="btn primary" id="d-close">关闭</button>
+      </div>
+    </header>
+    <div class="detail-body">
+      <div class="stage"><iframe id="d-frame" title="风格样例预览"></iframe></div>
+      <aside class="side">
+        <p class="banner" id="d-banner" hidden></p>
+
+        <section>
+          <h3>识别特征</h3>
+          <ul id="d-features"></ul>
+        </section>
+
+        <section>
+          <h3>什么时候不要用</h3>
+          <p class="avoid" id="d-avoid"></p>
+        </section>
+
+        <section>
+          <h3>Tokens <span class="hint">改一下，预览实时变</span></h3>
+          <div class="tokens" id="d-tokens"></div>
+          <p class="contrast" id="d-contrast"></p>
+        </section>
+
+        <section id="d-export" hidden>
+          <h3>导出</h3>
+          <div class="tabs" role="tablist" aria-label="导出格式">
+            <button role="tab" data-fmt="css" aria-selected="true">CSS 变量</button>
+            <button role="tab" data-fmt="tailwind" aria-selected="false">Tailwind</button>
+            <button role="tab" data-fmt="shadcn" aria-selected="false">shadcn</button>
+          </div>
+          <pre id="d-export-code" tabindex="0"></pre>
+          <button class="btn small" id="d-export-copy">复制这段</button>
+        </section>
+
+        <section>
+          <h3>给 AI 的提示词</h3>
+          <pre id="d-prompt" tabindex="0"></pre>
+          <button class="btn small" id="d-copy-prompt">复制提示词</button>
+        </section>
+
+        <section>
+          <h3>来源与依据</h3>
+          <ul class="sources" id="d-sources"></ul>
+        </section>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- 对比 -->
+<div class="overlay" id="compare" hidden>
+  <div class="compare-box" role="dialog" aria-modal="true" aria-labelledby="c-title">
+    <header class="compare-head">
+      <h2 id="c-title">对比</h2>
+      <div class="compare-tools">
+        <label class="switch"><input type="checkbox" id="c-sync" checked> 同步滚动</label>
+        <button class="btn" id="c-diff-toggle" aria-expanded="true" aria-controls="c-diff">差异</button>
+        <button class="btn primary" id="c-close">关闭</button>
+      </div>
+    </header>
+    <p class="c-conclusion" id="c-conclusion"></p>
+    <div class="compare-body" id="c-body"></div>
+    <section class="c-diff" id="c-diff">
+      <table>
+        <caption class="sr">两个风格的 token 差异</caption>
+        <thead><tr><th scope="col">token</th><th scope="col" id="c-th-a">A</th><th scope="col" id="c-th-b">B</th></tr></thead>
+        <tbody id="c-diff-body"></tbody>
+      </table>
+    </section>
+  </div>
+</div>
+
+<script src="app.js?v=8"></script>
+</body>
+</html>

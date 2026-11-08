@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass 参考实现 · 04 状态样张</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body class="ref">
+
+<nav class="refnav" aria-label="参考实现页面">
+  <a href="01-workbench.html">01 工作台</a>
+  <a href="02-record.html">02 详情</a>
+  <a href="03-form.html">03 表单</a>
+  <a href="04-states.html" class="is-active">04 状态</a>
+  <a href="05-dialog.html">05 弹窗</a>
+  <a href="06-light.html">06 浅色</a>
+  <a href="07-anti.html">07 反例</a>
+  <a href="08-marketing.html">08 营销</a>
+  <a href="09-auth.html">09 登录</a>
+  <a href="10-mobile.html">10 移动</a>
+  <span class="tag">glass · 参考实现</span>
+</nav>
+
+<div class="app">
+  <aside class="side">
+    <div class="side-brand"><span class="mark">◆</span> Northwind</div>
+    <div class="side-sec">经营</div>
+    <a class="side-link" href="#">总览</a>
+    <a class="side-link" href="#">会员</a>
+    <a class="side-link" href="#">订单</a>
+    <a class="side-link" href="#">内容</a>
+    <a class="side-link" href="#">工单</a>
+    <div class="side-sec">设置</div>
+    <a class="side-link" href="#">团队</a>
+    <a class="side-link" href="#">账单</a>
+    <div class="side-foot">
+      <a class="side-link" href="#"><span class="avatar accent">陈</span> 陈布凡 <span class="count">▾</span></a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb">组件 <span>/</span> <b>状态样张</b></div>
+      <div class="grow"></div>
+      <button class="btn sm">导出规范</button>
+    </header>
+
+    <div class="content">
+      <div class="page-head">
+        <div class="grow">
+          <h1>状态样张</h1>
+          <p>一个风格能不能立住，看的是状态，不是首屏。这一页把所有「非理想态」摊开。</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <section class="card">
+          <div class="panel-head"><h3>按钮</h3><div class="grow"></div><span class="badge plain">7 态</span></div>
+          <div class="pad stack">
+            <div class="row">
+              <button class="btn primary">主操作</button>
+              <button class="btn">次操作</button>
+              <button class="btn ghost">幽灵</button>
+              <button class="btn quiet">安静</button>
+              <button class="btn danger">删除</button>
+            </div>
+            <div class="row">
+              <button class="btn primary is-loading"><span class="label-txt">提交中</span></button>
+              <button class="btn" disabled>不可用</button>
+              <button class="btn primary sm">小号</button>
+            </div>
+            <p class="note"><b>加载态不改文案宽度：</b>文字变透明、转环占位，按钮不抖。</p>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="panel-head"><h3>输入框</h3><div class="grow"></div><span class="badge plain">7 态</span></div>
+          <div class="pad stack">
+            <div class="field">
+              <label class="label" for="s1">默认</label>
+              <input class="input" id="s1" placeholder="输入内容">
+            </div>
+            <div class="field">
+              <label class="label" for="s2">聚焦</label>
+              <input class="input is-focus" id="s2" value="正在输入">
+            </div>
+            <div class="field is-error">
+              <label class="label" for="s3">错误</label>
+              <input class="input" id="s3" value="not-an-email" aria-invalid="true">
+              <span class="help">邮箱格式不正确</span>
+            </div>
+            <div class="field is-ok">
+              <label class="label" for="s4">成功</label>
+              <input class="input" id="s4" value="lin@studio.cn">
+              <span class="help">✓ 可以使用</span>
+            </div>
+            <div class="field">
+              <label class="label" for="s5">只读</label>
+              <input class="input" id="s5" value="NW-1184 · 提交后不可改" readonly>
+            </div>
+            <div class="field">
+              <label class="label" for="s6">禁用</label>
+              <input class="input" id="s6" value="你没有变更权限" disabled>
+              <span class="help">禁用要能看出「不可点」，只读只是「不可改」。</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="panel-head"><h3>徽章与筛选</h3></div>
+          <div class="pad stack">
+            <div class="row">
+              <span class="badge ok">已续费</span>
+              <span class="badge warn">待付款</span>
+              <span class="badge danger">已流失</span>
+              <span class="badge info">试用中</span>
+              <span class="badge plain">待审核</span>
+            </div>
+            <div class="row">
+              <button class="chip is-active">全部</button>
+              <button class="chip">待付款</button>
+              <button class="chip">已续费</button>
+            </div>
+            <p class="note">状态色只用于状态：五种语义 + 一种中性，不许拿语义色当装饰。</p>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="panel-head"><h3>提示条</h3></div>
+          <div class="pad stack">
+            <div class="callout info"><span class="ic">i</span><span>本月账单将在 3 天后生成。</span></div>
+            <div class="callout ok"><span class="ic">✓</span><span>已保存，2 秒前。</span></div>
+            <div class="callout warn"><span class="ic">!</span><span>席位即将用尽，建议先扩容再邀请。</span></div>
+            <div class="callout danger"><span class="ic">×</span><span>这家客户已被标记为流失。</span></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="panel-head"><h3>加载骨架</h3></div>
+          <div class="pad stack" aria-hidden="true">
+            <div class="skeleton sk-line w40"></div>
+            <div class="skeleton sk-block"></div>
+            <div class="skeleton sk-line w80"></div>
+            <div class="skeleton sk-line w60"></div>
+            <div class="skeleton sk-block"></div>
+          </div>
+          <div class="panel-foot t-xs t-muted">骨架要贴合真实版式，不要放一个圆形的「转圈」了事。</div>
+        </section>
+
+        <section class="card">
+          <div class="panel-head"><h3>轻提示（toast）</h3></div>
+          <div class="pad stack">
+            <div class="toast"><span class="dot"></span><span>订单 NW-1184 已创建</span><span class="undo">查看</span></div>
+            <div class="toast"><span class="dot" style="background:var(--warn)"></span><span>已移入回收站</span><span class="undo">撤销</span></div>
+          </div>
+          <div class="panel-foot t-xs t-muted">可撤销的操作一定给「撤销」，比二次确认弹窗更省事。</div>
+        </section>
+
+        <section class="card">
+          <div class="panel-head"><h3>下拉菜单</h3></div>
+          <div class="pad">
+            <div class="menu">
+              <button type="button">查看详情 <span class="kbd">↵</span></button>
+              <button type="button">复制订单号 <span class="kbd">⌘C</span></button>
+              <button type="button">重新发送账单</button>
+              <div class="sep"></div>
+              <button type="button" class="danger">删除订单</button>
+            </div>
+          </div>
+          <div class="panel-foot t-xs t-muted">浮层用 <code>--surface-3</code> + <code>--blur-lg</code>，比卡片高一档才浮得起来。</div>
+        </section>
+
+        <section class="card">
+          <div class="panel-head"><h3>分页 / 标签页</h3></div>
+          <div class="pad stack">
+            <div class="pager">
+              <button disabled>‹</button>
+              <button class="is-active">1</button>
+              <button>2</button>
+              <button>3</button>
+              <span style="padding:0 var(--space-2)">…</span>
+              <button>12</button>
+              <button>›</button>
+            </div>
+            <div class="tabs" style="padding:0;border-bottom:0">
+              <a href="#" class="is-active">概览</a>
+              <a href="#">订单</a>
+              <a href="#">发票</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" style="grid-column:1/-1">
+          <div class="panel-head"><h3>空态 / 错误 / 无权限</h3><div class="grow"></div><span class="badge plain">三个别混用</span></div>
+          <div class="grid-2" style="padding:var(--space-4);gap:var(--space-4)">
+            <div class="empty">
+              <div class="art"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13h4l2 3h6l2-3h4"/><path d="M5 5h14l2 8v6H3v-6l2-8Z"/></svg></div>
+              <h3>还没有订单</h3>
+              <p>客户第一次下单后会出现在这里。也可以手动创建一笔。</p>
+              <button class="btn primary sm">新建订单</button>
+            </div>
+            <div class="empty">
+              <div class="art"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 20h18.4L12 4Z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg></div>
+              <h3>加载失败</h3>
+              <p>请求超时（30s）。这一屏是错误，不是空数据——别写「暂无数据」。</p>
+              <button class="btn sm">重试</button>
+            </div>
+            <div class="empty" style="grid-column:1/-1">
+              <div class="art"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg></div>
+              <h3>需要管理员权限</h3>
+              <p>你可以查看，但不能修改计费信息。申请权限请联系团队管理员。</p>
+              <button class="btn sm" disabled>申请权限</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <p class="note">
+        <b>为什么这一页比首屏重要：</b>
+        用户对产品的记忆来自空态、错误态和禁用态——首屏只有一次，这些状态每天都在发生。
+        一个风格如果在错误态里认不出来，说明它只是一张壁纸。
+      </p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

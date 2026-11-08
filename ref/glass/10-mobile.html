@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass 参考实现 · 10 移动端</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body class="ref">
+
+<nav class="refnav" aria-label="参考实现页面">
+  <a href="01-workbench.html">01 工作台</a>
+  <a href="02-record.html">02 详情</a>
+  <a href="03-form.html">03 表单</a>
+  <a href="04-states.html">04 状态</a>
+  <a href="05-dialog.html">05 弹窗</a>
+  <a href="06-light.html">06 浅色</a>
+  <a href="07-anti.html">07 反例</a>
+  <a href="08-marketing.html">08 营销</a>
+  <a href="09-auth.html">09 登录</a>
+  <a href="10-mobile.html" class="is-active">10 移动</a>
+  <span class="tag">glass · 390 宽</span>
+</nav>
+
+<main class="content" style="max-width:1140px;margin-inline:auto">
+  <div class="page-head">
+    <div class="grow">
+      <h1>移动端</h1>
+      <p>同一套 tokens，390 宽下必须重新做减法：能不用 blur 的地方就不用。</p>
+    </div>
+  </div>
+
+  <div class="mobile-wrap">
+    <div class="phone">
+      <div class="notch" aria-hidden="true"></div>
+
+      <div class="m-status"><b>9:41</b><span>5G ▪▪▪</span></div>
+
+      <div class="m-head">
+        <div>
+          <div class="hi">早安</div>
+          <h2>陈布凡</h2>
+        </div>
+        <span class="grow"></span>
+        <button class="icon-btn" type="button" aria-label="通知">◔</button>
+      </div>
+
+      <div class="m-body">
+        <div class="m-balance">
+          <div class="cap">本月经常性收入</div>
+          <div class="num">¥ 248,600</div>
+          <div class="spark" aria-hidden="true">
+            <i style="height:40%"></i><i style="height:52%"></i><i style="height:46%"></i><i style="height:61%"></i>
+            <i style="height:58%"></i><i style="height:72%"></i><i class="on" style="height:88%"></i>
+          </div>
+        </div>
+
+        <div class="m-sec"><b>最近订单</b><a href="#">全部 128 笔</a></div>
+
+        <div class="m-list">
+          <div class="m-item">
+            <span class="ic">林</span>
+            <div>
+              <div class="tt">林见夏</div>
+              <div class="mm">团队版 · 12 席</div>
+            </div>
+            <div class="rt">¥ 4,960<span>已续费</span></div>
+          </div>
+          <div class="m-item">
+            <span class="ic">周</span>
+            <div>
+              <div class="tt">周叙</div>
+              <div class="mm">专业版 · 3 席</div>
+            </div>
+            <div class="rt">¥ 1,280<span style="color:var(--warn)">待付款</span></div>
+          </div>
+          <div class="m-item">
+            <span class="ic">黄</span>
+            <div>
+              <div class="tt">黄侃</div>
+              <div class="mm">个人版</div>
+            </div>
+            <div class="rt">¥ 98<span style="color:var(--danger)">已流失</span></div>
+          </div>
+          <div class="m-item">
+            <span class="ic">钱</span>
+            <div>
+              <div class="tt">钱立言</div>
+              <div class="mm">专业版 · 5 席</div>
+            </div>
+            <div class="rt">¥ 2,140<span>试用中</span></div>
+          </div>
+        </div>
+
+        <div class="m-sec"><b>快捷操作</b></div>
+        <div class="m-quick">
+          <button class="m-q" type="button">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            新建订单
+          </button>
+          <button class="m-q" type="button">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg>
+            发账单
+          </button>
+          <button class="m-q" type="button">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M8 12l4 4 4-4"/><path d="M4 20h16"/></svg>
+            导出
+          </button>
+          <button class="m-q" type="button">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg>
+            设置
+          </button>
+        </div>
+
+        <div class="m-sec"><b>本周待办</b><span class="t-xs t-muted t-num">2 / 5</span></div>
+        <div class="progress" style="margin-bottom:var(--space-2)"><span style="width:40%"></span></div>
+      </div>
+
+      <nav class="m-tab" aria-label="底部导航">
+        <a href="#" class="on">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-5v-5H10v5H5a1 1 0 0 1-1-1v-8Z"/></svg>
+          总览
+        </a>
+        <a href="#">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          订单
+        </a>
+        <a href="#">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>
+          报表
+        </a>
+        <a href="#">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.4 3.8-5 7-5s5.8 1.6 7 5"/></svg>
+          我的
+        </a>
+      </nav>
+    </div>
+
+    <div class="m-notes">
+      <div class="card">
+        <h3 style="margin-bottom:var(--space-2)">没有 hover，状态就得换载体</h3>
+        <p class="t-sm t-muted" style="line-height:1.8">
+          桌面上 hover 撑起半个交互反馈，手机上完全没有。这里把反馈放在
+          <b style="color:var(--ink)">按下</b>：列表项从 <code>--surface-1</code> 到 <code>--surface-2</code>，
+          按钮整体降 1px。同时把「状态」永远写成文字（已续费 / 待付款 / 已流失），不靠颜色独撑。
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:var(--space-2)">触摸目标 ≥ 44×44</h3>
+        <p class="t-sm t-muted" style="line-height:1.8">
+          桌面按钮 36px 高就够了；手机上图标按钮要撑到 44，列表行 56 起。
+          这里列表行 58px，底部 tab 每格 44 高——不是审美问题，是手指宽度。
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:var(--space-2)">blur 要省着用</h3>
+        <p class="t-sm t-muted" style="line-height:1.8">
+          整屏 blur 在低端安卓上是真的掉帧。这一屏只有两处用了 blur：
+          收入卡（<code>--blur-md</code>）和底部 tab（<code>--blur-md</code>）；
+          列表项只用半透明底 + 一条细边，不做 backdrop-filter。
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:var(--space-2)">光斑跟着视口，不跟着页面</h3>
+        <p class="t-sm t-muted" style="line-height:1.8">
+          <code>body::before</code> 是 <code>position:fixed</code>，所以滚动时玻璃会「流过」色斑。
+          移动端要用 <code>dvh</code> 而不是 <code>vh</code>，否则地址栏一收一放，光斑会跳。
+        </p>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

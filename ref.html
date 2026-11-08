@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>参考实现 · Glass · UI Atlas</title>
+<meta name="description" content="把一条风格做穿：Glass 的完整 token 体系、7 个真实页面与状态样张、一张反例页和 7 条可判定规则。">
+<link rel="stylesheet" href="site.css?v=11">
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <a class="logo" href="index.html" aria-label="回到图鉴" style="text-decoration:none">◆</a>
+      <div>
+        <h1>参考实现 · Glass</h1>
+        <p>一条风格做穿：token 体系 + 10 个页面 + 反例</p>
+      </div>
+    </div>
+    <div class="tools">
+      <span class="spacer"></span>
+      <a class="btn" href="index.html">← 回到 60 条图鉴</a>
+      <a class="ref-link" href="ref/glass/01-workbench.html" target="_blank" rel="noopener">打开工作台 ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="refwrap">
+  <p class="ref-lead">
+    60 条图鉴解决的是<b>广度</b>：一眼看出风格之间的差别。但图鉴里每一条都只有一个首屏，
+    token 只有 8 个——它告诉你「长什么样」，没告诉你「怎么用」。
+    这一条是<b>深度</b>的模板：完整 token 体系（75 个变量）、十屏覆盖<b>三种产品形态</b>——
+    后台（工作台 / 详情 / 表单 / 状态样张 / 弹窗 / 浅色 / 反例）、公开页（营销 / 登录）、移动端。
+    再加 7 条可以拿去吵架的判定规则。
+  </p>
+
+  <div class="ref-stats">
+    <div class="ref-stat"><b>10</b><span>页面：后台 7 屏 + 营销页 + 登录 + 移动端</span></div>
+    <div class="ref-stat"><b>75</b><span>个 token，分 12 组，换 data-theme 就换主题</span></div>
+    <div class="ref-stat"><b>7</b><span>条判定规则（blur 区间、边框亮度、叠层上限…）</span></div>
+    <div class="ref-stat"><b>6</b><span>个典型坑，左错右对</span></div>
+  </div>
+
+  <div class="ref-sec">
+    <h2>十屏</h2>
+    <span>三种骨架：应用壳 / 公开页 / 手机框。点开即看，零依赖、无脚本</span>
+  </div>
+
+  <div class="screens">
+    <a class="screen" href="ref/glass/01-workbench.html" target="_blank" rel="noopener">
+      <div class="thumb"><iframe src="ref/glass/01-workbench.html" title="工作台预览" loading="lazy" scrolling="no" tabindex="-1"></iframe></div>
+      <div class="meta">
+        <b>01 工作台</b>
+        <p>侧栏 + 指标 + 表格 + 分页。四层玻璃，但只有两个不透明锚点——层级靠不透明度而不是阴影。</p>
+        <em>tokens.css · base.css · components.css</em>
+      </div>
+    </a>
+
+    <a class="screen" href="ref/glass/02-record.html" target="_blank" rel="noopener">
+      <div class="thumb"><iframe src="ref/glass/02-record.html" title="详情页预览" loading="lazy" scrolling="no" tabindex="-1"></iframe></div>
+      <div class="meta">
+        <b>02 详情</b>
+        <p>左栏放事实（键值、订单、备注），右栏放操作（套餐、开关、危险区）。两栏都是同一档玻璃，靠空隙分组。</p>
+        <em>kv · timeline · switch · progress</em>
+      </div>
+    </a>
+
+    <a class="screen" href="ref/glass/03-form.html" target="_blank" rel="noopener">
+      <div class="thumb"><iframe src="ref/glass/03-form.html" title="表单页预览" loading="lazy" scrolling="no" tabindex="-1"></iframe></div>
+      <div class="meta">
+        <b>03 表单</b>
+        <p>错误态同时改四处：边框、外环、文案、aria。顶部做汇总，免得用户在长表单里找不到出错那格。</p>
+        <em>field · is-error / is-ok · readonly / disabled</em>
+      </div>
+    </a>
+
+    <a class="screen" href="ref/glass/04-states.html" target="_blank" rel="noopener">
+      <div class="thumb"><iframe src="ref/glass/04-states.html" title="状态样张预览" loading="lazy" scrolling="no" tabindex="-1"></iframe></div>
+      <div class="meta">
+        <b>04 状态样张</b>
+        <p>按钮 7 态、输入 7 态、空态 / 错误 / 无权限三件套（别混用）、骨架、toast、下拉菜单、分页。</p>
+        <em>全组件 · 非理想态</em>
+      </div>
+    </a>
+
+    <a class="screen" href="ref/glass/05-dialog.html" target="_blank" rel="noopener">
+      <div class="thumb"><iframe src="ref/glass/05-dialog.html" title="弹窗页预览" loading="lazy" scrolling="no" tabindex="-1"></iframe></div>
+      <div class="meta">
+        <b>05 弹窗</b>
+        <p>破坏性操作：遮罩只糊不换色（背景色斑还在），列清单说明后果，输入名称二次确认。</p>
+        <em>backdrop · modal · danger</em>
+      </div>
+    </a>
+
+    <a class="screen" href="ref/glass/06-light.html" target="_blank" rel="noopener">
+      <div class="thumb"><iframe src="ref/glass/06-light.html" title="浅色主题预览" loading="lazy" scrolling="no" tabindex="-1"></iframe></div>
+      <div class="meta">
+        <b>06 浅色</b>
+        <p>同一份 HTML、同一份组件 CSS，只换 <code>data-theme</code>。塌了说明 token 没抽象干净，回去改 token。</p>
+        <em>[data-theme="light"]</em>
+      </div>
+    </a>
+
+    <a class="screen" href="ref/glass/07-anti.html" target="_blank" rel="noopener">
+      <div class="thumb"><iframe src="ref/glass/07-anti.html" title="反例页预览" loading="lazy" scrolling="no" tabindex="-1"></iframe></div>
+      <div class="meta">
+        <b>07 反例</b>
+        <p>六个做坏的玻璃，左错右对，每一对只差一条规则。这页的颜色故意硬编码——反例不配用 token。</p>
+        <em>6 坑 + 7 条判定规则</em>
+      </div>
+    </a>
+
+    <a class="screen" href="ref/glass/08-marketing.html" target="_blank" rel="noopener">
+      <div class="thumb"><iframe src="ref/glass/08-marketing.html" title="营销页预览" loading="lazy" scrolling="no" tabindex="-1"></iframe></div>
+      <div class="meta">
+        <b>08 营销页</b>
+        <p>没有侧栏：透明导航 + 大标题 + 产品截面 + 三档定价（推荐位）+ 原生 <code>details</code> 做 FAQ + 页脚。</p>
+        <em>mk-nav · mock · prices · faq</em>
+      </div>
+    </a>
+
+    <a class="screen" href="ref/glass/09-auth.html" target="_blank" rel="noopener">
+      <div class="thumb"><iframe src="ref/glass/09-auth.html" title="登录页预览" loading="lazy" scrolling="no" tabindex="-1"></iframe></div>
+      <div class="meta">
+        <b>09 登录</b>
+        <p>左右分栏：左品牌区放证言，右玻璃表单。错误态与「显示密码」同框不打架。</p>
+        <em>auth-brand · auth-card · pw</em>
+      </div>
+    </a>
+
+    <a class="screen" href="ref/glass/10-mobile.html" target="_blank" rel="noopener">
+      <div class="thumb"><iframe src="ref/glass/10-mobile.html" title="移动端预览" loading="lazy" scrolling="no" tabindex="-1"></iframe></div>
+      <div class="meta">
+        <b>10 移动端</b>
+        <p>390 宽真机框里做减法：整屏只有两处 blur，列表行 58px 保证手指够得着。</p>
+        <em>phone · m-balance · m-tab</em>
+      </div>
+    </a>
+  </div>
+
+  <div class="ref-sec">
+    <h2>Token 体系</h2>
+    <span>75 个变量，12 组。页面里出现的任何颜色、间距、字号都必须来自这里</span>
+  </div>
+
+  <table class="spec">
+    <thead>
+      <tr><th scope="col">组</th><th scope="col">变量</th><th scope="col" class="n">数量</th><th scope="col">为什么需要这一组</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>底色层级</td>
+        <td><code>--bg</code> <code>--bg-tint-1..3</code> <code>--surface-1/2/3</code> <code>--surface-solid</code> <code>--veil</code> <code>--overlay</code></td>
+        <td class="n">10</td>
+        <td>玻璃的层次来自四档不透明度 + 背景光斑。只有一个 surface 的「玻璃」必然糊成一片灰。</td>
+      </tr>
+      <tr>
+        <td>文字</td>
+        <td><code>--ink</code> <code>--ink-2</code> <code>--muted</code> <code>--muted-strong</code></td>
+        <td class="n">4</td>
+        <td>浅色主题里 muted 必须比深色主题更深，否则在白色玻璃上直接消失。</td>
+      </tr>
+      <tr>
+        <td>主色</td>
+        <td><code>--accent</code> <code>--accent-ink</code> <code>--accent-weak</code> <code>--accent-line</code></td>
+        <td class="n">4</td>
+        <td><code>--accent-ink</code> 是关键：浅主色上必须放深字，硬塞白字是 2.4:1。</td>
+      </tr>
+      <tr>
+        <td>语义色</td>
+        <td><code>--ok / --warn / --danger / --info</code> 各配 <code>-weak</code>，加 <code>--on-danger</code></td>
+        <td class="n">9</td>
+        <td>只用于状态，不用于装饰。徽章、提示条、危险按钮共用同一套。</td>
+      </tr>
+      <tr>
+        <td>线</td>
+        <td><code>--line-soft</code> <code>--line</code> <code>--line-strong</code> <code>--bevel</code></td>
+        <td class="n">4</td>
+        <td>三档边界 + 一条玻璃顶边高光。随手写 rgba 是玻璃变脏的最常见原因。</td>
+      </tr>
+      <tr>
+        <td>玻璃与阴影</td>
+        <td><code>--blur-sm/md/lg</code> <code>--saturate</code> <code>--shadow-1/2/3</code> <code>--glow-accent</code></td>
+        <td class="n">8</td>
+        <td>blur 分三档（10 / 18 / 28），浮层比卡片高两档才浮得起来。</td>
+      </tr>
+      <tr>
+        <td>圆角</td>
+        <td><code>--radius-xs..xl</code> <code>--radius-pill</code></td>
+        <td class="n">6</td>
+        <td>输入框小、卡片中、弹窗大。全站一个圆角值会让层级塌成平的。</td>
+      </tr>
+      <tr>
+        <td>字号</td>
+        <td><code>--text-xs..3xl</code>（8 级）+ 行高 3 档 + 字距 2 档</td>
+        <td class="n">13</td>
+        <td>这是图鉴里最缺的一组：8 个 token 拿不走排版尺度，而风格一半是排版。</td>
+      </tr>
+      <tr>
+        <td>间距</td>
+        <td><code>--space-1..8</code>（4px 基数）</td>
+        <td class="n">8</td>
+        <td>间距是节奏。设计稿与代码对不上，八成是间距没有阶梯。</td>
+      </tr>
+      <tr>
+        <td>字体 / 动效 / 层级</td>
+        <td><code>--font</code> <code>--font-mono</code>；<code>--dur-*</code> <code>--ease</code>；<code>--z-*</code></td>
+        <td class="n">9</td>
+        <td>动效统一到 120 / 180 / 320ms 三档，避免每个组件各写一个 0.2s。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="ref-sec">
+    <h2>判定规则与坑</h2>
+    <span>完整版在 07 反例页</span>
+  </div>
+
+  <div class="ref-two">
+    <div class="panel-simple">
+      <h3>七条可判定规则</h3>
+      <ol>
+        <li>背景至少一处低饱和彩色光斑，覆盖 ≥ 25% 面积；纯色底不做玻璃。</li>
+        <li>blur 12–32px；低于 12 看不出材质，高于 32 边界消失。</li>
+        <li>面板边框亮度 <code>rgba(255,255,255,.10–.24)</code>。</li>
+        <li>一屏最多 3 层玻璃；第三层起用 <code>--surface-solid</code> 做锚点。</li>
+        <li>至少一个不透明锚点（主按钮 / 图表 / 头像），否则整页发飘。</li>
+        <li>文字对比度按面板叠底后算：正文 ≥ 4.5:1，18px 以上 ≥ 3:1。</li>
+        <li>阴影只用大扩散低透明度，不用方向明确的硬投影。</li>
+      </ol>
+    </div>
+    <div class="panel-simple">
+      <h3>六个坑（都在 07 里）</h3>
+      <ul>
+        <li>纯色底上放玻璃 → 变成一块更脏的灰。</li>
+        <li>blur 46 + 边框 .6 → 面板边界直接消失。</li>
+        <li>三层玻璃叠加 → 越往里越脏，既不通透也不干净。</li>
+        <li>浅主色配白字 → 2.4:1，按钮上的字看不清。</li>
+        <li>全屏半透明、没有实心 → 表格里的金额最先被误读。</li>
+        <li>渐变 + 强投影 + 亮边框三件套 → 一眼 AI 模板。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ref-sec">
+    <h2>和图鉴的关系</h2>
+  </div>
+  <p class="ref-lead">
+    这一条不是第 61 条风格，而是<b>模板</b>。它的价值不在「多一个玻璃拟态」，而在验证了一件事：
+    把一条风格做穿需要什么——12 组 token、7 个状态、1 张反例页。
+    如果这个成本可以接受，剩下 47 条就照这个骨架铺；如果太重，就只保留「反例 + 判定规则」这一层，
+    那是性价比最高的部分（每条新增成本约为页面的一半）。
+  </p>
+  <p class="ref-lead" style="margin-top:12px">
+    反过来说，这十屏也暴露了图鉴现在的问题：原来的 60 条共用一套落地页骨架，
+    所以「识别特征」其实只是「首屏识别特征」。真实项目里决定成败的是表格、表单、错误态和弹窗——
+    这些在这次之前一条都没有。
+  </p>
+
+  <footer class="foot" style="max-width:none;padding-left:0;padding-right:0">
+    <p>所有页面均为本站自行实现，无第三方代码或素材。tokens.css / base.css / components.css 可直接整套拿走。</p>
+  </footer>
+</main>
+
+</body>
+</html>

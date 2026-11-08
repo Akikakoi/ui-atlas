@@ -1,0 +1,1985 @@
+{
+  "total": 60,
+  "styles": [
+    {
+      "id": "glass",
+      "name": "玻璃拟态",
+      "name_en": "Glassmorphism",
+      "group": "classic",
+      "era": "2019–",
+      "form": "landing",
+      "layout": "landing",
+      "base": "glass",
+      "tokens": {
+        "bg": "#0b1020",
+        "surface": "rgba(255,255,255,.10)",
+        "ink": "#eef2ff",
+        "muted": "#a9b4d0",
+        "accent": "#7aa2ff",
+        "line": "rgba(255,255,255,.22)",
+        "radius": "20px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "半透明磨砂面板（backdrop-filter blur + saturate）",
+        "背景必须有高饱和光斑才成立",
+        "细亮边（1px rgba 白）替代实色描边",
+        "大圆角 + 低对比阴影，层级靠模糊度区分"
+      ],
+      "prompt": "设计一个玻璃拟态产品页：深色渐变底 + 三团彩色光斑，卡片使用半透明白(10%)、backdrop-filter:blur(18px) saturate(140%)、1px 亮边，圆角 20px，避免实色块与硬阴影。",
+      "sources": [
+        "Frosted glass 材质：随 macOS Big Sur / iOS 14（2020）的视觉语言普及",
+        "“Glassmorphism” 一词由 Michal Malewicz 于 2020 年提出"
+      ],
+      "avoid": "背景没有彩色光斑时不成立——纯色底上的玻璃面板只会变成一层灰雾。",
+      "demo": "demos/glass.html"
+    },
+    {
+      "id": "bento",
+      "name": "Bento 网格",
+      "name_en": "Bento Grid",
+      "group": "classic",
+      "era": "2023–",
+      "form": "landing",
+      "layout": "grid",
+      "base": "bento",
+      "tokens": {
+        "bg": "#0c0d12",
+        "surface": "#16181f",
+        "ink": "#f2f4f8",
+        "muted": "#8b93a7",
+        "accent": "#a3e635",
+        "line": "#262a35",
+        "radius": "22px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "大小不等的圆角方格拼成一屏",
+        "每格只讲一件事，图标 + 一个数字",
+        "深底 + 一个荧光强调色",
+        "圆角统一 20–24px，格间距 12–16px"
+      ],
+      "prompt": "用 Bento 网格做产品介绍：深色底、圆角 22px 的卡片大小交错（2x2 + 1x1 + 1x2），每格一个指标或一句话，强调色荧光绿，格间距 14px。",
+      "sources": [
+        "Bento 便当盒布局，2022 年随 Apple 产品页回归",
+        "日式便当的分格逻辑 + Bento Grid 设计体系"
+      ],
+      "avoid": "层级超过两层的内容：大小交错的格子会让人找不到入口。",
+      "demo": "demos/bento.html"
+    },
+    {
+      "id": "neubrutalism",
+      "name": "新粗野主义",
+      "name_en": "Neubrutalism",
+      "group": "classic",
+      "era": "2022–",
+      "form": "landing",
+      "layout": "landing",
+      "base": "neubrutalism",
+      "tokens": {
+        "bg": "#f4f0e6",
+        "surface": "#fffdf6",
+        "ink": "#141414",
+        "muted": "#5a564c",
+        "accent": "#ff5252",
+        "line": "#141414",
+        "radius": "0px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "3px 纯黑描边 + 6px 硬投影（无模糊）",
+        "零圆角，色块直接撞色",
+        "粗黑标题，字重对比极端",
+        "交互靠位移：hover 时卡片向左上挪 2px"
+      ],
+      "prompt": "做一套新粗野主义界面：米白底、3px 黑边、6px 硬阴影（无 blur）、零圆角，主色 #ff5252，标题超粗，hover 时元素位移 2px，不要渐变与柔阴影。",
+      "sources": [
+        "Web Brutalism 的回潮，2021 年后由 Gumroad、Gather 等产品带火",
+        "新粗野主义（Neubrutalism）设计标签"
+      ],
+      "avoid": "信息密集的后台或表单页：粗边与硬阴影会把密度压成噪声。",
+      "demo": "demos/neubrutalism.html"
+    },
+    {
+      "id": "clay",
+      "name": "粘土拟态",
+      "name_en": "Claymorphism",
+      "group": "classic",
+      "era": "2022–",
+      "form": "landing",
+      "layout": "grid",
+      "base": "clay",
+      "tokens": {
+        "bg": "#eef1ff",
+        "surface": "#f7f8ff",
+        "ink": "#2b3152",
+        "muted": "#767ea6",
+        "accent": "#7c5cff",
+        "line": "#dfe3fb",
+        "radius": "28px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "超大圆角 + 双层阴影（外投影 + 内高光）",
+        "糖果色、低饱和底",
+        "元素像软糖，按下会有回弹感",
+        "阴影方向统一（左上高光、右下投影）"
+      ],
+      "prompt": "做粘土拟态界面：浅色底、圆角 28px、每个元素用 outer shadow + inset 高光做出软糖感，强调色糖果紫，按下时缩放 0.97 回弹。",
+      "sources": [
+        "Claymorphism（2022 年在 Dribbble 兴起）",
+        "糖果色软体 3D 插画"
+      ],
+      "avoid": "企业后台表格：双层阴影会让密集行距显脏。",
+      "demo": "demos/clay.html"
+    },
+    {
+      "id": "skeuo",
+      "name": "拟物主义",
+      "name_en": "Skeuomorphism",
+      "group": "classic",
+      "era": "2007–2013",
+      "form": "landing",
+      "layout": "landing",
+      "base": "skeuo",
+      "tokens": {
+        "bg": "#3b2f27",
+        "surface": "#f3ead7",
+        "ink": "#3a2d22",
+        "muted": "#7c6a56",
+        "accent": "#b8863b",
+        "line": "#c9b794",
+        "radius": "8px",
+        "font": "Georgia,'Songti SC',serif"
+      },
+      "features": [
+        "皮革 / 木纹 / 金属质感，材质即隐喻",
+        "按钮有凸起 + 高光 + 内阴影",
+        "衬线字 + 金色描边标题",
+        "纹理用 CSS 渐变模拟，不引入图片"
+      ],
+      "prompt": "做拟物风格界面：深木色背景 + 米色纸质面板、按钮做凸起（渐变 + inset 高光 + 外投影）、金色描边标题，衬线字体，材质靠 CSS 渐变模拟。",
+      "sources": [
+        "1990s–2010s 拟物界面（皮革、木纹、金属）",
+        "iOS 6 及更早的视觉语言"
+      ],
+      "avoid": "需要多主题或暗色适配的场景：材质隐喻一旦被压平成色块就失真。",
+      "demo": "demos/skeuo.html"
+    },
+    {
+      "id": "editorial",
+      "name": "杂志编辑风",
+      "name_en": "Editorial",
+      "group": "classic",
+      "era": "2015–",
+      "form": "landing",
+      "layout": "article",
+      "base": "editorial",
+      "tokens": {
+        "bg": "#fbf7ef",
+        "surface": "#fffdf8",
+        "ink": "#1a1713",
+        "muted": "#6b6357",
+        "accent": "#8a1f11",
+        "line": "#ddd4c4",
+        "radius": "2px",
+        "font": "Georgia,'Songti SC',serif"
+      },
+      "features": [
+        "大号衬线标题 + 极宽字距的栏目名",
+        "正文限宽 62–68ch，行高 1.8",
+        "细发丝线分隔，几乎不用阴影",
+        "首字下沉 / 引文缩进等排印细节"
+      ],
+      "prompt": "做一本杂志的专题页：米白纸感底、衬线大标题、栏目名宽字距、发丝线分隔、正文限宽 65ch、首字下沉，只用一种深红做强调，不要阴影和圆角。",
+      "sources": [
+        "杂志与报纸排印传统（Editorial Design）",
+        "衬线长文版式与首字下沉、引文缩进"
+      ],
+      "avoid": "需要快速扫读的数据页：衬线 + 宽字距会拖慢速度。",
+      "demo": "demos/editorial.html"
+    },
+    {
+      "id": "kids",
+      "name": "儿童 / 亲子",
+      "name_en": "Playful Kids",
+      "group": "classic",
+      "era": "—",
+      "form": "landing",
+      "layout": "landing",
+      "base": "kids",
+      "tokens": {
+        "bg": "#fff6e5",
+        "surface": "#fffdf7",
+        "ink": "#2b2b2b",
+        "muted": "#7a6a58",
+        "accent": "#ff5a5f",
+        "line": "#ffd166",
+        "radius": "24px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "高饱和三原色 + 超大字",
+        "厚圆角、粗描边、块状阴影",
+        "元素轻微旋转，像贴纸",
+        "形状比文字更重要"
+      ],
+      "prompt": "做儿童亲子页：奶油底、三原色点缀、24px 大圆角、3px 彩色描边、卡片轻微旋转像贴纸、按钮圆胖、字号偏大。",
+      "sources": [
+        "儿童教育与亲子产品插画",
+        "贴纸、蜡笔、三原色"
+      ],
+      "avoid": "面向成人的工具产品：高饱和与大圆角会被当成玩具。",
+      "demo": "demos/kids.html"
+    },
+    {
+      "id": "swiss",
+      "name": "瑞士国际主义",
+      "name_en": "Swiss / International",
+      "group": "classic",
+      "era": "1950–",
+      "form": "landing",
+      "layout": "poster",
+      "base": "swiss",
+      "tokens": {
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "ink": "#111111",
+        "muted": "#6b6b6b",
+        "accent": "#e2001a",
+        "line": "#111111",
+        "radius": "0px",
+        "font": "'Helvetica Neue',Arial,'PingFang SC',sans-serif"
+      },
+      "features": [
+        "严格网格对齐，左对齐到发指",
+        "无衬线 + 极端字号对比（80px 配 12px）",
+        "只用黑、白、一个红",
+        "零圆角零阴影，靠线和留白分区"
+      ],
+      "prompt": "用瑞士国际主义排版做页面：纯白底、Helvetica、12 栏网格、标题大到 80px、只用黑与红 #e2001a、零圆角零阴影，大量留白，元素严格左对齐。",
+      "sources": [
+        "瑞士国际主义平面设计（1950s，Josef Müller-Brockmann 等）",
+        "Helvetica 与 12 栏网格体系"
+      ],
+      "avoid": "儿童或娱乐产品：秩序感会显得冷。",
+      "demo": "demos/swiss.html"
+    },
+    {
+      "id": "cozy",
+      "name": "温暖小店",
+      "name_en": "Cozy Shop",
+      "group": "classic",
+      "era": "—",
+      "form": "landing",
+      "layout": "landing",
+      "base": "cozy",
+      "tokens": {
+        "bg": "#f6efe6",
+        "surface": "#fffaf3",
+        "ink": "#3a2c22",
+        "muted": "#8a7462",
+        "accent": "#8a5a3b",
+        "line": "#e8dccb",
+        "radius": "18px",
+        "font": "Georgia,'Songti SC',serif"
+      },
+      "features": [
+        "奶油 + 咖啡棕 + 木质暖调",
+        "大圆角、柔和投影、衬线标题",
+        "手写感的短句，像店招",
+        "图片位留白，不要密集排版"
+      ],
+      "prompt": "做温暖小店页：奶油底、咖啡棕主色、18px 圆角、柔和投影、衬线标题 + 手写感短句、宽松行距。",
+      "sources": [
+        "社区咖啡馆的店招与菜单",
+        "奶油 + 咖啡棕的暖调器物"
+      ],
+      "avoid": "效率工具：柔和色调会让「快」这件事说不出口。",
+      "demo": "demos/cozy.html"
+    },
+    {
+      "id": "material",
+      "name": "Material You",
+      "name_en": "Material 3",
+      "group": "classic",
+      "era": "2021–",
+      "form": "landing",
+      "layout": "grid",
+      "base": "material",
+      "tokens": {
+        "bg": "#f7f2fa",
+        "surface": "#f3edf7",
+        "ink": "#1d1b20",
+        "muted": "#49454f",
+        "accent": "#6750a4",
+        "line": "#e8def8",
+        "radius": "28px",
+        "font": "Roboto,'PingFang SC',sans-serif"
+      },
+      "features": [
+        "色调化表面：底与卡片同色系，靠 tonal 层次区分",
+        "超大圆角（28px）+ 药丸按钮",
+        "主色只出现在填充按钮与标签上",
+        "阴影极浅，靠色块分层"
+      ],
+      "prompt": "做 Material You 风格：底色 #f7f2fa，卡片用同色系 tonal 面 #f3edf7、圆角 28px、阴影极浅；按钮为药丸形主色填充；强调色 #6750a4 只用于按钮与标签。",
+      "sources": [
+        "Google Material Design 3 / Material You（2021）",
+        "动态取色（monet）体系"
+      ],
+      "avoid": "品牌主色强烈的产品：色调化会稀释品牌识别。",
+      "demo": "demos/material.html"
+    },
+    {
+      "id": "techblue",
+      "name": "企业科技蓝",
+      "name_en": "Enterprise SaaS",
+      "group": "classic",
+      "era": "2008–",
+      "form": "landing",
+      "layout": "landing",
+      "base": "techblue",
+      "tokens": {
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "ink": "#0b1b3a",
+        "muted": "#5a6b88",
+        "accent": "#2f6ad8",
+        "line": "#e6ebf5",
+        "radius": "12px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "白底 + 蓝，最“安全”的企业观感",
+        "卡片浅边框 + 轻投影，12px 圆角",
+        "标题左对齐、正文两行以内",
+        "蓝色渐变按钮 + 次级描边按钮"
+      ],
+      "prompt": "做企业 SaaS 落地页：白底、深蓝字、12px 圆角卡片 + 浅边框轻投影、蓝色渐变主按钮、稳重的字号阶梯。",
+      "sources": [
+        "企业 SaaS 官网（2008 年后的标准形态）",
+        "白底深蓝 + 蓝色渐层按钮"
+      ],
+      "avoid": "消费级或创意产品：安全即是平庸。",
+      "demo": "demos/techblue.html"
+    },
+    {
+      "id": "rawhtml",
+      "name": "裸 HTML",
+      "name_en": "Raw HTML",
+      "group": "classic",
+      "era": "1993–",
+      "form": "landing",
+      "layout": "article",
+      "base": "rawhtml",
+      "tokens": {
+        "bg": "#ffffff",
+        "surface": "#fafafa",
+        "ink": "#000000",
+        "muted": "#333333",
+        "accent": "#0000ee",
+        "line": "#cccccc",
+        "radius": "0px",
+        "font": "'Times New Roman',serif"
+      },
+      "features": [
+        "几乎不写样式：默认字体、蓝色下划线链接",
+        "灰色分隔线、系统默认按钮",
+        "信息密度高，没有卡片阴影",
+        "关键是“不修饰”的分寸感"
+      ],
+      "prompt": "做裸 HTML 风格：白底、Times 衬线默认字、蓝色带下划线链接、1px 灰线分隔、浏览器默认按钮外观、零圆角零阴影，不要任何装饰。",
+      "sources": [
+        "1993–1996 年的第一批网页",
+        "浏览器默认样式本身（UA stylesheet）"
+      ],
+      "avoid": "有品牌表达需求的商业页面：它唯一的价值就是「不做」。",
+      "demo": "demos/rawhtml.html"
+    },
+    {
+      "id": "y2k",
+      "name": "Y2K 千禧",
+      "name_en": "Y2K",
+      "group": "classic",
+      "era": "1998–2003",
+      "form": "landing",
+      "layout": "poster",
+      "base": "y2k",
+      "tokens": {
+        "bg": "#dbe4ff",
+        "surface": "#eef2ff",
+        "ink": "#161a3a",
+        "muted": "#5a6294",
+        "accent": "#ff3ea5",
+        "line": "#9aa8e0",
+        "radius": "10px",
+        "font": "'Trebuchet MS','PingFang SC',sans-serif"
+      },
+      "features": [
+        "金属 / 镭射渐变 + 星星闪光",
+        "窗口边框：标题栏 + 立体按钮",
+        "斜体粗字 + 宽字距",
+        "高饱和粉 / 蓝撞色，允许一点“过度设计”"
+      ],
+      "prompt": "做 Y2K 风格页面：镭射渐变背景 + 星星闪光、窗口式卡片（标题栏 + 立体按钮）、斜体粗标题、金属质感文字（background-clip:text），粉蓝撞色。",
+      "sources": [
+        "Y2K 千禧美学（1998–2003）",
+        "金属镭射、星星闪光、Windows 98 窗口形态"
+      ],
+      "avoid": "金融或医疗信息页：可读性会被装饰牺牲。",
+      "demo": "demos/y2k.html"
+    },
+    {
+      "id": "saasgrad",
+      "name": "SaaS 渐变",
+      "name_en": "SaaS Gradient",
+      "group": "classic",
+      "era": "2020–",
+      "form": "landing",
+      "layout": "landing",
+      "base": "saasgrad",
+      "tokens": {
+        "bg": "#0b0716",
+        "surface": "rgba(255,255,255,.06)",
+        "ink": "#f5f3ff",
+        "muted": "#b4a8d4",
+        "accent": "#8b5cf6",
+        "line": "rgba(167,139,250,.32)",
+        "radius": "16px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "紫粉渐变光晕 + 深底",
+        "渐变文字标题、发光按钮",
+        "悬浮卡片轻微倾斜/重叠",
+        "一句话价值主张 + 一个 CTA"
+      ],
+      "prompt": "做 SaaS 渐变风：深紫黑底 + 顶部紫色光晕、渐变文字标题、发光渐变按钮、半透明卡片带紫边，一句话主张。",
+      "sources": [
+        "深色 SaaS 渐变落地页（2020 年后 Stripe / Linear 一系）",
+        "紫粉光晕 + 渐变文字"
+      ],
+      "avoid": "金融、政务等需要稳重感的场景：光晕会被读成不严肃。",
+      "demo": "demos/saasgrad.html"
+    },
+    {
+      "id": "fluent",
+      "name": "Fluent 亚克力",
+      "name_en": "Fluent / Acrylic",
+      "group": "classic",
+      "era": "2017–",
+      "form": "landing",
+      "layout": "grid",
+      "base": "fluent",
+      "tokens": {
+        "bg": "#f3f2f1",
+        "surface": "#ffffff",
+        "ink": "#201f1e",
+        "muted": "#605e5c",
+        "accent": "#0078d4",
+        "line": "#e1dfdd",
+        "radius": "8px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "亚克力材质：半透明白 + 强背景模糊",
+        "4–8px 小圆角，克制的边框",
+        "强调色只做按钮与焦点下划线",
+        "层与层之间靠 1px 亮边 + 淡阴影"
+      ],
+      "prompt": "做 Fluent 亚克力界面：浅灰底 + 彩色微光背景，面板用半透明白 + backdrop-filter blur(20px)、1px 亮边、8px 圆角，强调色 #0078d4 只用于主按钮。",
+      "sources": [
+        "Microsoft Fluent Design（2017）的 Acrylic 材质",
+        "Windows 11 的 Mica 层"
+      ],
+      "avoid": "背景本身是纯色时：亚克力需要底下有内容才有意义。",
+      "demo": "demos/fluent.html"
+    },
+    {
+      "id": "japandi",
+      "name": "侘寂 × 北欧",
+      "name_en": "Japandi",
+      "group": "classic",
+      "era": "2018–",
+      "form": "landing",
+      "layout": "article",
+      "base": "japandi",
+      "tokens": {
+        "bg": "#f4efe8",
+        "surface": "#faf6f0",
+        "ink": "#2f3330",
+        "muted": "#7b7a70",
+        "accent": "#6b7a5e",
+        "line": "#e3dcd2",
+        "radius": "2px",
+        "font": "'Songti SC',Georgia,serif"
+      },
+      "features": [
+        "米白 + 炭黑 + 一点苔绿，几乎无饱和色",
+        "大留白、1px 发丝线、零阴影",
+        "衬线标题 + 无衬线正文，字距松",
+        "材质感来自纸色与亚光，不是纹理图"
+      ],
+      "prompt": "做 Japandi 风：米白底、炭黑字、苔绿点缀，1px 发丝线、零阴影、小圆角，衬线标题 + 松字距，大留白。",
+      "sources": [
+        "Japandi：日式侘寂 + 北欧功能主义",
+        "亚光纸色与发丝线"
+      ],
+      "avoid": "需要强转化的活动页：克制与转化率天然矛盾。",
+      "demo": "demos/japandi.html"
+    },
+    {
+      "id": "antidesign",
+      "name": "反设计",
+      "name_en": "Anti-design",
+      "group": "classic",
+      "era": "2016–",
+      "form": "landing",
+      "layout": "poster",
+      "base": "antidesign",
+      "tokens": {
+        "bg": "#fffdf0",
+        "surface": "#e8ffe8",
+        "ink": "#111111",
+        "muted": "#4a4a3a",
+        "accent": "#ff00aa",
+        "line": "#111111",
+        "radius": "0px",
+        "font": "'PingFang SC',sans-serif"
+      },
+      "features": [
+        "故意冲突：字体混搭、颜色撞车、块面歪斜",
+        "波浪下划线、点状描边、贴纸感",
+        "拒绝统一栅格，但信息仍然清楚",
+        "少量即可，整页都乱就变成噪声"
+      ],
+      "prompt": "做反设计风：米色底、粉绿撞色、块面轻微旋转 1–2 度、点状描边、波浪下划线、标题用衬线 + 正文无衬线混搭，保留可读性。",
+      "sources": [
+        "Anti-design（2016 年后）",
+        "朋克拼贴与迷幻海报"
+      ],
+      "avoid": "任何需要长期使用的产品：冲突感在第二次访问就开始消耗耐心。",
+      "demo": "demos/antidesign.html"
+    },
+    {
+      "id": "corporatememphis",
+      "name": "企业孟菲斯",
+      "name_en": "Corporate Memphis",
+      "group": "classic",
+      "era": "2019–",
+      "form": "landing",
+      "layout": "landing",
+      "base": "corporatememphis",
+      "tokens": {
+        "bg": "#ffffff",
+        "surface": "#f4f5ff",
+        "ink": "#1b1c26",
+        "muted": "#6c7186",
+        "accent": "#4a5ee5",
+        "line": "#e6e8f5",
+        "radius": "32px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "扁平矢量色块，无描边无渐变",
+        "超大圆角（24–32px）与圆润的胶囊按钮",
+        "蓝紫主色 + 珊瑚 / 薄荷两枚粉彩辅色",
+        "人物肢体被几何化、比例夸张"
+      ],
+      "prompt": "做 Corporate Memphis 风格：白底、扁平色块无描边、32px 大圆角、主色 #4a5ee5 配珊瑚 #ff6b5b 与薄荷 #7fd6c2、装饰只用圆与半圆，禁止渐变与阴影。",
+      "sources": [
+        "Corporate Memphis / Allegria 插画风格（2019 年后被科技公司大量采用）",
+        "扁平几何人物与粉彩色块"
+      ],
+      "avoid": "需要表达专业深度的产品：过度使用后它已经成了「廉价感」符号。",
+      "demo": "demos/corporatememphis.html"
+    },
+    {
+      "id": "aurora",
+      "name": "极光渐变",
+      "name_en": "Aurora Gradient",
+      "group": "classic",
+      "era": "2021–",
+      "form": "landing",
+      "layout": "grid",
+      "base": "aurora",
+      "tokens": {
+        "bg": "#080b16",
+        "surface": "rgba(255,255,255,.05)",
+        "ink": "#eaf0ff",
+        "muted": "#9aa6c8",
+        "accent": "#5b6cff",
+        "line": "rgba(255,255,255,.14)",
+        "radius": "16px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "深底 + 2–3 团大范围彩色渐变（极光）",
+        "卡片用 5% 白 + 1px 亮边，透出背景",
+        "按钮用渐变色而非单色",
+        "渐变要慢、要大、要低饱和"
+      ],
+      "prompt": "做极光渐变风：深蓝黑底 + 3 团大半径低饱和渐变（蓝/青/紫）、卡片 5% 白 + 1px 亮边 + 背景模糊、主按钮用双色渐变。",
+      "sources": [
+        "极光渐变（2021 年后 SaaS 落地页常见）",
+        "大面积低饱和径向渐变 + 玻璃卡片"
+      ],
+      "avoid": "暗环境下长时间阅读：低对比渐变底会持续分心。",
+      "demo": "demos/aurora.html"
+    },
+    {
+      "id": "mono",
+      "name": "单色极简",
+      "name_en": "Monochrome",
+      "group": "classic",
+      "era": "—",
+      "form": "landing",
+      "layout": "article",
+      "base": "mono",
+      "tokens": {
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "ink": "#111111",
+        "muted": "#6b6b6b",
+        "accent": "#111111",
+        "line": "#111111",
+        "radius": "0px",
+        "font": "'Helvetica Neue',Arial,sans-serif"
+      },
+      "features": [
+        "只有黑白，靠字号与线条建立层级",
+        "1px 实线分区，零阴影零圆角",
+        "大标题 + 小标签，中间没有过渡",
+        "留白是最主要的“颜色”"
+      ],
+      "prompt": "做单色极简页：纯白底、纯黑字、1px 实线分区、零圆角零阴影，只用字号/字重/留白建立层级，不使用任何彩色。",
+      "sources": [
+        "瑞士单色排印",
+        "黑白摄影画册版式"
+      ],
+      "avoid": "层级超过三层的界面：没有颜色，层级只能靠间距，容易失控。",
+      "demo": "demos/mono.html"
+    },
+    {
+      "id": "vaporwave",
+      "name": "蒸汽波",
+      "name_en": "Vaporwave",
+      "group": "classic",
+      "era": "2010–",
+      "form": "landing",
+      "layout": "poster",
+      "base": "vaporwave",
+      "tokens": {
+        "bg": "#2b1055",
+        "surface": "rgba(20,8,40,.55)",
+        "ink": "#ffe9ff",
+        "muted": "#c8a8e8",
+        "accent": "#ff77c8",
+        "line": "rgba(255,119,200,.45)",
+        "radius": "0px",
+        "font": "Georgia,'PingFang SC',serif"
+      },
+      "features": [
+        "粉紫渐变 + 网格地平线 + 夕阳圆盘",
+        "标题斜体、双色描边、轻微抖动",
+        "半透明深色面板 + 霓虹描边",
+        "允许俗气：这是风格的一部分"
+      ],
+      "prompt": "做蒸汽波页面：深紫到粉的渐变、透视网格地平线、斜体标题带粉/青双色偏移描边、半透明深紫面板 + 霓虹边，允许俗气。",
+      "sources": [
+        "Vaporwave / 蒸汽波（2010 年代网络亚文化）",
+        "Windows 95 与罗马雕塑拼贴"
+      ],
+      "avoid": "正式商务场景：它的表达是刻意的过时。",
+      "demo": "demos/vaporwave.html"
+    },
+    {
+      "id": "scandi",
+      "name": "北欧 Scandi",
+      "name_en": "Scandi",
+      "group": "classic",
+      "era": "2010–",
+      "form": "landing",
+      "layout": "landing",
+      "base": "scandi",
+      "tokens": {
+        "bg": "#f6f4ef",
+        "surface": "#ffffff",
+        "ink": "#2b2a26",
+        "muted": "#7b786f",
+        "accent": "#7c8b6b",
+        "line": "#e6e2d8",
+        "radius": "6px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "米白 + 浅木 + 一点苔绿",
+        "1px 细边、几乎无阴影，靠空隙分区",
+        "字号偏小、行高 1.8，留白占一半",
+        "像家具目录：物品少、间距大"
+      ],
+      "prompt": "做北欧 Scandi 风：米白底、苔绿点缀、1px 细边、6px 小圆角、无阴影、字号偏小行高 1.8、大留白。",
+      "sources": [
+        "北欧设计（Scandinavian Design）",
+        "浅木、米白、苔绿的日常器物"
+      ],
+      "avoid": "需要在嘈杂环境抢注意力的广告页：克制等于低音量。",
+      "demo": "demos/scandi.html"
+    },
+    {
+      "id": "dashboard",
+      "name": "数据看板",
+      "name_en": "Analytics Dashboard",
+      "group": "classic",
+      "era": "—",
+      "form": "landing",
+      "layout": "grid",
+      "base": "dashboard",
+      "tokens": {
+        "bg": "#0b0f14",
+        "surface": "#121821",
+        "ink": "#e6edf6",
+        "muted": "#8b98a8",
+        "accent": "#2f9e44",
+        "line": "#1f2a36",
+        "radius": "6px",
+        "font": "'Segoe UI',Consolas,sans-serif"
+      },
+      "features": [
+        "深色底 + 高密度信息，一格一个指标",
+        "数字用等宽、大字号，标签小写大写",
+        "涨跌用绿/红，但只占很小面积",
+        "卡片描边 1px，无阴影，像监控面板"
+      ],
+      "prompt": "做数据看板：深色底、1px 边框卡片、等宽大数字 + 小标签、涨跌色只用在数字上、密度高但间距统一。",
+      "sources": [
+        "运维监控面板（Grafana 一系）",
+        "金融终端的信息密度与等宽数字"
+      ],
+      "avoid": "营销页面：深色高密度会让人以为进了老后台。",
+      "demo": "demos/dashboard.html"
+    },
+    {
+      "id": "docs",
+      "name": "文档站",
+      "name_en": "Documentation",
+      "group": "classic",
+      "era": "—",
+      "form": "landing",
+      "layout": "article",
+      "base": "docs",
+      "tokens": {
+        "bg": "#ffffff",
+        "surface": "#f7f8fa",
+        "ink": "#111827",
+        "muted": "#6b7280",
+        "accent": "#2563eb",
+        "line": "#e5e7eb",
+        "radius": "6px",
+        "font": "-apple-system,'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "窄正文栏（≤ 72ch）+ 小标题层级",
+        "侧栏导航感：细线、灰底、当前项高亮",
+        "代码块与行内 code 是主角",
+        "克制：圆角小、阴影几乎没有"
+      ],
+      "prompt": "做文档站页面：白底、正文限宽 72ch、左侧细线导航、卡片用浅灰底 1px 边、代码块突出、强调色仅用于链接与当前项。",
+      "sources": [
+        "技术文档站形态（Stripe / Vercel Docs 一系）",
+        "72ch 正文栏 + 代码块优先"
+      ],
+      "avoid": "品牌展示页：文档式的克制会被读成「没设计」。",
+      "demo": "demos/docs.html"
+    },
+    {
+      "id": "luxury",
+      "name": "奢侈品",
+      "name_en": "Luxury",
+      "group": "classic",
+      "era": "—",
+      "form": "landing",
+      "layout": "poster",
+      "base": "luxury",
+      "tokens": {
+        "bg": "#0b0b0b",
+        "surface": "#111111",
+        "ink": "#f5f1e8",
+        "muted": "#a39a86",
+        "accent": "#c8a86a",
+        "line": "#2a2419",
+        "radius": "0px",
+        "font": "Georgia,'Songti SC',serif"
+      },
+      "features": [
+        "近黑底 + 香槟金，绝不加第三色",
+        "全大写宽字距 + 细金线",
+        "大图位、极简文案、零圆角",
+        "留白与黑场本身就是奢侈感"
+      ],
+      "prompt": "做奢侈品风页面：近黑底 + 香槟金 #c8a86a、全大写宽字距衬线标题、细金线分区、零圆角、极简文案与大量黑场。",
+      "sources": [
+        "奢侈品行业的黑金视觉（Maison 一系）",
+        "全大写宽字距 + 大黑场"
+      ],
+      "avoid": "需要解释功能的产品：黑场与极少文案承载不了功能说明。",
+      "demo": "demos/luxury.html"
+    },
+    {
+      "id": "terminal",
+      "name": "终端 / CLI",
+      "name_en": "Terminal",
+      "group": "classic",
+      "era": "1970–",
+      "form": "landing",
+      "layout": "console",
+      "base": "terminal",
+      "tokens": {
+        "bg": "#04120a",
+        "surface": "#071a10",
+        "ink": "#54f08a",
+        "muted": "#2f8f5a",
+        "accent": "#a6ff4d",
+        "line": "#1d4a30",
+        "radius": "0px",
+        "font": "Consolas,'Cascadia Mono',monospace"
+      },
+      "features": [
+        "等宽字体，一切用字符拼",
+        "荧光绿文字 + 极暗绿底，轻微辉光",
+        "提示符 $ / > 作为视觉锚点",
+        "分割用 ASCII 线条（----），不用卡片阴影"
+      ],
+      "prompt": "做一个终端风格落地页：#04120a 底、等宽字、荧光绿文字带轻微 text-shadow 辉光、提示符 $ 引导、用 -- 和 | 做分割，零圆角，可加 scanline。",
+      "sources": [
+        "命令行界面（CLI）与 TUI 传统",
+        "CRT 终端与 phosphor 荧光屏"
+      ],
+      "avoid": "面向普通消费者的注册与支付流程：等宽字与提示符会抬高心理门槛。",
+      "demo": "demos/terminal.html"
+    },
+    {
+      "id": "retroweb",
+      "name": "Web 2.0 玻璃",
+      "name_en": "Retro Web 2.0",
+      "group": "classic",
+      "era": "2005–2010",
+      "form": "landing",
+      "layout": "landing",
+      "base": "retroweb",
+      "tokens": {
+        "bg": "#dfe7f5",
+        "surface": "#ffffff",
+        "ink": "#1e2a44",
+        "muted": "#5b6a88",
+        "accent": "#2b6cb0",
+        "line": "#b9c6dd",
+        "radius": "8px",
+        "font": "'Trebuchet MS','PingFang SC',sans-serif"
+      },
+      "features": [
+        "玻璃质感的渐变按钮与光泽标题栏",
+        "1px 浅蓝边 + 内侧 1px 白高光",
+        "小字号 NEW / BETA 徽章做点缀",
+        "阴影是柔的——这是 2006 年的投影"
+      ],
+      "prompt": "做 Web 2.0 风：浅蓝灰底、白色 8px 圆角卡片 + 1px 浅边、按钮用顶部高光的蓝渐变 + 内白边、加 NEW 徽章。",
+      "sources": [
+        "Web 2.0 时代（2005–2010）的玻璃质感 UI",
+        "光泽按钮、渐变标题栏、NEW 徽章"
+      ],
+      "avoid": "现代移动端产品：光泽与渐变在视网膜屏上显得廉价。",
+      "demo": "demos/retroweb.html"
+    },
+    {
+      "id": "neumorph",
+      "name": "新拟物软 UI",
+      "name_en": "Neumorphism",
+      "group": "classic",
+      "era": "2019–",
+      "form": "landing",
+      "layout": "grid",
+      "base": "neumorph",
+      "tokens": {
+        "bg": "#e8ecf3",
+        "surface": "#e8ecf3",
+        "ink": "#3b4252",
+        "muted": "#7b8296",
+        "accent": "#5b6cff",
+        "line": "#d4d9e3",
+        "radius": "16px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "同色双阴影：左上高光、右下投影",
+        "元素与背景同色，靠光影浮起",
+        "低对比、低饱和，容易看不清",
+        "按钮按下改为 inset 阴影"
+      ],
+      "prompt": "做新拟物软 UI：浅灰蓝底、元素与底同色、左上白高光 + 右下灰投影、16px 圆角、按下变内阴影，保持低对比但可读。",
+      "sources": [
+        "Neumorphism（2019 年随 Dribbble 流行）",
+        "同色双阴影的 soft UI"
+      ],
+      "avoid": "表单密集的界面：低对比让输入框与按钮难以辨认。",
+      "demo": "demos/neumorph.html"
+    },
+    {
+      "id": "darkeditorial",
+      "name": "暗色编辑风",
+      "name_en": "Dark Editorial",
+      "group": "classic",
+      "era": "2018–",
+      "form": "landing",
+      "layout": "article",
+      "base": "darkeditorial",
+      "tokens": {
+        "bg": "#0e0e10",
+        "surface": "#16161a",
+        "ink": "#f0eee9",
+        "muted": "#8b8b93",
+        "accent": "#d8ff3e",
+        "line": "#2a2a30",
+        "radius": "0px",
+        "font": "Georgia,'Songti SC',serif"
+      },
+      "features": [
+        "近黑纸面 + 大号衬线标题",
+        "荧光黄绿只占极小面积（标签、链接）",
+        "1px 发丝线分区，无卡片阴影",
+        "正文窄栏、行高松，像夜读版"
+      ],
+      "prompt": "做暗色编辑风：近黑底、大号衬线标题、1px 细线分区、正文窄栏行高 1.85、荧光黄绿仅用于标签与链接，零圆角零阴影。",
+      "sources": [
+        "暗色编辑出版（夜间版专栏、影评刊物）",
+        "大号衬线 + 荧光强调色"
+      ],
+      "avoid": "白天的数据录入界面：暗底衬线在密集操作里拖慢速度。",
+      "demo": "demos/darkeditorial.html"
+    },
+    {
+      "id": "posterswiss",
+      "name": "瑞士海报",
+      "name_en": "Poster Swiss",
+      "group": "classic",
+      "era": "1955–",
+      "form": "landing",
+      "layout": "poster",
+      "base": "posterswiss",
+      "tokens": {
+        "bg": "#f2f0e9",
+        "surface": "#f2f0e9",
+        "ink": "#111111",
+        "muted": "#5c5c5c",
+        "accent": "#ff3b00",
+        "line": "#111111",
+        "radius": "0px",
+        "font": "'Helvetica Neue',Arial,'PingFang SC',sans-serif"
+      },
+      "features": [
+        "海报比例：标题占满上半屏",
+        "零圆角、零卡片，靠字块与粗线分区",
+        "只有一个荧光橙做强调",
+        "文字可以溢出、旋转、被裁切"
+      ],
+      "prompt": "做瑞士海报风：米白底、Helvetica 超粗标题（96px 以上）、荧光橙 #ff3b00 色块、零圆角零阴影、文字可裁切，只用字块分区。",
+      "sources": [
+        "瑞士海报学派（Josef Müller-Brockmann 等）",
+        "大字报式平面与展览海报"
+      ],
+      "avoid": "需要长文案的落地页：超大字号装不下信息。",
+      "demo": "demos/posterswiss.html"
+    },
+    {
+      "id": "blueprint",
+      "name": "蓝图 / 工程制图",
+      "name_en": "Blueprint",
+      "group": "classic",
+      "era": "—",
+      "form": "landing",
+      "layout": "console",
+      "base": "blueprint",
+      "tokens": {
+        "bg": "#0d3b63",
+        "surface": "#0f426d",
+        "ink": "#dcecf9",
+        "muted": "#8fb8d6",
+        "accent": "#ffd24a",
+        "line": "rgba(220,236,249,.35)",
+        "radius": "0px",
+        "font": "Consolas,'Cascadia Mono',monospace"
+      },
+      "features": [
+        "青底白线 + 细网格纸背景",
+        "虚线框、尺寸标注线、编号引出线",
+        "等宽小字写参数（SCALE 1:2 / UNIT mm）",
+        "零圆角，装饰即信息"
+      ],
+      "prompt": "做一张工程蓝图式页面：#0d3b63 底 + 细网格、白线框（可用虚线）、尺寸标注与编号引出线、等宽小字标注参数，零圆角零阴影，强调色用黄。",
+      "sources": [
+        "工程制图与蓝图晒图工艺",
+        "技术示意图的标注、编号与尺寸线体系"
+      ],
+      "avoid": "需要情绪表达的页面：蓝图的每一处装饰都是参数。",
+      "demo": "demos/blueprint.html"
+    },
+    {
+      "id": "glass-admin",
+      "name": "玻璃拟态 · 后台",
+      "name_en": "Glassmorphism 后台",
+      "group": "classic",
+      "era": "2019–",
+      "form": "admin",
+      "layout": "admin",
+      "base": "glass",
+      "tokens": {
+        "bg": "#0b1020",
+        "surface": "rgba(255,255,255,.10)",
+        "ink": "#eef2ff",
+        "muted": "#a9b4d0",
+        "accent": "#7aa2ff",
+        "line": "rgba(255,255,255,.22)",
+        "radius": "20px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "半透明磨砂面板（backdrop-filter blur + saturate）",
+        "背景必须有高饱和光斑才成立",
+        "细亮边（1px rgba 白）替代实色描边",
+        "大圆角 + 低对比阴影，层级靠模糊度区分"
+      ],
+      "prompt": "设计一个玻璃拟态产品页：深色渐变底 + 三团彩色光斑，卡片使用半透明白(10%)、backdrop-filter:blur(18px) saturate(140%)、1px 亮边，圆角 20px，避免实色块与硬阴影。",
+      "sources": [
+        "Frosted glass 材质：随 macOS Big Sur / iOS 14（2020）的视觉语言普及",
+        "“Glassmorphism” 一词由 Michal Malewicz 于 2020 年提出"
+      ],
+      "avoid": "背景没有彩色光斑时不成立——纯色底上的玻璃面板只会变成一层灰雾。",
+      "demo": "demos/glass-admin.html"
+    },
+    {
+      "id": "glass-app",
+      "name": "玻璃拟态 · App",
+      "name_en": "Glassmorphism App",
+      "group": "classic",
+      "era": "2019–",
+      "form": "app",
+      "layout": "app",
+      "base": "glass",
+      "tokens": {
+        "bg": "#0b1020",
+        "surface": "rgba(255,255,255,.10)",
+        "ink": "#eef2ff",
+        "muted": "#a9b4d0",
+        "accent": "#7aa2ff",
+        "line": "rgba(255,255,255,.22)",
+        "radius": "20px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "半透明磨砂面板（backdrop-filter blur + saturate）",
+        "背景必须有高饱和光斑才成立",
+        "细亮边（1px rgba 白）替代实色描边",
+        "大圆角 + 低对比阴影，层级靠模糊度区分"
+      ],
+      "prompt": "设计一个玻璃拟态产品页：深色渐变底 + 三团彩色光斑，卡片使用半透明白(10%)、backdrop-filter:blur(18px) saturate(140%)、1px 亮边，圆角 20px，避免实色块与硬阴影。",
+      "sources": [
+        "Frosted glass 材质：随 macOS Big Sur / iOS 14（2020）的视觉语言普及",
+        "“Glassmorphism” 一词由 Michal Malewicz 于 2020 年提出"
+      ],
+      "avoid": "背景没有彩色光斑时不成立——纯色底上的玻璃面板只会变成一层灰雾。",
+      "demo": "demos/glass-app.html"
+    },
+    {
+      "id": "neubrutalism-admin",
+      "name": "新粗野主义 · 后台",
+      "name_en": "Neubrutalism 后台",
+      "group": "classic",
+      "era": "2022–",
+      "form": "admin",
+      "layout": "admin",
+      "base": "neubrutalism",
+      "tokens": {
+        "bg": "#f4f0e6",
+        "surface": "#fffdf6",
+        "ink": "#141414",
+        "muted": "#5a564c",
+        "accent": "#ff5252",
+        "line": "#141414",
+        "radius": "0px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "3px 纯黑描边 + 6px 硬投影（无模糊）",
+        "零圆角，色块直接撞色",
+        "粗黑标题，字重对比极端",
+        "交互靠位移：hover 时卡片向左上挪 2px"
+      ],
+      "prompt": "做一套新粗野主义界面：米白底、3px 黑边、6px 硬阴影（无 blur）、零圆角，主色 #ff5252，标题超粗，hover 时元素位移 2px，不要渐变与柔阴影。",
+      "sources": [
+        "Web Brutalism 的回潮，2021 年后由 Gumroad、Gather 等产品带火",
+        "新粗野主义（Neubrutalism）设计标签"
+      ],
+      "avoid": "信息密集的后台或表单页：粗边与硬阴影会把密度压成噪声。",
+      "demo": "demos/neubrutalism-admin.html"
+    },
+    {
+      "id": "neubrutalism-app",
+      "name": "新粗野主义 · App",
+      "name_en": "Neubrutalism App",
+      "group": "classic",
+      "era": "2022–",
+      "form": "app",
+      "layout": "app",
+      "base": "neubrutalism",
+      "tokens": {
+        "bg": "#f4f0e6",
+        "surface": "#fffdf6",
+        "ink": "#141414",
+        "muted": "#5a564c",
+        "accent": "#ff5252",
+        "line": "#141414",
+        "radius": "0px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "3px 纯黑描边 + 6px 硬投影（无模糊）",
+        "零圆角，色块直接撞色",
+        "粗黑标题，字重对比极端",
+        "交互靠位移：hover 时卡片向左上挪 2px"
+      ],
+      "prompt": "做一套新粗野主义界面：米白底、3px 黑边、6px 硬阴影（无 blur）、零圆角，主色 #ff5252，标题超粗，hover 时元素位移 2px，不要渐变与柔阴影。",
+      "sources": [
+        "Web Brutalism 的回潮，2021 年后由 Gumroad、Gather 等产品带火",
+        "新粗野主义（Neubrutalism）设计标签"
+      ],
+      "avoid": "信息密集的后台或表单页：粗边与硬阴影会把密度压成噪声。",
+      "demo": "demos/neubrutalism-app.html"
+    },
+    {
+      "id": "swiss-admin",
+      "name": "瑞士国际主义 · 后台",
+      "name_en": "Swiss / International 后台",
+      "group": "classic",
+      "era": "1950–",
+      "form": "admin",
+      "layout": "admin",
+      "base": "swiss",
+      "tokens": {
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "ink": "#111111",
+        "muted": "#6b6b6b",
+        "accent": "#e2001a",
+        "line": "#111111",
+        "radius": "0px",
+        "font": "'Helvetica Neue',Arial,'PingFang SC',sans-serif"
+      },
+      "features": [
+        "严格网格对齐，左对齐到发指",
+        "无衬线 + 极端字号对比（80px 配 12px）",
+        "只用黑、白、一个红",
+        "零圆角零阴影，靠线和留白分区"
+      ],
+      "prompt": "用瑞士国际主义排版做页面：纯白底、Helvetica、12 栏网格、标题大到 80px、只用黑与红 #e2001a、零圆角零阴影，大量留白，元素严格左对齐。",
+      "sources": [
+        "瑞士国际主义平面设计（1950s，Josef Müller-Brockmann 等）",
+        "Helvetica 与 12 栏网格体系"
+      ],
+      "avoid": "儿童或娱乐产品：秩序感会显得冷。",
+      "demo": "demos/swiss-admin.html"
+    },
+    {
+      "id": "swiss-app",
+      "name": "瑞士国际主义 · App",
+      "name_en": "Swiss / International App",
+      "group": "classic",
+      "era": "1950–",
+      "form": "app",
+      "layout": "app",
+      "base": "swiss",
+      "tokens": {
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "ink": "#111111",
+        "muted": "#6b6b6b",
+        "accent": "#e2001a",
+        "line": "#111111",
+        "radius": "0px",
+        "font": "'Helvetica Neue',Arial,'PingFang SC',sans-serif"
+      },
+      "features": [
+        "严格网格对齐，左对齐到发指",
+        "无衬线 + 极端字号对比（80px 配 12px）",
+        "只用黑、白、一个红",
+        "零圆角零阴影，靠线和留白分区"
+      ],
+      "prompt": "用瑞士国际主义排版做页面：纯白底、Helvetica、12 栏网格、标题大到 80px、只用黑与红 #e2001a、零圆角零阴影，大量留白，元素严格左对齐。",
+      "sources": [
+        "瑞士国际主义平面设计（1950s，Josef Müller-Brockmann 等）",
+        "Helvetica 与 12 栏网格体系"
+      ],
+      "avoid": "儿童或娱乐产品：秩序感会显得冷。",
+      "demo": "demos/swiss-app.html"
+    },
+    {
+      "id": "luxury-admin",
+      "name": "奢侈品 · 后台",
+      "name_en": "Luxury 后台",
+      "group": "classic",
+      "era": "—",
+      "form": "admin",
+      "layout": "admin",
+      "base": "luxury",
+      "tokens": {
+        "bg": "#0b0b0b",
+        "surface": "#111111",
+        "ink": "#f5f1e8",
+        "muted": "#a39a86",
+        "accent": "#c8a86a",
+        "line": "#2a2419",
+        "radius": "0px",
+        "font": "Georgia,'Songti SC',serif"
+      },
+      "features": [
+        "近黑底 + 香槟金，绝不加第三色",
+        "全大写宽字距 + 细金线",
+        "大图位、极简文案、零圆角",
+        "留白与黑场本身就是奢侈感"
+      ],
+      "prompt": "做奢侈品风页面：近黑底 + 香槟金 #c8a86a、全大写宽字距衬线标题、细金线分区、零圆角、极简文案与大量黑场。",
+      "sources": [
+        "奢侈品行业的黑金视觉（Maison 一系）",
+        "全大写宽字距 + 大黑场"
+      ],
+      "avoid": "需要解释功能的产品：黑场与极少文案承载不了功能说明。",
+      "demo": "demos/luxury-admin.html"
+    },
+    {
+      "id": "luxury-app",
+      "name": "奢侈品 · App",
+      "name_en": "Luxury App",
+      "group": "classic",
+      "era": "—",
+      "form": "app",
+      "layout": "app",
+      "base": "luxury",
+      "tokens": {
+        "bg": "#0b0b0b",
+        "surface": "#111111",
+        "ink": "#f5f1e8",
+        "muted": "#a39a86",
+        "accent": "#c8a86a",
+        "line": "#2a2419",
+        "radius": "0px",
+        "font": "Georgia,'Songti SC',serif"
+      },
+      "features": [
+        "近黑底 + 香槟金，绝不加第三色",
+        "全大写宽字距 + 细金线",
+        "大图位、极简文案、零圆角",
+        "留白与黑场本身就是奢侈感"
+      ],
+      "prompt": "做奢侈品风页面：近黑底 + 香槟金 #c8a86a、全大写宽字距衬线标题、细金线分区、零圆角、极简文案与大量黑场。",
+      "sources": [
+        "奢侈品行业的黑金视觉（Maison 一系）",
+        "全大写宽字距 + 大黑场"
+      ],
+      "avoid": "需要解释功能的产品：黑场与极少文案承载不了功能说明。",
+      "demo": "demos/luxury-app.html"
+    },
+    {
+      "id": "terminal-admin",
+      "name": "终端 / CLI · 后台",
+      "name_en": "Terminal 后台",
+      "group": "classic",
+      "era": "1970–",
+      "form": "admin",
+      "layout": "admin",
+      "base": "terminal",
+      "tokens": {
+        "bg": "#04120a",
+        "surface": "#071a10",
+        "ink": "#54f08a",
+        "muted": "#2f8f5a",
+        "accent": "#a6ff4d",
+        "line": "#1d4a30",
+        "radius": "0px",
+        "font": "Consolas,'Cascadia Mono',monospace"
+      },
+      "features": [
+        "等宽字体，一切用字符拼",
+        "荧光绿文字 + 极暗绿底，轻微辉光",
+        "提示符 $ / > 作为视觉锚点",
+        "分割用 ASCII 线条（----），不用卡片阴影"
+      ],
+      "prompt": "做一个终端风格落地页：#04120a 底、等宽字、荧光绿文字带轻微 text-shadow 辉光、提示符 $ 引导、用 -- 和 | 做分割，零圆角，可加 scanline。",
+      "sources": [
+        "命令行界面（CLI）与 TUI 传统",
+        "CRT 终端与 phosphor 荧光屏"
+      ],
+      "avoid": "面向普通消费者的注册与支付流程：等宽字与提示符会抬高心理门槛。",
+      "demo": "demos/terminal-admin.html"
+    },
+    {
+      "id": "terminal-app",
+      "name": "终端 / CLI · App",
+      "name_en": "Terminal App",
+      "group": "classic",
+      "era": "1970–",
+      "form": "app",
+      "layout": "app",
+      "base": "terminal",
+      "tokens": {
+        "bg": "#04120a",
+        "surface": "#071a10",
+        "ink": "#54f08a",
+        "muted": "#2f8f5a",
+        "accent": "#a6ff4d",
+        "line": "#1d4a30",
+        "radius": "0px",
+        "font": "Consolas,'Cascadia Mono',monospace"
+      },
+      "features": [
+        "等宽字体，一切用字符拼",
+        "荧光绿文字 + 极暗绿底，轻微辉光",
+        "提示符 $ / > 作为视觉锚点",
+        "分割用 ASCII 线条（----），不用卡片阴影"
+      ],
+      "prompt": "做一个终端风格落地页：#04120a 底、等宽字、荧光绿文字带轻微 text-shadow 辉光、提示符 $ 引导、用 -- 和 | 做分割，零圆角，可加 scanline。",
+      "sources": [
+        "命令行界面（CLI）与 TUI 传统",
+        "CRT 终端与 phosphor 荧光屏"
+      ],
+      "avoid": "面向普通消费者的注册与支付流程：等宽字与提示符会抬高心理门槛。",
+      "demo": "demos/terminal-app.html"
+    },
+    {
+      "id": "ink",
+      "name": "水墨",
+      "name_en": "Ink Wash",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "poster",
+      "base": "ink",
+      "tokens": {
+        "bg": "#f2ecde",
+        "surface": "#f7f2e6",
+        "ink": "#1c1712",
+        "muted": "#6b6255",
+        "accent": "#b02e22",
+        "line": "#cfc4ae",
+        "radius": "2px",
+        "font": "'Songti SC',SimSun,serif"
+      },
+      "features": [
+        "宣纸底 + 墨色浓淡（不用纯黑）",
+        "细墨线 + 大留白，讲究呼吸",
+        "只允许一枚朱红（印章）",
+        "标题可竖排，字距松"
+      ],
+      "prompt": "做水墨风页面：宣纸底 #f2ecde、墨色分五阶（不用纯黑）、细线框、大量留白、只用一枚朱红做印章，衬线字，标题竖排可加分。",
+      "sources": [
+        "中国水墨画：宣纸、墨分五色、留白",
+        "文人题跋与印章排版"
+      ],
+      "avoid": "高信息密度或多按钮操作页：留白要求与功能密度直接冲突。",
+      "demo": "demos/ink.html"
+    },
+    {
+      "id": "memo",
+      "name": "手账笔记",
+      "name_en": "Bullet Journal",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "article",
+      "base": "memo",
+      "tokens": {
+        "bg": "#fffdf6",
+        "surface": "#fffef9",
+        "ink": "#2a3a52",
+        "muted": "#7c8698",
+        "accent": "#ffb800",
+        "line": "#dfe3ea",
+        "radius": "4px",
+        "font": "'Kaiti SC',KaiTi,'PingFang SC',sans-serif"
+      },
+      "features": [
+        "方格纸底 + 和纸胶带 + 荧光笔",
+        "手写体标题，重点用马克笔划线",
+        "便签纸、回形针、贴纸做点缀",
+        "颜色控制在三种以内"
+      ],
+      "prompt": "做手账笔记风页面：方格纸背景、手写标题、荧光笔划线重点、和纸胶带贴角、便签纸块，颜色不超过三种（黄 + 蓝 + 墨）。",
+      "sources": [
+        "Bullet Journal 手账体系",
+        "和纸胶带、荧光笔、便签的文具语言"
+      ],
+      "avoid": "企业对外正式页面：手写感会削弱权威。",
+      "demo": "demos/memo.html"
+    },
+    {
+      "id": "cyberneon",
+      "name": "赛博霓虹",
+      "name_en": "Cyber Neon",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "poster",
+      "base": "cyberneon",
+      "tokens": {
+        "bg": "#06060e",
+        "surface": "#0d0b1a",
+        "ink": "#f2f6ff",
+        "muted": "#7a7fa8",
+        "accent": "#ff2d95",
+        "line": "#2a2a4a",
+        "radius": "4px",
+        "font": "Consolas,'Cascadia Mono',monospace"
+      },
+      "features": [
+        "纯黑底 + 霓虹描边 + 外发光",
+        "粉 / 青双色，绝不混成紫",
+        "等宽小字做标签，扫描线/噪点加分",
+        "边框要细，靠辉光而不是填充"
+      ],
+      "prompt": "做赛博霓虹界面：近黑底、粉色 #ff2d95 与青色 #2de2ff 霓虹描边 + 外发光、等宽小字标签、细边框、加扫描线与噪点，禁止大面积填充。",
+      "sources": [
+        "Cyberpunk 霓虹视觉（Blade Runner 一系）",
+        "游戏 HUD 与合成波平面设计"
+      ],
+      "avoid": "长文本阅读：暗底发光字连续阅读极易疲劳。",
+      "demo": "demos/cyberneon.html"
+    },
+    {
+      "id": "newsprint",
+      "name": "报纸",
+      "name_en": "Newsprint",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "article",
+      "base": "newsprint",
+      "tokens": {
+        "bg": "#eee9dc",
+        "surface": "#f7f2e4",
+        "ink": "#1b1a17",
+        "muted": "#5f5a4e",
+        "accent": "#8c1c13",
+        "line": "#1b1a17",
+        "radius": "0px",
+        "font": "Georgia,'Songti SC',serif"
+      },
+      "features": [
+        "报头 + 双线 + 日期栏",
+        "多栏排版，正文两端对齐",
+        "黑色粗规则线分区，无卡片阴影",
+        "图片位用半调网点占位"
+      ],
+      "prompt": "做报纸风页面：纸灰底、报头 + 双线 + 日期、多栏正文、黑色粗线分区、零圆角零阴影，一张半调网点图片位，深红做强调。",
+      "sources": [
+        "铅字报纸排版：报头、多栏、双线",
+        "凸版印刷的字距与栏宽传统"
+      ],
+      "avoid": "移动端单列阅读：多栏与粗线在窄屏没有落脚点。",
+      "demo": "demos/newsprint.html"
+    },
+    {
+      "id": "artdeco",
+      "name": "装饰艺术",
+      "name_en": "Art Deco",
+      "group": "shift",
+      "era": "1925–",
+      "form": "landing",
+      "layout": "poster",
+      "base": "artdeco",
+      "tokens": {
+        "bg": "#101423",
+        "surface": "#161b2e",
+        "ink": "#f2e6c8",
+        "muted": "#a99a74",
+        "accent": "#c9a24a",
+        "line": "#3a3f58",
+        "radius": "0px",
+        "font": "Georgia,'Songti SC',serif"
+      },
+      "features": [
+        "深藏青 + 金，绝不加第三种颜色",
+        "对称构图 + 放射线 + 阶梯纹",
+        "细金线描边，全大写宽字距",
+        "零圆角，装饰靠线条不靠图形"
+      ],
+      "prompt": "做 Art Deco 页面：深藏青底 + 金色 #c9a24a 细线、对称布局、放射线与阶梯装饰、全大写宽字距衬线字，零圆角，只用两色。",
+      "sources": [
+        "装饰艺术运动（1925 巴黎国际博览会）",
+        "金线、放射线、阶梯母题"
+      ],
+      "avoid": "高频操作界面：对称与装饰会妨碍扫视。",
+      "demo": "demos/artdeco.html"
+    },
+    {
+      "id": "hologram",
+      "name": "全息 HUD",
+      "name_en": "Hologram HUD",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "console",
+      "base": "hologram",
+      "tokens": {
+        "bg": "#03121c",
+        "surface": "rgba(10,40,56,.55)",
+        "ink": "#cdf6ff",
+        "muted": "#6fa8bd",
+        "accent": "#3ce0ff",
+        "line": "rgba(60,224,255,.32)",
+        "radius": "2px",
+        "font": "Consolas,'Cascadia Mono',monospace"
+      },
+      "features": [
+        "青蓝线框 + 虚线弧 + 角标",
+        "半透明面板带内发光，像投影",
+        "等宽读数（LAT / ORBIT / SIGNAL）",
+        "背景加光锥与细网格"
+      ],
+      "prompt": "做全息 HUD 界面：深青底、线框面板（细边 + 内发光）、虚线圆弧与角标、等宽读数、光锥背景，禁止实色填充与圆角。",
+      "sources": [
+        "科幻电影中的全息投影 HUD",
+        "航天与军用遥测界面"
+      ],
+      "avoid": "需要高对比无障碍的场景：半透明青字对比度普遍不足。",
+      "demo": "demos/hologram.html"
+    },
+    {
+      "id": "riso",
+      "name": "丝网 / 孔版印刷",
+      "name_en": "Risograph",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "poster",
+      "base": "riso",
+      "tokens": {
+        "bg": "#f3eddf",
+        "surface": "#faf6ec",
+        "ink": "#1a1a1a",
+        "muted": "#6a6456",
+        "accent": "#ff4f8b",
+        "line": "#d8d0be",
+        "radius": "2px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "两色套印错位（multiply 叠加）",
+        "半调网点 + 纸颗粒",
+        "高饱和单色 + 黑，不用渐变",
+        "边缘略有毛刺，允许“不精准”"
+      ],
+      "prompt": "做孔版印刷风页面：米色纸底、两色套印（粉 #ff4f8b + 青绿 #17a398）用 multiply 叠加并故意错位 2–3px、半调网点、纸颗粒，高饱和平涂。",
+      "sources": [
+        "Risograph 孔版印刷与错版叠加",
+        "独立出版与地下海报文化"
+      ],
+      "avoid": "需要精准还原品牌色的场景：套印错位让色彩不可控。",
+      "demo": "demos/riso.html"
+    },
+    {
+      "id": "chinesemodern",
+      "name": "新中式",
+      "name_en": "Modern Chinese",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "article",
+      "base": "chinesemodern",
+      "tokens": {
+        "bg": "#f7f4ee",
+        "surface": "#fffdf8",
+        "ink": "#221c17",
+        "muted": "#6f6558",
+        "accent": "#b02e22",
+        "line": "#e0d8c8",
+        "radius": "0px",
+        "font": "'Songti SC','SimSun',serif"
+      },
+      "features": [
+        "留白 + 细线 + 一抹朱红边条",
+        "宋体标题、松字距，横排为主",
+        "卡片直角、无阴影，左侧一条朱红竖线",
+        "克制：不加纹理、不做水墨晕染"
+      ],
+      "prompt": "做新中式现代页面：米白底、宋体标题松字距、卡片直角无阴影、左侧 3px 朱红竖线、细边框、大量留白。",
+      "sources": [
+        "新中式：宋体、朱红、留白的现代转译",
+        "传统匾额与界画的比例关系"
+      ],
+      "avoid": "国际化产品的主界面：文化符号需要语境。",
+      "demo": "demos/chinesemodern.html"
+    },
+    {
+      "id": "chalk",
+      "name": "黑板粉笔",
+      "name_en": "Chalkboard",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "poster",
+      "base": "chalk",
+      "tokens": {
+        "bg": "#20302a",
+        "surface": "#26382f",
+        "ink": "#eef3ea",
+        "muted": "#9fb2a6",
+        "accent": "#f2d68a",
+        "line": "rgba(238,243,234,.28)",
+        "radius": "2px",
+        "font": "'Segoe UI','PingFang SC',sans-serif"
+      },
+      "features": [
+        "墨绿黑板 + 白色粉笔字，边缘略糊",
+        "划线用手指擦过的痕迹（低透明度）",
+        "手写感标题 + 粉笔灰点缀",
+        "黄色粉笔做强调"
+      ],
+      "prompt": "做黑板粉笔风格：墨绿底、白色粉笔字（轻微模糊与颗粒）、手写感标题、黄色粉笔强调、擦痕做装饰，不要阴影与渐变。",
+      "sources": [
+        "黑板与粉笔的教学场景",
+        "咖啡馆手写菜单"
+      ],
+      "avoid": "小字号密集内容：粉笔质感在 12px 以下会糊成一片。",
+      "demo": "demos/chalk.html"
+    },
+    {
+      "id": "ascii",
+      "name": "ASCII 文本界面",
+      "name_en": "ASCII / TUI",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "console",
+      "base": "ascii",
+      "tokens": {
+        "bg": "#000000",
+        "surface": "#020a02",
+        "ink": "#b8ffb8",
+        "muted": "#4a8a4a",
+        "accent": "#4ade80",
+        "line": "#2a5a2a",
+        "radius": "0px",
+        "font": "Consolas,'Cascadia Mono',monospace"
+      },
+      "features": [
+        "一切用等宽字符与虚线框表达",
+        "荧光绿字 + 纯黑底，方括号做标签",
+        "分割线用 ---- 而不是边框",
+        "像 80 年代的终端程序"
+      ],
+      "prompt": "做 ASCII 文本界面：纯黑底、荧光绿等宽字、虚线框、方括号标签、用 ---- 做分割，零圆角零渐变。",
+      "sources": [
+        "BBS / ASCII art / DOS TUI",
+        "等宽字符画边框"
+      ],
+      "avoid": "移动端窄屏：字符框在窄屏一律错位。",
+      "demo": "demos/ascii.html"
+    },
+    {
+      "id": "pixel",
+      "name": "像素 / 8-bit",
+      "name_en": "Pixel Art",
+      "group": "shift",
+      "era": "1985–",
+      "form": "landing",
+      "layout": "poster",
+      "base": "pixel",
+      "tokens": {
+        "bg": "#0f0f1b",
+        "surface": "#1b1b2e",
+        "ink": "#e8e8ff",
+        "muted": "#8a8ab0",
+        "accent": "#ffd24a",
+        "line": "#3a3a5c",
+        "radius": "0px",
+        "font": "'Courier New',Consolas,monospace"
+      },
+      "features": [
+        "像素级描边（阶梯阴影，不用 border-radius）",
+        "有限调色板 + 高对比",
+        "像素字体或等宽字模拟",
+        "按钮按下有 4px 位移"
+      ],
+      "prompt": "做 8-bit 像素风页面：深蓝底、像素描边（用多层 box-shadow 做阶梯）、零圆角、有限调色板（蓝紫 + 黄 + 白）、等宽字、按钮按下位移 4px。",
+      "sources": [
+        "8-bit 像素艺术与早期家用游戏机",
+        "有限调色板（NES 一系）"
+      ],
+      "avoid": "需要精细图标或层级较多的界面：像素化会吃掉细节。",
+      "demo": "demos/pixel.html"
+    },
+    {
+      "id": "gothic",
+      "name": "哥特暗黑",
+      "name_en": "Gothic",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "article",
+      "base": "gothic",
+      "tokens": {
+        "bg": "#080509",
+        "surface": "#14081c",
+        "ink": "#e8dcff",
+        "muted": "#9a86b8",
+        "accent": "#a855f7",
+        "line": "#4c2a63",
+        "radius": "0px",
+        "font": "Georgia,'Songti SC',serif"
+      },
+      "features": [
+        "近黑紫底 + 烛光式紫色辉光",
+        "衬线大写 + 极宽字距，零圆角",
+        "细边框 + 四角小装饰",
+        "克制用色：不加第三种颜色"
+      ],
+      "prompt": "做哥特暗黑页：近黑底 + 紫色径向辉光、衬线大写宽字距标题、1px 暗紫边框、零圆角、四角小装饰，只用紫与灰白。",
+      "sources": [
+        "哥特建筑与烛光宗教画",
+        "暗色衬线宽字距的书籍排版"
+      ],
+      "avoid": "需要亲和力的消费产品：压迫感正是它的功能。",
+      "demo": "demos/gothic.html"
+    },
+    {
+      "id": "papercut",
+      "name": "剪纸",
+      "name_en": "Paper Cut",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "poster",
+      "base": "papercut",
+      "tokens": {
+        "bg": "#f6ecd8",
+        "surface": "#fffaf0",
+        "ink": "#2b1f18",
+        "muted": "#7a6a58",
+        "accent": "#c8371f",
+        "line": "#e2d5bd",
+        "radius": "6px",
+        "font": "'Songti SC',SimSun,serif"
+      },
+      "features": [
+        "层叠纸片 + 投影做深度",
+        "参差的“撕纸”边缘（clip-path）",
+        "暖色纸 + 一抹中国红",
+        "元素之间留缝，像真的叠在一起"
+      ],
+      "prompt": "做剪纸层叠风页面：暖色纸底、卡片用 clip-path 做参差边缘、每层加 6–10px 硬投影做厚度、中国红做强调，衬线字。",
+      "sources": [
+        "中国剪纸与层叠纸艺",
+        "立体绘本、纸雕"
+      ],
+      "avoid": "需要精确对齐的表单：参差边缘会破坏对齐感。",
+      "demo": "demos/papercut.html"
+    },
+    {
+      "id": "amberterminal",
+      "name": "琥珀终端",
+      "name_en": "Amber Terminal",
+      "group": "shift",
+      "era": "1980–",
+      "form": "landing",
+      "layout": "console",
+      "base": "amberterminal",
+      "tokens": {
+        "bg": "#0a0700",
+        "surface": "#140d00",
+        "ink": "#ffb000",
+        "muted": "#8a5f00",
+        "accent": "#ffd479",
+        "line": "#3a2600",
+        "radius": "0px",
+        "font": "Consolas,'Cascadia Mono',monospace"
+      },
+      "features": [
+        "单色琥珀屏：黄字黑底，只有一种颜色",
+        "等宽字体 + 轻微辉光与扫描线",
+        "装饰用 ASCII 方框与刻度，不用图形",
+        "亮度分层，不靠色相区分层级"
+      ],
+      "prompt": "做琥珀终端风：黑底、#ffb000 单色等宽字、轻微发光与扫描线、ASCII 方框分隔、零圆角，不用第二种颜色。",
+      "sources": [
+        "amber phosphor CRT 单色屏",
+        "80 年代终端与 BBS 客户端"
+      ],
+      "avoid": "强光户外使用：琥珀字在阳光下几乎不可见。",
+      "demo": "demos/amberterminal.html"
+    },
+    {
+      "id": "zine",
+      "name": "复印小志",
+      "name_en": "Photocopy Zine",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "poster",
+      "base": "zine",
+      "tokens": {
+        "bg": "#e9e7e2",
+        "surface": "#ffffff",
+        "ink": "#111111",
+        "muted": "#5a5a55",
+        "accent": "#111111",
+        "line": "#111111",
+        "radius": "0px",
+        "font": "'Arial Black','PingFang SC',sans-serif"
+      },
+      "features": [
+        "黑白复印质感 + 网点噪点",
+        "剪贴式粗标题、块状硬阴影",
+        "纸片轻微旋转，边缘参差",
+        "只有黑与纸白，靠字号冲撞"
+      ],
+      "prompt": "做复印小志风：灰纸底、纯黑白、网点噪点、剪贴式超粗标题、卡片 2px 黑边 + 4px 硬阴影、轻微旋转。",
+      "sources": [
+        "Photocopy zine 与地下出版物",
+        "剪贴 + 网点 + 复印噪点"
+      ],
+      "avoid": "需要机构可信度的页面：粗糙感会被读成不可靠。",
+      "demo": "demos/zine.html"
+    },
+    {
+      "id": "zenminimal",
+      "name": "禅意极简",
+      "name_en": "Zen Minimal",
+      "group": "shift",
+      "era": "—",
+      "form": "landing",
+      "layout": "article",
+      "base": "zenminimal",
+      "tokens": {
+        "bg": "#faf9f6",
+        "surface": "#faf9f6",
+        "ink": "#22201d",
+        "muted": "#8d887e",
+        "accent": "#22201d",
+        "line": "#e7e3da",
+        "radius": "0px",
+        "font": "'Songti SC',Georgia,serif"
+      },
+      "features": [
+        "一张纸、一条竖线、一句话",
+        "字号极小 + 字距极大，靠空白呼吸",
+        "零阴影零色块，边界只靠空隙",
+        "留白占七成，内容是注脚"
+      ],
+      "prompt": "做禅意极简：米白纸底、一条 1px 竖线、极小字号 + 极大字距、零阴影零色块、只用黑白两色，留白占 70%。",
+      "sources": [
+        "禅意极简与日本平面设计中的「間」",
+        "极小字号 + 极大字距的书籍排版"
+      ],
+      "avoid": "需要清晰操作引导的产品：留白过多会让人不知道下一步点哪。",
+      "demo": "demos/zenminimal.html"
+    },
+    {
+      "id": "cyberhud2",
+      "name": "战术 HUD 2",
+      "name_en": "Cyber HUD 2",
+      "group": "shift",
+      "era": "2024–",
+      "form": "landing",
+      "layout": "console",
+      "base": "cyberhud2",
+      "tokens": {
+        "bg": "#08090a",
+        "surface": "rgba(20,22,24,.72)",
+        "ink": "#e9f2e6",
+        "muted": "#7d8a80",
+        "accent": "#c8ff2e",
+        "line": "rgba(200,255,46,.28)",
+        "radius": "0px",
+        "font": "'Segoe UI',Consolas,sans-serif"
+      },
+      "features": [
+        "斜切角 + 四角括号，全部直角",
+        "荧光黄绿描边 + 刻度网格，无第三种色",
+        "边缘铺数据带（SYNC / LOCK / SIG）",
+        "信息密度优先，装饰只是刻度"
+      ],
+      "prompt": "做战术 HUD 2.0：近黑底、荧光黄绿 #c8ff2e 描边与刻度网格、clip-path 斜切角、四角括号、等宽读数，零圆角，不加第三种颜色。",
+      "sources": [
+        "战术 / 军事 HUD（斜切角、刻度、括号）",
+        "游戏中的目标锁定界面"
+      ],
+      "avoid": "面向大众的消费产品：信息密度与荧光色会带来压迫感。",
+      "demo": "demos/cyberhud2.html"
+    },
+    {
+      "id": "ink-admin",
+      "name": "水墨 · 后台",
+      "name_en": "Ink Wash 后台",
+      "group": "shift",
+      "era": "—",
+      "form": "admin",
+      "layout": "admin",
+      "base": "ink",
+      "tokens": {
+        "bg": "#f2ecde",
+        "surface": "#f7f2e6",
+        "ink": "#1c1712",
+        "muted": "#6b6255",
+        "accent": "#b02e22",
+        "line": "#cfc4ae",
+        "radius": "2px",
+        "font": "'Songti SC',SimSun,serif"
+      },
+      "features": [
+        "宣纸底 + 墨色浓淡（不用纯黑）",
+        "细墨线 + 大留白，讲究呼吸",
+        "只允许一枚朱红（印章）",
+        "标题可竖排，字距松"
+      ],
+      "prompt": "做水墨风页面：宣纸底 #f2ecde、墨色分五阶（不用纯黑）、细线框、大量留白、只用一枚朱红做印章，衬线字，标题竖排可加分。",
+      "sources": [
+        "中国水墨画：宣纸、墨分五色、留白",
+        "文人题跋与印章排版"
+      ],
+      "avoid": "高信息密度或多按钮操作页：留白要求与功能密度直接冲突。",
+      "demo": "demos/ink-admin.html"
+    },
+    {
+      "id": "ink-app",
+      "name": "水墨 · App",
+      "name_en": "Ink Wash App",
+      "group": "shift",
+      "era": "—",
+      "form": "app",
+      "layout": "app",
+      "base": "ink",
+      "tokens": {
+        "bg": "#f2ecde",
+        "surface": "#f7f2e6",
+        "ink": "#1c1712",
+        "muted": "#6b6255",
+        "accent": "#b02e22",
+        "line": "#cfc4ae",
+        "radius": "2px",
+        "font": "'Songti SC',SimSun,serif"
+      },
+      "features": [
+        "宣纸底 + 墨色浓淡（不用纯黑）",
+        "细墨线 + 大留白，讲究呼吸",
+        "只允许一枚朱红（印章）",
+        "标题可竖排，字距松"
+      ],
+      "prompt": "做水墨风页面：宣纸底 #f2ecde、墨色分五阶（不用纯黑）、细线框、大量留白、只用一枚朱红做印章，衬线字，标题竖排可加分。",
+      "sources": [
+        "中国水墨画：宣纸、墨分五色、留白",
+        "文人题跋与印章排版"
+      ],
+      "avoid": "高信息密度或多按钮操作页：留白要求与功能密度直接冲突。",
+      "demo": "demos/ink-app.html"
+    }
+  ]
+}

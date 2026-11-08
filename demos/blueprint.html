@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>蓝图 / 工程制图 · 控制台版式 · UI 样例</title>
+<style>
+:root{--bg:#0d3b63;--surface:#0f426d;--ink:#dcecf9;--muted:#8fb8d6;--accent:#ffd24a;--accent-ink:#0b0b0b;--line:rgba(220,236,249,.35);--radius:0px;--radius-sm:0px;--font:Consolas,'Cascadia Mono',monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.75}
+.term{height:100vh;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--line);
+  font-size:11.5px;color:var(--muted);letter-spacing:.04em}
+.dots{display:flex;gap:5px}
+.dots i{width:9px;height:9px;border:1px solid currentColor;border-radius:50%;opacity:.55}
+.bar .path{margin-left:auto}
+.body{flex:1;padding:20px 24px;overflow:hidden}
+.ln{margin:0;white-space:pre-wrap}
+.p{color:var(--accent)}
+.c{color:var(--ink)}
+.o{color:var(--muted)}
+.tbl{display:grid;grid-template-columns:132px 132px auto;gap:0 18px;width:max-content;
+  min-width:392px;color:var(--muted);padding:2px 0}
+.tbl .ok{color:var(--accent)}
+.cursor{display:inline-block;width:9px;height:16px;background:var(--ink);vertical-align:-3px;
+  animation:blink 1.05s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.status{display:flex;justify-content:space-between;padding:6px 16px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--muted);letter-spacing:.08em}
+@media (prefers-reduced-motion:reduce){.cursor{animation:none}}
+
+body{background:
+  linear-gradient(rgba(220,236,249,.10) 1px,transparent 1px) 0 0/28px 28px,
+  linear-gradient(90deg,rgba(220,236,249,.10) 1px,transparent 1px) 0 0/28px 28px,
+  #0d3b63}
+.card,.panel{border:1px dashed rgba(220,236,249,.55);background:rgba(15,66,109,.6);border-radius:0}
+.card .k{color:#ffd24a;letter-spacing:.3em}
+.btn{background:#ffd24a;color:#0d3b63;border-radius:0;font-family:inherit;border:1px dashed #ffd24a}
+.btn.ghost{background:transparent;color:#dcecf9;border:1px dashed rgba(220,236,249,.55)}
+.nav{border-bottom:1px dashed rgba(220,236,249,.55)}
+input,select{background:rgba(13,59,99,.8);color:#dcecf9;border:1px dashed rgba(220,236,249,.45);border-radius:0}
+</style>
+</head>
+<body>
+<div class="term">
+  <div class="bar">
+    <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span>DWG A-104</span>
+    <span class="path">DWG A-104 · rev 6</span>
+  </div>
+  <div class="body">
+    <p class="ln"><span class="p">$</span> <span class="c">dwg list --rev 6</span></p>
+    <p class="ln o">sheets 12 · rev 6 · 2026-11-08</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="c">dwg check</span></p>
+    <p class="ln o">──────────────────────────────────────────────</p>
+    <div class="tbl"><span>SHEET</span><span>REV</span><span>CHECK</span><span>A-101</span><span class="ok">6</span><span>ok</span><span>A-104</span><span class="ok">6</span><span>ok</span><span>S-203</span><span class="ok">5</span><span>stale</span></div>
+    <p class="ln o">──────────────────────────────────────────────</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="c">dwg diff --rev 5..6</span></p>
+    <p class="ln o">[rev5] 梁 L-12 位移 40mm</p>
+    <p class="ln o">[rev6] 已修正并复核</p>
+    <p class="ln p">[rev6] S-203 未同步 · 仍为 rev5</p>
+    <p class="ln o">[rev6] 待结构专业确认</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="c">cat NOTES</span></p>
+    <p class="ln c">第六版结构图已发布</p>
+    <p class="ln o">每根梁都有编号、尺寸和出处。</p>
+    <p class="ln">&nbsp;</p>
+    <p class="ln"><span class="p">$</span> <span class="cursor" aria-hidden="true"></span></p>
+  </div>
+  <div class="status"><span>-- 审阅 --</span><span>A-104 · rev 6</span></div>
+</div>
+</body>
+</html>

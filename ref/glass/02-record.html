@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass 参考实现 · 02 详情</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body class="ref">
+
+<nav class="refnav" aria-label="参考实现页面">
+  <a href="01-workbench.html">01 工作台</a>
+  <a href="02-record.html" class="is-active">02 详情</a>
+  <a href="03-form.html">03 表单</a>
+  <a href="04-states.html">04 状态</a>
+  <a href="05-dialog.html">05 弹窗</a>
+  <a href="06-light.html">06 浅色</a>
+  <a href="07-anti.html">07 反例</a>
+  <a href="08-marketing.html">08 营销</a>
+  <a href="09-auth.html">09 登录</a>
+  <a href="10-mobile.html">10 移动</a>
+  <span class="tag">glass · 参考实现</span>
+</nav>
+
+<div class="app">
+  <aside class="side">
+    <div class="side-brand"><span class="mark">◆</span> Northwind</div>
+    <div class="side-sec">经营</div>
+    <a class="side-link" href="#">总览</a>
+    <a class="side-link is-active" href="#">会员 <span class="count">3,182</span></a>
+    <a class="side-link" href="#">订单 <span class="count">128</span></a>
+    <a class="side-link" href="#">内容</a>
+    <a class="side-link" href="#">工单 <span class="count">12</span></a>
+    <div class="side-sec">设置</div>
+    <a class="side-link" href="#">团队</a>
+    <a class="side-link" href="#">账单</a>
+    <div class="side-foot">
+      <a class="side-link" href="#"><span class="avatar accent">陈</span> 陈布凡 <span class="count">▾</span></a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb">会员 <span>/</span> <b>林见夏</b></div>
+      <div class="grow"></div>
+      <button class="btn sm">发送邮件</button>
+      <button class="icon-btn" aria-label="更多操作">⋯</button>
+    </header>
+
+    <div class="content">
+      <div class="page-head">
+        <div class="grow">
+          <h1>林见夏</h1>
+          <div class="row" style="margin-top:var(--space-2)">
+            <span class="badge ok">已续费</span>
+            <span class="badge plain">团队版 · 12 席</span>
+            <span class="badge plain">客户 4 年 2 个月</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn sm">变更方案</button>
+          <button class="btn primary sm">新建订单</button>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="stack">
+          <section class="card">
+            <div class="tabs" role="tablist" aria-label="记录分区">
+              <a href="#" role="tab" aria-selected="true" class="is-active">账户</a>
+              <a href="#" role="tab" aria-selected="false">订单</a>
+              <a href="#" role="tab" aria-selected="false">发票</a>
+              <a href="#" role="tab" aria-selected="false">活动日志</a>
+            </div>
+            <div class="pad">
+              <dl class="kv">
+                <dt>邮箱</dt><dd>lin@studio.cn</dd>
+                <dt>公司</dt><dd>林间设计工作室</dd>
+                <dt>所在地区</dt><dd>中国 · 杭州</dd>
+                <dt>注册时间</dt><dd class="t-num">2022-09-14</dd>
+                <dt>最近登录</dt><dd class="t-num">2026-11-08 09:12 · 浏览器 Windows</dd>
+                <dt>客户编号</dt><dd class="t-mono">CUS-2022-0914-118</dd>
+              </dl>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="panel-head">
+              <h3>最近订单</h3>
+              <div class="grow"></div>
+              <a href="#" class="t-sm">全部 14 笔 →</a>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">订单号</th>
+                  <th scope="col">方案</th>
+                  <th scope="col" class="num">金额</th>
+                  <th scope="col">状态</th>
+                  <th scope="col">日期</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="t-mono">NW-1183</td>
+                  <td>团队版 · 12 席</td>
+                  <td class="num">¥ 4,960.00</td>
+                  <td><span class="badge ok">已支付</span></td>
+                  <td class="muted t-num">2026-11-08</td>
+                </tr>
+                <tr>
+                  <td class="t-mono">NW-1102</td>
+                  <td>团队版 · 12 席</td>
+                  <td class="num">¥ 4,960.00</td>
+                  <td><span class="badge ok">已支付</span></td>
+                  <td class="muted t-num">2026-10-08</td>
+                </tr>
+                <tr>
+                  <td class="t-mono">NW-1040</td>
+                  <td>团队版 · 8 席</td>
+                  <td class="num">¥ 3,310.00</td>
+                  <td><span class="badge plain">已退款</span></td>
+                  <td class="muted t-num">2026-09-08</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="card">
+            <div class="panel-head"><h3>内部备注</h3></div>
+            <div class="pad stack">
+              <div class="field">
+                <label class="label" for="memo">只对团队可见</label>
+                <textarea class="textarea" id="memo">11-08 电话沟通：他们对「按席位临时增减」很感兴趣，Q1 之前给出方案。</textarea>
+                <span class="help">保存后写入活动日志，客户不可见。</span>
+              </div>
+              <div class="row">
+                <button class="btn primary sm">保存备注</button>
+                <button class="btn quiet sm">取消</button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="stack">
+          <section class="card">
+            <div class="panel-head"><h3>账户状态</h3></div>
+            <div class="pad stack">
+              <div>
+                <div class="t-eyebrow">当前套餐</div>
+                <div style="font-size:var(--text-md);font-weight:600;margin-top:var(--space-1)">团队版 · 12 席</div>
+                <div class="t-sm t-muted t-num">下次扣款 2026-12-08 · ¥4,960.00</div>
+              </div>
+              <div>
+                <div class="t-eyebrow" style="margin-bottom:var(--space-2)">席位使用</div>
+                <div class="progress"><span style="width:67%"></span></div>
+                <div class="t-xs t-muted t-num" style="margin-top:var(--space-2)">8 / 12 已使用</div>
+              </div>
+              <label class="switch"><input type="checkbox" checked><span class="track"></span> 自动续费</label>
+              <label class="switch"><input type="checkbox" checked><span class="track"></span> 到期前 7 天邮件提醒</label>
+              <label class="switch"><input type="checkbox"><span class="track"></span> 每月发送用量报告</label>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="panel-head"><h3>危险操作</h3></div>
+            <div class="pad stack">
+              <p class="t-sm t-muted">暂停后席位保留 30 天，期间不可登录；删除不可撤销。</p>
+              <button class="btn sm">暂停订阅</button>
+              <button class="btn danger sm">删除账户…</button>
+            </div>
+          </section>
+
+          <p class="note">
+            <b>详情页最容易翻车的地方是「信息密度」。</b>
+            左栏放事实（键值、订单、备注），右栏放操作（状态、开关、危险区）。
+            两栏都是 <code>--surface-1</code>，靠 <code>--space-5</code> 的空隙分组，
+            没有额外描边——玻璃面板上再加边框会脏。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

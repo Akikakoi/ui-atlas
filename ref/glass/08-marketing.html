@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass 参考实现 · 08 营销页</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body class="ref">
+
+<nav class="refnav" aria-label="参考实现页面">
+  <a href="01-workbench.html">01 工作台</a>
+  <a href="02-record.html">02 详情</a>
+  <a href="03-form.html">03 表单</a>
+  <a href="04-states.html">04 状态</a>
+  <a href="05-dialog.html">05 弹窗</a>
+  <a href="06-light.html">06 浅色</a>
+  <a href="07-anti.html">07 反例</a>
+  <a href="08-marketing.html" class="is-active">08 营销</a>
+  <a href="09-auth.html">09 登录</a>
+  <a href="10-mobile.html">10 移动</a>
+  <span class="tag">glass · 公开页</span>
+</nav>
+
+<header class="mk mk-nav">
+  <span class="side-brand" style="padding:0"><span class="mark">◆</span> Northwind</span>
+  <nav class="links" aria-label="站点导航">
+    <a href="#">产品</a>
+    <a href="#pricing">定价</a>
+    <a href="#">文档</a>
+    <a href="#">客户</a>
+  </nav>
+  <span class="grow"></span>
+  <a class="btn ghost sm" href="09-auth.html">登录</a>
+  <a class="btn primary sm" href="09-auth.html">免费试用</a>
+</header>
+
+<main class="mk">
+  <section class="mk-hero">
+    <div class="t-eyebrow">订阅管理 · 2026 秋季版</div>
+    <h1>把「这个月收了多少」<br>变成一句<em>不用问</em>的话</h1>
+    <p>席位、续费、退款、发票，所有数字都在一个视图里。给做订阅制的小团队用，不塞 CRM，不逼你上手两周。</p>
+    <div class="cta">
+      <a class="btn primary" href="09-auth.html">免费试用 14 天</a>
+      <a class="btn ghost" href="#">看 3 分钟演示</a>
+    </div>
+    <div class="fine">不用信用卡 · 随时导出全部数据 · 中文界面</div>
+  </section>
+
+  <section class="mock" aria-label="产品界面示意">
+    <div class="mock-top">
+      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="t">northwind.app / overview</span>
+    </div>
+    <div class="mock-body">
+      <div class="mock-chart">
+        <div class="cap"><span>经常性收入 · 近 12 周</span><span class="t-num">¥ 248,600</span></div>
+        <div class="bars" aria-hidden="true">
+          <i style="height:34%"></i><i style="height:40%"></i><i style="height:37%"></i><i style="height:46%"></i>
+          <i style="height:52%"></i><i style="height:49%"></i><i style="height:58%"></i><i style="height:63%"></i>
+          <i style="height:60%"></i><i style="height:71%"></i><i style="height:78%"></i><i class="on" style="height:88%"></i>
+        </div>
+      </div>
+      <div class="mock-kpi">
+        <div class="row-k"><span>活跃会员</span><b>3,182</b></div>
+        <div class="row-k"><span>本月新增</span><b>+214</b></div>
+        <div class="row-k"><span>待收款</span><b>¥ 12,480</b></div>
+        <div class="row-k"><span>流失率</span><b>2.4%</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="page-head" style="margin-bottom:var(--space-6)">
+      <div class="grow">
+        <h2>按席位计价，随时增减</h2>
+        <p>年付省两个月。降级不退差价，但会折算到下一个账期。</p>
+      </div>
+    </div>
+
+    <div class="prices">
+      <div class="card price">
+        <div class="name">个人版</div>
+        <div class="amount">¥98 <small>/ 月</small></div>
+        <ul>
+          <li>1 个席位</li>
+          <li>订单与发票管理</li>
+          <li>每月导出一次</li>
+        </ul>
+        <a class="btn ghost sm" href="09-auth.html">开始试用</a>
+      </div>
+
+      <div class="card price is-featured">
+        <span class="flag">最常选</span>
+        <div class="name">团队版</div>
+        <div class="amount">¥620 <small>/ 席 / 月</small></div>
+        <ul>
+          <li>不限席位，按人计费</li>
+          <li>权限与审批流</li>
+          <li>随时导出、API 访问</li>
+          <li>到期前 7 天自动提醒</li>
+        </ul>
+        <a class="btn primary sm" href="09-auth.html">免费试用 14 天</a>
+      </div>
+
+      <div class="card price">
+        <div class="name">企业版</div>
+        <div class="amount">定制</div>
+        <ul>
+          <li>SSO / SCIM</li>
+          <li>私有部署可选</li>
+          <li>专属支持与 SLA</li>
+        </ul>
+        <a class="btn ghost sm" href="#">联系我们</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-top:var(--space-8)">
+    <h2 style="margin-bottom:var(--space-4)">常见问题</h2>
+    <div class="faq">
+      <details open>
+        <summary>中途加席位，账单怎么算？</summary>
+        <p>按天折算，下一个账期一起收。比如 12 席用满 15 天再升到 15 席，只补这 15 天差额，不会整月重收。</p>
+      </details>
+      <details>
+        <summary>可以导出全部数据吗？</summary>
+        <p>可以。订单、发票、会员、活动日志都能导出 CSV，API 也能拉。我们不锁数据——锁数据的订阅产品最后都留不住人。</p>
+      </details>
+      <details>
+        <summary>团队版有最低席位数吗？</summary>
+        <p>没有。3 个人也能用团队版，单价与 30 人一样，只是按席位总数算钱。</p>
+      </details>
+      <details>
+        <summary>支持哪些支付方式？</summary>
+        <p>对公转账、支付宝、微信、境外信用卡。对公转账需要人工确认，通常 1 个工作日内到账。</p>
+      </details>
+    </div>
+  </section>
+
+  <footer class="mk-foot">
+    <div class="col">
+      <span class="side-brand" style="padding:0"><span class="mark">◆</span> Northwind</span>
+      <span class="t-muted" style="font-size:var(--text-xs);line-height:1.8">给做订阅制的小团队用的账务台。<br>杭州 · 2021 年起</span>
+    </div>
+    <div class="col"><b>产品</b><a href="#">总览</a><a href="#">定价</a><a href="#">更新日志</a></div>
+    <div class="col"><b>资源</b><a href="#">文档</a><a href="#">API</a><a href="#">状态</a></div>
+    <div class="col"><b>公司</b><a href="#">关于</a><a href="#">隐私</a><a href="#">条款</a></div>
+    <div class="copy">© 2026 Northwind Studio · 本页是 UI Atlas 的参考实现，非真实产品</div>
+  </footer>
+</main>
+
+</body>
+</html>

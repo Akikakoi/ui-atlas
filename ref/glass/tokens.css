@@ -1,0 +1,165 @@
+/* ============================================================================
+   Glass · 参考实现 —— Token 层
+   ----------------------------------------------------------------------------
+   这一份是「体系」，不是「色板」。任何页面都不写死颜色/间距/字号，
+   全部走变量；换一个 data-theme 就应该成立，而不是换皮。
+
+   命名分七组：底色层级 / 文字 / 主色 / 语义色 / 线 / 玻璃与阴影 / 尺度（圆角 字号 间距 动效 层级）
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* ---------- 1. 底色与层级：背景 → 面板 → 卡片 → 浮层，四层递进 ---------- */
+  --bg: #070912;
+  /* 背景光斑：玻璃拟态存在的前提。没有它就退化成灰雾（见 07-anti） */
+  --bg-tint-1: rgba(59, 107, 255, .28);
+  --bg-tint-2: rgba(139, 92, 246, .22);
+  --bg-tint-3: rgba(34, 211, 238, .16);
+
+  --surface-1: rgba(255, 255, 255, .055);   /* 一级面板：侧栏、卡片 */
+  --surface-2: rgba(255, 255, 255, .09);    /* 二级：输入框、次级按钮 */
+  --surface-3: rgba(255, 255, 255, .14);    /* 三级：浮层、弹窗、dropdown */
+  --surface-solid: #101426;                 /* 不透明锚点：不能全透明 */
+  --veil: rgba(7, 9, 18, .62);              /* 粘性栏的半透明底 */
+  --overlay: rgba(5, 7, 14, .66);           /* 遮罩 */
+
+  /* ---------- 2. 文字：三级 + 强调 ---------- */
+  --ink: #eef2ff;
+  --ink-2: #c9d1e8;
+  --muted: #8b96b8;
+  --muted-strong: #a7b1cd;
+
+  /* ---------- 3. 主色 ---------- */
+  --accent: #7aa2ff;
+  --accent-ink: #05122e;                    /* 主色上的文字：深色，不硬塞白字 */
+  --accent-weak: rgba(122, 162, 255, .16);
+  --accent-line: rgba(122, 162, 255, .45);
+
+  /* ---------- 4. 语义色（只用于状态，不用于装饰） ---------- */
+  --ok: #34d399;
+  --ok-weak: rgba(52, 211, 153, .14);
+  --warn: #fbbf24;
+  --warn-weak: rgba(251, 191, 36, .14);
+  --danger: #fb7185;
+  --danger-weak: rgba(251, 113, 133, .14);
+  --on-danger: #2a0410;                     /* 危险按钮上的文字，别硬塞白字 */
+  --info: #60a5fa;
+  --info-weak: rgba(96, 165, 250, .14);
+
+  /* ---------- 5. 线：三档，不许随手 rgba ---------- */
+  --line-soft: rgba(255, 255, 255, .08);
+  --line: rgba(255, 255, 255, .14);
+  --line-strong: rgba(255, 255, 255, .26);
+  --bevel: rgba(255, 255, 255, .06);        /* 玻璃顶边高光 */
+
+  /* ---------- 6. 玻璃与阴影：blur 三档，阴影三档 ---------- */
+  --blur-sm: 10px;
+  --blur-md: 18px;
+  --blur-lg: 28px;
+  --saturate: 140%;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .28);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, .34);
+  --shadow-3: 0 24px 64px rgba(0, 0, 0, .48);
+  --glow-accent: 0 0 0 1px var(--accent-line), 0 8px 30px rgba(122, 162, 255, .18);
+
+  /* ---------- 7a. 圆角：5 档，pills 单独 ---------- */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* ---------- 7b. 字号阶梯：11.5 → 44，八级 ---------- */
+  --text-xs: 11.5px;
+  --text-sm: 12.5px;
+  --text-base: 14px;
+  --text-md: 15.5px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 44px;
+
+  --lh-tight: 1.2;
+  --lh-base: 1.55;
+  --lh-loose: 1.75;
+  --tracking-wide: .14em;
+  --tracking-wide-xl: .22em;
+
+  /* ---------- 7c. 间距：4px 基数，八级 ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* ---------- 7d. 字体 ---------- */
+  --font: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, Consolas, "Cascadia Mono", monospace;
+
+  /* ---------- 7e. 动效 ---------- */
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 320ms;
+  --ease: cubic-bezier(.2, .7, .3, 1);
+
+  /* ---------- 7f. 层级 ---------- */
+  --z-sticky: 20;
+  --z-modal: 60;
+  --z-toast: 80;
+}
+
+/* ============================================================================
+   同一套变量，切到浅色：如果换主题后组件开始「糊」，说明 token 层没抽象干净。
+   浅色玻璃比深色难 3 倍——背景光斑必须更重，面板必须更白。
+   ========================================================================== */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #eef1f8;
+  --bg-tint-1: rgba(59, 107, 255, .22);
+  --bg-tint-2: rgba(139, 92, 246, .18);
+  --bg-tint-3: rgba(34, 211, 238, .16);
+
+  --surface-1: rgba(255, 255, 255, .55);
+  --surface-2: rgba(255, 255, 255, .72);
+  --surface-3: rgba(255, 255, 255, .88);
+  --surface-solid: #ffffff;
+  --veil: rgba(238, 241, 248, .72);
+  --overlay: rgba(20, 26, 45, .38);
+
+  --ink: #10142a;
+  --ink-2: #2c3450;
+  --muted: #5d6785;
+  --muted-strong: #454f6b;
+
+  --accent: #2a5bd7;
+  --accent-ink: #ffffff;
+  --accent-weak: rgba(42, 91, 215, .12);
+  --accent-line: rgba(42, 91, 215, .42);
+
+  --ok: #0f7a53;
+  --ok-weak: rgba(15, 122, 83, .12);
+  --warn: #8a5a00;
+  --warn-weak: rgba(180, 120, 0, .16);
+  --danger: #b02a3c;
+  --danger-weak: rgba(176, 42, 60, .12);
+  --on-danger: #ffffff;
+  --info: #1d4ed8;
+  --info-weak: rgba(29, 78, 216, .12);
+
+  --line-soft: rgba(16, 20, 42, .08);
+  --line: rgba(16, 20, 42, .14);
+  --line-strong: rgba(16, 20, 42, .26);
+  --bevel: rgba(255, 255, 255, .85);
+
+  --shadow-1: 0 1px 2px rgba(20, 26, 45, .08);
+  --shadow-2: 0 8px 24px rgba(20, 26, 45, .10);
+  --shadow-3: 0 24px 64px rgba(20, 26, 45, .16);
+  --glow-accent: 0 0 0 1px var(--accent-line), 0 8px 30px rgba(42, 91, 215, .16);
+}

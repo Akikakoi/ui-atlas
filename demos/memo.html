@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>手账笔记 · 长文版式 · UI 样例</title>
+<style>
+:root{--bg:#fffdf6;--surface:#fffef9;--ink:#2a3a52;--muted:#7c8698;--accent:#ffb800;--accent-ink:#0b0b0b;--line:#dfe3ea;--radius:4px;--radius-sm:4px;--font:'Kaiti SC',KaiTi,'PingFang SC',sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15.5px;line-height:1.85}
+.wrap{max-width:1040px;margin:0 auto;padding:22px 28px 36px;display:grid;
+  grid-template-columns:104px minmax(0,1fr);gap:0 40px}
+.mast{grid-column:1/-1;display:flex;align-items:baseline;gap:14px;padding-bottom:12px;
+  border-bottom:1px solid var(--line);margin-bottom:28px}
+.mast .b{font-weight:700;font-size:16px}
+.mast nav{margin-left:auto;display:flex;gap:16px;font-size:12px;color:var(--muted)}
+a{color:inherit;text-decoration:none}
+.rail{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  display:grid;gap:8px;align-content:start;padding-top:8px}
+.art{min-width:0;max-width:60ch}
+.eyebrow{margin:0 0 14px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent)}
+h1{margin:0 0 18px;font-size:clamp(28px,4vw,46px);line-height:1.18;letter-spacing:-.02em;font-weight:700;
+  text-wrap:balance}
+.stand{margin:0 0 22px;font-size:17px;line-height:1.8;color:var(--muted)}
+.rule{border:0;border-top:1px solid var(--line);margin:0 0 26px}
+.sec{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;margin:0 0 20px}
+.sec .n{font-size:11px;color:var(--accent);padding-top:7px;font-variant-numeric:tabular-nums}
+.sec p{margin:0;font-size:15px;line-height:1.9}
+.art h2{margin:30px 0 12px;font-size:16px;font-weight:600;letter-spacing:.01em}
+.art .body{margin:0 0 18px;font-size:15.5px;line-height:1.95}
+.art .cols{column-count:2;column-gap:32px;column-rule:1px solid var(--line);max-width:none}
+.art .cols h2{margin-top:0}
+.art:has(.cols){max-width:none}
+.pull{margin:30px 0;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  font-size:17px;line-height:1.75;letter-spacing:-.01em;color:var(--muted)}
+.pull-k{display:block;margin-bottom:8px;font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent)}
+.colophon{grid-column:1/-1;margin-top:34px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--muted);display:flex;gap:14px}
+@media (max-width:820px){
+  .wrap{grid-template-columns:1fr;padding:18px 20px}
+  .rail{grid-auto-flow:column;justify-content:start;gap:14px;padding:0 0 18px}
+  .art{max-width:none}
+}
+
+body{background:
+  linear-gradient(rgba(120,150,190,.16) 1px,transparent 1px) 0 0/14px 14px,
+  linear-gradient(90deg,rgba(120,150,190,.16) 1px,transparent 1px) 0 0/14px 14px,
+  #fffdf6}
+.hero h1{font-family:'Kaiti SC',KaiTi,serif;font-weight:400;font-size:clamp(32px,5vw,52px)}
+.hero h1 span{background:linear-gradient(transparent 62%,#ffe14d 62%);padding:0 .1em}
+.card,.panel{background:#fffef9;border:1px solid #dfe3ea;border-radius:4px;box-shadow:0 6px 18px rgba(80,90,110,.08)}
+.card{position:relative}
+.card::before{content:"";position:absolute;left:-6px;top:-8px;width:44px;height:16px;background:#ffe9a8;
+  transform:rotate(-8deg);opacity:.9}
+.card .k{color:#ffb800}
+.btn{background:#2a3a52;border-radius:4px;font-family:inherit}
+.btn.ghost{background:#fffef9;color:#2a3a52;border:1px solid #dfe3ea}
+.nav{border-bottom:1px solid #dfe3ea}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast"><span class="b">课堂 · 03</span><nav><a href="#">目录</a><a href="#">归档</a><a href="#">关于</a></nav></header>
+  <aside class="rail"><span>Bullet Journal</span><span>—</span><span>8 分钟</span></aside>
+  <article class="art">
+    <p class="eyebrow">手账笔记</p>
+    <h1>第三讲：怎么记笔记</h1>
+    <p class="stand">一条线、两个箭头、三句结论。</p>
+    <hr class="rule">
+      <p class="body">笔记不是抄写。抄写只证明你手在动；笔记要证明你在想。所以我的本子上，右边记老师说的，左边记我没听懂的。</p>
+      <p class="body">三个符号够用：一条线连因果，两个箭头分先后，一个方框圈结论。颜色只用两种，红的标疑点，蓝的写自己的话。</p>
+      <h2>复习的时候</h2>
+      <p class="body">只看左边。左边懂了，右边就不用再看；左边一直是空的，说明这节课白上了。</p>
+    <p class="pull"><span class="pull-k">别用在这</span>企业对外正式页面：手写感会削弱权威。</p>
+  </article>
+  <footer class="colophon"><span>© 2026 课堂 · 03</span><span>风格样例 · 非真实刊物</span></footer>
+</div>
+</body>
+</html>
