@@ -123,6 +123,7 @@
     save('uiatlas.recent', RECENT);
     var n = document.getElementById('n-recent');
     if (n) n.textContent = RECENT.length;
+    syncDropdowns();
   }
 
   /* ---------- 缩略图缩放 ---------- */
@@ -341,6 +342,7 @@
   }
 
   function render() {
+    syncDropdowns();
     grid.textContent = '';
     if (io) io.disconnect();
     var list = DATA.styles.filter(match);
@@ -773,6 +775,55 @@
     this.setAttribute('aria-expanded', show ? 'true' : 'false');
   });
 
+
+  /* ================================================================= 筛选下拉 */
+  var DD_LABEL = {
+    group: { "": "全部", classic: "经典 UI", shift: "风格平移" },
+    form: { "": "全部", landing: "落地页", admin: "后台", app: "App" },
+    layout: { "": "全部", landing: "落地页", grid: "网格", poster: "海报",
+              console: "控制台", article: "长文" }
+  };
+
+  function closeMenus() {
+    document.querySelectorAll(".dd-menu").forEach(function (m) { m.hidden = true; });
+    document.querySelectorAll(".dd-btn").forEach(function (b) { b.setAttribute("aria-expanded", "false"); });
+  }
+
+  function syncDropdowns() {
+    document.querySelectorAll(".dd").forEach(function (dd) {
+      var k = dd.getAttribute("data-dd");
+      var v = dd.querySelector(".dd-v");
+      if (!v) return;
+      if (k === "mine") {
+        var mine = [];
+        if (state.fav) mine.push("收藏 " + FAV.size);
+        if (state.recent) mine.push("最近 " + RECENT.length);
+        v.textContent = mine.length ? mine.join(" · ") : "未设置";
+        dd.classList.toggle("is-set", mine.length > 0);
+      } else {
+        var label = (DD_LABEL[k] || {})[state[k]];
+        if (label === undefined) label = state[k] || "全部";
+        v.textContent = label;
+        dd.classList.toggle("is-set", !!state[k]);
+      }
+    });
+  }
+
+  document.querySelectorAll(".dd").forEach(function (dd) {
+    var btn = dd.querySelector(".dd-btn"), menu = dd.querySelector(".dd-menu");
+    if (!btn || !menu) return;
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var open = menu.hidden;
+      closeMenus();
+      menu.hidden = !open;
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  });
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest(".dd")) closeMenus();
+  });
+
   /* ================================================================= 顶栏与路由 */
   var q = document.getElementById('q');
   var qt = null;
@@ -796,6 +847,8 @@
           x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
         });
       }
+      closeMenus();
+      syncDropdowns();
       render();
     });
   });
@@ -812,6 +865,7 @@
       : (!compare.hidden ? compare.querySelector('.compare-box') : null);
 
     if (e.key === 'Escape') {
+      closeMenus();
       if (!detail.hidden) { closeDetail(); return; }
       if (!compare.hidden) {
         compare.hidden = true;

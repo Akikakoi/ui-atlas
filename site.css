@@ -250,3 +250,27 @@ pre { margin: 0 0 8px; background: #f5f3ec; border: 1px solid var(--line); borde
   .screens, .ref-two { grid-template-columns: 1fr; }
   .ref-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ================================================================ 筛选下拉 */
+.dd { position: relative; }
+.dd-btn { display: flex; align-items: center; gap: 7px; border: 1px solid var(--line);
+  background: var(--panel); border-radius: 999px; padding: 5px 12px; font: inherit;
+  font-size: 12.5px; cursor: pointer; color: var(--ink); }
+.dd-btn:hover { border-color: #c9c6bc; }
+.dd-btn[aria-expanded="true"], .dd.is-set .dd-btn { border-color: var(--ink); }
+.dd-k { font-size: 11px; color: var(--muted); }
+.dd-v { font-weight: 600; }
+.dd-caret { font-size: 9px; color: var(--muted); }
+.dd-menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; min-width: 158px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(30,30,20,.16); padding: 6px; display: grid; gap: 2px; }
+.dd.right .dd-menu { left: auto; right: 0; }
+.dd-menu .chip { display: flex; align-items: center; justify-content: space-between; width: 100%;
+  border: 0; background: none; border-radius: 7px; padding: 6px 10px; font-size: 12.5px;
+  text-align: left; }
+.dd-menu .chip:hover { background: var(--chip); border-color: transparent; }
+.dd-menu .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.dd-menu .chip small { opacity: .65; margin-left: auto; font-size: 11px; }
+@media (max-width: 720px) {
+  .dd.right .dd-menu, .dd .dd-menu { max-width: calc(100vw - 32px); }
+}

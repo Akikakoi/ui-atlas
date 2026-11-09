@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UI Atlas · 网页 UI 风格图鉴</title>
 <meta name="description" content="60 个网页 UI 风格样例：落地页 / 后台 / App 三种形态，全部颜色与圆角写成 CSS 变量，可实时改、可分享、可导出 Tailwind / shadcn。">
-<link rel="stylesheet" href="site.css?v=11">
+<link rel="stylesheet" href="site.css?v=12">
 </head>
 <body>
 <a class="skip" href="#grid">跳到图鉴</a>
@@ -27,32 +27,48 @@
     </div>
   </div>
   <div class="filterbar">
-    <div class="fgroup" role="group" aria-label="按分组筛选">
-      <span class="flabel">分组</span>
-      <button class="chip" data-k="group" data-v="" aria-pressed="true">全部 <small id="n-all"></small></button>
-      <button class="chip" data-k="group" data-v="classic" aria-pressed="false">经典 UI <small id="n-classic"></small></button>
-      <button class="chip" data-k="group" data-v="shift" aria-pressed="false">风格平移 <small id="n-shift"></small></button>
+    <div class="dd" data-dd="group">
+      <button class="dd-btn" type="button" aria-expanded="false" aria-haspopup="true">
+        <span class="dd-k">分组</span><span class="dd-v">全部</span><span class="dd-caret" aria-hidden="true">▾</span>
+      </button>
+      <div class="dd-menu" hidden>
+        <button class="chip" data-k="group" data-v="" aria-pressed="true">全部 <small id="n-all"></small></button>
+        <button class="chip" data-k="group" data-v="classic" aria-pressed="false">经典 UI <small id="n-classic"></small></button>
+        <button class="chip" data-k="group" data-v="shift" aria-pressed="false">风格平移 <small id="n-shift"></small></button>
+      </div>
     </div>
-    <div class="fgroup" role="group" aria-label="按形态筛选">
-      <span class="flabel">形态</span>
-      <button class="chip" data-k="form" data-v="" aria-pressed="true">全部 <small id="n-form-all"></small></button>
-      <button class="chip" data-k="form" data-v="landing" aria-pressed="false">落地页 <small id="n-landing"></small></button>
-      <button class="chip" data-k="form" data-v="admin" aria-pressed="false">后台 <small id="n-admin"></small></button>
-      <button class="chip" data-k="form" data-v="app" aria-pressed="false">App <small id="n-app"></small></button>
+    <div class="dd" data-dd="form">
+      <button class="dd-btn" type="button" aria-expanded="false" aria-haspopup="true">
+        <span class="dd-k">形态</span><span class="dd-v">全部</span><span class="dd-caret" aria-hidden="true">▾</span>
+      </button>
+      <div class="dd-menu" hidden>
+        <button class="chip" data-k="form" data-v="" aria-pressed="true">全部 <small id="n-form-all"></small></button>
+        <button class="chip" data-k="form" data-v="landing" aria-pressed="false">落地页 <small id="n-landing"></small></button>
+        <button class="chip" data-k="form" data-v="admin" aria-pressed="false">后台 <small id="n-admin"></small></button>
+        <button class="chip" data-k="form" data-v="app" aria-pressed="false">App <small id="n-app"></small></button>
+      </div>
     </div>
-    <div class="fgroup" role="group" aria-label="按版式筛选">
-      <span class="flabel">版式</span>
-      <button class="chip" data-k="layout" data-v="" aria-pressed="true">全部</button>
-      <button class="chip" data-k="layout" data-v="landing" aria-pressed="false">落地页 <small id="n-lay-landing"></small></button>
-      <button class="chip" data-k="layout" data-v="grid" aria-pressed="false">网格 <small id="n-lay-grid"></small></button>
-      <button class="chip" data-k="layout" data-v="poster" aria-pressed="false">海报 <small id="n-lay-poster"></small></button>
-      <button class="chip" data-k="layout" data-v="console" aria-pressed="false">控制台 <small id="n-lay-console"></small></button>
-      <button class="chip" data-k="layout" data-v="article" aria-pressed="false">长文 <small id="n-lay-article"></small></button>
+    <div class="dd" data-dd="layout">
+      <button class="dd-btn" type="button" aria-expanded="false" aria-haspopup="true">
+        <span class="dd-k">版式</span><span class="dd-v">全部</span><span class="dd-caret" aria-hidden="true">▾</span>
+      </button>
+      <div class="dd-menu" hidden>
+        <button class="chip" data-k="layout" data-v="" aria-pressed="true">全部</button>
+        <button class="chip" data-k="layout" data-v="landing" aria-pressed="false">落地页 <small id="n-lay-landing"></small></button>
+        <button class="chip" data-k="layout" data-v="grid" aria-pressed="false">网格 <small id="n-lay-grid"></small></button>
+        <button class="chip" data-k="layout" data-v="poster" aria-pressed="false">海报 <small id="n-lay-poster"></small></button>
+        <button class="chip" data-k="layout" data-v="console" aria-pressed="false">控制台 <small id="n-lay-console"></small></button>
+        <button class="chip" data-k="layout" data-v="article" aria-pressed="false">长文 <small id="n-lay-article"></small></button>
+      </div>
     </div>
-    <div class="fgroup" role="group" aria-label="个人筛选">
-      <span class="flabel">我的</span>
-      <button class="chip" data-k="fav" data-v="1" aria-pressed="false">收藏 <small id="n-fav">0</small></button>
-      <button class="chip" data-k="recent" data-v="1" aria-pressed="false">最近 <small id="n-recent">0</small></button>
+    <div class="dd right" data-dd="mine">
+      <button class="dd-btn" type="button" aria-expanded="false" aria-haspopup="true">
+        <span class="dd-k">我的</span><span class="dd-v">未设置</span><span class="dd-caret" aria-hidden="true">▾</span>
+      </button>
+      <div class="dd-menu" hidden>
+        <button class="chip" data-k="fav" data-v="1" aria-pressed="false">收藏 <small id="n-fav">0</small></button>
+        <button class="chip" data-k="recent" data-v="1" aria-pressed="false">最近 <small id="n-recent">0</small></button>
+      </div>
     </div>
     <span class="spacer"></span>
     <a class="ref-link" href="ref.html">参考实现 · Glass →</a>
@@ -152,6 +168,6 @@
   </div>
 </div>
 
-<script src="app.js?v=8"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>
