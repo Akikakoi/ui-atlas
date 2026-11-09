@@ -83,68 +83,6 @@
   <p>内容为学习与设计参考：所有样例均为本站自行实现，未复制任何第三方站点的代码或素材。</p>
 </footer>
 
-<!-- 详情：全页路由 -->
-<section id="detail-page" hidden>
-  <header class="dp-head">
-    <div class="dp-title">
-      <button class="btn" id="d-back" type="button">← 返回图鉴</button>
-      <div>
-        <h2 id="d-name"></h2>
-        <p id="d-sub"></p>
-      </div>
-    </div>
-    <div class="detail-actions">
-      <a class="btn" id="d-open" target="_blank" rel="noopener">新窗口打开</a>
-      <button class="btn" id="d-share">复制分享链接</button>
-      <button class="btn" id="d-export-btn" aria-expanded="false" aria-controls="d-export">导出 ▾</button>
-    </div>
-  </header>
-  <div class="dp-body">
-    <div class="stage"><iframe id="d-frame" title="风格样例预览"></iframe></div>
-    <aside class="side">
-      <p class="banner" id="d-banner" hidden></p>
-
-      <section>
-        <h3>识别特征</h3>
-        <ul id="d-features"></ul>
-      </section>
-
-      <section>
-        <h3>什么时候不要用</h3>
-        <p class="avoid" id="d-avoid"></p>
-      </section>
-
-      <section>
-        <h3>Tokens <span class="hint">改一下，预览实时变</span></h3>
-        <div class="tokens" id="d-tokens"></div>
-        <p class="contrast" id="d-contrast"></p>
-      </section>
-
-      <section id="d-export" hidden>
-        <h3>导出</h3>
-        <div class="tabs" role="tablist" aria-label="导出格式">
-          <button role="tab" data-fmt="css" aria-selected="true">CSS 变量</button>
-          <button role="tab" data-fmt="tailwind" aria-selected="false">Tailwind</button>
-          <button role="tab" data-fmt="shadcn" aria-selected="false">shadcn</button>
-        </div>
-        <pre id="d-export-code" tabindex="0"></pre>
-        <button class="btn small" id="d-export-copy">复制这段</button>
-      </section>
-
-      <section>
-        <h3>给 AI 的提示词</h3>
-        <pre id="d-prompt" tabindex="0"></pre>
-        <button class="btn small" id="d-copy-prompt">复制提示词</button>
-      </section>
-
-      <section>
-        <h3>来源与依据</h3>
-        <ul class="sources" id="d-sources"></ul>
-      </section>
-    </aside>
-  </div>
-</section>
-
 <!-- 对比 -->
 <div class="overlay" id="compare" hidden>
   <div class="compare-box" role="dialog" aria-modal="true" aria-labelledby="c-title">
@@ -168,7 +106,10 @@
   </div>
 </div>
 
-<script src="app.js?v=10"></script>
+<script>
+try { sessionStorage.setItem('uiatlas.gallery', JSON.stringify({layout:'poster', y: 240})); } catch(e) {}
+</script>
+<script src="app.js?v=11"></script>
 
 </body>
 </html>

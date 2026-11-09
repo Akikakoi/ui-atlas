@@ -9,7 +9,6 @@
       editState = {},   // id -> tokens（用户改过的值）
       S = null,         // 当前打开的样式
       lastFocus = null,
-      lastScroll = 0,   // 打开详情前记录画廊滚动位置，返回时恢复
       io = null;
 
   var FORM_LABEL = { landing: '落地页', admin: '后台', app: 'App' };
@@ -263,10 +262,10 @@
     setTimeout(function () { if (!shot.classList.contains('ready')) shot.classList.add('failed'); }, 8000);
     shot.addEventListener('click', function (e) {
       if (e.target.classList && e.target.classList.contains('fb')) return;
-      openDetail(s.id);
+      goDetail(s.id);
     });
     shot.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(s.id); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goDetail(s.id); }
     });
 
     var cb = el('input', { type: 'checkbox', 'aria-label': '把《' + s.name + '》选入对比' });
@@ -295,7 +294,7 @@
     });
 
     var more = el('button', { class: 'linkish', type: 'button', text: '看详情 →' });
-    more.addEventListener('click', function () { openDetail(s.id); });
+    more.addEventListener('click', function () { goDetail(s.id); });
 
     var ratio = contrastOn(s.tokens.ink, s.tokens.bg);
     var aaCls = ratio !== null && ratio >= 4.5 ? 'aa' : 'aa low';
@@ -334,7 +333,7 @@
       ]);
       picks.forEach(function (s) {
         var b = el('button', { type: 'button', text: s.name + ' · ' + (FORM_LABEL[s.form] || '') });
-        b.addEventListener('click', function () { openDetail(s.id); });
+        b.addEventListener('click', function () { goDetail(s.id); });
         row.appendChild(b);
       });
       box.appendChild(row);
@@ -388,281 +387,7 @@
     document.body.removeChild(ta);
   }
 
-  /* ================================================================= 详情 */
-  var detail = document.getElementById('detail-page');
-  var compare = document.getElementById('compare');
-
-  function tokensOf(s) {
-    if (!editState[s.id]) editState[s.id] = Object.assign({}, s.tokens);
-    return editState[s.id];
-  }
-  function changedKeys(s) {
-    var t = tokensOf(s), out = {};
-    Object.keys(s.tokens).forEach(function (k) { if (t[k] !== s.tokens[k]) out[k] = 1; });
-    return out;
-  }
-  function applyVars(iframe, tokens) {
-    try {
-      var root = iframe.contentDocument.documentElement;
-      Object.keys(tokens).forEach(function (k) { root.style.setProperty('--' + k, tokens[k]); });
-    } catch (e) { /* iframe 未就绪 */ }
-  }
-
-  function cssText(tokens) {
-    return ':root {\n' + Object.keys(tokens).map(function (k) {
-      return '  --' + k + ': ' + tokens[k] + ';';
-    }).join('\n') + '\n}';
-  }
-  function smRadius(r) {
-    var n = parseFloat(r);
-    if (isNaN(n)) return '8px';
-    return (n === 0 ? 0 : Math.min(8, n)) + 'px';
-  }
-  function tailwindText(tokens) {
-    var keys = ['bg', 'surface', 'ink', 'muted', 'accent', 'line'];
-    var colors = keys.map(function (k) { return "        " + k + ": '" + tokens[k] + "',"; }).join('\n');
-    var fonts = tokens.font.split(',').map(function (x) {
-      return "'" + x.trim().replace(/^['"]|['"]$/g, '') + "'";
-    }).join(', ');
-    return '// tailwind.config.js\nmodule.exports = {\n  theme: {\n    extend: {\n      colors: {\n'
-      + colors + '\n      },\n      borderRadius: {\n        DEFAULT: \'' + tokens.radius + '\',\n        sm: \''
-      + smRadius(tokens.radius) + '\',\n      },\n      fontFamily: {\n        sans: [' + fonts + '],\n      },\n'
-      + '    },\n  },\n};';
-  }
-  function shadcnText(tokens) {
-    var map = [['background', 'bg'], ['card', 'surface'], ['foreground', 'ink'],
-               ['muted-foreground', 'muted'], ['primary', 'accent'], ['border', 'line']];
-    var body = map.map(function (p) {
-      var hsl = hexToHsl(tokens[p[1]]);
-      if (!hsl) return '  /* --' + p[0] + ': ' + tokens[p[1]] + ' （非纯色，需手动换算） */';
-      var extra = parseColor(tokens[p[1]])[3] < 1 ? '  /* 原值 ' + tokens[p[1]] + ' 半透明 */' : '';
-      return '  --' + p[0] + ': ' + hsl[0] + ' ' + hsl[1] + '% ' + hsl[2] + '%;' + extra;
-    }).join('\n');
-    return '/* app.css —— shadcn 变量命名映射 */\n:root {\n' + body + '\n  --radius: ' + tokens.radius + ';\n}\n'
-      + '\n/* tailwind.config 里记得：colors 用 hsl(var(--background)) 这类写法 */';
-  }
-  var FMT = { css: cssText, tailwind: tailwindText, shadcn: shadcnText };
-  var curFmt = 'css';
-
-  function hashFor(id, tokens) {
-    var base = (DATA.styles.find(function (x) { return x.id === id; }) || { tokens: {} }).tokens;
-    var qs = [];
-    Object.keys(SHORT).forEach(function (k) {
-      if (tokens[k] !== undefined && tokens[k] !== base[k]) {
-        qs.push(SHORT[k] + '=' + encodeURIComponent(tokens[k]));
-      }
-    });
-    return '#/s/' + id + (qs.length ? '?' + qs.join('&') : '');
-  }
-
-  function syncHash() {
-    if (!S) return;
-    var h = hashFor(S.id, tokensOf(S));
-    if (location.hash !== h) history.replaceState(null, '', h);
-  }
-
-  function updateContrast(s, tokens) {
-    var bg = tokens.bg;
-    var r1 = contrastOn(tokens.ink, bg);
-    var r2 = contrastOn(tokens.ink, tokens.surface, bg);
-    var r3 = contrastOn(tokens.ink, tokens.accent, bg);
-    var parts = [
-      ['ink/bg', r1], ['ink/surface', r2], ['ink/accent', r3]
-    ];
-    var box = document.getElementById('d-contrast');
-    box.textContent = '';
-    parts.forEach(function (p, i) {
-      if (i) box.appendChild(document.createTextNode(' · '));
-      box.appendChild(document.createTextNode(p[0] + ' '));
-      var b = el('b', { text: rating(p[1]).txt });
-      b.className = rating(p[1]).cls;
-      box.appendChild(b);
-    });
-    box.appendChild(document.createTextNode('   （WCAG 正文需 ≥ 4.5:1）'));
-  }
-
-  function buildTokens(s, iframe) {
-    var box = document.getElementById('d-tokens');
-    box.textContent = '';
-    var tokens = tokensOf(s);
-    var changed = changedKeys(s);
-
-    function commit() {
-      applyVars(iframe, tokens);
-      updateContrast(s, tokens);
-      if (curFmt) document.getElementById('d-export-code').textContent = FMT[curFmt](tokens);
-      syncHash();
-    }
-
-    Object.keys(s.tokens).forEach(function (k) {
-      var row = el('div', { class: 'tok' + (changed[k] ? ' changed' : ''), 'data-k': k });
-      row.appendChild(el('span', { class: 'tk', text: k }));
-
-      var out = el('code', { text: tokens[k] });
-      var ctrl;
-
-      if (isHex(tokens[k])) {
-        ctrl = el('input', { type: 'color', value: tokens[k], 'aria-label': k });
-        ctrl.addEventListener('input', function () {
-          tokens[k] = ctrl.value; out.textContent = ctrl.value;
-          row.classList.toggle('changed', tokens[k] !== s.tokens[k]);
-          commit();
-        });
-      } else if (k === 'radius') {
-        ctrl = el('input', { type: 'range', min: '0', max: '40', step: '1',
-          value: String(clamp(parseFloat(tokens[k]) || 0, 0, 40)), 'aria-label': k });
-        ctrl.addEventListener('input', function () {
-          tokens[k] = ctrl.value + 'px'; out.textContent = tokens[k];
-          row.classList.toggle('changed', tokens[k] !== s.tokens[k]);
-          commit();
-        });
-      } else {
-        ctrl = el('input', { type: 'text', value: tokens[k], 'aria-label': k, spellcheck: 'false' });
-        ctrl.addEventListener('input', function () {
-          tokens[k] = ctrl.value; out.textContent = ctrl.value;
-          row.classList.toggle('changed', tokens[k] !== s.tokens[k]);
-          commit();
-        });
-      }
-
-      // 颜色 token：右侧标出它对 bg 的对比度
-      var cr = el('span', { class: 'cr' });
-      if (k !== 'bg' && parseColor(tokens[k])) {
-        var r = contrastOn(tokens[k], tokens.bg);
-        if (r !== null) { cr.textContent = r.toFixed(1); cr.className = 'cr ' + rating(r).cls; }
-      }
-
-      row.appendChild(ctrl);
-      row.appendChild(out);
-      row.appendChild(cr);
-      box.appendChild(row);
-    });
-
-    box.appendChild(el('div', { class: 'tok-bar' }, [
-      el('button', {
-        class: 'btn small', type: 'button', text: '重置为原值',
-        onclick: function () {
-          delete editState[s.id];
-          try { iframe.contentDocument.documentElement.removeAttribute('style'); } catch (e) {}
-          buildTokens(s, iframe);
-          syncHash();
-        }
-      }),
-      el('button', {
-        class: 'btn small', type: 'button', text: '复制 CSS 变量',
-        onclick: function () { copy(cssText(tokensOf(s)), this); }
-      }),
-      el('span', { class: 'tok-hint', text: '改动只作用于预览' })
-    ]));
-
-    commit();
-  }
-
-  function openDetail(id, params) {
-    var s = DATA.styles.find(function (x) { return x.id === id; });
-    if (!s) return;
-    lastFocus = document.activeElement;
-    S = s;
-
-    // 链接里的参数 → 套用并高亮
-    var applied = 0;
-    if (params) {
-      var t = tokensOf(s);
-      Object.keys(params).forEach(function (k) {
-        if (s.tokens[k] !== undefined && params[k] !== t[k]) { t[k] = params[k]; applied++; }
-      });
-    }
-
-    document.getElementById('d-name').textContent = s.name + ' · ' + s.name_en;
-    document.getElementById('d-sub').textContent =
-      (s.group === 'classic' ? '经典 UI 风格' : '风格平移（来自动效库）')
-      + ' · ' + FORM_LABEL[s.form]
-      + (LAYOUT_TAG[s.layout] ? ' · ' + LAYOUT_LABEL[s.layout] : '')
-      + (s.era ? ' · ' + s.era : '');
-
-    var banner = document.getElementById('d-banner');
-    banner.hidden = applied === 0;
-    banner.textContent = applied ? '已套用分享链接里的 ' + applied + ' 处改动（右侧高亮）。' : '';
-
-    var df = document.getElementById('d-frame');
-    df.style.opacity = '.35';
-    df.onload = function () {
-      df.style.opacity = '1';
-      applyVars(df, tokensOf(s));
-    };
-    df.src = s.demo;
-    document.getElementById('d-open').href = s.demo;
-
-    var ul = document.getElementById('d-features');
-    ul.textContent = '';
-    s.features.forEach(function (f) { ul.appendChild(el('li', { text: f })); });
-
-    document.getElementById('d-avoid').textContent = s.avoid || '（暂无）';
-
-    var src = document.getElementById('d-sources');
-    src.textContent = '';
-    (s.sources || []).forEach(function (x) { src.appendChild(el('li', { text: x })); });
-
-    document.getElementById('d-prompt').textContent = s.prompt;
-    document.getElementById('d-copy-prompt').onclick = function () { copy(s.prompt, this); };
-
-    // 导出面板默认收起
-    var exp = document.getElementById('d-export');
-    exp.hidden = true;
-    document.getElementById('d-export-btn').setAttribute('aria-expanded', 'false');
-    curFmt = 'css';
-    setFmt('css');
-
-    buildTokens(s, df);
-
-    document.getElementById('d-share').onclick = function () {
-      var url = location.origin + location.pathname + hashFor(s.id, tokensOf(s));
-      copy(url, this, '链接已复制 ✓');
-    };
-
-    markRecent(s.id);
-    lastScroll = window.scrollY;
-    document.body.classList.add('dp-open');
-    detail.hidden = false;
-    syncHash();
-    window.scrollTo(0, 0);
-  }
-
-  function setFmt(fmt) {
-    curFmt = fmt;
-    document.querySelectorAll('#d-export .tabs button').forEach(function (b) {
-      b.setAttribute('aria-selected', b.dataset.fmt === fmt ? 'true' : 'false');
-    });
-    var code = document.getElementById('d-export-code');
-    code.textContent = S ? FMT[fmt](tokensOf(S)) : '';
-    document.getElementById('d-export-copy').onclick = function () { copy(code.textContent, this); };
-  }
-
-  document.getElementById('d-export-btn').addEventListener('click', function () {
-    var exp = document.getElementById('d-export');
-    var open = exp.hidden;
-    exp.hidden = !open;
-    this.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) {
-      setFmt(curFmt);
-      setTimeout(function () { exp.scrollIntoView({ block: 'nearest' }); }, 20);
-    }
-  });
-  document.querySelectorAll('#d-export .tabs button').forEach(function (b) {
-    b.addEventListener('click', function () { setFmt(b.dataset.fmt); });
-  });
-
-  document.getElementById('d-back').addEventListener('click', function () { closeDetail(); });
-
-  function closeDetail() {
-    detail.hidden = true;
-    document.body.classList.remove('dp-open');
-    S = null;
-    history.replaceState(null, '', '#/');
-    window.scrollTo(0, lastScroll);
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
-  }
-
+  /* ================================================================= 对比 */
   /* ================================================================= 对比 */
   var COMPARE_IDS = [];
 
@@ -870,14 +595,13 @@
 
     if (e.key === 'Escape') {
       closeMenus();
-      if (!detail.hidden) { closeDetail(); return; }
       if (!compare.hidden) {
         compare.hidden = true;
         if (lastFocus && lastFocus.focus) lastFocus.focus();
         return;
       }
     }
-    if (e.key === '/' && document.activeElement !== q && !openBox && detail.hidden) {
+    if (e.key === '/' && document.activeElement !== q && !openBox) {
       e.preventDefault(); q.focus();
     }
     if (e.key === 'Tab' && openBox) {
@@ -894,28 +618,42 @@
     document.querySelectorAll('.shot').forEach(fitShot);
   });
 
-  function parseHash() {
-    var h = location.hash.replace(/^#/, '');
-    var m = /^\/s\/([\w-]+)(?:\?(.+))?$/.exec(h);
-    if (!m) return null;
-    var params = {};
-    if (m[2]) {
-      m[2].split('&').forEach(function (p) {
-        var i = p.indexOf('=');
-        if (i < 0) return;
-        var k = SHORT_REV[p.slice(0, i)];
-        if (!k) return;
-        try { params[k] = decodeURIComponent(p.slice(i + 1)); } catch (e) {}
-      });
-    }
-    return { id: m[1], params: params };
+  /* ================================================================= 跳转到详情页 */
+  function saveUiState() {
+    try {
+      sessionStorage.setItem('uiatlas.gallery', JSON.stringify({
+        q: state.q, group: state.group, form: state.form, layout: state.layout,
+        fav: state.fav, recent: state.recent, y: window.scrollY
+      }));
+    } catch (e) {}
+  }
+  function restoreUiState() {
+    try {
+      var s = JSON.parse(sessionStorage.getItem('uiatlas.gallery') || 'null');
+      if (!s) return;
+      state.q = s.q || ''; state.group = s.group || ''; state.form = s.form || '';
+      state.layout = s.layout || ''; state.fav = !!s.fav; state.recent = !!s.recent;
+      q.value = state.q;
+      window.__restoreY = s.y || 0;
+    } catch (e) {}
+  }
+  function syncChips() {
+    document.querySelectorAll('.chip[data-k]').forEach(function (c) {
+      var k = c.getAttribute('data-k'), v = c.getAttribute('data-v');
+      if (k === 'fav') c.setAttribute('aria-pressed', state.fav ? 'true' : 'false');
+      else if (k === 'recent') c.setAttribute('aria-pressed', state.recent ? 'true' : 'false');
+      else c.setAttribute('aria-pressed', state[k] === v ? 'true' : 'false');
+    });
+  }
+  function goDetail(id) {
+    saveUiState();
+    location.href = 'detail.html?id=' + encodeURIComponent(id);
   }
 
-  window.addEventListener('hashchange', function () {
-    var r = parseHash();
-    if (r) openDetail(r.id, r.params);
-    else if (!detail.hidden) closeDetail();
-  });
+  window.addEventListener('scroll', function () {
+    clearTimeout(window.__st);
+    window.__st = setTimeout(saveUiState, 250);
+  }, { passive: true });
 
   /* ================================================================= 启动 */
   fetch('styles.json').then(function (r) {
@@ -951,9 +689,14 @@
       }, { rootMargin: '300px 0px' });
     }
 
+    restoreUiState();
+    syncChips();
     render();
-    var r = parseHash();
-    if (r) openDetail(r.id, r.params);
+    if (window.__restoreY) window.scrollTo(0, window.__restoreY);
+    if (/^#\/s\//.test(location.hash)) {
+      // 旧的 hash 分享链接 → 跳到独立详情页
+      location.replace('detail.html?id=' + location.hash.slice(4));
+    }
   }).catch(function (err) {
     window.__errstack = (err && err.stack) || String(err);
     grid.appendChild(el('div', { class: 'empty' }, [
