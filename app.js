@@ -9,6 +9,7 @@
       editState = {},   // id -> tokens（用户改过的值）
       S = null,         // 当前打开的样式
       lastFocus = null,
+      lastScroll = 0,   // 打开详情前记录画廊滚动位置，返回时恢复
       io = null;
 
   var FORM_LABEL = { landing: '落地页', admin: '后台', app: 'App' };
@@ -388,7 +389,7 @@
   }
 
   /* ================================================================= 详情 */
-  var detail = document.getElementById('detail');
+  var detail = document.getElementById('detail-page');
   var compare = document.getElementById('compare');
 
   function tokensOf(s) {
@@ -620,9 +621,11 @@
     };
 
     markRecent(s.id);
+    lastScroll = window.scrollY;
+    document.body.classList.add('dp-open');
     detail.hidden = false;
     syncHash();
-    setTimeout(function () { document.getElementById('d-close').focus(); }, 30);
+    window.scrollTo(0, 0);
   }
 
   function setFmt(fmt) {
@@ -649,12 +652,14 @@
     b.addEventListener('click', function () { setFmt(b.dataset.fmt); });
   });
 
-  document.getElementById('d-close').addEventListener('click', function () { closeDetail(); });
+  document.getElementById('d-back').addEventListener('click', function () { closeDetail(); });
 
   function closeDetail() {
     detail.hidden = true;
+    document.body.classList.remove('dp-open');
     S = null;
     history.replaceState(null, '', '#/');
+    window.scrollTo(0, lastScroll);
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
@@ -861,8 +866,7 @@
   }
 
   document.addEventListener('keydown', function (e) {
-    var openBox = !detail.hidden ? detail.querySelector('.detail-box')
-      : (!compare.hidden ? compare.querySelector('.compare-box') : null);
+    var openBox = !compare.hidden ? compare.querySelector('.compare-box') : null;
 
     if (e.key === 'Escape') {
       closeMenus();
@@ -873,7 +877,7 @@
         return;
       }
     }
-    if (e.key === '/' && document.activeElement !== q && !openBox) {
+    if (e.key === '/' && document.activeElement !== q && !openBox && detail.hidden) {
       e.preventDefault(); q.focus();
     }
     if (e.key === 'Tab' && openBox) {
@@ -951,6 +955,7 @@
     var r = parseHash();
     if (r) openDetail(r.id, r.params);
   }).catch(function (err) {
+    window.__errstack = (err && err.stack) || String(err);
     grid.appendChild(el('div', { class: 'empty' }, [
       el('h2', { text: '读不到 styles.json（' + err.message + '）' }),
       el('p', { text: '用 file:// 直接打开时浏览器会拦截 fetch；请运行 serve.py 或 启动预览.bat。' })

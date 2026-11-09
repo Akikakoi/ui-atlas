@@ -81,6 +81,8 @@ ui-atlas/
 
 **改 token，实时看变化。** 详情页右侧的 tokens 是控件：颜色 → 取色器，`radius` → 0–40px 滑杆，字体栈 → 文本输入。改动通过 `iframe.contentDocument.documentElement.style.setProperty('--x', v)` 直接注入，**真的在改那个样例**。每个颜色 token 旁边标着 WCAG 对比度。
 
+**详情是全页，不是弹窗。** 点「看详情」进入独立页面：预览占满视口（海报、控制台、网格这类满版构图不再被裁），左栏 sticky 预览 + 右侧栏随滚动，返回图鉴后筛选与滚动位置都还在，直接刷新或新标签打开也成立。
+
 **分享改过的版本。** 改动编码进 hash（`#/s/glass?r=0px&a=%23ff2d2d`），「复制分享链接」发出去，对方打开就是同一套改动，被改的 token 高亮。
 
 **导出。** CSS 变量 / `tailwind.config` 的 `theme.extend` / shadcn 的 CSS 变量（hex 自动转 HSL 三元组）。

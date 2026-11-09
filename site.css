@@ -274,3 +274,26 @@ pre { margin: 0 0 8px; background: #f5f3ec; border: 1px solid var(--line); borde
 @media (max-width: 720px) {
   .dd.right .dd-menu, .dd .dd-menu { max-width: calc(100vw - 32px); }
 }
+
+/* ================================================================ 详情：全页路由 */
+#detail-page[hidden] { display: none; }
+body.dp-open { padding-bottom: 0; }
+body.dp-open .top, body.dp-open #grid, body.dp-open .foot { display: none; }
+.dp-head { position: sticky; top: 0; z-index: 20; display: flex; align-items: center;
+  gap: 16px; padding: 12px 22px; background: rgba(245,244,239,.94); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.dp-title { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1 1 320px; }
+.dp-title h2 { margin: 0; font-size: 17px; }
+.dp-title p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+.dp-body { display: grid; grid-template-columns: minmax(0, 1fr) 390px; align-items: start; }
+.dp-body .stage { position: sticky; top: 63px; height: calc(100vh - 63px);
+  border-right: 1px solid var(--line); }
+.dp-body .side { border-left: 0; padding: 20px 22px 48px; }
+@media (max-width: 1080px) {
+  .dp-body { grid-template-columns: minmax(0, 1fr) 340px; }
+}
+@media (max-width: 980px) {
+  .dp-body { grid-template-columns: 1fr; }
+  .dp-body .stage { position: static; height: 52vh; border-right: 0;
+    border-bottom: 1px solid var(--line); }
+}
