@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>图文随行 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f4ee;--ink:#121317;--muted:#7a7d84;--line:#e4e0d5;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{max-width:720px;margin:0 auto;padding:28px 20px 80px}
+.grid{display:grid;grid-template-columns:150px minmax(0,1fr);gap:22px;align-items:start}
+.figure{position:sticky;top:22px}
+.art{height:196px;border-radius:14px;border:1px solid var(--line);overflow:hidden;position:relative;
+  background:radial-gradient(circle at 30% 25%,#f3dcb9,transparent 55%),linear-gradient(135deg,#c9a06a,#4f5f4a);
+  transition:background .5s ease}
+.art::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(120deg,rgba(255,255,255,.10) 0 5px,transparent 5px 15px)}
+.figure[data-p="1"] .art{background:radial-gradient(circle at 70% 25%,#dce6f5,transparent 55%),linear-gradient(135deg,#7d94bd,#3f4d66)}
+.figure[data-p="2"] .art{background:radial-gradient(circle at 35% 70%,#e4edd8,transparent 55%),linear-gradient(135deg,#93a67f,#4a5c3e)}
+.figure[data-p="3"] .art{background:radial-gradient(circle at 72% 68%,#f4ddd0,transparent 55%),linear-gradient(135deg,#c9906f,#5c4034)}
+.cap{margin:10px 0 0;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 24px;font-size:clamp(24px,5.6vw,36px);line-height:1.1;letter-spacing:-.04em;font-weight:650}
+.text section{min-height:230px;padding:24px 0 10px;border-top:1px solid var(--line)}
+.text section:first-of-type{border-top:0;padding-top:0}
+.text h2{margin:0 0 8px;font-size:15px;letter-spacing:-.01em}
+.text p{margin:0;font-size:12.5px;line-height:1.85;color:var(--muted);max-width:32em}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:420px){.grid{grid-template-columns:118px minmax(0,1fr);gap:16px}.art{height:168px}}
+@media (prefers-reduced-motion:reduce){.art{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="grid">
+    <aside class="figure" id="figure" data-p="0">
+      <div class="art" aria-hidden="true"></div>
+      <p class="cap" id="cap">01 · 材料</p>
+    </aside>
+    <div class="text">
+      <p class="kicker">SCROLL / 10</p>
+      <h1>图停住，<br>文字继续走。</h1>
+      <section data-p="0"><h2>先让图站住</h2><p>左栏只做一件事：position: sticky。它不跟着正文滚，读者看到第三段时，图还在原位，图和字的对应关系就不会断。</p></section>
+      <section data-p="1"><h2>颜色跟着章节换</h2><p>IntersectionObserver 观察右侧每一节，谁进入视口中线就把索引写到 figure 的 data-p 上；图不重排，只换一层渐变。</p></section>
+      <section data-p="2"><h2>窄屏就并排变小</h2><p>不改结构，只把左栏从 150px 收到 118px；文字仍然是正文宽度，不因为图而缩成一条缝。</p></section>
+      <section data-p="3"><h2>停下来的时机</h2><p>图比正文短，sticky 会在它的容器底部自然结束；不要给容器写死高度，否则最后一段会提前失去图。</p></section>
+    </div>
+  </div>
+</main>
+<p class="hint">往下滚，左边图片会停住</p>
+<script>
+(function () {
+  var figure = document.getElementById('figure'), cap = document.getElementById('cap');
+  var secs = [].slice.call(document.querySelectorAll('.text section'));
+  var labels = ['01 · 材料', '02 · 颜色', '03 · 窄屏', '04 · 收尾'];
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      var i = secs.indexOf(en.target);
+      figure.dataset.p = String(i);
+      cap.textContent = labels[i] || labels[0];
+    });
+  }, { threshold: .55 });
+  secs.forEach(function (s) { io.observe(s); });
+})();
+</script>
+</body>
+</html>

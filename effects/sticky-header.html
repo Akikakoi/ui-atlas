@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>收缩顶栏 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f4f2ec;--ink:#111216;--muted:#7a7d84;--line:#e1ddd2;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.top{position:fixed;inset:0 0 auto 0;z-index:10;height:64px;background:rgba(244,242,236,.82);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+  transition:height .28s cubic-bezier(.2,.8,.2,1),background .28s ease,box-shadow .28s ease}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent);
+  transform:scaleX(var(--p,0));transform-origin:0 50%}
+.top.compact{height:46px;background:rgba(244,242,236,.94);box-shadow:0 8px 22px rgba(30,30,20,.08)}
+.bar{height:100%;display:flex;align-items:center;gap:16px;padding:0 22px;max-width:760px;margin:0 auto;transition:padding .28s ease}
+.brand{display:flex;align-items:center;gap:8px;font-weight:650;letter-spacing:-.02em;font-size:16px;
+  transition:font-size .28s ease,letter-spacing .28s ease}
+.brand i{width:8px;height:8px;border-radius:2px;background:var(--accent);transform:rotate(45deg);transition:transform .28s ease}
+.top.compact .brand{font-size:13px}
+.top.compact .brand i{transform:rotate(0) scale(.82)}
+nav{margin-left:auto;display:flex;gap:2px}
+nav a{display:block;padding:6px 10px;border-radius:7px;color:var(--muted);text-decoration:none;font-size:12px;transition:color .2s,background .2s}
+nav a:hover{color:var(--ink);background:rgba(20,20,15,.05)}
+.cta{height:30px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);
+  font:inherit;font-size:11.5px;cursor:pointer;transition:height .28s ease,border-color .2s,color .2s}
+.cta:hover{border-color:var(--accent);color:var(--accent)}
+.top.compact .cta{height:26px}
+.page{max-width:760px;margin:0 auto;padding:64px 22px 80px}
+.hero{min-height:64vh;display:grid;align-content:center;padding:26px 0 40px}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+.hero h1{margin:0 0 16px;font-size:clamp(32px,8vw,56px);line-height:1.02;letter-spacing:-.05em;font-weight:650}
+.hero p{margin:0;max-width:28em;font-size:13px;line-height:1.85;color:var(--muted)}
+section{min-height:78vh;padding:48px 0 30px;border-top:1px solid var(--line)}
+section .no{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
+section h2{margin:12px 0 10px;font-size:clamp(24px,5.4vw,36px);line-height:1.08;letter-spacing:-.04em;font-weight:640}
+section p{margin:0;font-size:13px;line-height:1.9;color:var(--muted);max-width:32em}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:11}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.top,.bar,.brand,.brand i,.cta{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="bar">
+    <span class="brand"><i aria-hidden="true"></i>Atlas</span>
+    <nav><a href="#a">案例</a><a href="#b">方法</a><a href="#c">关于</a></nav>
+    <button class="cta" type="button">联系</button>
+  </div>
+</header>
+<main class="page">
+  <div class="hero">
+    <p class="kicker">LAYOUT / 08</p>
+    <h1>顶栏会收，<br>但不会走。</h1>
+    <p>滚动超过 40px 后高度从 64 收到 46，品牌字缩小、按钮变矮，底部细线同时显示阅读进度；它始终留在视口里。</p>
+  </div>
+  <section id="a"><p class="no">01 · TRIGGER</p><h2>用 scrollY 判断，不用滚动监听堆叠</h2><p>scroll 事件只排一帧 rAF，回调里同时切换 compact 与进度线；不要在事件里直接读写布局，滚动才不会发涩。</p></section>
+  <section id="b"><p class="no">02 · WHAT CHANGES</p><h2>只改顶栏自己的高度</h2><p>顶栏是 fixed，高度变化不会推动正文；正文的 padding-top 一次性写死 64px，收起后也不会突然跳上来。</p></section>
+  <section id="c"><p class="no">03 · PROGRESS</p><h2>一条线，用 scaleX</h2><p>可滚高度 = scrollHeight - innerHeight；比例写进 scaleX，不碰 width。到页底时线正好铺满，不需要额外的状态。</p></section>
+</main>
+<p class="hint">往下滚，顶栏会收起来</p>
+<script>
+(function () {
+  var top = document.getElementById('top');
+  var raf = null;
+
+  function render() {
+    raf = null;
+    var y = scrollY;
+    top.classList.toggle('compact', y > 40);
+    var max = document.documentElement.scrollHeight - innerHeight;
+    var p = max > 0 ? Math.max(0, Math.min(1, y / max)) : 0;
+    top.style.setProperty('--p', p.toFixed(4));
+  }
+
+  addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+  addEventListener('resize', function () { if (!raf) raf = requestAnimationFrame(render); });
+  render();
+})();
+</script>
+</body>
+</html>

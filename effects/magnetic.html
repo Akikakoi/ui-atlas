@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>磁吸按钮 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f7f6f2;--ink:#111216;--muted:#74777e;--accent:#2f5fd0;--line:#e2dfd6}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden}
+.stage{min-height:100vh;display:grid;place-items:center;padding:36px 22px 70px}
+.wrap{width:100%;max-width:560px}
+.kicker{margin:0 0 14px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 26px;font-size:clamp(26px,6.6vw,46px);line-height:1.12;letter-spacing:-.03em;font-weight:650}
+h1 em{font-style:normal;color:var(--accent)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.mag{position:relative;height:50px;padding:0 24px;border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:#fff;
+  font:inherit;font-size:14.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:9px;will-change:transform}
+.mag.ghost{background:transparent;color:var(--ink);border-color:#cfcabd}
+.mag span{display:inline-block;will-change:transform}
+.note{margin:22px 0 0;max-width:34em;font-size:12.5px;line-height:1.8;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">POINTER / 01</p>
+    <h1>光标靠近，<em>按钮会过来。</em></h1>
+    <div class="row">
+      <button class="mag" data-s=".34">开始使用 <span>→</span></button>
+      <button class="mag ghost" data-s=".22">看文档</button>
+    </div>
+    <p class="note">进入 150px 半径才开始吸附，越近位移越大；标签再反向偏移 4px，按钮才像有厚度，而不是整块贴纸被拖走。</p>
+  </div>
+</main>
+<p class="hint">把光标移向按钮</p>
+<script>
+(function () {
+  var els = [].slice.call(document.querySelectorAll('.mag'));
+  if (!els.length || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var st = els.map(function (el) {
+    return { el: el, s: parseFloat(el.dataset.s) || .3, x: 0, y: 0, tx: 0, ty: 0, label: el.querySelector('span') };
+  });
+  var raf = null;
+  function tick() {
+    var busy = false;
+    st.forEach(function (o) {
+      o.x += (o.tx - o.x) * .16;
+      o.y += (o.ty - o.y) * .16;
+      if (Math.abs(o.tx - o.x) > .04 || Math.abs(o.ty - o.y) > .04) busy = true;
+      o.el.style.transform = 'translate3d(' + o.x.toFixed(2) + 'px,' + o.y.toFixed(2) + 'px,0)';
+      if (o.label) o.label.style.transform = 'translate3d(' + (-o.x * .12).toFixed(2) + 'px,' + (-o.y * .12).toFixed(2) + 'px,0)';
+    });
+    raf = busy ? requestAnimationFrame(tick) : null;
+  }
+  function aim(e) {
+    st.forEach(function (o) {
+      var r = o.el.getBoundingClientRect();
+      var dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+      var d = Math.hypot(dx, dy), R = 150, f = d < R ? 1 - d / R : 0;
+      o.tx = dx * o.s * f; o.ty = dy * o.s * f;
+    });
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+  addEventListener('pointermove', aim, { passive: true });
+  document.addEventListener('pointerleave', function () {
+    st.forEach(function (o) { o.tx = 0; o.ty = 0; });
+    if (!raf) raf = requestAnimationFrame(tick);
+  });
+})();
+</script>
+</body>
+</html>

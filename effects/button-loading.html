@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>按钮加载 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f5f3ed;--ink:#111216;--muted:#7a7d84;--line:#e3dfd4;--accent:#2f5fd0;--ok:#2f6b45}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:34px 22px 72px}
+.wrap{width:100%;max-width:420px}
+.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 22px;font-size:clamp(26px,6.2vw,38px);line-height:1.08;letter-spacing:-.04em;font-weight:650}
+.card{padding:17px;background:#fff;border:1px solid var(--line);border-radius:15px}
+.row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid #efebe2;margin-bottom:14px}
+.row b{font-size:13.5px;letter-spacing:-.01em}
+.row span{font:600 12px/1 ui-monospace,Consolas,monospace;color:var(--muted)}
+.btn{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:46px;border:1px solid var(--accent);
+  border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;
+  transition:background .25s ease,border-color .25s ease,opacity .2s ease}
+.btn:disabled{cursor:default}
+.btn.loading{background:#3d6ad6}
+.btn.done{background:var(--ok);border-color:var(--ok)}
+.spinner{position:absolute;left:17px;top:50%;width:15px;height:15px;margin-top:-7.5px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.32);border-top-color:#fff;opacity:0;transition:opacity .15s ease}
+.btn.loading .spinner{opacity:1;animation:spin .7s linear infinite}
+.check{position:absolute;left:17px;top:50%;width:17px;height:17px;margin-top:-8.5px;opacity:0;transition:opacity .2s ease .05s}
+.btn.done .check{opacity:1}
+.check path{fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:24;stroke-dashoffset:24}
+.btn.done .check path{animation:draw .32s ease forwards}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.msg{margin:10px 0 0;min-height:18px;font-size:11.5px;line-height:1.6;color:var(--muted);text-align:center}
+.note{margin:16px 0 0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){
+  .btn,.spinner,.check{transition:none}
+  .btn.loading .spinner{animation:none;border-color:rgba(255,255,255,.5);border-top-color:#fff}
+  .btn.done .check path{animation:none;stroke-dashoffset:0}
+}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">FEEDBACK / 06</p>
+    <h1>按钮自己<br>把事办完。</h1>
+    <div class="card">
+      <div class="row"><b>苔原笔记 · 布面精装</b><span>¥ 168</span></div>
+      <button class="btn" id="btn" type="button">
+        <span class="spinner" aria-hidden="true"></span>
+        <svg class="check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+        <span id="label">提交订单</span>
+      </button>
+      <p class="msg" id="msg" role="status" aria-live="polite"></p>
+    </div>
+    <p class="note">宽度锁死，转圈与对勾都绝对定位在左侧，标签始终居中；按钮不会因为文字从「提交订单」变成「处理中」而抽动。</p>
+  </div>
+</main>
+<p class="hint">点按钮，看它转完再打勾</p>
+<script>
+(function () {
+  var btn = document.getElementById('btn'), label = document.getElementById('label'), msg = document.getElementById('msg');
+  var timer = null;
+
+  btn.addEventListener('click', function () {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.classList.add('loading');
+    label.textContent = '处理中…';
+    msg.textContent = '正在提交，请稍候。';
+
+    timer = setTimeout(function () {
+      btn.classList.remove('loading');
+      btn.classList.add('done');
+      label.textContent = '已提交';
+      msg.textContent = '订单已提交，稍后会收到确认。';
+      timer = setTimeout(function () {
+        btn.classList.remove('done');
+        btn.disabled = false;
+        label.textContent = '提交订单';
+        msg.textContent = '';
+      }, 2200);
+    }, 1400);
+  });
+  addEventListener('pagehide', function () { clearTimeout(timer); });
+})();
+</script>
+</body>
+</html>

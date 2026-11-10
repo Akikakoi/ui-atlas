@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拖拽底部抽屉 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
+.stage{min-height:100vh;display:grid;place-items:center;padding:34px 20px 70px}
+.wrap{width:100%;max-width:400px}
+.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 18px;font-size:clamp(23px,5.4vw,33px);line-height:1.14;letter-spacing:-.03em;font-weight:640}
+.card{background:#fff;border:1px solid var(--line);border-radius:15px;overflow:hidden}
+.cover{height:150px;background:radial-gradient(circle at 28% 22%,#f0d9b8,transparent 55%),linear-gradient(135deg,#c9a06a,#4f5f4a)}
+.card .body{padding:14px 15px 16px}
+.card .body b{font-size:14px}
+.card .body p{margin:4px 0 12px;font-size:12px;color:var(--muted)}
+.btn{height:42px;width:100%;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#fff;
+  font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+.backdrop{position:fixed;inset:0;background:rgba(15,16,20,.42);opacity:0;pointer-events:none;transition:opacity .3s;z-index:8}
+.backdrop.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:9;background:#fff;border-radius:20px 20px 0 0;padding:8px 20px calc(20px + env(safe-area-inset-bottom));
+  transform:translateY(102%);transition:transform .44s cubic-bezier(.2,.8,.2,1);box-shadow:0 -18px 50px rgba(20,20,15,.22);
+  max-width:520px;margin:0 auto;touch-action:none}
+.sheet.on{transform:none}
+.sheet.drag{transition:none}
+.grab{width:100%;padding:6px 0 12px;cursor:grab;touch-action:none;display:grid;place-items:center}
+.grab i{display:block;width:38px;height:4px;border-radius:2px;background:#d8d4c9}
+.sheet h2{margin:0 0 4px;font-size:17px;letter-spacing:-.02em}
+.sheet p{margin:0 0 14px;font-size:12px;color:var(--muted)}
+.sizes{display:flex;gap:8px;margin-bottom:16px}
+.size{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 0;font:inherit;font-size:12.5px;cursor:pointer}
+.size[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:#fff}
+.sheet .row{display:flex;gap:8px}
+.sheet .row .btn{flex:1}
+.sheet .btn.quiet{background:#fff;color:var(--ink);border-color:var(--line)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:10}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.sheet,.backdrop{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">TRANSITION / 03</p>
+    <h1>抽屉可以<br>被手指推回去。</h1>
+    <div class="card">
+      <div class="cover"></div>
+      <div class="body">
+        <b>苔原笔记 · 布面精装</b>
+        <p>¥ 168 · 现货 12 本</p>
+        <button class="btn" id="open" type="button">加入清单</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="backdrop" id="backdrop"></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true">
+  <div class="grab" id="grab" aria-hidden="true"><i></i></div>
+  <h2 id="sheet-title">选择装帧</h2>
+  <p>往下拖动手柄可以直接关掉；松手时超过 110px 才判定为关闭。</p>
+  <div class="sizes" role="group" aria-label="装帧">
+    <button class="size" type="button" aria-pressed="true">布面</button>
+    <button class="size" type="button" aria-pressed="false">纸面</button>
+    <button class="size" type="button" aria-pressed="false">皮面</button>
+  </div>
+  <div class="row">
+    <button class="btn quiet" type="button" data-close>取消</button>
+    <button class="btn" type="button" data-close>加入 · ¥168</button>
+  </div>
+</section>
+<p class="hint">打开后拖顶部手柄，或按 Esc</p>
+<script>
+(function () {
+  var sheet = document.getElementById('sheet'), backdrop = document.getElementById('backdrop');
+  var openBtn = document.getElementById('open'), grab = document.getElementById('grab');
+  var drag = null;
+
+  function open() {
+    sheet.classList.add('on');
+    sheet.setAttribute('aria-hidden', 'false');
+    backdrop.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () { grab.focus && grab.focus(); }, 300);
+  }
+  function close() {
+    sheet.classList.remove('on');
+    sheet.setAttribute('aria-hidden', 'true');
+    backdrop.classList.remove('on');
+    document.body.style.overflow = '';
+    sheet.style.transform = '';
+    openBtn.focus();
+  }
+  openBtn.addEventListener('click', open);
+  backdrop.addEventListener('click', close);
+  document.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', close); });
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && sheet.classList.contains('on')) close(); });
+
+  document.querySelectorAll('.size').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.size').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+      b.setAttribute('aria-pressed', 'true');
+    });
+  });
+
+  grab.addEventListener('pointerdown', function (e) {
+    if (!sheet.classList.contains('on')) return;
+    drag = { y: e.clientY, dy: 0 };
+    sheet.classList.add('drag');
+    grab.setPointerCapture(e.pointerId);
+  });
+  grab.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dy = Math.max(0, e.clientY - drag.y);
+    drag.dy = dy;
+    sheet.style.transform = 'translateY(' + dy + 'px)';
+    backdrop.style.opacity = Math.max(.15, 1 - dy / 420);
+  });
+  function end() {
+    if (!drag) return;
+    var dy = drag.dy;
+    drag = null;
+    sheet.classList.remove('drag');
+    sheet.style.transform = '';
+    backdrop.style.opacity = '';
+    if (dy > 110) close();
+  }
+  grab.addEventListener('pointerup', end);
+  grab.addEventListener('pointercancel', end);
+})();
+</script>
+</body>
+</html>

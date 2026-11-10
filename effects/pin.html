@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滚动钉住 · UI Atlas 动效</title>
+<style>
+:root{--ink:#f5f3ec;--muted:rgba(245,243,236,.55);--accent:#f0a35e}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#0c0d10;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.pin{height:320vh}
+.stick{position:sticky;top:0;height:100vh;overflow:hidden}
+.track{display:flex;width:100%;height:100%;will-change:transform}
+.panel{width:100%;height:100%;flex:0 0 100%;position:relative;display:grid;place-items:center;padding:28px}
+.panel::before{content:"";position:absolute;inset:0;opacity:.9}
+.p1::before{background:radial-gradient(120% 90% at 20% 10%,#1d2a4a,#0c0d10 70%)}
+.p2::before{background:radial-gradient(120% 90% at 80% 20%,#4a2230,#0c0d10 70%)}
+.p3::before{background:radial-gradient(120% 90% at 40% 90%,#24402f,#0c0d10 70%)}
+.inner{position:relative;z-index:1;max-width:420px;text-align:left}
+.no{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--accent)}
+.inner h2{margin:12px 0 8px;font-size:clamp(26px,6.4vw,44px);line-height:1.02;letter-spacing:-.04em;font-weight:600}
+.inner p{margin:0;font-size:12.5px;line-height:1.8;color:var(--muted);max-width:28em}
+.inner .fig{display:block;margin-top:20px;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:rgba(245,243,236,.4)}
+.hud{position:absolute;left:20px;right:20px;bottom:18px;z-index:2;display:flex;align-items:center;gap:14px}
+.hud .line{flex:1;height:2px;background:rgba(255,255,255,.16);position:relative;overflow:hidden}
+.hud .line i{position:absolute;inset:0;background:var(--accent);transform-origin:left;transform:scaleX(0)}
+.hud span{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:40px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);z-index:3;pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.track{transform:none!important}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<div class="pin" id="pin">
+  <div class="stick">
+    <div class="track" id="track">
+      <section class="panel p1"><div class="inner"><span class="no">SCROLL / 03 · A</span><h2>竖向滚动<br>推着横向走。</h2><p>外层 320vh 只负责提供「时间」；内层 sticky 固定在视口，横向轨道按进度位移 200%。</p><span class="fig">translateX = -progress × 200%</span></div></section>
+      <section class="panel p2"><div class="inner"><span class="no">SCROLL / 03 · B</span><h2>三屏内容<br>只占一屏高。</h2><p>滚动条长度是可预期的，用户不会滚不到底；移动端建议改成原生横向滑动，别硬抢滚轮。</p><span class="fig">p 0.33 → 0.66</span></div></section>
+      <section class="panel p3"><div class="inner"><span class="no">SCROLL / 03 · C</span><h2>进度条<br>同步 HUD。</h2><p>同一个 progress 变量喂给轨道和底部细线，两者不会走散。</p><span class="fig">p 1.00 / end</span></div></section>
+    </div>
+    <div class="hud"><span id="pct">00%</span><div class="line"><i id="bar"></i></div><span>03</span></div>
+  </div>
+</div>
+<p class="hint">继续往下滚，画面会横向推进</p>
+<script>
+(function () {
+  var pin = document.getElementById('pin'), track = document.getElementById('track');
+  var bar = document.getElementById('bar'), pct = document.getElementById('pct');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var raf = null;
+  function render() {
+    raf = null;
+    var r = pin.getBoundingClientRect();
+    var total = pin.offsetHeight - innerHeight;
+    var p = Math.max(0, Math.min(1, -r.top / total));
+    track.style.transform = 'translate3d(' + (-p * 200).toFixed(3) + '%,0,0)';
+    bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+    pct.textContent = String(Math.round(p * 100)).padStart(2, '0') + '%';
+  }
+  addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+  addEventListener('resize', render);
+  render();
+})();
+</script>
+</body>
+</html>

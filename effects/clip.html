@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>光标裁切揭示 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:26px 20px 54px}
+.wrap{width:100%;max-width:600px;height:calc(100vh - 80px);max-height:620px;display:grid;grid-template-rows:auto minmax(0,1fr)}
+.head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.kicker{margin:0;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0;font-size:clamp(21px,4.8vw,30px);letter-spacing:-.03em;font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px;min-height:0}
+.tile{position:relative;min-height:0;border-radius:13px;overflow:hidden;cursor:crosshair;isolation:isolate}
+.layer{position:absolute;inset:0}
+.base{background:
+  repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 9px),
+  linear-gradient(150deg,#7c7f86,#3b3e45);filter:grayscale(1) contrast(.92) brightness(.85)}
+.c1 .base{background-image:radial-gradient(circle at 30% 25%,#d9cbb4,transparent 55%),linear-gradient(150deg,#8b8377,#3c3a36)}
+.c2 .base{background-image:radial-gradient(circle at 70% 20%,#c9d3da,transparent 55%),linear-gradient(150deg,#7d8790,#333a42)}
+.c3 .base{background-image:radial-gradient(circle at 35% 70%,#d6d0c4,transparent 55%),linear-gradient(150deg,#8a8177,#403b34)}
+.c4 .base{background-image:radial-gradient(circle at 65% 65%,#c8cfc4,transparent 55%),linear-gradient(150deg,#7c8478,#363c34)}
+.tile .base{filter:grayscale(1) contrast(.9) brightness(.72)}
+.color{clip-path:circle(var(--r,0px) at var(--x,50%) var(--y,50%));transition:clip-path .25s ease-out}
+.c1 .color{background:radial-gradient(circle at 30% 25%,#f7d19a,transparent 58%),linear-gradient(150deg,#e0663c,#8e2b1c)}
+.c2 .color{background:radial-gradient(circle at 70% 20%,#b8e6f2,transparent 58%),linear-gradient(150deg,#3f7f9e,#1b3b56)}
+.c3 .color{background:radial-gradient(circle at 35% 70%,#f2e6a8,transparent 58%),linear-gradient(150deg,#c79a3a,#6d4d16)}
+.c4 .color{background:radial-gradient(circle at 65% 65%,#cdf0b6,transparent 58%),linear-gradient(150deg,#5f9b52,#234a22)}
+.grain{position:absolute;inset:0;opacity:.18;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E")}
+.cap{position:absolute;left:12px;right:12px;bottom:11px;z-index:2;display:flex;align-items:baseline;gap:7px;color:#fff}
+.cap b{font-size:12.5px;letter-spacing:-.01em}
+.cap span{margin-left:auto;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;opacity:.65}
+.tile .no{position:absolute;left:12px;top:11px;z-index:2;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(255,255,255,.6)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:#e0663c}
+@media (hover:none){.color{--r:200px}}
+@media (prefers-reduced-motion:reduce){.color{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <div class="head"><p class="kicker">LAYOUT / 01</p><h1>灰片下面压着一张彩色底片。</h1></div>
+    <div class="grid">
+      <figure class="tile c1" style="margin:0"><div class="layer base"></div><div class="layer color"></div><div class="layer grain"></div><div class="no">01</div><figcaption class="cap"><b>熔岩</b><span>2026</span></figcaption></figure>
+      <figure class="tile c2" style="margin:0"><div class="layer base"></div><div class="layer color"></div><div class="layer grain"></div><div class="no">02</div><figcaption class="cap"><b>深水</b><span>2026</span></figcaption></figure>
+      <figure class="tile c3" style="margin:0"><div class="layer base"></div><div class="layer color"></div><div class="layer grain"></div><div class="no">03</div><figcaption class="cap"><b>琥珀</b><span>2025</span></figcaption></figure>
+      <figure class="tile c4" style="margin:0"><div class="layer base"></div><div class="layer color"></div><div class="layer grain"></div><div class="no">04</div><figcaption class="cap"><b>苔原</b><span>2025</span></figcaption></figure>
+    </div>
+  </div>
+</main>
+<p class="hint">在图上移动光标，圆孔会跟着走</p>
+<script>
+(function () {
+  var tiles = [].slice.call(document.querySelectorAll('.tile'));
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var R = 96;
+
+  tiles.forEach(function (tile, idx) {
+    var color = tile.querySelector('.color');
+    var idle = null, idleTimer = null, touched = false;
+
+    function move(e) {
+      var r = tile.getBoundingClientRect();
+      color.style.setProperty('--x', (e.clientX - r.left).toFixed(0) + 'px');
+      color.style.setProperty('--y', (e.clientY - r.top).toFixed(0) + 'px');
+    }
+
+    // 没人操作时自己慢慢走一圈，预览里也能看见彩色底片
+    function roam() {
+      if (touched || reduce) return;
+      var t = idx * 1.7;
+      function frame() {
+        if (touched) return;
+        var r = tile.getBoundingClientRect();
+        t += .011;
+        color.style.setProperty('--x', (r.width * (.5 + .3 * Math.cos(t))).toFixed(0) + 'px');
+        color.style.setProperty('--y', (r.height * (.5 + .3 * Math.sin(t * 1.13))).toFixed(0) + 'px');
+        color.style.setProperty('--r', (76 + 16 * Math.sin(t * 1.9)) + 'px');
+        idle = requestAnimationFrame(frame);
+      }
+      cancelAnimationFrame(idle);
+      idle = requestAnimationFrame(frame);
+    }
+
+    tile.addEventListener('pointermove', move);
+    tile.addEventListener('pointerenter', function (e) {
+      touched = true;
+      cancelAnimationFrame(idle);
+      clearTimeout(idleTimer);
+      move(e);
+      color.style.setProperty('--r', R + 'px');
+    });
+    tile.addEventListener('pointerleave', function () {
+      color.style.setProperty('--r', '0px');
+      idleTimer = setTimeout(function () {
+        touched = false;
+        roam();
+      }, 1400);
+    });
+
+    if (reduce) {
+      color.style.setProperty('--x', '50%');
+      color.style.setProperty('--y', '50%');
+      color.style.setProperty('--r', '84px');
+    } else {
+      idleTimer = setTimeout(roam, 400 + idx * 260);
+    }
+  });
+})();
+</script>
+</body>
+</html>

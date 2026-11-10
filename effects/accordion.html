@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>无缝手风琴 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:36px 20px 68px}
+.wrap{width:100%;max-width:560px}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 22px;font-size:clamp(22px,5.2vw,32px);line-height:1.16;letter-spacing:-.03em;font-weight:620}
+.acc{border-top:1px solid var(--line)}
+.item{border-bottom:1px solid var(--line)}
+.q{width:100%;display:flex;align-items:center;gap:12px;padding:15px 2px;border:0;background:none;color:inherit;
+  font:inherit;font-size:14.5px;text-align:left;cursor:pointer}
+.q .idx{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#a7a49c}
+.q .t{flex:1;letter-spacing:-.01em}
+.q .ic{width:15px;height:15px;position:relative;flex:0 0 15px}
+.q .ic::before,.q .ic::after{content:"";position:absolute;inset:0;margin:auto;background:var(--ink);transition:transform .4s}
+.q .ic::before{width:13px;height:1px}
+.q .ic::after{width:1px;height:13px}
+.item.open .q .ic::after{transform:scaleY(0)}
+.item.open .q .t{color:var(--accent)}
+.panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .42s cubic-bezier(.2,.8,.2,1)}
+.item.open .panel{grid-template-rows:1fr}
+.panel>div{overflow:hidden}
+.panel p{margin:0 0 16px;padding-left:34px;font-size:12.8px;line-height:1.85;color:var(--muted);max-width:36em}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.panel,.q .ic::before,.q .ic::after{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">LAYOUT / 03</p>
+    <h1>展开不需要<br>量高度。</h1>
+    <div class="acc" id="acc">
+      <div class="item open"><button class="q" type="button" aria-expanded="true"><span class="idx">01</span><span class="t">为什么不用 height: auto</span><span class="ic" aria-hidden="true"></span></button><div class="panel"><div><p>height 从 0 到 auto 没有可插值的终点，JS 量 scrollHeight 又会在字体加载后失准。用 grid-template-rows: 0fr → 1fr，浏览器自己算。</p></div></div></div>
+      <div class="item"><button class="q" type="button" aria-expanded="false"><span class="idx">02</span><span class="t">内容要包一层 overflow</span><span class="ic" aria-hidden="true"></span></button><div class="panel"><div><p>0fr 时内容仍占最小高度，必须在内层 div 上 overflow:hidden。外层保持 grid，过渡才只影响行高，不碰 padding。</p></div></div></div>
+      <div class="item"><button class="q" type="button" aria-expanded="false"><span class="idx">03</span><span class="t">一次只开一个</span><span class="ic" aria-hidden="true"></span></button><div class="panel"><div><p>打开新的同时关掉旧的。两个方向共用同一条 420ms 曲线，看起来像一块内容在让位，而不是两条独立动画撞在一起。</p></div></div></div>
+    </div>
+  </div>
+</main>
+<p class="hint">点标题展开/收起</p>
+<script>
+(function () {
+  var items = [].slice.call(document.querySelectorAll('.item'));
+  items.forEach(function (item) {
+    var btn = item.querySelector('.q');
+    btn.addEventListener('click', function () {
+      var open = item.classList.contains('open');
+      items.forEach(function (x) {
+        x.classList.remove('open');
+        x.querySelector('.q').setAttribute('aria-expanded', 'false');
+      });
+      if (!open) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

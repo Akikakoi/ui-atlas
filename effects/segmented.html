@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>胶囊滑块 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f5f4ef;--ink:#111216;--muted:#7a7d84;--line:#e3dfd4;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:36px 22px 76px}
+.wrap{width:100%;max-width:440px}
+.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 24px;font-size:clamp(26px,6.4vw,38px);line-height:1.08;letter-spacing:-.04em;font-weight:650}
+h1 em{font-style:normal;color:var(--accent)}
+.seg{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:4px;margin:0 0 18px;
+  background:#e9e6dc;border-radius:12px}
+.seg .thumb{position:absolute;top:4px;bottom:4px;left:0;border-radius:9px;background:#fff;
+  box-shadow:0 2px 8px rgba(20,20,15,.12);
+  transition:transform .34s cubic-bezier(.2,.8,.2,1),width .34s cubic-bezier(.2,.8,.2,1)}
+.seg button{position:relative;z-index:1;border:0;background:transparent;padding:9px 0;border-radius:9px;
+  font:inherit;font-size:12.5px;color:var(--muted);cursor:pointer;transition:color .2s}
+.seg button[aria-selected="true"]{color:var(--ink);font-weight:600}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{padding:20px;background:#fff;border:1px solid var(--line);border-radius:14px;min-height:176px}
+.panel[hidden]{display:none}
+.panel.on{animation:panelIn .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes panelIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.panel .row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:4px}
+.panel .row b{font-size:15px;letter-spacing:-.01em}
+.panel .row span{font-size:12px;color:var(--muted)}
+.panel .price{margin:10px 0 14px;font:600 34px/1 ui-monospace,Consolas,monospace;letter-spacing:-.05em}
+.panel .price small{font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0;margin-left:4px}
+.panel ul{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+.panel li{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.6;color:#4c4f56}
+.panel li::before{content:"";width:5px;height:5px;margin-top:7px;border-radius:50%;background:var(--accent);flex:0 0 5px}
+.panel .cta{display:block;width:100%;margin-top:16px;height:40px;border:0;border-radius:9px;background:var(--ink);color:#fff;
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){
+  .seg .thumb{transition:none}
+  .panel.on{animation:none}
+}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">LAYOUT / 05</p>
+    <h1>三选一，<br><em>滑块先到。</em></h1>
+
+    <div class="seg" id="seg" role="tablist" aria-label="计费周期">
+      <span class="thumb" id="thumb" aria-hidden="true"></span>
+      <button role="tab" type="button" id="tab-1" aria-selected="true" aria-controls="p1" data-panel="p1">月付</button>
+      <button role="tab" type="button" id="tab-2" aria-selected="false" aria-controls="p2" data-panel="p2" tabindex="-1">年付</button>
+      <button role="tab" type="button" id="tab-3" aria-selected="false" aria-controls="p3" data-panel="p3" tabindex="-1">团队</button>
+    </div>
+
+    <section class="panel on" id="p1" role="tabpanel" aria-labelledby="tab-1">
+      <div class="row"><b>个人 · 月付</b><span>随时取消</span></div>
+      <p class="price">¥39<small>/ 月</small></p>
+      <ul><li>全部 60 个风格样例</li><li>动效源码与复制</li><li>单个工作区</li></ul>
+    </section>
+    <section class="panel" id="p2" role="tabpanel" aria-labelledby="tab-2" hidden>
+      <div class="row"><b>个人 · 年付</b><span>省 27%</span></div>
+      <p class="price">¥342<small>/ 年</small></p>
+      <ul><li>月付的全部内容</li><li>提前解锁新样例</li><li>导出 Tailwind / shadcn 配置</li></ul>
+    </section>
+    <section class="panel" id="p3" role="tabpanel" aria-labelledby="tab-3" hidden>
+      <div class="row"><b>团队 · 年付</b><span>5 人起</span></div>
+      <p class="price">¥1,290<small>/ 年</small></p>
+      <ul><li>成员共享收藏与对比</li><li>团队 token 预设</li><li>集中开票</li></ul>
+    </section>
+  </div>
+</main>
+<p class="hint">点选项，或按方向键切换</p>
+<script>
+(function () {
+  var seg = document.getElementById('seg'), thumb = document.getElementById('thumb');
+  var tabs = [].slice.call(seg.querySelectorAll('[role="tab"]'));
+
+  function panelOf(tab) { return document.getElementById(tab.dataset.panel); }
+
+  function place(tab) {
+    thumb.style.width = tab.offsetWidth + 'px';
+    thumb.style.transform = 'translateX(' + tab.offsetLeft + 'px)';
+  }
+
+  function select(tab, focus) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      var p = panelOf(t);
+      p.hidden = !on;
+      if (on) { p.classList.remove('on'); void p.offsetWidth; p.classList.add('on'); }
+    });
+    place(tab);
+    if (focus) tab.focus();
+  }
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () { select(tab); });
+    tab.addEventListener('keydown', function (e) {
+      var i = tabs.indexOf(tab), n = null;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = tabs[(i + 1) % tabs.length];
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (e.key === 'Home') n = tabs[0];
+      if (e.key === 'End') n = tabs[tabs.length - 1];
+      if (!n) return;
+      e.preventDefault();
+      select(n, true);
+    });
+  });
+
+  addEventListener('resize', function () { place(seg.querySelector('[aria-selected="true"]')); });
+  addEventListener('load', function () { place(tabs[0]); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { place(tabs[0]); });
+  place(tabs[0]);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拖拽排序 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f5f3ed;--ink:#111216;--muted:#7a7d84;--line:#e3dfd4;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:30px 22px 66px}
+.wrap{width:100%;max-width:420px}
+.kicker{margin:0 0 10px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 18px;font-size:clamp(25px,6vw,34px);line-height:1.07;letter-spacing:-.04em;font-weight:650}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;gap:11px;height:46px;padding:0 13px;background:#fff;border:1px solid var(--line);
+  border-radius:11px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;will-change:transform}
+.item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.item.dragging{cursor:grabbing;z-index:2;border-color:var(--accent);box-shadow:0 14px 30px rgba(30,30,20,.18)}
+.item .grip{color:#b9b3a4;font-size:15px;line-height:1;letter-spacing:-1px}
+.item .no{width:17px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--accent)}
+.item b{font-size:13.5px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item em{margin-left:auto;font-style:normal;font-size:10.5px;color:var(--muted);background:#f2efe7;border-radius:5px;padding:2px 7px;flex:0 0 auto}
+.note{margin:14px 0 0;font-size:11.5px;line-height:1.75;color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.item{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">LAYOUT / 07</p>
+    <h1>顺序，<br>可以拖出来。</h1>
+    <ul class="list" id="list">
+      <li class="item" tabindex="0"><span class="grip" aria-hidden="true">⠿</span><span class="no">01</span><b>先写内容，再排版</b><em>结构</em></li>
+      <li class="item" tabindex="0"><span class="grip" aria-hidden="true">⠿</span><span class="no">02</span><b>颜色只做最后一层</b><em>视觉</em></li>
+      <li class="item" tabindex="0"><span class="grip" aria-hidden="true">⠿</span><span class="no">03</span><b>动效要有退路</b><em>动效</em></li>
+      <li class="item" tabindex="0"><span class="grip" aria-hidden="true">⠿</span><span class="no">04</span><b>数据先对齐，再谈风格</b><em>数据</em></li>
+    </ul>
+    <p class="note">拖动时只移动被拖的那一行，其余行按目标索引让出空位；松手后先补完位移动画，再重排 DOM，所以不会跳一下。</p>
+    <p class="sr" id="status" role="status" aria-live="polite"></p>
+  </div>
+</main>
+<p class="hint">拖住任意一行上下移动；聚焦后也可按 ↑ ↓</p>
+<script>
+(function () {
+  var list = document.getElementById('list'), status = document.getElementById('status');
+  var items = [].slice.call(list.children);
+  var STEP = 54;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var drag = null, busy = false;
+
+  function renumber() {
+    items.forEach(function (el, i) {
+      var no = el.querySelector('.no');
+      if (no) no.textContent = String(i + 1).padStart(2, '0');
+    });
+  }
+
+  function clearAll() {
+    items.forEach(function (el) {
+      el.style.transition = '';
+      el.style.transform = '';
+    });
+  }
+
+  function shiftOthers() {
+    if (!drag) return;
+    items.forEach(function (el, i) {
+      if (el === drag.item) return;
+      var s = 0;
+      if (drag.to > drag.from && i > drag.from && i <= drag.to) s = -STEP;
+      if (drag.to < drag.from && i >= drag.to && i < drag.from) s = STEP;
+      el.style.transition = reduce ? 'none' : 'transform .18s ease';
+      el.style.transform = s ? 'translate3d(0,' + s + 'px,0)' : '';
+    });
+  }
+
+  function commit() {
+    var d = drag;
+    drag = null;
+    if (!d) return;
+
+    var delta = (d.to - d.from) * STEP;
+    if (reduce) {
+      reorder(d);
+      return;
+    }
+    busy = true;
+    d.item.style.transition = 'transform .22s cubic-bezier(.2,.8,.2,1)';
+    d.item.style.transform = 'translate3d(0,' + delta + 'px,0)';
+    setTimeout(function () { reorder(d); }, 230);
+  }
+
+  function reorder(d) {
+    var rest = items.filter(function (el) { return el !== d.item; });
+    rest.splice(d.to, 0, d.item);
+    rest.forEach(function (el) { list.appendChild(el); });
+    items = rest;
+    items.forEach(function (el) {
+      el.style.transition = 'none';
+      el.style.transform = '';
+    });
+    d.item.classList.remove('dragging');
+    renumber();
+    status.textContent = '「' + d.item.querySelector('b').textContent + '」已移到第 ' + (d.to + 1) + ' 位';
+    requestAnimationFrame(function () {
+      items.forEach(function (el) { el.style.transition = ''; });
+      busy = false;
+    });
+    d.item.focus({ preventScroll: true });
+  }
+
+  function cancelDrag() {
+    if (!drag) return;
+    var d = drag;
+    drag = null;
+    if (reduce) {
+      clearAll();
+      d.item.classList.remove('dragging');
+      return;
+    }
+    d.item.style.transition = 'transform .22s cubic-bezier(.2,.8,.2,1)';
+    d.item.style.transform = '';
+    items.forEach(function (el) {
+      if (el === d.item) return;
+      el.style.transition = 'transform .22s cubic-bezier(.2,.8,.2,1)';
+      el.style.transform = '';
+    });
+    busy = true;
+    setTimeout(function () {
+      clearAll();
+      d.item.classList.remove('dragging');
+      busy = false;
+    }, 230);
+  }
+
+  items.forEach(function (item) {
+    item.addEventListener('pointerdown', function (e) {
+      if (drag || busy || (e.button !== undefined && e.button > 0)) return;
+      var i = items.indexOf(item);
+      drag = { item: item, from: i, to: i, startY: e.clientY, moved: false };
+      item.classList.add('dragging');
+      item.style.transition = 'none';
+      item.setPointerCapture && item.setPointerCapture(e.pointerId);
+      item.focus({ preventScroll: true });
+      e.preventDefault();
+    });
+
+    item.addEventListener('pointermove', function (e) {
+      if (!drag || drag.item !== item) return;
+      var dy = e.clientY - drag.startY;
+      if (Math.abs(dy) > 4) drag.moved = true;
+      item.style.transform = 'translate3d(0,' + dy + 'px,0)';
+
+      var box = list.getBoundingClientRect();
+      var to = Math.round((e.clientY - box.top - 23) / STEP);
+      to = Math.max(0, Math.min(items.length - 1, to));
+      if (to !== drag.to) { drag.to = to; shiftOthers(); }
+    });
+
+    item.addEventListener('pointerup', function () {
+      if (!drag) return;
+      if (!drag.moved) { cancelDrag(); return; }
+      commit();
+    });
+    item.addEventListener('pointercancel', cancelDrag);
+
+    item.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+      e.preventDefault();
+      var i = items.indexOf(item);
+      var j = e.key === 'ArrowUp' ? i - 1 : i + 1;
+      if (j < 0 || j >= items.length) return;
+      var other = items[j];
+      var a = item.getBoundingClientRect(), b = other.getBoundingClientRect();
+      if (e.key === 'ArrowUp') list.insertBefore(item, other);
+      else list.insertBefore(other, item);
+
+      var a2 = item.getBoundingClientRect(), b2 = other.getBoundingClientRect();
+      items = [].slice.call(list.children);
+      if (!reduce) {
+        item.animate([
+          { transform: 'translate3d(0,' + (a.top - a2.top) + 'px,0)' },
+          { transform: 'none' }
+        ], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' });
+        other.animate([
+          { transform: 'translate3d(0,' + (b.top - b2.top) + 'px,0)' },
+          { transform: 'none' }
+        ], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      }
+      renumber();
+      status.textContent = '「' + item.querySelector('b').textContent + '」已移到第 ' + (j + 1) + ' 位';
+      item.focus({ preventScroll: true });
+    });
+  });
+})();
+</script>
+</body>
+</html>

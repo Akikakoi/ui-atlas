@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>双行跑马灯 · UI Atlas 动效</title>
+<style>
+:root{--bg:#0e1013;--ink:#f2f0e9;--dim:#2a2e35;--accent:#e2683c}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
+.stage{min-height:100vh;display:grid;align-content:center;gap:0;padding:40px 0}
+.top{margin:0 0 22px;padding:0 22px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:#7b7f88}
+.band{display:flex;overflow:hidden;padding:10px 0;border-top:1px solid rgba(255,255,255,.09);border-bottom:1px solid rgba(255,255,255,.09)}
+.band + .band{border-top:0}
+.track{display:flex;flex:0 0 auto;min-width:max-content;animation:slide 26s linear infinite;will-change:transform}
+.band.rev .track{animation-direction:reverse;animation-duration:34s}
+.band:hover .track{animation-play-state:paused}
+.track span{display:inline-flex;align-items:center;gap:26px;padding-right:26px;white-space:nowrap;
+  font-size:clamp(28px,7.6vw,58px);line-height:1.1;letter-spacing:-.03em;font-weight:600}
+.track span::after{content:"◆";font-size:.32em;color:var(--accent);transform:translateY(-.1em)}
+.band.rev .track span{font-weight:400;color:transparent;-webkit-text-stroke:1px rgba(242,240,233,.55);font-style:italic;font-family:Georgia,serif}
+.band.rev .track span::after{-webkit-text-stroke:0;color:var(--accent)}
+@keyframes slide{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+.foot{margin:26px 0 0;padding:0 22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font:600 10px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#7b7f88}
+.foot b{color:var(--accent);font-weight:600}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:#7b7f88;pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.track{animation:none;transform:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <p class="top">TYPE / 04 · 悬停暂停</p>
+  <div class="band" aria-hidden="true">
+    <div class="track">
+      <span>MOTION</span><span>RHYTHM</span><span>REPEAT</span><span>MOTION</span><span>RHYTHM</span><span>REPEAT</span>
+    </div>
+    <div class="track"><span>MOTION</span><span>RHYTHM</span><span>REPEAT</span><span>MOTION</span><span>RHYTHM</span><span>REPEAT</span></div>
+  </div>
+  <div class="band rev" aria-hidden="true">
+    <div class="track"><span>Nothing stands still</span><span>Nothing stands still</span></div>
+    <div class="track"><span>Nothing stands still</span><span>Nothing stands still</span></div>
+  </div>
+  <p class="foot"><span>两条内容相同、方向相反 · 26s / 34s</span><span>悬停 <b>PAUSE</b></span></p>
+</main>
+<p class="hint">悬停任意一条会暂停</p>
+</body>
+</html>

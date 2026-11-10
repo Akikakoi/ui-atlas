@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>卡片展开 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f4f2ec;--ink:#111216;--muted:#797c83;--line:#e2ded3;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:34px 22px 74px}
+.wrap{width:100%;max-width:460px}
+.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 22px;font-size:clamp(26px,6.2vw,38px);line-height:1.08;letter-spacing:-.04em;font-weight:650}
+.card{position:relative;width:100%;max-width:380px;border:1px solid var(--line);border-radius:15px;background:#fff;
+  overflow:hidden;cursor:pointer;box-shadow:0 10px 24px rgba(30,30,20,.07);transform-origin:top left}
+.card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.cover{height:142px;background:
+  radial-gradient(circle at 28% 22%,#f3dcb9,transparent 55%),
+  linear-gradient(135deg,#c9a06a,#4f5f4a);position:relative}
+.cover span{position:absolute;left:12px;bottom:10px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(255,255,255,.78)}
+.body{padding:15px 16px 18px}
+.tag{margin:0 0 5px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
+.body h2{margin:0 0 4px;font-size:18px;letter-spacing:-.02em}
+.body .sub{margin:0;font-size:12px;color:var(--muted)}
+.more{display:none;margin:12px 0 0;font-size:12.5px;line-height:1.85;color:#4b4e55}
+.card.open{position:fixed;z-index:20;max-width:none;cursor:default;border-radius:18px;overflow:auto;
+  box-shadow:0 24px 60px rgba(20,20,15,.30);margin:0}
+.card.open .cover{height:44%}
+.card.open .body{padding-bottom:22px}
+.card.open .more{display:block}
+.x{display:none;position:absolute;right:10px;top:10px;z-index:2;width:28px;height:28px;border:1px solid rgba(255,255,255,.35);
+  border-radius:50%;background:rgba(15,16,20,.35);color:#fff;font:16px/1 system-ui;cursor:pointer;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.card.open .x{display:grid;place-items:center}
+.backdrop{position:fixed;inset:0;z-index:15;background:rgba(15,16,20,.36);opacity:0;pointer-events:none;transition:opacity .3s}
+.backdrop.on{opacity:1;pointer-events:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:30}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.backdrop{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">TRANSITION / 04</p>
+    <h1>一张卡，<br>长成一张详情页。</h1>
+    <article class="card" id="card" tabindex="0" role="button" aria-expanded="false" aria-label="展开《苔原笔记》详情">
+      <button class="x" id="x" type="button" aria-label="关闭详情">×</button>
+      <div class="cover"><span>2026 · 春</span></div>
+      <div class="body">
+        <p class="tag">CASE 001</p>
+        <h2>苔原笔记</h2>
+        <p class="sub">布面精装 · 128 页</p>
+        <p class="more">先记住卡片在流里的 rect，再把同一张卡 fixed 到目标位置，用两次 rect 的差做反向 transform——这就是 FLIP。关闭时把顺序反过来，卡片自己缩回原位。</p>
+      </div>
+    </article>
+  </div>
+</main>
+<div class="backdrop" id="backdrop"></div>
+<p class="hint">点卡片展开，点遮罩或按 Esc 关闭</p>
+<script>
+(function () {
+  var card = document.getElementById('card'), backdrop = document.getElementById('backdrop');
+  var x = document.getElementById('x');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var openState = false, anim = null;
+
+  function open() {
+    if (openState) return;
+    var first = card.getBoundingClientRect();
+    openState = true;
+    card.classList.add('open');
+
+    var w = Math.min(420, innerWidth - 32);
+    var h = Math.min(innerHeight - 56, 330);
+    card.style.width = w + 'px';
+    card.style.height = h + 'px';
+    card.style.left = (innerWidth - w) / 2 + 'px';
+    card.style.top = (innerHeight - h) / 2 + 'px';
+    card.setAttribute('aria-expanded', 'true');
+    backdrop.classList.add('on');
+
+    var last = card.getBoundingClientRect();
+    if (!reduce) {
+      if (anim) anim.cancel();
+      anim = card.animate([
+        {
+          transformOrigin: 'top left',
+          transform: 'translate(' + (first.left - last.left) + 'px,' + (first.top - last.top) + 'px) scale(' +
+            (first.width / last.width).toFixed(4) + ',' + (first.height / last.height).toFixed(4) + ')',
+          borderRadius: '15px'
+        },
+        { transformOrigin: 'top left', transform: 'none', borderRadius: '18px' }
+      ], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    }
+    x.focus();
+  }
+
+  function close() {
+    if (!openState) return;
+    var first = card.getBoundingClientRect();
+    openState = false;
+    card.classList.remove('open');
+    card.style.width = '';
+    card.style.height = '';
+    card.style.left = '';
+    card.style.top = '';
+    card.setAttribute('aria-expanded', 'false');
+    backdrop.classList.remove('on');
+
+    var last = card.getBoundingClientRect();
+    if (!reduce) {
+      if (anim) anim.cancel();
+      anim = card.animate([
+        {
+          transformOrigin: 'top left',
+          transform: 'translate(' + (first.left - last.left) + 'px,' + (first.top - last.top) + 'px) scale(' +
+            (first.width / last.width).toFixed(4) + ',' + (first.height / last.height).toFixed(4) + ')'
+        },
+        { transformOrigin: 'top left', transform: 'none' }
+      ], { duration: 360, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    }
+    card.focus();
+  }
+
+  card.addEventListener('click', function () { if (!openState) open(); });
+  card.addEventListener('keydown', function (e) {
+    if ((e.key === 'Enter' || e.key === ' ') && !openState) { e.preventDefault(); open(); }
+  });
+  x.addEventListener('click', function (e) { e.stopPropagation(); close(); });
+  backdrop.addEventListener('click', close);
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && openState) close(); });
+})();
+</script>
+</body>
+</html>

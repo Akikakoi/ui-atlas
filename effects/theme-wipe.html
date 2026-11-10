@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>圆形主题切换 · UI Atlas 动效</title>
+<style>
+:root{
+  --bg:#f5f3ec;--panel:#fff;--ink:#111216;--muted:#7a7d84;--line:#e3dfd4;--accent:#2f5fd0;
+  --soft:#ece8dd;
+}
+html[data-theme="dark"]{
+  --bg:#0e1014;--panel:#171a20;--ink:#f2efe7;--muted:#9aa0ab;--line:#2a2e36;--accent:#8fb0ff;
+  --soft:#1d212a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;
+  transition:background .3s ease,color .3s ease}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;max-width:760px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.02em}
+.brand i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.toggle{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px;border:1px solid var(--line);
+  border-radius:999px;background:var(--panel);color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
+.toggle:hover{border-color:var(--accent);color:var(--accent)}
+.stage{min-height:calc(100vh - 66px);display:grid;place-items:center;padding:20px 22px 66px}
+.wrap{width:100%;max-width:620px}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 16px;font-size:clamp(30px,7.4vw,50px);line-height:1.04;letter-spacing:-.045em;font-weight:650}
+h1 em{font-style:normal;color:var(--accent)}
+p.sub{margin:0 0 26px;font-size:13px;line-height:1.85;color:var(--muted);max-width:30em}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{padding:16px 14px;border:1px solid var(--line);border-radius:13px;background:var(--panel)}
+.tile b{display:block;font:600 26px/1 ui-monospace,Consolas,monospace;letter-spacing:-.04em}
+.tile span{display:block;margin-top:7px;font-size:11px;color:var(--muted)}
+.note{margin:22px 0 0;padding:12px 14px;border-radius:11px;background:var(--soft);font-size:11.5px;line-height:1.8;color:var(--muted)}
+.wipe{position:fixed;inset:0;z-index:50;pointer-events:none;background:#0e1014;clip-path:circle(0 at 50% 50%);will-change:clip-path}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:40}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){body{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<header class="bar">
+  <span class="brand"><i aria-hidden="true"></i>Atlas / 主题实验</span>
+  <button class="toggle" id="toggle" type="button" aria-pressed="false">
+    <span aria-hidden="true">◐</span><span id="tlabel">深色</span>
+  </button>
+</header>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">TRANSITION / 05</p>
+    <h1>换主题，<br><em>从一个圆开始。</em></h1>
+    <p class="sub">点击按钮后，目标主题的底色先以按钮为圆心铺满视口，等完全盖住再换 class，最后淡出。顺序反了会闪一下白。</p>
+    <div class="grid">
+      <div class="tile"><b>12</b><span>基础组件</span></div>
+      <div class="tile"><b>3</b><span>主题模式</span></div>
+      <div class="tile"><b>0</b><span>外部依赖</span></div>
+    </div>
+    <p class="note">圆心的位置来自按钮的 <code>getBoundingClientRect()</code>，半径取到最远角的距离，所以不管按钮在哪个角落都能铺满。减动效时直接换主题，不做扩散。</p>
+  </div>
+</main>
+<div class="wipe" id="wipe" aria-hidden="true"></div>
+<p class="hint">点右上角按钮，看圆形怎么铺开</p>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('toggle');
+  var label = document.getElementById('tlabel'), wipe = document.getElementById('wipe');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var busy = false;
+
+  function setTheme(t) {
+    if (t === 'dark') root.setAttribute('data-theme', 'dark');
+    else root.removeAttribute('data-theme');
+    btn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+    label.textContent = t === 'dark' ? '浅色' : '深色';
+  }
+
+  btn.addEventListener('click', function () {
+    if (busy) return;
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+
+    if (reduce) { setTheme(next); return; }
+
+    busy = true;
+    var r = btn.getBoundingClientRect();
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    var reach = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
+
+    wipe.style.background = next === 'dark' ? '#0e1014' : '#f5f3ec';
+    wipe.style.transition = 'none';
+    wipe.style.opacity = '1';
+    wipe.style.clipPath = 'circle(0px at ' + cx + 'px ' + cy + 'px)';
+    void wipe.offsetWidth;
+    wipe.style.transition = 'clip-path .5s cubic-bezier(.2,.8,.2,1)';
+    wipe.style.clipPath = 'circle(' + reach + 'px at ' + cx + 'px ' + cy + 'px)';
+
+    setTimeout(function () {
+      setTheme(next);
+      wipe.style.transition = 'opacity .26s ease';
+      wipe.style.opacity = '0';
+      setTimeout(function () {
+        wipe.style.transition = 'none';
+        wipe.style.opacity = '1';
+        wipe.style.clipPath = 'circle(0px at ' + cx + 'px ' + cy + 'px)';
+        busy = false;
+      }, 280);
+    }, 500);
+  });
+})();
+</script>
+</body>
+</html>

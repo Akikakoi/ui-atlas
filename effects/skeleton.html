@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>骨架屏到内容 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:28px 22px 74px}
+.wrap{width:100%;max-width:420px}
+.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 20px;font-size:clamp(21px,5vw,30px);line-height:1.18;letter-spacing:-.03em;font-weight:620}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;position:relative;min-height:252px}
+.sk,.real{position:absolute;inset:15px}
+.sk{display:grid;grid-template-columns:40px 1fr;gap:11px;align-content:start;transition:opacity .3s}
+.sk .av{width:40px;height:40px;border-radius:50%}
+.sk .l{height:10px;border-radius:5px;margin-top:4px}
+.sk .l.w1{width:44%}.sk .l.w2{width:82%}.sk .l.w3{width:64%}
+.sk .media{grid-column:1/-1;height:92px;border-radius:9px;margin-top:4px}
+.sk i,.sk div{background:linear-gradient(100deg,#eeece5 20%,#f8f6ef 40%,#eeece5 60%) 0 0/220% 100%;animation:sh 1.35s linear infinite}
+@keyframes sh{from{background-position:110% 0}to{background-position:-110% 0}}
+.real{opacity:0;transform:translateY(5px);transition:opacity .42s ease,transform .42s cubic-bezier(.2,.8,.2,1)}
+.card.done .sk{opacity:0;pointer-events:none}
+.card.done .real{opacity:1;transform:none}
+.real .head{display:flex;gap:11px;align-items:center}
+.real .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2f5fd0,#8fb4ff);display:grid;place-items:center;
+  color:#fff;font-size:13px;font-weight:600}
+.real .who b{display:block;font-size:13.5px}
+.real .who span{font-size:11.5px;color:var(--muted)}
+.real .txt{margin:11px 0 0;font-size:12.5px;line-height:1.75;color:#4b4e55}
+.real .media{margin-top:11px;height:82px;border-radius:9px;background:
+  radial-gradient(circle at 25% 30%,#f0d7b4,transparent 55%),linear-gradient(135deg,#c9a06a,#5d6b52)}
+.again{display:block;margin:10px 0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;
+  padding:5px 11px;font:inherit;font-size:11.5px;cursor:pointer;color:var(--muted)}
+.again:hover{border-color:var(--accent);color:var(--accent)}
+.note{margin:12px 0 0;font-size:12px;line-height:1.8;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px){.note{display:none}.stage{padding-bottom:64px}}
+@media (prefers-reduced-motion:reduce){.sk i,.sk div{animation:none}.real{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">FEEDBACK / 03</p>
+    <h1>先给形状，<br>再给内容。</h1>
+    <div class="card" id="card" aria-busy="true">
+      <div class="sk" aria-hidden="true">
+        <div class="av"></div>
+        <div><div class="l w1"></div><div class="l w2"></div></div>
+        <div class="media"></div>
+        <div class="l w3" style="grid-column:1/-1"></div>
+        <div class="l w2" style="grid-column:1/-1"></div>
+      </div>
+      <div class="real">
+        <div class="head">
+          <div class="av">星</div>
+          <div class="who"><b>星野计划</b><span>2 分钟前 · 更新了封面</span></div>
+        </div>
+        <p class="txt">骨架的形状和最终内容一致：头像、两行标题、一块媒体、两行正文。位置不跳，眼睛就不用重新找。</p>
+        <div class="media"></div>
+      </div>
+    </div>
+    <button class="again" id="again" type="button">重新加载</button>
+    <p class="note">加载态用 aria-busy 标出；完成后只做一次淡入 + 5px 位移，不做逐元素弹跳。</p>
+  </div>
+</main>
+<p class="hint">1.7 秒后替换为真实内容</p>
+<script>
+(function () {
+  var card = document.getElementById('card');
+  var timer = null;
+  function load() {
+    clearTimeout(timer);
+    card.classList.remove('done');
+    card.setAttribute('aria-busy', 'true');
+    timer = setTimeout(function () {
+      card.classList.add('done');
+      card.setAttribute('aria-busy', 'false');
+    }, 1700);
+  }
+  document.getElementById('again').addEventListener('click', load);
+  load();
+})();
+</script>
+</body>
+</html>

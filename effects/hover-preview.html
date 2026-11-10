@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>列表悬停预览 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f7f6f2;--ink:#111216;--muted:#777a81;--line:#e4e1d8;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden}
+.stage{min-height:100vh;display:grid;place-items:center;padding:34px 20px 66px}
+.wrap{position:relative;width:100%;max-width:560px}
+.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 20px;font-size:clamp(22px,5.2vw,34px);line-height:1.14;letter-spacing:-.03em;font-weight:640}
+.list{border-top:1px solid var(--line)}
+.row{position:relative;display:flex;align-items:baseline;gap:12px;padding:14px 4px;border-bottom:1px solid var(--line);
+  color:inherit;text-decoration:none;transition:padding-left .35s cubic-bezier(.2,.8,.2,1)}
+.row:hover{padding-left:12px}
+.row .idx{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#a5a29a}
+.row b{font-size:clamp(15px,3.4vw,18px);font-weight:560;letter-spacing:-.015em}
+.row .tag{margin-left:auto;font-size:11.5px;color:var(--muted)}
+.row .arrow{opacity:0;transform:translateX(-6px);transition:opacity .3s,transform .3s;color:var(--accent)}
+.row:hover .arrow{opacity:1;transform:none}
+.preview{position:absolute;left:0;top:0;width:152px;height:190px;border-radius:12px;overflow:hidden;z-index:5;
+  pointer-events:none;opacity:0;transform:translate3d(-999px,-999px,0) scale(.92);
+  transition:opacity .25s,transform .18s cubic-bezier(.2,.8,.2,1);box-shadow:0 18px 40px rgba(20,20,20,.24)}
+.preview.on{opacity:1}
+.preview .img{position:absolute;inset:0;background:linear-gradient(150deg,var(--c1),var(--c2));transition:background .3s}
+.preview .img::after{content:attr(data-l);position:absolute;left:14px;bottom:8px;font:700 56px/1 Georgia,serif;color:rgba(255,255,255,.9)}
+.preview .cap{position:absolute;left:10px;top:10px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(255,255,255,.82)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (hover:none){.preview{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap" id="wrap">
+    <p class="kicker">POINTER / 04</p>
+    <h1>列表里藏着<br>一张会跟随的图。</h1>
+    <nav class="list">
+      <a class="row" href="#a" data-c1="#1b1d24" data-c2="#5f6577" data-l="A"><span class="idx">01</span><b>星野计划</b><span class="tag">品牌 / 2026</span><span class="arrow">→</span></a>
+      <a class="row" href="#b" data-c1="#7a2f24" data-c2="#e0a07c" data-l="B"><span class="idx">02</span><b>潮汐档案</b><span class="tag">出版 / 2026</span><span class="arrow">→</span></a>
+      <a class="row" href="#c" data-c1="#1f3a2c" data-c2="#9fbf8a" data-l="C"><span class="idx">03</span><b>苔原笔记</b><span class="tag">空间 / 2025</span><span class="arrow">→</span></a>
+      <a class="row" href="#d" data-c1="#2c2a4a" data-c2="#9c93d6" data-l="D"><span class="idx">04</span><b>静默频率</b><span class="tag">影像 / 2025</span><span class="arrow">→</span></a>
+    </nav>
+    <div class="preview" id="pv" aria-hidden="true">
+      <div class="img" id="pv-img" data-l="A"></div>
+      <div class="cap" id="pv-cap">CASE 01</div>
+    </div>
+  </div>
+</main>
+<p class="hint">悬停列表行，预览图会滞后跟随光标</p>
+<script>
+(function () {
+  var pv = document.getElementById('pv'), img = document.getElementById('pv-img'), cap = document.getElementById('pv-cap');
+  if (!pv || matchMedia('(hover:none)').matches) return;
+  var tx = 0, ty = 0, x = 0, y = 0, raf = null, live = false;
+
+  function tick() {
+    x += (tx - x) * .16; y += (ty - y) * .16;
+    pv.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) scale(' + (live ? 1 : .94) + ')';
+    raf = Math.abs(tx - x) > .4 || Math.abs(ty - y) > .4 || live ? requestAnimationFrame(tick) : null;
+  }
+  function move(e) {
+    var r = document.getElementById('wrap').getBoundingClientRect();
+    tx = e.clientX - r.left + 26;
+    ty = e.clientY - r.top - 95;
+    var maxX = r.width - 152 - 4;
+    tx = Math.max(0, Math.min(maxX, tx));
+    ty = Math.max(0, Math.min(r.height - 190, ty));
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+
+  document.querySelectorAll('.row').forEach(function (row) {
+    row.addEventListener('pointerenter', function () {
+      live = true;
+      img.style.setProperty('--c1', row.dataset.c1);
+      img.style.setProperty('--c2', row.dataset.c2);
+      img.setAttribute('data-l', row.dataset.l);
+      cap.textContent = 'CASE ' + row.querySelector('.idx').textContent;
+      pv.classList.add('on');
+      if (!raf) raf = requestAnimationFrame(tick);
+    });
+    row.addEventListener('pointermove', move);
+  });
+  document.querySelector('.list').addEventListener('pointerleave', function () {
+    live = false;
+    pv.classList.remove('on');
+    pv.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) scale(.94)';
+  });
+  addEventListener('pointermove', function (e) { if (live) move(e); }, { passive: true });
+})();
+</script>
+</body>
+</html>

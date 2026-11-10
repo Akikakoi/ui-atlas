@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>全屏菜单 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f5f3ed;--ink:#111216;--muted:#7a7d84;--line:#e3dfd4;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.top{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;max-width:760px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:650;letter-spacing:-.01em}
+.brand i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.menu-btn{display:inline-flex;align-items:center;gap:8px;height:33px;padding:0 13px;border:1px solid var(--line);
+  border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
+.menu-btn:hover{border-color:var(--accent);color:var(--accent)}
+.menu-btn i{display:grid;gap:3px}
+.menu-btn i::before,.menu-btn i::after{content:"";display:block;width:13px;height:1.5px;background:currentColor}
+.stage{min-height:calc(100vh - 65px);display:grid;place-items:center;padding:20px 22px 70px}
+.wrap{width:100%;max-width:620px}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 16px;font-size:clamp(30px,7.2vw,50px);line-height:1.04;letter-spacing:-.045em;font-weight:650}
+h1 em{font-style:normal;color:var(--accent)}
+p.sub{margin:0;max-width:29em;font-size:13px;line-height:1.85;color:var(--muted)}
+.menu{position:fixed;inset:0;z-index:30;background:#0f1116;color:#f2efe7;
+  clip-path:inset(0 0 100% 0);pointer-events:none;
+  transition:clip-path .55s cubic-bezier(.2,.8,.2,1)}
+.menu.open{clip-path:inset(0 0 0 0);pointer-events:auto}
+.menu-in{height:100%;max-width:760px;margin:0 auto;padding:22px 24px 30px;display:flex;flex-direction:column}
+.menu-top{display:flex;align-items:center;justify-content:space-between}
+.menu-brand{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.16em;color:rgba(242,239,231,.6)}
+.menu-brand i{width:8px;height:8px;border-radius:50%;background:#8fb0ff}
+.close{width:34px;height:34px;border:1px solid rgba(242,239,231,.25);border-radius:50%;background:transparent;
+  color:#f2efe7;font:19px/1 system-ui;cursor:pointer}
+.close:hover{border-color:#8fb0ff;color:#8fb0ff}
+.menu nav{margin:auto 0;display:grid}
+.menu nav a{display:flex;align-items:baseline;gap:14px;padding:13px 0;border-top:1px solid rgba(242,239,231,.14);
+  color:#f2efe7;text-decoration:none;font-size:clamp(30px,7.4vw,50px);line-height:1.05;letter-spacing:-.045em;font-weight:600}
+.menu nav a:last-child{border-bottom:1px solid rgba(242,239,231,.14)}
+.menu nav a .idx{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:#8fb0ff;flex:0 0 auto}
+.mask{display:block;overflow:hidden;flex:1}
+.txt{display:block;transform:translateY(115%);transition:transform .5s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 70ms + 90ms)}
+.menu.open .txt{transform:none}
+.menu:not(.open) .txt{transition-delay:0s;transition-duration:.2s}
+.menu-foot{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:rgba(242,239,231,.45)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:31}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.menu,.txt{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><i aria-hidden="true"></i>Atlas</span>
+  <button class="menu-btn" id="open" type="button" aria-expanded="false" aria-controls="menu"><i aria-hidden="true"></i>菜单</button>
+</header>
+<main class="stage" id="main">
+  <div class="wrap">
+    <p class="kicker">TRANSITION / 06</p>
+    <h1>一整屏，<br><em>从上往下展开。</em></h1>
+    <p class="sub">面板用 clip-path: inset(0 0 100% 0) 藏起来，打开时只改到底部的 0；四个菜单项再各自从遮罩里升起，错开 70ms。</p>
+  </div>
+</main>
+
+<div class="menu" id="menu" aria-hidden="true">
+  <div class="menu-in">
+    <div class="menu-top">
+      <span class="menu-brand"><i aria-hidden="true"></i>ATLAS / MENU</span>
+      <button class="close" id="close" type="button" aria-label="关闭菜单">×</button>
+    </div>
+    <nav aria-label="主导航">
+      <a href="#work"><span class="idx">01</span><span class="mask"><span class="txt" style="--i:0">作品</span></span></a>
+      <a href="#method"><span class="idx">02</span><span class="mask"><span class="txt" style="--i:1">方法</span></span></a>
+      <a href="#notes"><span class="idx">03</span><span class="mask"><span class="txt" style="--i:2">笔记</span></span></a>
+      <a href="#about"><span class="idx">04</span><span class="mask"><span class="txt" style="--i:3">关于</span></span></a>
+    </nav>
+    <div class="menu-foot"><span>© 2026 Atlas</span><span>零依赖 · 单文件</span></div>
+  </div>
+</div>
+<p class="hint">点右上角「菜单」，Esc 关闭</p>
+<script>
+(function () {
+  var menu = document.getElementById('menu'), openBtn = document.getElementById('open'), closeBtn = document.getElementById('close');
+  var main = document.getElementById('main'), header = document.querySelector('.top');
+  var lastFocus = null;
+
+  menu.inert = true;
+
+  function open() {
+    if (menu.classList.contains('open')) return;
+    lastFocus = document.activeElement;
+    menu.inert = false;
+    menu.classList.add('open');
+    menu.setAttribute('aria-hidden', 'false');
+    openBtn.setAttribute('aria-expanded', 'true');
+    main.inert = true;
+    header.inert = true;
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () { closeBtn.focus(); }, 80);
+  }
+
+  function close() {
+    if (!menu.classList.contains('open')) return;
+    menu.classList.remove('open');
+    menu.inert = true;
+    menu.setAttribute('aria-hidden', 'true');
+    openBtn.setAttribute('aria-expanded', 'false');
+    main.inert = false;
+    header.inert = false;
+    document.body.style.overflow = '';
+    setTimeout(function () {
+      (lastFocus && lastFocus.focus ? lastFocus : openBtn).focus();
+    }, 300);
+  }
+
+  openBtn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  menu.querySelectorAll('nav a').forEach(function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); close(); });
+  });
+  addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+})();
+</script>
+</body>
+</html>

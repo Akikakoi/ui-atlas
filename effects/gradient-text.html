@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>渐变扫光 · UI Atlas 动效</title>
+<style>
+:root{--bg:#0b0c10;--ink:#f4f1e8;--muted:rgba(244,241,232,.5);--line:rgba(244,241,232,.14);--accent:#9db8ff}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(760px 480px at 50% 0%,#151a26,#0b0c10 70%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:38px 24px 84px}
+.wrap{width:100%;max-width:640px}
+.kicker{margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+.sweep{margin:0;font-size:clamp(34px,8.6vw,62px);line-height:1.02;letter-spacing:-.05em;font-weight:650;
+  background:linear-gradient(100deg,#7aa2ff 0%,#c9a0ff 22%,#ffd479 44%,#9df0c8 62%,#7aa2ff 84%,#c9a0ff 100%);
+  background-size:250% 100%;
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+  animation:sweep 7s linear infinite;
+  cursor:default;padding-bottom:.08em}
+.sweep:hover{animation-play-state:paused}
+@keyframes sweep{from{background-position:0% 50%}to{background-position:250% 50%}}
+.sub{margin:22px 0 0;font-size:13px;line-height:1.9;color:var(--muted);max-width:30em}
+.swatches{display:flex;gap:8px;margin-top:24px}
+.swatches i{width:34px;height:7px;border-radius:999px;background:var(--c);opacity:.9}
+.meta{display:flex;align-items:center;gap:8px;margin-top:16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.meta b{color:var(--accent);font-weight:600}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.sweep{animation:none;background-position:32% 50%}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">TYPE / 08</p>
+    <h1 class="sweep">颜色在字里，<br>慢慢走一遍。</h1>
+    <p class="sub">同一段渐变铺在文字上，再用 background-clip: text 把字形之外的部分裁掉；真正动的只有 background-position，字本身没有位移。</p>
+    <div class="swatches" aria-hidden="true">
+      <i style="--c:#7aa2ff"></i><i style="--c:#c9a0ff"></i><i style="--c:#ffd479"></i><i style="--c:#9df0c8"></i>
+    </div>
+    <p class="meta"><b>background-size: 250%</b> · 7s linear · 悬停暂停</p>
+  </div>
+</main>
+<p class="hint">悬停标题，可以让扫光停住</p>
+</body>
+</html>

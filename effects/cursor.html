@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自定义光标 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#101114;--muted:#787b82;--accent:#2f5fd0;--line:#e4e1d8}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+body.has-cursor,body.has-cursor a,body.has-cursor button{cursor:none}
+.stage{min-height:100vh;display:grid;place-items:center;padding:40px 24px 74px}
+.wrap{width:100%;max-width:520px}
+.kicker{margin:0 0 14px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 26px;font-size:clamp(28px,7vw,50px);line-height:1.08;letter-spacing:-.035em;font-weight:600}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400}
+.links{display:grid;border-top:1px solid var(--line)}
+.links a{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid var(--line);
+  color:inherit;text-decoration:none;font-size:15px;transition:padding-left .3s cubic-bezier(.2,.8,.2,1)}
+.links a:hover{padding-left:8px}
+.links a small{margin-left:auto;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.dot,.ring{position:fixed;left:0;top:0;z-index:9;pointer-events:none;border-radius:50%;will-change:transform;opacity:0;transition:opacity .25s}
+body.moved .dot,body.moved .ring{opacity:1}
+.dot{width:6px;height:6px;background:var(--ink);mix-blend-mode:difference}
+.ring{width:36px;height:36px;border:1px solid rgba(20,20,22,.55);display:grid;place-items:center;
+  transition:width .25s,height .25s,border-color .25s,background-color .25s;mix-blend-mode:difference;border-color:#fff}
+.ring::after{content:attr(data-label);font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:#fff;opacity:0;transition:opacity .2s}
+.ring.big{width:66px;height:66px;background:#fff;border-color:#fff}
+.ring.big::after{opacity:1;mix-blend-mode:difference;color:#000}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (hover:none){.dot,.ring{display:none}body.has-cursor,body.has-cursor a{cursor:auto}}
+@media (prefers-reduced-motion:reduce){.ring{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">POINTER / 03</p>
+    <h1>光标不该只是<br><em>一个箭头。</em></h1>
+    <nav class="links">
+      <a href="#work" data-label="看">精选项目 <small>12</small></a>
+      <a href="#notes" data-label="读">设计笔记 <small>34</small></a>
+      <a href="#about" data-label="聊">关于我 <small>→</small></a>
+    </nav>
+  </div>
+</main>
+<p class="hint">小点是即时位置，外圈慢半拍跟上</p>
+<script>
+(function () {
+  var dot = document.createElement('div'), ring = document.createElement('div');
+  dot.className = 'dot'; ring.className = 'ring';
+  document.body.appendChild(dot); document.body.appendChild(ring);
+  document.body.classList.add('has-cursor');
+
+  var tx = -100, ty = -100, rx = tx, ry = ty, rs = 1, ts = 1;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  addEventListener('pointermove', function (e) {
+    tx = e.clientX; ty = e.clientY;
+    document.body.classList.add('moved');
+  }, { passive: true });
+  document.querySelectorAll('[data-label]').forEach(function (a) {
+    a.addEventListener('pointerenter', function () { ts = 1.8; ring.dataset.label = a.dataset.label; ring.classList.add('big'); });
+    a.addEventListener('pointerleave', function () { ts = 1; ring.classList.remove('big'); });
+  });
+
+  function frame() {
+    rx += (tx - rx) * (reduce ? 1 : .16);
+    ry += (ty - ry) * (reduce ? 1 : .16);
+    rs += (ts - rs) * .18;
+    dot.style.transform = 'translate3d(' + (tx - 3) + 'px,' + (ty - 3) + 'px,0)';
+    ring.style.transform = 'translate3d(' + (rx - 18) + 'px,' + (ry - 18) + 'px,0) scale(' + rs.toFixed(3) + ')';
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

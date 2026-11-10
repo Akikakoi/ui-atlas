@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>模糊聚焦 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f2f1fb;--ink:#12131a;--muted:#747786;--line:#dedcec;--accent:#5546c9}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(720px 420px at 50% 0%,#fff,#f2f1fb 68%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:38px 24px 80px}
+.wrap{width:100%;max-width:610px}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+.head{margin:0;font-size:clamp(30px,7.4vw,50px);line-height:1.06;letter-spacing:-.045em;font-weight:650}
+.head .word{padding-right:.12em}
+.head em{font-style:normal;color:var(--accent)}
+.lede{margin:20px 0 0;font-size:13.5px;line-height:1.9;color:var(--muted);max-width:31em}
+.word{display:inline-block;filter:blur(10px);opacity:0;letter-spacing:.13em;
+  transition:filter .95s ease,opacity .78s ease,letter-spacing .95s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 150ms)}
+.on .word{filter:none;opacity:1;letter-spacing:inherit}
+.note{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;line-height:1.8;color:var(--muted)}
+.replay{position:fixed;right:16px;top:14px;z-index:3;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;
+  font:inherit;font-size:12px;color:var(--ink);cursor:pointer}
+.replay:hover{border-color:var(--accent);color:var(--accent)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.word{filter:none;opacity:1;letter-spacing:inherit}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<button class="replay" id="replay" type="button">重播</button>
+<main class="stage">
+  <div class="wrap" id="wrap">
+    <p class="kicker">TYPE / 07</p>
+    <h1 class="head">
+      <span class="word" style="--i:0">先是一片模糊，</span><br>
+      <span class="word" style="--i:1">再慢慢<em>对焦</em>。</span>
+    </h1>
+    <p class="lede">
+      <span class="word" style="--i:2">模糊 10px、字距多出 0.13em、透明度归零——三个信号一起收，</span>
+      <span class="word" style="--i:3">像镜头合焦。每行错开 150ms，视线有地方落。</span>
+    </p>
+    <p class="note">只对标题与短句用。正文整段模糊会让人等，也会让首屏在慢设备上显得没加载完。</p>
+  </div>
+</main>
+<p class="hint">等它合焦，或点右上角「重播」</p>
+<script>
+(function () {
+  var wrap = document.getElementById('wrap'), replay = document.getElementById('replay');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    wrap.classList.add('on');
+    replay.hidden = true;
+    return;
+  }
+  function play() {
+    wrap.classList.remove('on');
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { wrap.classList.add('on'); });
+    });
+  }
+  replay.addEventListener('click', play);
+  setTimeout(play, 180);
+})();
+</script>
+</body>
+</html>

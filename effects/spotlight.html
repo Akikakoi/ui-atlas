@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>光斑跟随卡片 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f4f3ef;--ink:#111216;--muted:#74777e;--accent:#2f5fd0;--line:#e3e0d7}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;padding:38px 22px 70px;display:grid;place-items:center}
+.wrap{width:100%;max-width:660px}
+.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 22px;font-size:clamp(24px,5.6vw,38px);line-height:1.15;letter-spacing:-.03em;font-weight:650}
+h1 em{font-style:normal;color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px}
+.card{position:relative;isolation:isolate;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 15px 15px;overflow:hidden;
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.card:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(28,28,20,.09)}
+.card::before{content:"";position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .3s;
+  background:radial-gradient(200px circle at var(--mx,50%) var(--my,50%),rgba(47,95,208,.13),transparent 66%)}
+.card:hover::before{opacity:1}
+.card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;
+  padding:1px;background:radial-gradient(150px circle at var(--mx,50%) var(--my,50%),rgba(47,95,208,.7),transparent 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+.card:hover::after{opacity:1}
+.num{font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--accent)}
+.card h2{margin:10px 0 6px;font-size:14px;letter-spacing:-.01em}
+.card p{margin:0;font-size:12px;line-height:1.7;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">POINTER / 02</p>
+    <h1>卡片上有一盏<em>跟着你走的灯。</em></h1>
+    <div class="grid">
+      <article class="card"><div class="num">01 / SIGNAL</div><h2>实时指标</h2><p>每分钟刷新一次，异常自动标记。</p></article>
+      <article class="card"><div class="num">02 / ROUTE</div><h2>边缘节点</h2><p>37 个区域，请求就近落地。</p></article>
+      <article class="card"><div class="num">03 / TRACE</div><h2>链路追踪</h2><p>一次点击，串起 12 个服务。</p></article>
+      <article class="card"><div class="num">04 / GUARD</div><h2>权限守卫</h2><p>按角色下发，改一条即刻生效。</p></article>
+    </div>
+  </div>
+</main>
+<p class="hint">移动光标扫过卡片</p>
+<script>
+(function () {
+  [].forEach.call(document.querySelectorAll('.card'), function (card) {
+    card.addEventListener('pointermove', function (e) {
+      var r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX - r.left).toFixed(0) + 'px');
+      card.style.setProperty('--my', (e.clientY - r.top).toFixed(0) + 'px');
+    });
+    card.addEventListener('pointerleave', function () {
+      card.style.removeProperty('--mx');
+      card.style.removeProperty('--my');
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滚动擦亮文字 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f7f6f2;--ink:#111216;--off:#cdc9bf;--muted:#7d8087;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{max-width:680px;margin:0 auto;padding:44px 22px 120px}
+.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 40px;font-size:clamp(24px,5.6vw,36px);line-height:1.15;letter-spacing:-.03em;font-weight:650}
+.para{margin:0;font-size:clamp(19px,4.4vw,29px);line-height:1.62;letter-spacing:-.02em;font-weight:500;max-width:24em}
+.para .w{color:var(--off);transition:color .3s ease}
+.para .w.on{color:var(--ink)}
+.para .w.hot{color:var(--accent)}
+.readout{position:fixed;right:18px;top:16px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);
+  background:rgba(247,246,242,.9);padding:6px 9px;border:1px solid var(--line,#e5e2d9);border-radius:7px}
+.after{margin-top:44px;font-size:13px;color:var(--muted);max-width:34em;line-height:1.85}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.para .w{color:var(--ink)}.para .w.hot{color:var(--ink)}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<div class="readout" id="readout">00 / 00 词</div>
+<main class="stage">
+  <p class="kicker">SCROLL / 04</p>
+  <h1>文字跟着<br>滚动条亮起来。</h1>
+  <p class="para" id="para">好的动效不是装饰，它在解释结构：哪一句是重点，哪一段已经读完，下一步该看哪里。当滚动成为进度条，阅读就有了位置感。</p>
+  <p class="after">实现只需三步：把段落按词切 span、算出段落在视口里的完成度、给前 N 个词换色。不用逐帧改样式，只在阈值变化时改 class。</p>
+</main>
+<p class="hint">往下滚，文字从灰变黑</p>
+<script>
+(function () {
+  var para = document.getElementById('para'), out = document.getElementById('readout');
+  var words = para.textContent.trim().split(/\s+/);
+  para.textContent = '';
+  var spans = words.map(function (w) {
+    var s = document.createElement('span');
+    s.className = 'w'; s.textContent = w + ' ';
+    para.appendChild(s); return s;
+  });
+  var last = -1;
+  function update() {
+    var r = para.getBoundingClientRect();
+    var start = innerHeight * .82, end = innerHeight * .42 - r.height;
+    var t = (start - r.top) / (start - end);
+    t = Math.max(0, Math.min(1, t));
+    var n = Math.round(t * spans.length);
+    if (n === last) return;
+    last = n;
+    spans.forEach(function (s, i) { s.classList.toggle('on', i < n); });
+    if (spans[n - 1]) {
+      spans.forEach(function (s) { s.classList.remove('hot'); });
+      spans[n - 1].classList.add('hot');
+    }
+    out.textContent = String(n).padStart(2, '0') + ' / ' + spans.length + ' 词';
+  }
+  addEventListener('scroll', update, { passive: true });
+  addEventListener('resize', update);
+  update();
+})();
+</script>
+</body>
+</html>

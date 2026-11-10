@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>悬停放大镜 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f5f3ed;--ink:#111216;--muted:#7a7d84;--line:#e3dfd4;--accent:#2f5fd0;
+  --art:radial-gradient(circle at 28% 22%,#f3dcb9,transparent 55%),
+        radial-gradient(circle at 72% 78%,#8aa07a,transparent 48%),
+        repeating-linear-gradient(115deg,rgba(255,255,255,.12) 0 6px,transparent 6px 18px),
+        linear-gradient(135deg,#c9a06a,#4f5f4a)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:34px 22px 70px}
+.wrap{width:100%;max-width:420px}
+.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 20px;font-size:clamp(26px,6.2vw,38px);line-height:1.07;letter-spacing:-.04em;font-weight:650}
+.frame{border:1px solid var(--line);border-radius:15px;background:#fff;overflow:hidden}
+.art{position:relative;height:236px;background-image:var(--art);background-size:cover;cursor:crosshair;touch-action:none}
+.art .badge{position:absolute;left:12px;bottom:11px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;
+  color:rgba(255,255,255,.8);background:rgba(15,16,20,.28);border-radius:999px;padding:5px 9px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.lens{position:absolute;left:50%;top:50%;width:108px;height:108px;border-radius:50%;pointer-events:none;
+  border:2px solid rgba(255,255,255,.82);background-image:var(--art);background-repeat:no-repeat;
+  box-shadow:0 10px 26px rgba(20,20,15,.28),inset 0 0 0 1px rgba(0,0,0,.08);
+  transform:translate(-50%,-50%);opacity:0;transition:opacity .18s ease}
+.meta{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;font-size:12.5px}
+.meta b{font-weight:600}
+.meta span{color:var(--muted)}
+.note{margin:16px 0 0;font-size:12px;line-height:1.8;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (hover:none){.lens{display:none}}
+@media (prefers-reduced-motion:reduce){.lens{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">POINTER / 07</p>
+    <h1>把细节，<br>放到光标下面。</h1>
+    <div class="frame">
+      <div class="art" id="art">
+        <span class="badge">苔原 · 001</span>
+        <span class="lens" id="lens" aria-hidden="true"></span>
+      </div>
+      <div class="meta"><b>布面精装</b><span>¥ 168 · 现货</span></div>
+    </div>
+    <p class="note">放大镜不是把整张图放大，而是复制同一层背景、把尺寸乘 2.3，再用指针坐标反推 background-position；镜片本身只有 108px，不参与布局。</p>
+  </div>
+</main>
+<p class="hint">在图片上移动光标</p>
+<script>
+(function () {
+  var art = document.getElementById('art'), lens = document.getElementById('lens');
+  if (!art || !lens || matchMedia('(hover:none)').matches) return;
+  var Z = 2.3;
+
+  art.addEventListener('pointermove', function (e) {
+    var r = art.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top;
+    var lw = lens.clientWidth, lh = lens.clientHeight;
+    lens.style.backgroundSize = (r.width * Z) + 'px ' + (r.height * Z) + 'px';
+    lens.style.left = x + 'px';
+    lens.style.top = y + 'px';
+    lens.style.backgroundPosition = (lw / 2 - x * Z) + 'px ' + (lh / 2 - y * Z) + 'px';
+    lens.style.opacity = '1';
+  });
+  art.addEventListener('pointerleave', function () { lens.style.opacity = '0'; });
+})();
+</script>
+</body>
+</html>

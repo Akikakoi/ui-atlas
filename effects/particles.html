@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>粒子连线 · UI Atlas 动效</title>
+<style>
+:root{--bg:#080a0f;--ink:#eef1f7;--muted:rgba(238,241,247,.5);--accent:#7fa8ff}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;overflow:hidden}
+body{background:radial-gradient(600px 320px at 50% 0%,#111c33,#080a0f 70%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.stage{position:relative;min-height:100vh;display:grid;place-items:center;padding:34px 24px;z-index:2;pointer-events:none;text-align:center}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(238,241,247,.42)}
+h1{margin:0;font-size:clamp(28px,6.8vw,50px);line-height:1.04;letter-spacing:-.04em;font-weight:600}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{margin:16px 0 0;font-size:12px;line-height:1.8;color:var(--muted);max-width:24em}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:rgba(238,241,247,.5);z-index:3;pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){canvas{display:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<main class="stage">
+  <div>
+    <p class="kicker">BACKGROUND / 02</p>
+    <h1>点与点之间，<br><em>有线才成星座。</em></h1>
+    <p class="sub">距离小于 110px 才连线，透明度随距离衰减。光标经过时会被轻轻推开。</p>
+  </div>
+</main>
+<p class="hint">移动光标穿过粒子</p>
+<script>
+(function () {
+  var c = document.getElementById('c');
+  if (!c || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var ctx = c.getContext('2d');
+  var W = 0, H = 0, DPR = 1, dots = [], raf = null, running = true;
+  var mouse = { x: -9999, y: -9999 };
+  var LINK = 110, R = 420;
+
+  function resize() {
+    DPR = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight;
+    c.width = W * DPR; c.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var n = Math.max(26, Math.min(84, Math.round(W * H / 16000)));
+    dots = [];
+    for (var i = 0; i < n; i++) {
+      dots.push({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - .5) * .32, vy: (Math.random() - .5) * .32,
+        r: .9 + Math.random() * 1.5
+      });
+    }
+  }
+
+  function step() {
+    raf = null;
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < dots.length; i++) {
+      var a = dots[i];
+      a.x += a.vx; a.y += a.vy;
+      if (a.x < 0 || a.x > W) a.vx *= -1;
+      if (a.y < 0 || a.y > H) a.vy *= -1;
+
+      var dx = a.x - mouse.x, dy = a.y - mouse.y;
+      var md = Math.hypot(dx, dy);
+      if (md < R && md > .1) {
+        var f = (1 - md / R) * .55;
+        a.x += dx / md * f; a.y += dy / md * f;
+      }
+
+      for (var j = i + 1; j < dots.length; j++) {
+        var b = dots[j];
+        var d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < LINK) {
+          ctx.strokeStyle = 'rgba(127,168,255,' + ((1 - d / LINK) * .26).toFixed(3) + ')';
+          ctx.lineWidth = .7;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      }
+      ctx.fillStyle = 'rgba(198,216,255,.82)';
+      ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2); ctx.fill();
+    }
+    if (running) raf = requestAnimationFrame(step);
+  }
+
+  addEventListener('resize', resize);
+  addEventListener('pointermove', function (e) { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+  addEventListener('pointerleave', function () { mouse.x = -9999; mouse.y = -9999; });
+  document.addEventListener('visibilitychange', function () {
+    running = !document.hidden;
+    if (running && !raf) raf = requestAnimationFrame(step);
+  });
+  resize(); step();
+})();
+</script>
+</body>
+</html>

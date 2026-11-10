@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>卡片堆叠 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f4f2ec;--ink:#111216;--muted:#797c83;--line:#e1ddd2;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{max-width:560px;margin:0 auto;padding:34px 20px 70px}
+.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 26px;font-size:clamp(26px,6.4vw,40px);line-height:1.08;letter-spacing:-.04em;font-weight:650}
+.stack{display:grid;gap:22px}
+.card{position:sticky;top:calc(20px + var(--i) * 17px);min-height:228px;padding:22px 22px 24px;border-radius:16px;
+  background:var(--panel-bg,#fff);border:1px solid var(--line);overflow:hidden;
+  transform-origin:top center;will-change:transform;box-shadow:0 12px 26px rgba(30,30,20,.10)}
+.card::after{content:"";position:absolute;inset:0;background:#0d0e11;opacity:calc(var(--p,0) * .26);pointer-events:none}
+.card .tag{position:relative;z-index:1;margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
+.card h2{position:relative;z-index:1;margin:0 0 10px;font-size:clamp(24px,6vw,34px);line-height:1.02;letter-spacing:-.04em;font-weight:640}
+.card p{position:relative;z-index:1;margin:0;font-size:12.5px;line-height:1.8;color:var(--muted);max-width:27em}
+.card.outro{position:relative;top:auto;display:grid;place-items:center;min-height:150px;border-style:dashed;background:transparent;box-shadow:none;
+  font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.card.c1{--panel-bg:#fffdf7}
+.card.c2{--panel-bg:#f1f6ef}
+.card.c3{--panel-bg:#eef2fb}
+.card.c4{--panel-bg:#fbf1ea}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.card{transform:none!important}.card::after{opacity:0}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <p class="kicker">SCROLL / 08</p>
+  <h1>滚下去，卡片<br>一张张压上来。</h1>
+  <div class="stack" id="stack">
+    <article class="card c1" style="--i:0">
+      <p class="tag">01 · 材料</p>
+      <h2>先定纸，<br>再定版。</h2>
+      <p>每张卡都 sticky 在自己的 top 上；下一张靠近时，上一张缩到 0.955，并压一层 26% 的暗色，前后关系立刻清楚。</p>
+    </article>
+    <article class="card c2" style="--i:1">
+      <p class="tag">02 · 结构</p>
+      <h2>叠的是层级，<br>不是位置。</h2>
+      <p>卡片仍在文档流里，滚动条长度是对的；transform 只负责视觉上的退后，读屏顺序也不变。</p>
+    </article>
+    <article class="card c3" style="--i:2">
+      <p class="tag">03 · 节奏</p>
+      <h2>留 17px<br>给上一张。</h2>
+      <p>每张卡的 top 依次加 17px，被盖住时还能露出一条边，像一叠纸；完全盖住反而看不出有几张。</p>
+    </article>
+    <article class="card c4" style="--i:3">
+      <p class="tag">04 · 收尾</p>
+      <h2>最后一张<br>自己走。</h2>
+      <p>末尾的卡片不再 sticky，跟着页面滚走；这也告诉用户「叠完了」，不需要额外的提示。</p>
+    </article>
+    <div class="card outro">END · 4 张</div>
+  </div>
+</main>
+<p class="hint">往下滚，看卡片一张张叠起来</p>
+<script>
+(function () {
+  var cards = [].slice.call(document.querySelectorAll('.card:not(.outro)'));
+  if (!cards.length || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var raf = null;
+
+  function render() {
+    raf = null;
+    cards.forEach(function (c, i) {
+      var next = cards[i + 1];
+      if (!next) return;
+      var a = c.getBoundingClientRect(), b = next.getBoundingClientRect();
+      var span = Math.max(200, innerHeight * .55);
+      var p = Math.max(0, Math.min(1, 1 - (b.top - a.top) / span));
+      c.style.setProperty('--p', p.toFixed(3));
+      c.style.transform = 'translate3d(0,' + (p * 5).toFixed(2) + 'px,0) scale(' + (1 - p * .045).toFixed(4) + ')';
+    });
+  }
+
+  addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+  addEventListener('resize', function () { if (!raf) raf = requestAnimationFrame(render); });
+  render();
+})();
+</script>
+</body>
+</html>

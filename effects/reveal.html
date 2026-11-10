@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>逐段入场 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7a7d84;--line:#e4e1d8;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{max-width:620px;margin:0 auto;padding:40px 22px 90px}
+.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 34px;font-size:clamp(24px,5.6vw,36px);line-height:1.15;letter-spacing:-.03em;font-weight:650}
+.reveal{opacity:0;transform:translate3d(0,26px,0);
+  transition:opacity .72s cubic-bezier(.2,.8,.2,1),transform .72s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 85ms)}
+.reveal.in{opacity:1;transform:none}
+.block{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:20px 0;border-top:1px solid var(--line);align-items:start}
+.block .no{font:600 10.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);padding-top:3px}
+.block h2{margin:0 0 5px;font-size:16px;letter-spacing:-.01em}
+.block p{margin:0;font-size:13px;line-height:1.75;color:var(--muted);max-width:36em}
+.block .bar{display:block;height:6px;margin-top:12px;border-radius:3px;background:#e8e5db;overflow:hidden}
+.block .bar i{display:block;height:100%;width:var(--w);background:var(--accent);border-radius:3px;transform-origin:left;transform:scaleX(0);transition:transform 1s .2s cubic-bezier(.2,.8,.2,1)}
+.reveal.in .bar i{transform:scaleX(1)}
+.replay{position:fixed;right:16px;top:14px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;
+  font:inherit;font-size:12px;cursor:pointer;color:var(--ink)}
+.replay:hover{border-color:var(--accent);color:var(--accent)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}.block .bar i{transform:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<button class="replay" id="replay" type="button">重播</button>
+<main class="stage">
+  <p class="kicker">SCROLL / 01</p>
+  <h1>不是「滚到了」，<br>而是「该出现了」。</h1>
+  <div id="list">
+    <section class="reveal block"><span class="no">01</span><div><h2>先写内容，再决定节奏</h2><p>每块单独观察，进入视口 60% 才播；同一块里的元素按 85ms 递进。</p><span class="bar"><i style="--w:82%"></i></span></div></section>
+    <section class="reveal block"><span class="no">02</span><div><h2>位移只走 26px</h2><p>再远就像从屏幕外飞进来。opacity 与位移同长，收尾用 ease-out。</p><span class="bar"><i style="--w:64%"></i></span></div></section>
+    <section class="reveal block"><span class="no">03</span><div><h2>一次性触发</h2><p>看过就不再重播，避免上下滚动时抽搐。想重看有右上角那个按钮。</p><span class="bar"><i style="--w:91%"></i></span></div></section>
+    <section class="reveal block"><span class="no">04</span><div><h2>关掉动效也要能读</h2><p>prefers-reduced-motion 下直接把元素摆到位，不做位移。</p><span class="bar"><i style="--w:48%"></i></span></div></section>
+    <section class="reveal block"><span class="no">05</span><div><h2>骨架先占好位置</h2><p>动画只改 transform 与 opacity，不碰 height，滚动条不会抖。</p><span class="bar"><i style="--w:73%"></i></span></div></section>
+  </div>
+</main>
+<p class="hint">往下滚，或点右上角「重播」</p>
+<script>
+(function () {
+  var list = [].slice.call(document.querySelectorAll('.reveal'));
+  list.forEach(function (el, i) { el.style.setProperty('--i', i % 3); });
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    list.forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .35 });
+  list.forEach(function (el) { io.observe(el); });
+
+  document.getElementById('replay').addEventListener('click', function () {
+    list.forEach(function (el) { el.classList.remove('in'); io.observe(el); });
+    scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(function () {
+      list.forEach(function (el) {
+        if (el.getBoundingClientRect().top < innerHeight * .8) {
+          el.classList.add('in'); io.unobserve(el);
+        }
+      });
+    }, 300);
+  });
+})();
+</script>
+</body>
+</html>

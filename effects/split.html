@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>逐字上浮 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:40px 22px 76px}
+.wrap{width:100%;max-width:620px}
+.kicker{margin:0 0 16px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0;font-size:clamp(30px,7.4vw,56px);line-height:1.16;letter-spacing:-.045em;font-weight:620}
+.mask{display:block;overflow:hidden;padding-bottom:.08em}
+.c{display:inline-block;transform:translate3d(0,112%,0);transition:transform .85s cubic-bezier(.19,1,.22,1);
+  transition-delay:calc(var(--i) * 26ms);will-change:transform}
+.in .c{transform:none}
+h1 em{font-style:normal;color:var(--accent)}
+.note{margin:24px 0 0;font-size:12.5px;line-height:1.85;color:var(--muted);max-width:32em}
+.replay{margin-top:22px;border:1px solid #d8d4c9;background:#fff;border-radius:999px;padding:7px 15px;
+  font:inherit;font-size:12.5px;cursor:pointer;color:var(--ink)}
+.replay:hover{border-color:var(--accent);color:var(--accent)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.c{transform:none;transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">TYPE / 01</p>
+    <h1 id="title">
+      <span class="mask" data-line="让每一行字"></span>
+      <span class="mask" data-line="各就各位。"></span>
+    </h1>
+    <p class="note">每个字住在一个 overflow:hidden 的窗口里，只把 transform 从 112% 挪到 0。26ms 的递进让句子有阅读方向，而不是一起闪出来。</p>
+    <button class="replay" id="replay" type="button">再放一次</button>
+  </div>
+</main>
+<p class="hint">刷新或点「再放一次」</p>
+<script>
+(function () {
+  var title = document.getElementById('title');
+  var masks = [].slice.call(title.querySelectorAll('.mask'));
+  var n = 0;
+  masks.forEach(function (mask) {
+    Array.from(mask.dataset.line).forEach(function (ch) {
+      var s = document.createElement('span');
+      s.className = 'c';
+      s.textContent = ch === ' ' ? '\u00a0' : ch;
+      s.style.setProperty('--i', n++);
+      mask.appendChild(s);
+    });
+  });
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { title.classList.add('in'); return; }
+  requestAnimationFrame(function () { requestAnimationFrame(function () { title.classList.add('in'); }); });
+  document.getElementById('replay').addEventListener('click', function () {
+    title.classList.remove('in');
+    void title.offsetWidth;
+    requestAnimationFrame(function () { title.classList.add('in'); });
+  });
+  title.addEventListener('pointerenter', function () { title.classList.add('in'); });
+})();
+</script>
+</body>
+</html>

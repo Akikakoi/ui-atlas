@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>荧光笔划线 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f7f5ef;--ink:#141519;--muted:#777a81;--line:#e5e1d6;--accent:#2f5fd0;--pen:rgba(240,196,74,.62)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{max-width:600px;margin:0 auto;padding:38px 24px 84px}
+.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 16px;font-size:clamp(28px,7vw,44px);line-height:1.08;letter-spacing:-.04em;font-weight:650}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{margin:0 0 26px;font-size:13px;line-height:1.85;color:var(--muted);max-width:32em}
+article{border-top:1px solid var(--line);padding-top:22px}
+article p{margin:0 0 20px;font-size:15px;line-height:1.95;color:#2f3238}
+mark{color:inherit;padding:0 .08em;border-radius:2px;
+  background:linear-gradient(transparent 58%,var(--pen) 58%) no-repeat 0 0;
+  background-size:0% 100%;
+  transition:background-size .88s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 170ms)}
+mark.in{background-size:100% 100%}
+.replay{position:fixed;right:16px;top:14px;z-index:3;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;
+  font:inherit;font-size:12px;color:var(--ink);cursor:pointer}
+.replay:hover{border-color:var(--accent);color:var(--accent)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){mark{background-size:100% 100%}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<button class="replay" id="replay" type="button">重播</button>
+<main class="stage">
+  <p class="kicker">TYPE / 06</p>
+  <h1>让重点，<br><em>像被笔划亮。</em></h1>
+  <p class="lede">不用描边，也不用底色块：一条从 58% 处开始的渐变，把背景宽度从 0 拉到 100%，字就像被荧光笔经过一次。</p>
+  <article id="paper">
+    <p>好用的界面不会把「重点」<mark style="--i:0">全部加粗</mark>。加粗是喊叫，划亮只是把视线轻轻按一下；一段话里最多两处，读者才知道先看哪里。</p>
+    <p>划线的位置也有讲究：线要压在字的<mark style="--i:1">下半部分</mark>，大约从基线往上 42% 的地方开始，才像真的笔迹；压得太高会盖住笔画，压得太低又像下划线。</p>
+    <p>最后，别让它自己动个不停。进入视口划一次就够了，<mark style="--i:2">看过就停</mark>；想再看，右上角有一个重播按钮。</p>
+  </article>
+</main>
+<p class="hint">往下滚，或点右上角「重播」</p>
+<script>
+(function () {
+  var marks = [].slice.call(document.querySelectorAll('mark'));
+  if (!marks.length) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    marks.forEach(function (m) { m.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .6 });
+  marks.forEach(function (m) { io.observe(m); });
+
+  document.getElementById('replay').addEventListener('click', function () {
+    marks.forEach(function (m) { m.classList.remove('in'); io.observe(m); });
+    scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+</body>
+</html>

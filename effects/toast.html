@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>堆叠提示 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0;--ok:#1f7a4d;--warn:#a8481f}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:38px 22px 74px}
+.wrap{width:100%;max-width:480px}
+.kicker{margin:0 0 14px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 24px;font-size:clamp(24px,5.8vw,36px);line-height:1.14;letter-spacing:-.035em;font-weight:640}
+h1 em{font-style:normal;color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{height:40px;padding:0 15px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--ink);
+  font:inherit;font-size:12.5px;cursor:pointer}
+.btn:hover{border-color:#c9c5b9}
+.btn.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.note{margin:24px 0 0;font-size:12.5px;line-height:1.85;color:var(--muted);max-width:30em}
+.stack{position:fixed;right:14px;bottom:14px;left:14px;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none;z-index:9}
+.toast{position:relative;pointer-events:auto;width:min(320px,100%);background:#15171b;color:#f4f5f7;border-radius:11px;
+  padding:11px 34px 11px 13px;display:flex;gap:10px;align-items:flex-start;overflow:hidden;
+  box-shadow:0 14px 34px rgba(15,18,24,.32);transform:translateY(14px) scale(.97);opacity:0;
+  transition:transform .34s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.toast.in{transform:none;opacity:1}
+.toast.out{transform:translateY(8px) scale(.97);opacity:0}
+.toast .dot{width:7px;height:7px;border-radius:50%;margin-top:6px;flex:0 0 7px;background:var(--accent)}
+.toast.ok .dot{background:#5fd39a}
+.toast.warn .dot{background:#f0a06a}
+.toast .t{font-size:12.5px;line-height:1.55}
+.toast .t small{display:block;font-size:11px;color:#9aa0ac;margin-top:1px}
+.toast .x{position:absolute;right:8px;top:8px;border:0;background:none;color:#8c929e;font-size:14px;line-height:1;cursor:pointer;padding:2px 5px;border-radius:5px}
+.toast .x:hover{background:rgba(255,255,255,.08);color:#fff}
+.toast .life{position:absolute;left:0;bottom:0;height:2px;width:100%;background:#5b6270;transform-origin:left;animation:life 3.2s linear forwards}
+.toast.ok .life{background:#5fd39a}.toast.warn .life{background:#f0a06a}
+@keyframes life{to{transform:scaleX(0)}}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:10}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">FEEDBACK / 02</p>
+    <h1>提示不该<br><em>打断操作。</em></h1>
+    <div class="row">
+      <button class="btn p" type="button" data-t="save">保存成功</button>
+      <button class="btn" type="button" data-t="err">网络错误</button>
+      <button class="btn" type="button" data-t="note">有更新</button>
+    </div>
+    <p class="note">最多同时三条，新的从底部推入；3.2 秒自动收起，底部细线就是剩余时间。手动关掉时直接淡出，不等计时器。</p>
+  </div>
+</main>
+<div class="stack" id="stack" aria-live="polite" aria-relevant="additions"></div>
+<p class="hint">点按钮，提示从右下角堆上来</p>
+<script>
+(function () {
+  var stack = document.getElementById('stack');
+  var seq = 0;
+  var COPY = {
+    save: { cls: 'ok', t: '已保存', s: '改动已写入版本 42' },
+    err: { cls: 'warn', t: '网络请求失败', s: '重试中，第 2 次' },
+    note: { cls: '', t: '有新的构建可用', s: 'v1.8.2 · 现在更新' }
+  };
+  function push(kind) {
+    var c = COPY[kind] || COPY.note;
+    var t = document.createElement('div');
+    t.className = 'toast ' + c.cls;
+    t.innerHTML = '<i class="dot"></i><div class="t">' + c.t + '<small>' + c.s + '</small></div>' +
+      '<button class="x" type="button" aria-label="关闭">×</button><i class="life"></i>';
+    stack.appendChild(t);
+    while (stack.children.length > 3) stack.removeChild(stack.firstChild);
+    requestAnimationFrame(function () { t.classList.add('in'); });
+    var timer = setTimeout(function () { dismiss(t); }, 3200);
+    t.querySelector('.x').addEventListener('click', function () { clearTimeout(timer); dismiss(t); });
+    return t;
+  }
+  function dismiss(t) {
+    if (t.dataset.out) return;
+    t.dataset.out = '1';
+    t.classList.remove('in'); t.classList.add('out');
+    setTimeout(function () { t.remove(); }, 350);
+  }
+  document.querySelectorAll('[data-t]').forEach(function (b) {
+    b.addEventListener('click', function () { push(b.dataset.t); });
+  });
+})();
+</script>
+</body>
+</html>

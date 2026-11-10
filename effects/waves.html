@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>等高线波浪 · UI Atlas 动效</title>
+<style>
+:root{--bg:#080a0f;--ink:#eef1f7;--muted:rgba(238,241,247,.52);--accent:#7fa8ff}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:radial-gradient(720px 480px at 50% 24%,#101d35,#080a0f 72%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.stage{position:relative;z-index:2;min-height:100vh;display:grid;place-items:center;padding:34px 24px;text-align:center;pointer-events:none}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(238,241,247,.42)}
+h1{margin:0;font-size:clamp(28px,6.8vw,50px);line-height:1.04;letter-spacing:-.04em;font-weight:600}
+h1 em{font-style:normal;color:var(--accent)}
+p.sub{max-width:25em;margin:16px auto 0;font-size:12px;line-height:1.8;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:rgba(238,241,247,.5);z-index:3;pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){canvas{opacity:1}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<main class="stage">
+  <div>
+    <p class="kicker">BACKGROUND / 04</p>
+    <h1>山脊线，<br><em>在水面下呼吸。</em></h1>
+    <p class="sub">18 条正弦线叠出等高线的错觉：频率只差一点，相位各错开 0.62，速度再慢一点，画面就不会像洗衣机。</p>
+  </div>
+</main>
+<p class="hint">不用操作，看波纹自己走</p>
+<script>
+(function () {
+  var c = document.getElementById('c');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = 0, H = 0, DPR = 1, raf = null, running = true;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var LINES = 18;
+
+  function resize() {
+    DPR = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight;
+    c.width = W * DPR; c.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (reduce) draw(0);
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < LINES; i++) {
+      var k = i / (LINES - 1);
+      var y0 = H * (.13 + .74 * k);
+      var amp = 11 + 26 * Math.sin(k * Math.PI);
+      var freq = .0042 + .0009 * (i % 4);
+      var phase = i * .62;
+
+      ctx.beginPath();
+      for (var x = -12; x <= W + 12; x += 8) {
+        var y = y0
+          + Math.sin(x * freq + t * .00055 + phase) * amp
+          + Math.sin(x * freq * 2.7 - t * .00038 + i * .9) * amp * .32;
+        if (x <= -12) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = 'rgba(127,168,255,' + (.08 + .20 * k).toFixed(3) + ')';
+      ctx.lineWidth = (i % 5 === 0) ? 1.3 : .8;
+      ctx.stroke();
+    }
+  }
+
+  function loop(now) {
+    raf = null;
+    draw(now);
+    if (running) raf = requestAnimationFrame(loop);
+  }
+
+  addEventListener('resize', resize);
+  document.addEventListener('visibilitychange', function () {
+    running = !document.hidden;
+    if (running && !reduce && !raf) raf = requestAnimationFrame(loop);
+  });
+
+  resize();
+  if (!reduce) raf = requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

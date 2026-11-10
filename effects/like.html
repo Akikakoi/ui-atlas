@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>点赞粒子 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--accent:#e0426b}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:38px 22px 74px}
+.wrap{width:100%;max-width:440px;text-align:center}
+.kicker{margin:0 0 18px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+.quote{margin:0 auto 30px;max-width:17em;font:italic 400 clamp(21px,4.8vw,27px)/1.5 Georgia,"Songti SC",serif;letter-spacing:-.01em}
+.quote span{display:block;margin-top:12px;font:400 11.5px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;font-style:normal;
+  letter-spacing:.08em;color:var(--muted)}
+.like{position:relative;display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 18px 0 15px;border-radius:999px;
+  border:1px solid #e6d6da;background:#fff;cursor:pointer;font:inherit;font-size:13.5px;color:var(--ink);overflow:visible}
+.like:hover{border-color:#e7bcc7}
+.like svg{width:20px;height:20px;display:block;fill:none;stroke:#c9a3ac;stroke-width:1.7;transition:fill .2s,stroke .2s,transform .2s}
+.like.on svg{fill:var(--accent);stroke:var(--accent)}
+.like.on{color:var(--accent);border-color:#efc3ce;background:#fff7f8}
+.like .n{font-variant-numeric:tabular-nums;min-width:3.4em;text-align:left}
+.like.pop svg{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(.72)}70%{transform:scale(1.22)}100%{transform:scale(1)}}
+.burst{position:absolute;left:24px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--accent);pointer-events:none;z-index:0}
+.like svg,.like .n{position:relative;z-index:1}
+.note{margin:26px 0 0;font-size:12px;line-height:1.8;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.like svg{animation:none!important}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">FEEDBACK / 04</p>
+    <p class="quote">「真正被记住的，<br>是点下去的那一下。」<span>— 设计笔记，第 34 则</span></p>
+    <button class="like" id="like" type="button" aria-pressed="false" aria-label="点赞">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-9.6a4.4 4.4 0 0 1 7.5-3.1 4.4 4.4 0 0 1 7.5 3.1c0 5-7.5 9.6-7.5 9.6Z"/></svg>
+      <span class="n" id="n">1,204</span>
+    </button>
+    <p class="note">粒子用 Web Animations API 现建现删，10 颗、620ms、随机角度与距离；计数只做 +1，不做滚动数字。</p>
+  </div>
+</main>
+<p class="hint">点一下心形</p>
+<script>
+(function () {
+  var btn = document.getElementById('like'), n = document.getElementById('n');
+  var on = false, count = 1204;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function burst() {
+    if (reduce) return;
+    for (var i = 0; i < 10; i++) {
+      var p = document.createElement('i');
+      p.className = 'burst';
+      btn.appendChild(p);
+      var a = (Math.PI * 2 * i) / 10 + Math.random() * .5;
+      var d = 26 + Math.random() * 22;
+      p.animate([
+        { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+        { transform: 'translate(calc(-50% + ' + Math.cos(a) * d + 'px), calc(-50% + ' + Math.sin(a) * d + 'px)) scale(.2)', opacity: 0 }
+      ], { duration: 620, easing: 'cubic-bezier(.2,.8,.2,1)', delay: Math.random() * 60 })
+        .onfinish = function () { this.effect.target.remove(); };
+      (function (node) {
+        setTimeout(function () { if (node.parentNode) node.remove(); }, 760);
+      })(p);
+    }
+  }
+
+  btn.addEventListener('click', function () {
+    on = !on;
+    if (on) { count++; burst(); }
+    else count--;
+    btn.classList.toggle('on', on);
+    btn.classList.add('pop');
+    setTimeout(function () { btn.classList.remove('pop'); }, 520);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    n.textContent = count.toLocaleString('zh-CN');
+  });
+})();
+</script>
+</body>
+</html>

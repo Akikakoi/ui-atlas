@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滑动下划线标签页 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:36px 20px 68px}
+.wrap{width:100%;max-width:560px}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 22px;font-size:clamp(22px,5.2vw,32px);line-height:1.16;letter-spacing:-.03em;font-weight:620}
+.tabs{position:relative;display:flex;gap:2px;border-bottom:1px solid var(--line)}
+.tab{position:relative;border:0;background:none;padding:11px 13px;font:inherit;font-size:13px;color:var(--muted);cursor:pointer;letter-spacing:-.01em}
+.tab[aria-selected="true"]{color:var(--ink);font-weight:600}
+.tab:first-child{padding-left:2px}
+.ind{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--ink);transition:transform .38s cubic-bezier(.2,.8,.2,1),width .38s cubic-bezier(.2,.8,.2,1)}
+.panels{margin-top:18px;position:relative}
+.panel{display:none}
+.panel.on{display:block;animation:in .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.panel h2{margin:0 0 7px;font-size:15px}
+.panel p{margin:0 0 12px;font-size:13px;line-height:1.8;color:#4b4e55;max-width:34em}
+.panel .row{display:flex;gap:8px;flex-wrap:wrap}
+.panel .box{flex:1 1 120px;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:#fff}
+.panel .box b{display:block;font-size:19px;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.panel .box span{font-size:11px;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.ind,.panel.on{transition:none;animation:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">LAYOUT / 04</p>
+    <h1>下划线不重画，<br>它只是滑过去。</h1>
+    <div class="tabs" role="tablist" aria-label="示例">
+      <button class="tab" role="tab" id="t1" aria-controls="p1" aria-selected="true">概览</button>
+      <button class="tab" role="tab" id="t2" aria-controls="p2" aria-selected="false" tabindex="-1">用量</button>
+      <button class="tab" role="tab" id="t3" aria-controls="p3" aria-selected="false" tabindex="-1">账单</button>
+      <span class="ind" id="ind" aria-hidden="true"></span>
+    </div>
+    <div class="panels">
+      <section class="panel on" id="p1" role="tabpanel" aria-labelledby="t1"><h2>本月运行正常</h2><p>三个区域全部在线，无未处理告警。下划线宽度来自按钮的 offsetWidth，位置来自 offsetLeft，不写死像素。</p><div class="row"><div class="box"><b>99.98%</b><span>可用性</span></div><div class="box"><b>41s</b><span>平均发布</span></div></div></section>
+      <section class="panel" id="p2" role="tabpanel" aria-labelledby="t2"><h2>请求量</h2><p>近 7 天上涨 18%，主要来自移动端。切换标签时内容用 7px 位移淡入，比直接 display 切换更容易感知。</p><div class="row"><div class="box"><b>2.4M</b><span>请求 / 日</span></div><div class="box"><b>+18%</b><span>周同比</span></div></div></section>
+      <section class="panel" id="p3" role="tabpanel" aria-labelledby="t3"><h2>下月账单预估</h2><p>按当前用量，预计 ¥1,284。键盘左右方向键可以在标签间移动，焦点跟着下划线走。</p><div class="row"><div class="box"><b>¥1,284</b><span>预估</span></div><div class="box"><b>¥980</b><span>上月</span></div></div></section>
+    </div>
+  </div>
+</main>
+<p class="hint">点标签，或聚焦后用左右方向键</p>
+<script>
+(function () {
+  var tabs = [].slice.call(document.querySelectorAll('.tab'));
+  var ind = document.getElementById('ind');
+  var panels = [].slice.call(document.querySelectorAll('.panel'));
+
+  function place(tab) {
+    ind.style.width = tab.offsetWidth + 'px';
+    ind.style.transform = 'translateX(' + tab.offsetLeft + 'px)';
+  }
+  function select(tab, focus) {
+    tabs.forEach(function (t, i) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      panels[i].classList.toggle('on', on);
+    });
+    place(tab);
+    if (focus) tab.focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { select(t); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      var n = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      select(tabs[n], true);
+    });
+  });
+  addEventListener('resize', function () {
+    var cur = tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0];
+    if (cur) place(cur);
+  });
+  requestAnimationFrame(function () { place(tabs[0]); });
+})();
+</script>
+</body>
+</html>

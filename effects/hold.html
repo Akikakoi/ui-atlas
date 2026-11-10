@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>长按确认 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f3ee;--ink:#141519;--muted:#7b7e85;--line:#e4dfd4;--accent:#2f5fd0;--danger:#b83b30}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:34px 22px 74px}
+.wrap{width:100%;max-width:430px}
+.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 22px;font-size:clamp(26px,6.2vw,38px);line-height:1.08;letter-spacing:-.04em;font-weight:650}
+.card{padding:18px;background:#fff;border:1px solid var(--line);border-radius:15px}
+.file{display:flex;align-items:center;gap:12px;padding-bottom:15px;border-bottom:1px solid #efebe2}
+.file .ico{width:34px;height:34px;border-radius:9px;flex:0 0 34px;display:grid;place-items:center;
+  background:#f2eee5;color:#8b8779;font:600 10px/1 ui-monospace,Consolas,monospace}
+.file b{display:block;font-size:13.5px;letter-spacing:-.01em}
+.file span{display:block;font-size:11.5px;color:var(--muted)}
+.hold{position:relative;display:flex;align-items:center;justify-content:center;gap:9px;width:100%;height:46px;margin-top:15px;
+  border:1px solid #e4c3be;border-radius:11px;background:#fff;color:var(--danger);
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;overflow:hidden;
+  touch-action:none;user-select:none;-webkit-user-select:none}
+.hold:active{background:#fdf6f5}
+.hold.done{border-color:#c8ddcc;background:#f4faf5;color:#2f6b45}
+.ring{width:21px;height:21px;flex:0 0 21px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:2.4}
+.ring .bg{stroke:#f0d9d5}
+.hold.done .ring .bg{stroke:#d8e8db}
+.ring .fg{stroke:var(--danger);stroke-linecap:round;stroke-dasharray:106.8;stroke-dashoffset:106.8}
+.hold.done .ring .fg{stroke:#3c8558;stroke-dashoffset:0}
+.msg{margin:11px 0 0;min-height:18px;font-size:11.5px;line-height:1.6;color:var(--muted);text-align:center}
+.legend{margin:16px 0 0;font-size:11.5px;line-height:1.8;color:var(--muted);text-align:center}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">FEEDBACK / 05</p>
+    <h1>删除这件事，<br>值得按久一点。</h1>
+    <div class="card">
+      <div class="file">
+        <span class="ico" aria-hidden="true">DOC</span>
+        <span><b>季度报告 · 草稿</b><span>12 KB · 今天 09:41</span></span>
+      </div>
+      <button class="hold" id="hold" type="button" aria-label="按住 1 秒删除「季度报告 · 草稿」">
+        <span class="ring" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="21" height="21">
+            <circle class="bg" cx="20" cy="20" r="17"></circle>
+            <circle class="fg" id="fg" cx="20" cy="20" r="17"></circle>
+          </svg>
+        </span>
+        <span id="label">按住 1 秒删除</span>
+      </button>
+      <p class="msg" id="msg" role="status" aria-live="polite"></p>
+    </div>
+    <p class="legend">松手就撤回，进度不会保留；键盘用户按住空格或回车同样有效。</p>
+  </div>
+</main>
+<p class="hint">按住按钮别松手，满 1 秒才删除</p>
+<script>
+(function () {
+  var btn = document.getElementById('hold'), fg = document.getElementById('fg');
+  var label = document.getElementById('label'), msg = document.getElementById('msg');
+  var C = 2 * Math.PI * 17;
+  var start = 0, raf = null, holding = false, done = false, fadeTimer = null;
+
+  fg.style.strokeDasharray = C;
+  fg.style.strokeDashoffset = C;
+
+  function begin() {
+    if (done || holding) return;
+    holding = true;
+    start = performance.now();
+    clearTimeout(fadeTimer);
+    fg.style.transition = 'none';
+    label.textContent = '保持住…';
+    msg.textContent = '松开即取消';
+    raf = requestAnimationFrame(frame);
+  }
+
+  function frame(now) {
+    if (!holding) return;
+    var p = Math.min(1, (now - start) / 1000);
+    fg.style.strokeDashoffset = String(C * (1 - p));
+    if (p >= 1) { finish(); return; }
+    raf = requestAnimationFrame(frame);
+  }
+
+  function cancel() {
+    if (!holding) return;
+    holding = false;
+    cancelAnimationFrame(raf);
+    raf = null;
+    label.textContent = '按住 1 秒删除';
+    msg.textContent = '';
+    fg.style.transition = 'stroke-dashoffset .3s ease';
+    fg.style.strokeDashoffset = C;
+    clearTimeout(fadeTimer);
+    fadeTimer = setTimeout(function () { fg.style.transition = 'none'; }, 320);
+  }
+
+  function finish() {
+    holding = false;
+    done = true;
+    cancelAnimationFrame(raf);
+    raf = null;
+    fg.style.transition = 'none';
+    fg.style.strokeDashoffset = '0';
+    btn.classList.add('done');
+    label.textContent = '已删除 · 点此撤销';
+    btn.setAttribute('aria-label', '已删除，点按撤销');
+    msg.textContent = '「季度报告 · 草稿」已移到回收站。';
+  }
+
+  function reset() {
+    done = false;
+    btn.classList.remove('done');
+    label.textContent = '按住 1 秒删除';
+    btn.setAttribute('aria-label', '按住 1 秒删除「季度报告 · 草稿」');
+    msg.textContent = '已撤销。';
+    fg.style.transition = 'none';
+    fg.style.strokeDashoffset = C;
+  }
+
+  btn.addEventListener('pointerdown', function (e) {
+    if (done) { reset(); return; }
+    e.preventDefault();
+    btn.setPointerCapture && btn.setPointerCapture(e.pointerId);
+    begin();
+  });
+  btn.addEventListener('pointerup', cancel);
+  btn.addEventListener('pointercancel', cancel);
+  btn.addEventListener('pointerleave', cancel);
+
+  btn.addEventListener('keydown', function (e) {
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    e.preventDefault();
+    if (done) { reset(); return; }
+    if (!e.repeat) begin();
+  });
+  btn.addEventListener('keyup', function (e) {
+    if (e.key === ' ' || e.key === 'Enter') cancel();
+  });
+  btn.addEventListener('blur', cancel);
+})();
+</script>
+</body>
+</html>

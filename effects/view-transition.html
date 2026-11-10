@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>共享元素转场 · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:26px 18px 56px}
+.app{width:100%;max-width:520px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:360px;position:relative}
+.bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.bar b{color:var(--ink);font-size:13px;letter-spacing:-.01em}
+.bar .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.view{padding:18px 16px 22px}
+.view[hidden]{display:none}
+.kicker{margin:0 0 10px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+h1{margin:0 0 16px;font-size:clamp(20px,4.6vw,27px);line-height:1.16;letter-spacing:-.03em;font-weight:640}
+.case{display:flex;gap:12px;align-items:center;width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;
+  background:#fbfaf6;text-align:left;font:inherit;cursor:pointer;transition:border-color .2s,transform .2s}
+.case:hover{border-color:#c9c5b9;transform:translateY(-1px)}
+.thumb{width:78px;height:64px;border-radius:8px;flex:0 0 78px;background:
+  radial-gradient(circle at 30% 25%,#f0d7b4,transparent 55%),linear-gradient(135deg,#c9a06a,#5d6b52);
+  view-transition-name:hero}
+.case .who b{display:block;font-size:13.5px;letter-spacing:-.01em}
+.case .who span{font-size:11.5px;color:var(--muted)}
+.case .go{margin-left:auto;color:var(--accent);font-size:12px}
+.hero{height:150px;border-radius:11px;margin-bottom:14px;background:
+  radial-gradient(circle at 30% 25%,#f0d7b4,transparent 55%),linear-gradient(135deg,#c9a06a,#5d6b52)}
+.detail h1{margin-bottom:8px}
+.detail p{margin:0 0 10px;font-size:12.5px;line-height:1.85;color:#4b4e55;max-width:34em}
+.back{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 11px;font:inherit;font-size:11.5px;cursor:pointer;margin-bottom:12px}
+.back:hover{border-color:var(--accent);color:var(--accent)}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.tagrow span{font-size:10.5px;color:var(--muted);background:#f3f1ea;border-radius:999px;padding:2px 9px}
+::view-transition-group(hero){animation-duration:.58s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+::view-transition-old(hero),::view-transition-new(hero){animation-duration:.58s}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.3s}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px){
+  .stage{padding:18px 18px 46px}
+  .app{min-height:0}
+  .hero{height:104px;margin-bottom:10px}
+  .tagrow{display:none}
+  .view{padding:14px 16px 16px}
+}
+@media (prefers-reduced-motion:reduce){::view-transition-group(hero){animation-duration:.01s}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="app">
+    <div class="bar"><span class="dot"></span><b>档案</b><span>· 2026</span></div>
+    <section class="view" id="listView">
+      <p class="kicker">VIEW TRANSITIONS</p>
+      <h1>点开一个案例，<br>缩略图会自己长大。</h1>
+      <button class="case" id="openBtn" type="button">
+        <span class="thumb" id="thumb"></span>
+        <span class="who"><b>星野计划</b><span>品牌识别 · 2026</span></span>
+        <span class="go">→</span>
+      </button>
+    </section>
+    <section class="view detail" id="detailView" hidden>
+      <button class="back" id="backBtn" type="button">← 返回列表</button>
+      <div class="hero" id="hero"></div>
+      <p class="kicker">CASE 001</p>
+      <h1>星野计划</h1>
+      <p>缩略图与详情大图共用一个 <code>view-transition-name: hero</code>，浏览器自己补出中间的位移与缩放，不需要手写 FLIP。</p>
+      <div class="tagrow"><span>品牌识别</span><span>包装</span><span>2026</span></div>
+    </section>
+  </div>
+</main>
+<p class="hint">点卡片进入，返回时图形会缩回去</p>
+<script>
+(function () {
+  var list = document.getElementById('listView'), detail = document.getElementById('detailView');
+  var thumb = document.getElementById('thumb'), hero = document.getElementById('hero');
+  var openBtn = document.getElementById('openBtn'), backBtn = document.getElementById('backBtn');
+  var busy = false;
+
+  function swap(toDetail) {
+    list.hidden = toDetail;
+    detail.hidden = !toDetail;
+    if (toDetail) {
+      thumb.style.viewTransitionName = 'none';
+      hero.style.viewTransitionName = 'hero';
+      backBtn.focus();
+    } else {
+      hero.style.viewTransitionName = 'none';
+      thumb.style.viewTransitionName = 'hero';
+      openBtn.focus();
+    }
+  }
+  function go(toDetail) {
+    if (busy) return;
+    if (!document.startViewTransition) { swap(toDetail); return; }
+    busy = true;
+    var t = document.startViewTransition(function () { swap(toDetail); });
+    t.finished.finally(function () { busy = false; });
+  }
+  openBtn.addEventListener('click', function () { go(true); });
+  backBtn.addEventListener('click', function () { go(false); });
+})();
+</script>
+</body>
+</html>

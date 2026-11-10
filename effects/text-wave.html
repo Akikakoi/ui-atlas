@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文字波浪 · UI Atlas 动效</title>
+<style>
+:root{--bg:#0c0d11;--ink:#f5f2e9;--muted:rgba(245,242,233,.5);--accent:#f0a35e}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(680px 420px at 50% 12%,#1a1c25,#0c0d11 72%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden}
+.stage{min-height:100vh;display:grid;place-items:center;padding:38px 22px 84px;text-align:center}
+.wrap{width:100%;max-width:620px}
+.kicker{margin:0 0 18px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+.line{margin:0;font-size:clamp(30px,7.4vw,50px);line-height:1.18;letter-spacing:-.04em;font-weight:640}
+.line + .line{margin-top:2px}
+.ch{display:inline-block;will-change:transform}
+.line .accent{color:var(--accent)}
+.sub{margin:26px 0 0;font-size:12.5px;line-height:1.85;color:var(--muted)}
+.readout{margin:14px 0 0;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(240,163,94,.8)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.ch{will-change:auto}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">TYPE / 09</p>
+    <h1 class="line" id="l1" aria-label="动起来的时候，">动起来的时候，</h1>
+    <h1 class="line" id="l2" aria-label="字也有呼吸。">字也有呼吸。</h1>
+    <p class="sub">每个字一个 span，共用一条时间线；相位按字符序号错开 0.36，幅度由光标横向位置决定。只改 transform，字体渲染不重排。</p>
+    <p class="readout" id="readout">AMPLITUDE · 9px</p>
+  </div>
+</main>
+<p class="hint">移动光标左右，改变波幅</p>
+<script>
+(function () {
+  var lines = [document.getElementById('l1'), document.getElementById('l2')];
+  var readout = document.getElementById('readout');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var chars = [];
+
+  lines.forEach(function (line) {
+    var text = line.textContent.trim();
+    line.textContent = '';
+    Array.from(text).forEach(function (c) {
+      var span = document.createElement('span');
+      span.className = 'ch';
+      span.setAttribute('aria-hidden', 'true');
+      span.textContent = c === ' ' ? '\u00A0' : c;
+      line.appendChild(span);
+      chars.push(span);
+    });
+  });
+
+  var amp = 9, targetAmp = 9;
+
+  function setAmp(v) {
+    targetAmp = v;
+    readout.textContent = 'AMPLITUDE · ' + Math.round(v) + 'px';
+  }
+
+  if (reduce) {
+    chars.forEach(function (ch, i) {
+      ch.style.transform = 'translate3d(0,' + (Math.sin(i * .36) * amp).toFixed(2) + 'px,0)';
+    });
+    return;
+  }
+
+  var start = performance.now(), raf = null, running = true;
+
+  function loop(now) {
+    raf = null;
+    amp += (targetAmp - amp) * .08;
+    var t = (now - start) * .0021;
+    for (var i = 0; i < chars.length; i++) {
+      var y = Math.sin(t + i * .36) * amp;
+      chars[i].style.transform = 'translate3d(0,' + y.toFixed(2) + 'px,0)';
+    }
+    if (running) raf = requestAnimationFrame(loop);
+  }
+
+  addEventListener('pointermove', function (e) {
+    setAmp(4 + (e.clientX / Math.max(1, innerWidth)) * 13);
+  }, { passive: true });
+  addEventListener('pointerleave', function () { setAmp(9); });
+  document.addEventListener('visibilitychange', function () {
+    running = !document.hidden;
+    if (running && !raf) raf = requestAnimationFrame(loop);
+  });
+
+  raf = requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

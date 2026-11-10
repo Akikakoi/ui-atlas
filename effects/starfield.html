@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>星空穿越 · UI Atlas 动效</title>
+<style>
+:root{--bg:#07090e;--ink:#eef1f7;--muted:rgba(238,241,247,.52);--accent:#8fb0ff}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:radial-gradient(760px 520px at 50% 50%,#111a2b,#07090e 72%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.stage{position:relative;z-index:2;min-height:100vh;display:grid;place-items:center;padding:34px 24px;text-align:center;pointer-events:none}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(238,241,247,.42)}
+h1{margin:0;font-size:clamp(28px,6.8vw,50px);line-height:1.04;letter-spacing:-.04em;font-weight:600}
+h1 em{font-style:normal;color:var(--accent)}
+p.sub{max-width:24em;margin:16px auto 0;font-size:12px;line-height:1.8;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:rgba(238,241,247,.5);z-index:3;pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<main class="stage">
+  <div>
+    <p class="kicker">BACKGROUND / 05</p>
+    <h1>星星不动，<br><em>是我们在穿过它。</em></h1>
+    <p class="sub">每颗星只有一个 z 值：z 越小，投影越大、拖线越长；z 小于 1 就回到远处重生。光标只轻轻挪动消失点。</p>
+  </div>
+</main>
+<p class="hint">移动光标，星空会轻微偏移</p>
+<script>
+(function () {
+  var c = document.getElementById('c');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = 0, H = 0, DPR = 1, stars = [], raf = null, running = true;
+  var cx = 0, cy = 0, tx = 0, ty = 0;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var COUNT = 170;
+
+  function spawn(s, far) {
+    s.x = (Math.random() - .5) * W * 1.9;
+    s.y = (Math.random() - .5) * H * 1.9;
+    s.z = far ? W : Math.random() * W + 1;
+    s.pz = s.z;
+  }
+
+  function resize() {
+    DPR = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight;
+    c.width = W * DPR; c.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    cx = tx = W / 2; cy = ty = H / 2;
+    stars = [];
+    for (var i = 0; i < COUNT; i++) {
+      var s = {};
+      spawn(s, false);
+      stars.push(s);
+    }
+    if (reduce) drawStatic();
+  }
+
+  function drawStatic() {
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i], k = 180 / s.z;
+      var x = cx + s.x * k, y = cy + s.y * k;
+      if (x < 0 || x > W || y < 0 || y > H) continue;
+      var a = Math.max(.12, 1 - s.z / W);
+      ctx.fillStyle = 'rgba(205,220,255,' + a.toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(.4, 1.9 * (1 - s.z / W)), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function frame() {
+    raf = null;
+    ctx.clearRect(0, 0, W, H);
+
+    cx += (tx - cx) * .05;
+    cy += (ty - cy) * .05;
+    var speed = 2.4 + W * .0012;
+
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      s.pz = s.z;
+      s.z -= speed;
+      if (s.z < 1) { spawn(s, true); continue; }
+
+      var k = 180 / s.z, kp = 180 / s.pz;
+      var x = cx + s.x * k, y = cy + s.y * k;
+      var px = cx + s.x * kp, py = cy + s.y * kp;
+      if (x < -80 || x > W + 80 || y < -80 || y > H + 80) continue;
+
+      var t = 1 - s.z / W;
+      ctx.strokeStyle = 'rgba(200,218,255,' + Math.min(.9, t * 1.25).toFixed(3) + ')';
+      ctx.lineWidth = Math.max(.6, 1.8 * t);
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+    if (running) raf = requestAnimationFrame(frame);
+  }
+
+  addEventListener('resize', resize);
+  addEventListener('pointermove', function (e) {
+    tx = W / 2 + (e.clientX - W / 2) * .08;
+    ty = H / 2 + (e.clientY - H / 2) * .08;
+  }, { passive: true });
+  document.addEventListener('visibilitychange', function () {
+    running = !document.hidden;
+    if (running && !reduce && !raf) raf = requestAnimationFrame(frame);
+  });
+
+  resize();
+  if (!reduce) frame();
+})();
+</script>
+</body>
+</html>

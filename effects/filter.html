@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>过滤网格 FLIP · UI Atlas 动效</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.stage{min-height:100vh;padding:36px 20px 68px;display:grid;place-items:center}
+.wrap{width:100%;max-width:600px}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0 0 18px;font-size:clamp(22px,5.2vw,32px);line-height:1.14;letter-spacing:-.032em;font-weight:620}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font:inherit;font-size:12px;cursor:pointer;color:#4b4e55}
+.chip:hover{border-color:#c9c5b9}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip small{opacity:.55;margin-left:4px;font-size:10.5px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.item{position:relative;aspect-ratio:1;border-radius:11px;overflow:hidden;display:grid;place-items:end start;padding:10px;
+  color:#fff;text-decoration:none;background:linear-gradient(150deg,var(--c1),var(--c2));will-change:transform}
+.item b{position:relative;z-index:1;font-size:12px;letter-spacing:-.01em}
+.item::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.32),transparent 60%)}
+.item .k{position:absolute;right:9px;top:8px;z-index:1;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;opacity:.7}
+.item[hidden]{display:none}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.item{will-change:auto}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <p class="kicker">LAYOUT / 02 · FLIP</p>
+    <h1>筛掉几张，剩下的<br>自己走到新位置。</h1>
+    <div class="chips" role="group" aria-label="按类型筛选">
+      <button class="chip" type="button" data-cat="all" aria-pressed="true">全部 <small>6</small></button>
+      <button class="chip" type="button" data-cat="brand" aria-pressed="false">品牌 <small>2</small></button>
+      <button class="chip" type="button" data-cat="ui" aria-pressed="false">界面 <small>2</small></button>
+      <button class="chip" type="button" data-cat="print" aria-pressed="false">印刷 <small>2</small></button>
+    </div>
+    <div class="grid" id="grid">
+      <a class="item" href="#a" data-cat="brand" style="--c1:#26313f;--c2:#6b7f95"><span class="k">BRAND</span><b>星野</b></a>
+      <a class="item" href="#b" data-cat="ui" style="--c1:#5a2f3d;--c2:#b4788a"><span class="k">UI</span><b>潮汐</b></a>
+      <a class="item" href="#c" data-cat="print" style="--c1:#3a4a2c;--c2:#8fa06a"><span class="k">PRINT</span><b>苔原</b></a>
+      <a class="item" href="#d" data-cat="ui" style="--c1:#33304f;--c2:#7d76b0"><span class="k">UI</span><b>静默</b></a>
+      <a class="item" href="#e" data-cat="brand" style="--c1:#4a3b22;--c2:#b4905a"><span class="k">BRAND</span><b>日晒</b></a>
+      <a class="item" href="#f" data-cat="print" style="--c1:#2a3a3c;--c2:#6d8d8e"><span class="k">PRINT</span><b>潮线</b></a>
+    </div>
+  </div>
+</main>
+<p class="hint">切换分类，看卡片如何挪位</p>
+<script>
+(function () {
+  var items = [].slice.call(document.querySelectorAll('.item'));
+  var chips = [].slice.call(document.querySelectorAll('.chip'));
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function apply(cat) {
+    var first = new Map();
+    items.forEach(function (it) {
+      if (!it.hidden) first.set(it, it.getBoundingClientRect());
+    });
+
+    items.forEach(function (it) { it.hidden = cat !== 'all' && it.dataset.cat !== cat; });
+
+    if (reduce) return;
+    items.forEach(function (it) {
+      if (it.hidden) return;
+      var last = it.getBoundingClientRect();
+      var f = first.get(it);
+      if (!f) {
+        it.animate([{ opacity: 0, transform: 'scale(.92)' }, { opacity: 1, transform: 'none' }],
+          { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
+        return;
+      }
+      var dx = f.left - last.left, dy = f.top - last.top;
+      if (Math.abs(dx) > .5 || Math.abs(dy) > .5) {
+        it.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }],
+          { duration: 360, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      }
+    });
+  }
+
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      chips.forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); });
+      apply(c.dataset.cat);
+    });
+  });
+})();
+</script>
+</body>
+</html>

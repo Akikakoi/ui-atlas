@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>遮罩擦除转场 · UI Atlas 动效</title>
+<style>
+:root{--ink:#f4f1e9;--muted:rgba(244,241,233,.55);--accent:#e2683c}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:#0d0e11;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
+.view{position:fixed;inset:0;display:grid;align-content:space-between;padding:32px 24px 26px;opacity:0;pointer-events:none;transition:opacity .25s}
+.view.show{opacity:1;pointer-events:auto}
+.a{background:radial-gradient(100% 80% at 20% 0%,#25304a,#0d0e11 70%)}
+.b{background:radial-gradient(100% 80% at 80% 0%,#3d241c,#0d0e11 70%)}
+.kicker{margin:0;font:600 9.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:14px 0 0;font-size:clamp(30px,7.6vw,58px);line-height:1.02;letter-spacing:-.045em;font-weight:600;max-width:9em}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{margin:16px 0 0;font-size:12.5px;line-height:1.85;color:var(--muted);max-width:26em}
+.foot{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.foot p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted);max-width:26em}
+.cta{border:1px solid rgba(255,255,255,.26);background:transparent;color:var(--ink);border-radius:999px;padding:9px 18px;
+  font:inherit;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.cta:hover{border-color:var(--accent);color:#ffb99c}
+.curtain{position:fixed;inset:0;z-index:9;display:grid;grid-template-columns:repeat(4,1fr);pointer-events:none;visibility:hidden}
+.curtain i{background:#e2683c;transform:translateY(101%);transition:transform .5s cubic-bezier(.76,0,.24,1);transition-delay:calc(var(--i) * 42ms)}
+.curtain i:nth-child(2){background:#c2542f}
+.curtain i:nth-child(3){background:#9c4026}
+.curtain i:nth-child(4){background:#73301d}
+.curtain.on{visibility:visible}
+.curtain.on i{transform:none}
+.curtain.out i{transform:translateY(-101%);transition-delay:calc((3 - var(--i)) * 42ms)}
+.hint{position:fixed;left:16px;bottom:10px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);z-index:3;pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.curtain i{transition:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<section class="view a show" id="va">
+  <div>
+    <p class="kicker">TRANSITION / 02</p>
+    <h1>换页时，<br>让四块板<em>先盖上来。</em></h1>
+    <p class="lede">四列色板错开 42ms 升起，完全遮住后换内容，再继续向上退出。用户看到的是同一块幕布在走，不是两次淡入。</p>
+  </div>
+  <div class="foot">
+    <p>与 View Transitions 的区别：这条不依赖新 API，纯 transform，任何浏览器都能跑。</p>
+    <button class="cta" type="button" data-go="b">进入案例 <span>→</span></button>
+  </div>
+</section>
+<section class="view b" id="vb">
+  <div>
+    <p class="kicker">TRANSITION / 02 · CASE</p>
+    <h1>遮罩把<br><em>两页缝在一起。</em></h1>
+    <p class="lede">返回时用同一套板，方向反过来。时长 500ms、错峰 42ms——总时长控制在 700ms 内，否则会等得不耐烦。</p>
+  </div>
+  <div class="foot">
+    <p>CASE 002 · 星野计划</p>
+    <button class="cta" type="button" data-go="a"><span>←</span> 回到封面</button>
+  </div>
+</section>
+<div class="curtain" id="curtain" aria-hidden="true">
+  <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i>
+</div>
+<p class="hint">点「进入案例」或「回到封面」</p>
+<script>
+(function () {
+  var va = document.getElementById('va'), vb = document.getElementById('vb');
+  var curtain = document.getElementById('curtain');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('.cta').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var to = b.dataset.go;
+        va.classList.toggle('show', to === 'a');
+        vb.classList.toggle('show', to === 'b');
+      });
+    });
+    return;
+  }
+  var lock = false;
+  function run(to) {
+    if (lock) return;
+    lock = true;
+    curtain.classList.remove('out');
+    curtain.classList.add('on');
+    setTimeout(function () {
+      va.classList.toggle('show', to === 'a');
+      vb.classList.toggle('show', to === 'b');
+      curtain.classList.remove('on');
+      curtain.classList.add('out');
+      setTimeout(function () {
+        curtain.classList.remove('out');
+        curtain.style.visibility = 'hidden';
+        lock = false;
+      }, 780);
+    }, 690);
+  }
+  document.querySelectorAll('.cta').forEach(function (b) {
+    b.addEventListener('click', function () { run(b.dataset.go); });
+  });
+})();
+</script>
+</body>
+</html>

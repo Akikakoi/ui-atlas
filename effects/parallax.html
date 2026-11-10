@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>视差分层 · UI Atlas 动效</title>
+<style>
+:root{--ink:#101418;--paper:#f4efe4;--accent:#c4552d}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#0d1b21;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+.scene{position:relative;height:135vh;overflow:hidden;background:linear-gradient(#0b1a21 0%,#16323a 26%,#7b5f4d 52%,#e2a06a 72%,#f6d8ab 88%,#f4efe4 100%)}
+.layer{position:absolute;left:-6%;right:-6%;will-change:transform}
+.sun{position:absolute;left:58%;top:24%;width:96px;height:96px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#ffe6b0,#f7b96a 60%,rgba(247,185,106,0) 72%);filter:blur(.4px);opacity:.9}
+.ring{position:absolute;left:58%;top:24%;width:96px;height:96px;margin:-14px 0 0 -14px;border-radius:50%;
+  border:1px solid rgba(255,238,205,.35);width:124px;height:124px}
+.hill-back{top:38%;height:40vh;background:#274a4a;opacity:.85;
+  clip-path:polygon(0 62%,12% 44%,26% 56%,40% 32%,54% 50%,68% 30%,82% 46%,100% 34%,100% 100%,0 100%)}
+.hill-mid{top:52%;height:44vh;background:#1d3438;
+  clip-path:polygon(0 58%,14% 40%,30% 54%,46% 34%,62% 52%,78% 36%,92% 50%,100% 42%,100% 100%,0 100%)}
+.hill-front{top:68%;height:44vh;background:#11262a;
+  clip-path:polygon(0 46%,16% 56%,32% 38%,50% 58%,66% 40%,82% 56%,100% 42%,100% 100%,0 100%)}
+.mast{position:absolute;left:22px;right:22px;top:15%;z-index:3;max-width:600px}
+.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:rgba(255,240,215,.62)}
+.mast h1{margin:0;font-size:clamp(30px,7.6vw,62px);line-height:.98;letter-spacing:-.045em;font-weight:600;color:#fdf5e6;text-wrap:balance}
+.mast h1 em{display:block;font-style:normal;color:#ffd9a8}
+.mast p{margin:14px 0 0;max-width:26em;font-size:12.5px;line-height:1.8;color:rgba(255,240,220,.7)}
+.meta{position:absolute;left:22px;right:22px;bottom:26px;display:flex;gap:18px;flex-wrap:wrap;
+  font:600 10px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(28,40,40,.55);z-index:3}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:#e9dfc9;pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:#ffd9a8}
+@media (prefers-reduced-motion:reduce){.layer{transform:none!important}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="layer" data-k=".10" style="top:0;bottom:0">
+    <div class="sun"></div><div class="ring"></div>
+  </div>
+  <div class="layer hill-back" data-k=".12"></div>
+  <div class="layer hill-mid" data-k=".24"></div>
+  <div class="mast">
+    <p class="kicker">SCROLL / 02 · 视差分层</p>
+    <h1>地平线<em>在移动。</em></h1>
+    <p>四层各自以不同的速度上移：太阳 0.10、远山 0.12、近山 0.24、标题 0.40。速度差决定纵深。</p>
+  </div>
+  <div class="layer hill-front" data-k=".38"></div>
+  <div class="meta"><span>35.6812° N</span><span>139.7671° E</span><span>06:24 / 日出</span></div>
+</div>
+<p class="hint">往下滚，山会以不同速度让开</p>
+<script>
+(function () {
+  var layers = [].slice.call(document.querySelectorAll('.layer[data-k]'));
+  var mast = document.querySelector('.mast h1');
+  var scene = document.getElementById('scene');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var raf = null;
+  function render() {
+    raf = null;
+    var y = scrollY;
+    layers.forEach(function (l) {
+      l.style.transform = 'translate3d(0,' + (-y * parseFloat(l.dataset.k)).toFixed(1) + 'px,0)';
+    });
+    if (mast) mast.style.transform = 'translate3d(0,' + (y * .16).toFixed(1) + 'px,0)';
+  }
+  addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+  render();
+})();
+</script>
+</body>
+</html>

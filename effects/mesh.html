@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>流动网格渐变 · UI Atlas 动效</title>
+<style>
+:root{--ink:#f4f2ec;--muted:rgba(244,242,236,.55)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:#08090c;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
+.bg{position:fixed;inset:-10%;filter:blur(64px) saturate(140%);opacity:.92}
+.blob{position:absolute;border-radius:50%;mix-blend-mode:screen;will-change:transform}
+.b1{width:52vw;height:52vw;left:4%;top:6%;background:radial-gradient(circle,#ff6a3d,transparent 68%);animation:drift1 19s ease-in-out infinite alternate}
+.b2{width:46vw;height:46vw;right:2%;top:-4%;background:radial-gradient(circle,#5f7dff,transparent 68%);animation:drift2 23s ease-in-out infinite alternate}
+.b3{width:44vw;height:44vw;left:24%;bottom:-12%;background:radial-gradient(circle,#3fd6a8,transparent 68%);animation:drift3 27s ease-in-out infinite alternate}
+.b4{width:36vw;height:36vw;right:14%;bottom:2%;background:radial-gradient(circle,#f2c14e,transparent 68%);animation:drift4 21s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate3d(14%,10%,0) scale(1.15)}}
+@keyframes drift2{to{transform:translate3d(-12%,16%,0) scale(1.2)}}
+@keyframes drift3{to{transform:translate3d(10%,-14%,0) scale(.92)}}
+@keyframes drift4{to{transform:translate3d(-16%,-10%,0) scale(1.1)}}
+.grain{position:fixed;inset:0;pointer-events:none;opacity:.16;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+.stage{position:relative;min-height:100vh;display:grid;align-content:space-between;padding:34px 24px 26px;z-index:2}
+.kicker{margin:0;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:14px 0 0;font-size:clamp(30px,7.4vw,58px);line-height:1.02;letter-spacing:-.045em;font-weight:600;max-width:9em}
+h1 em{font-style:normal;font-family:Georgia,serif;font-weight:400;color:#ffd9c2}
+.foot{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;max-width:640px}
+.foot p{margin:0;font-size:12px;line-height:1.8;color:var(--muted);max-width:30em}
+.foot .mark{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(244,242,236,.42)}
+.hint{position:fixed;left:16px;bottom:10px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:rgba(244,242,236,.5);z-index:3;pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:#ffd9c2}
+@media (prefers-reduced-motion:reduce){.blob{animation:none}}
+
+/* hint 胶囊：滚动页里不会与正文糊在一起 */
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
+</div>
+<div class="grain" aria-hidden="true"></div>
+<main class="stage">
+  <div>
+    <p class="kicker">BACKGROUND / 01</p>
+    <h1>颜色在<br><em>慢慢换气。</em></h1>
+  </div>
+  <div class="foot">
+    <p>四团 36–52vw 的光斑、64px 模糊、screen 混合，各自 19–27s 交替漂移。速度必须不同步，画面才不会「一起呼吸」。</p>
+    <span class="mark">MESH / 04 BLOBS</span>
+  </div>
+</main>
+<p class="hint">这是一段不需要交互的背景</p>
+</body>
+</html>

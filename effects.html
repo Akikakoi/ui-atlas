@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI Atlas · 动效图鉴</title>
+<meta name="description" content="50 个可交互的前端 UI 动效：指针跟随、滚动叙事、文字动画、布局过渡、反馈、背景与页面转场。全部为零依赖单文件 HTML，可直接预览、查看源码、复制使用。">
+<link rel="stylesheet" href="site.css?v=13">
+<link rel="stylesheet" href="effects.css?v=1">
+</head>
+<body>
+<a class="skip" href="#fx-grid">跳到效果</a>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">◆</span>
+      <div>
+        <h1>UI Atlas</h1>
+        <p>动效图鉴 · <span id="n-sub">50</span> 个可交互效果 · 零依赖</p>
+      </div>
+    </div>
+    <div class="tools">
+      <input id="q" type="search" placeholder="搜：磁吸、视差、粒子、转场…" aria-label="搜索效果、技术或类别">
+      <span class="spacer"></span>
+      <button class="btn" id="random" type="button">随机一个</button>
+      <a class="ref-link" href="motion.html">动效系统 →</a>
+      <a class="ref-link" href="index.html">← 风格图鉴</a>
+    </div>
+  </div>
+  <div class="filterbar">
+    <div class="fx-cats" id="cats" role="group" aria-label="按类别筛选"></div>
+    <span class="spacer"></span>
+    <button class="chip" id="fav-only" type="button" aria-pressed="false">只看收藏 <small id="n-fav">0</small></button>
+    <span class="count" id="count-info"></span>
+  </div>
+</header>
+
+<main id="fx-grid" class="fx-grid" aria-live="polite"></main>
+
+<footer class="foot">
+  <p>每个效果都是零依赖单文件 HTML：CSS 与 JS 内联，复制一个文件就能跑。全部为本站自行实现，未复制第三方站点的代码或素材。</p>
+  <p>预览可直接交互；点预览右下角「放大」会按 600 × 450 的同一构图等比铺到全屏，想打开响应式原页点「原页」，想拿走源码点「代码」。</p>
+</footer>
+
+<div class="overlay" id="codeModal" hidden>
+  <div class="fx-code-box" role="dialog" aria-modal="true" aria-labelledby="cm-title">
+    <header class="code-head">
+      <div class="code-title">
+        <h2 id="cm-title">效果</h2>
+        <p id="cm-sub"></p>
+      </div>
+      <div class="code-actions">
+        <button class="btn small" id="cm-notes" type="button" aria-expanded="false" aria-controls="code-notes">深度</button>
+        <a class="btn small" id="cm-open" href="#" target="_blank" rel="noopener">新标签打开 ↗</a>
+        <button class="btn small primary" id="cm-copy" type="button">复制当前标签</button>
+        <button class="btn small" id="cm-close" type="button">关闭</button>
+      </div>
+    </header>
+    <div class="code-body">
+      <aside class="code-notes" id="code-notes">
+        <section><h3>做法</h3><p id="cm-how"></p></section>
+        <section><h3>解剖</h3><ol class="code-steps" id="cm-anatomy"></ol></section>
+        <section><h3>参数</h3><dl class="code-params" id="cm-params"></dl></section>
+        <section><h3>变体</h3><ul class="code-variants" id="cm-variants"></ul></section>
+        <section><h3>注意</h3><p id="cm-watch"></p></section>
+        <section><h3>成本</h3><p class="code-cost"><b id="cm-cost-tier"></b><span id="cm-cost-note"></span></p></section>
+        <section><h3>什么时候别用</h3><p id="cm-avoid"></p></section>
+        <section><h3>关键点</h3><ul id="cm-features"></ul></section>
+        <section><h3>用到的</h3><div class="code-tags" id="cm-tech"></div></section>
+        <p class="code-lines" id="cm-lines"></p>
+      </aside>
+      <div class="code-pane">
+        <div class="code-tabs" role="tablist" aria-label="源码分段">
+          <button role="tab" type="button" data-tab="all" aria-selected="true">全部</button>
+          <button role="tab" type="button" data-tab="css" aria-selected="false">CSS</button>
+          <button role="tab" type="button" data-tab="js" aria-selected="false">JS</button>
+        </div>
+        <pre id="cm-pre"><code id="cm-code"></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay fx-zoom-modal" id="zoomModal" hidden>
+  <div class="fx-zoom-box" role="dialog" aria-modal="true" aria-labelledby="zm-title">
+    <header class="fx-zoom-head">
+      <div class="fx-zoom-title">
+        <h2 id="zm-title">效果</h2>
+        <p id="zm-sub"></p>
+      </div>
+      <div class="fx-zoom-actions">
+        <a class="btn small" id="zm-open" href="#" target="_blank" rel="noopener">新标签打开 ↗</a>
+        <button class="btn small" id="zm-code" type="button">看代码</button>
+        <button class="btn small primary" id="zm-close" type="button">关闭</button>
+      </div>
+    </header>
+    <div class="fx-zoom-stage" id="zm-stage">
+      <span class="fx-zoom-loading">加载预览…</span>
+      <iframe id="zm-frame" title="放大预览"></iframe>
+    </div>
+  </div>
+</div>
+
+<script src="effects.js?v=1"></script>
+</body>
+</html>
