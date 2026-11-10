@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>动效参数实验台 · UI Atlas</title>
+<meta name="description" content="拖动距离、时长、曲线、错峰与项数，实时看 10 条动效规则怎么判定；可复制 CSS 与分享链接。">
+<link rel="stylesheet" href="../site.css?v=13">
+<link rel="stylesheet" href="tokens.css">
+<style>
+.lab{max-width:1120px;margin:0 auto;padding:0 22px}
+.hero{padding:44px 0 28px;border-bottom:1px solid var(--line)}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+.hero h1{margin:0 0 14px;font-size:clamp(34px,6.4vw,56px);line-height:1.03;letter-spacing:-.05em;font-weight:650}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .lede{margin:0;max-width:38em;font-size:13.5px;line-height:1.9;color:var(--muted)}
+.lab-grid{display:grid;grid-template-columns:318px minmax(0,1fr);gap:18px;padding:24px 0 52px;align-items:start}
+.controls{position:sticky;top:74px;display:grid;gap:14px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.control{display:grid;gap:6px}
+.c-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:12px}
+.c-top label{font-weight:600}
+.c-top output{font:600 11px/1.4 ui-monospace,Consolas,monospace;color:var(--accent)}
+input[type="range"]{width:100%;accent-color:var(--accent);cursor:pointer}
+.c-hint{font-size:10.5px;line-height:1.5;color:var(--muted)}
+select{width:100%;height:34px;padding:0 9px;border:1px solid var(--line);border-radius:8px;background:#fbfaf5;
+  color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
+.presets{display:flex;flex-wrap:wrap;gap:5px}
+.presets button{border:1px solid var(--line);background:#fbfaf5;color:var(--ink);border-radius:999px;
+  padding:4px 9px;font:inherit;font-size:10.5px;cursor:pointer}
+.presets button:hover{border-color:var(--accent);color:var(--accent)}
+.presets button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.toggles{display:grid;gap:7px;font-size:12px}
+.toggles label{display:flex;align-items:center;gap:7px;cursor:pointer;color:#4b4e55}
+.toggles input{accent-color:var(--accent)}
+.prop{display:grid;gap:6px;font-size:12px}
+.prop > span{font-weight:600}
+.seg{display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:8px;background:#e9e5da}
+.seg button{border:0;background:transparent;padding:6px;border-radius:6px;font:inherit;font-size:11px;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 4px rgba(20,20,15,.1)}
+.actions{display:flex;flex-wrap:wrap;gap:6px}
+.stage-wrap{display:grid;gap:12px;min-width:0}
+.stage{position:relative;padding:16px;border:1px solid var(--line);border-radius:16px;
+  background:linear-gradient(160deg,#fbf9f3,#f1eee4);overflow:hidden}
+.stage-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px;
+  font-size:11px;color:var(--muted)}
+.stage-head b{color:var(--ink)}
+.stage-head .vals{font:600 10px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.02em}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px;min-height:118px}
+.tile{display:grid;gap:3px;padding:9px 10px;border:1px solid #e2ddd0;border-radius:9px;background:#fff;
+  opacity:0;transform:translate3d(0,var(--lab-move,26px),0);
+  transition:transform var(--lab-dur,480ms) var(--lab-ease,cubic-bezier(.2,.8,.2,1)),
+    opacity var(--lab-dur,480ms) var(--lab-ease,cubic-bezier(.2,.8,.2,1));
+  transition-delay:calc(var(--i,0) * var(--lab-stagger,70ms));will-change:transform}
+.tile.in{opacity:1;transform:none}
+.tile span{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--accent)}
+.tile b{font-size:11px;letter-spacing:-.01em;white-space:nowrap}
+.bar-demo{margin-top:16px;padding-top:13px;border-top:1px solid var(--line)}
+.bar-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:7px;font-size:10.5px;color:var(--muted)}
+.bar-head span:last-child{font:600 9.5px/1.4 ui-monospace,Consolas,monospace;color:var(--accent)}
+.track{height:10px;border-radius:5px;background:#e9e5da;overflow:hidden}
+.bar{display:block;width:100%;height:100%;border-radius:5px;background:var(--accent);
+  transform-origin:0 50%;transform:scaleX(0);
+  transition:transform var(--lab-dur,480ms) var(--lab-ease,cubic-bezier(.2,.8,.2,1))}
+.bar.in{transform:scaleX(1)}
+.stage.prop-width .bar{width:0;transform:none;transition:width var(--lab-dur,480ms) var(--lab-ease,cubic-bezier(.2,.8,.2,1))}
+.stage.prop-width .bar.in{width:100%}
+.stage.no-anim .tile,.stage.no-anim .bar{transition:none!important}
+.stage.reduce .tile{opacity:1;transform:none;transition:none}
+.stage.reduce .bar{width:100%;transform:scaleX(1);transition:none}
+.decor-dot{position:absolute;right:17px;top:14px;width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:0}
+.stage.decor .decor-dot{opacity:1;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(47,95,208,.35)}50%{box-shadow:0 0 0 8px rgba(47,95,208,0)}}
+.stage.decor .stage-head::after{content:"装饰循环 ON";font:600 8px/1 ui-monospace,Consolas,monospace;
+  letter-spacing:.12em;color:#8d3a30;background:#fbe4e1;border-radius:999px;padding:3px 6px}
+.verdict{display:flex;align-items:baseline;gap:6px;padding:11px 13px;border:1px solid var(--line);
+  border-radius:10px;background:var(--panel);font-size:12.5px;color:var(--muted)}
+.verdict b{color:var(--ink);font-size:15px;font-variant-numeric:tabular-nums}
+.verdict.warn{border-color:#f0c9c0;background:#fff7f4;color:#8d3a30}
+.verdict.warn b{color:#8d3a30}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.checks li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px;align-items:start;
+  padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel)}
+.checks .st{min-width:32px;padding:2px 6px;border-radius:999px;text-align:center;
+  font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em}
+.checks li.ok .st{background:#e8f2ec;color:#2f6b45}
+.checks li.warn .st{background:#fbe4e1;color:#8d3a30}
+.checks li.info .st{background:#ececec;color:#6b6b6b}
+.checks b{display:block;font-size:11.5px;letter-spacing:-.01em}
+.checks small{display:block;margin-top:2px;font-size:10.5px;line-height:1.65;color:var(--muted)}
+.checks li.warn small{color:#8d3a30}
+.css-out{margin:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fbfaf6;
+  font:11px/1.75 ui-monospace,Consolas,monospace;color:#2f3238;overflow:auto;max-height:280px;white-space:pre}
+.hint{position:fixed;left:16px;bottom:14px;z-index:9;display:flex;align-items:center;gap:6px;margin:0;
+  padding:4px 9px;border:1px solid rgba(128,128,128,.18);border-radius:999px;background:rgba(128,128,128,.10);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.lab .foot{max-width:1120px;padding-left:0;padding-right:0}
+@media (max-width:900px){
+  .lab-grid{grid-template-columns:1fr}
+  .controls{position:static}
+}
+@media (max-width:720px){
+  .lab{padding:0 14px}
+  .hero{padding:34px 0 24px}
+  .cards{grid-template-columns:repeat(auto-fill,minmax(78px,1fr))}
+  .checks small{font-size:10px}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .stage.decor .decor-dot{animation:none}
+  .screen.anim-in{animation:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#lab">跳到实验台</a>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">◆</span>
+      <div>
+        <h1>UI Atlas</h1>
+        <p>动效系统 · 参数实验台</p>
+      </div>
+    </div>
+    <div class="tools">
+      <span class="spacer"></span>
+      <a class="ref-link" href="../motion.html">← 动效系统</a>
+      <a class="ref-link" href="flow.html">3 屏流程 →</a>
+    </div>
+  </div>
+</header>
+
+<main class="lab" id="lab">
+  <section class="hero">
+    <p class="kicker">MOTION LAB · 02</p>
+    <h1>调四个数，<br><em>看规则怎么翻脸。</em></h1>
+    <p class="lede">距离、时长、曲线、错峰、项数都是活的。每改一次，下面 10 条规则会重新判定；预设可以直接看「太快 / 太慢 / 过度错峰 / 多运动 / width 动画」长什么样。</p>
+  </section>
+
+  <div class="lab-grid">
+    <aside class="controls" aria-label="参数">
+      <div class="control">
+        <div class="c-top"><label for="dist">距离</label><output id="distOut">26px</output></div>
+        <input id="dist" type="range" min="0" max="40" step="1" value="26">
+        <div class="c-hint" id="distHint">最接近 --move-4（26px）</div>
+      </div>
+      <div class="control">
+        <div class="c-top"><label for="dur">时长</label><output id="durOut">480ms</output></div>
+        <input id="dur" type="range" min="80" max="900" step="10" value="480">
+        <div class="c-hint" id="durHint">最接近 --dur-4 · 当前距离建议 480ms</div>
+      </div>
+      <div class="control">
+        <div class="c-top"><label for="ease">曲线</label><output id="easeOut">enter</output></div>
+        <select id="ease">
+          <option value="standard">standard · 原地</option>
+          <option value="enter" selected>enter · 进入</option>
+          <option value="exit">exit · 退出</option>
+          <option value="spring">spring · 回弹</option>
+        </select>
+        <div class="c-hint" id="easeHint">cubic-bezier(0,0,.2,1)</div>
+      </div>
+      <div class="control">
+        <div class="c-top"><label for="stagger">错峰</label><output id="staggerOut">70ms</output></div>
+        <input id="stagger" type="range" min="0" max="160" step="5" value="70">
+        <div class="c-hint" id="staggerHint">最接近 --stagger-2 · 最后一项等 210ms</div>
+      </div>
+      <div class="control">
+        <div class="c-top"><label for="count">项数</label><output id="countOut">4 项</output></div>
+        <input id="count" type="range" min="1" max="12" step="1" value="4">
+        <div class="c-hint" id="countHint">4 项 · 总错峰 210ms</div>
+      </div>
+
+      <div class="presets" id="presets" role="group" aria-label="预设">
+        <button type="button" data-preset="ok" aria-pressed="true">推荐</button>
+        <button type="button" data-preset="fast" aria-pressed="false">太快</button>
+        <button type="button" data-preset="slow" aria-pressed="false">太慢</button>
+        <button type="button" data-preset="stagger" aria-pressed="false">过度错峰</button>
+        <button type="button" data-preset="multi" aria-pressed="false">多运动</button>
+        <button type="button" data-preset="width" aria-pressed="false">width 动画</button>
+      </div>
+
+      <div class="toggles">
+        <label><input type="checkbox" id="decor"> 额外装饰循环</label>
+        <label><input type="checkbox" id="reduce"> 模拟减动效</label>
+      </div>
+
+      <div class="prop">
+        <span>进度条属性</span>
+        <div class="seg" id="propSeg" role="group" aria-label="进度条动画属性">
+          <button type="button" data-prop="transform" aria-pressed="true">transform</button>
+          <button type="button" data-prop="width" aria-pressed="false">width</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary small" id="replay" type="button">重播</button>
+        <button class="btn small" id="copyCss" type="button">复制 CSS</button>
+        <button class="btn small" id="copyLink" type="button">复制链接</button>
+      </div>
+    </aside>
+
+    <section class="stage-wrap" aria-label="预览与规则体检">
+      <div class="stage" id="stage">
+        <span class="decor-dot" aria-hidden="true"></span>
+        <div class="stage-head">
+          <span>列表入场 · <b id="stageCount">4</b> 项</span>
+          <span class="vals" id="stageVals">26px · 480ms · 70ms</span>
+        </div>
+        <div class="cards" id="cards"></div>
+        <div class="bar-demo">
+          <div class="bar-head"><span>进度条</span><span id="barMode">transform · scaleX</span></div>
+          <div class="track"><i class="bar" id="bar"></i></div>
+        </div>
+      </div>
+
+      <div class="verdict" id="verdict" role="status" aria-live="polite" aria-atomic="true"><b>6</b> 条通过 · 参数可以上桌 · 4 条需在真实页面判断</div>
+
+      <ul class="checks" id="checks">
+        <li data-check="intent"><span class="st">参考</span><div><b>01 · 先决定要不要动</b><small></small></div></li>
+        <li data-check="duration"><span class="st">通过</span><div><b>02 · 时长跟距离走</b><small></small></div></li>
+        <li data-check="ease"><span class="st">通过</span><div><b>03 · 进入 / 退出曲线</b><small></small></div></li>
+        <li data-check="multi"><span class="st">通过</span><div><b>04 · 一次一个主运动</b><small></small></div></li>
+        <li data-check="stagger"><span class="st">通过</span><div><b>05 · 错峰与分组</b><small></small></div></li>
+        <li data-check="spatial"><span class="st">参考</span><div><b>06 · 保持空间关系</b><small></small></div></li>
+        <li data-check="interrupt"><span class="st">通过</span><div><b>07 · 可打断</b><small></small></div></li>
+        <li data-check="drag"><span class="st">参考</span><div><b>08 · 拖动跟手</b><small></small></div></li>
+        <li data-check="reduce"><span class="st">参考</span><div><b>09 · 减动效不是 0ms</b><small></small></div></li>
+        <li data-check="perf"><span class="st">通过</span><div><b>10 · 性能预算</b><small></small></div></li>
+      </ul>
+
+      <pre class="css-out" id="cssOut"></pre>
+    </section>
+  </div>
+</main>
+
+<p class="hint">拖动滑杆，或点预设看规则翻脸</p>
+
+<footer class="foot">
+  <p>参数实验台只验证入场与进度条两条路径；共享元素、拖拽、View Transitions 去 <a href="flow.html">3 屏流程</a> 看。</p>
+  <p><a href="../motion.html">动效系统</a> · <a href="../effects.html">50 条动效</a> · <a href="../README.md">说明</a></p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var EASE = {
+    standard: ['cubic-bezier(.2,.8,.2,1)', '--ease-standard'],
+    enter: ['cubic-bezier(0,0,.2,1)', '--ease-enter'],
+    exit: ['cubic-bezier(.4,0,1,1)', '--ease-exit'],
+    spring: ['cubic-bezier(.34,1.56,.64,1)', '--ease-spring']
+  };
+  var MOVE = [[4, '--move-1'], [8, '--move-2'], [16, '--move-3'], [26, '--move-4'], [40, '--move-5']];
+  var DUR = [[120, '--dur-1'], [200, '--dur-2'], [320, '--dur-3'], [480, '--dur-4'], [720, '--dur-5']];
+  var STAG = [[40, '--stagger-1'], [70, '--stagger-2'], [110, '--stagger-3']];
+  var LABELS = ['结构', '视觉', '动效', '数据', '排版', '色彩', '交互', '内容', '层级', '节奏', '细节', '收尾'];
+  var DEFAULTS = { dist: 26, dur: 480, ease: 'enter', stagger: 70, count: 4, prop: 'transform', decor: false, reduce: false };
+  var PRESETS = {
+    ok: { dist: 26, dur: 480, ease: 'enter', stagger: 70, count: 4, prop: 'transform', decor: false, reduce: false },
+    fast: { dist: 26, dur: 120, ease: 'enter', stagger: 70, count: 4, prop: 'transform', decor: false, reduce: false },
+    slow: { dist: 26, dur: 900, ease: 'enter', stagger: 70, count: 4, prop: 'transform', decor: false, reduce: false },
+    stagger: { dist: 26, dur: 480, ease: 'enter', stagger: 140, count: 12, prop: 'transform', decor: false, reduce: false },
+    multi: { dist: 26, dur: 480, ease: 'spring', stagger: 70, count: 4, prop: 'transform', decor: true, reduce: false },
+    width: { dist: 26, dur: 480, ease: 'standard', stagger: 70, count: 4, prop: 'width', decor: false, reduce: false }
+  };
+
+  var stage = document.getElementById('stage');
+  var cards = document.getElementById('cards');
+  var bar = document.getElementById('bar');
+  var cssOut = document.getElementById('cssOut');
+  var verdict = document.getElementById('verdict');
+  var state = {};
+  var presetKey = 'ok';
+  var running = false, pendingReplay = false, runTimer = null;
+
+  function $(id) { return document.getElementById(id); }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function readHash() {
+    var p = new URLSearchParams(location.hash.replace(/^#/, ''));
+    var s = {};
+    Object.keys(DEFAULTS).forEach(function (k) { s[k] = DEFAULTS[k]; });
+    if (p.has('d')) s.dist = clamp(parseInt(p.get('d'), 10) || 0, 0, 40);
+    if (p.has('t')) s.dur = clamp(parseInt(p.get('t'), 10) || 0, 80, 900);
+    if (p.has('e') && EASE[p.get('e')]) s.ease = p.get('e');
+    if (p.has('s')) s.stagger = clamp(parseInt(p.get('s'), 10) || 0, 0, 160);
+    if (p.has('n')) s.count = clamp(parseInt(p.get('n'), 10) || 1, 1, 12);
+    if (p.get('p') === 'width' || p.get('p') === 'transform') s.prop = p.get('p');
+    s.decor = p.get('x') === '1';
+    s.reduce = p.get('r') === '1';
+    return s;
+  }
+
+  function nearest(list, v) {
+    var best = list[0];
+    list.forEach(function (item) {
+      if (Math.abs(item[0] - v) < Math.abs(best[0] - v)) best = item;
+    });
+    return best;
+  }
+
+  function recommend(dist) {
+    if (dist <= 6) return 120;
+    if (dist <= 12) return 200;
+    if (dist <= 20) return 320;
+    if (dist <= 32) return 480;
+    return 720;
+  }
+
+  function setChecks(key, status, text) {
+    var li = document.querySelector('[data-check="' + key + '"]');
+    if (!li) return;
+    li.className = status;
+    li.querySelector('.st').textContent = status === 'ok' ? '通过' : status === 'warn' ? '注意' : '参考';
+    li.querySelector('small').textContent = text;
+  }
+
+  function applyStage() {
+    stage.style.setProperty('--lab-move', state.dist + 'px');
+    stage.style.setProperty('--lab-dur', state.dur + 'ms');
+    stage.style.setProperty('--lab-ease', EASE[state.ease][0]);
+    stage.style.setProperty('--lab-stagger', state.stagger + 'ms');
+    stage.classList.toggle('decor', state.decor);
+    stage.classList.toggle('reduce', state.reduce);
+    stage.classList.toggle('prop-width', state.prop === 'width');
+    $('stageCount').textContent = state.count;
+    $('stageVals').textContent = state.dist + 'px · ' + state.dur + 'ms · ' + state.stagger + 'ms';
+    $('barMode').textContent = state.prop === 'transform' ? 'transform · scaleX' : 'width · 0→100%';
+  }
+
+  function renderCards() {
+    cards.textContent = '';
+    for (var i = 0; i < state.count; i++) {
+      var tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.style.setProperty('--i', i);
+      var no = document.createElement('span');
+      no.textContent = String(i + 1).padStart(2, '0');
+      var name = document.createElement('b');
+      name.textContent = LABELS[i % LABELS.length];
+      tile.appendChild(no);
+      tile.appendChild(name);
+      cards.appendChild(tile);
+    }
+  }
+
+  function finalState() {
+    var tiles = [].slice.call(cards.children);
+    stage.classList.add('no-anim');
+    tiles.forEach(function (t) { t.classList.add('in'); });
+    bar.classList.add('in');
+    void stage.offsetWidth;
+    stage.classList.remove('no-anim');
+  }
+
+  function replay() {
+    clearTimeout(runTimer);
+    running = true;
+    pendingReplay = false;
+    var tiles = [].slice.call(cards.children);
+    tiles.forEach(function (t) { t.classList.remove('in'); });
+    bar.classList.remove('in');
+    stage.classList.remove('no-anim');
+    void stage.offsetWidth;
+    if (state.reduce) {
+      tiles.forEach(function (t) { t.classList.add('in'); });
+      bar.classList.add('in');
+    } else {
+      requestAnimationFrame(function () {
+        tiles.forEach(function (t) { t.classList.add('in'); });
+        bar.classList.add('in');
+      });
+    }
+    var total = state.dur + Math.max(0, state.count - 1) * state.stagger;
+    var wait = state.reduce ? 160 : Math.min(total, 900) + 80;
+    runTimer = setTimeout(function () {
+      running = false;
+      if (pendingReplay) {
+        pendingReplay = false;
+        replay();
+      }
+    }, wait);
+  }
+
+  /* 拖动滑杆时：让当前这一遍播完，再带着最新参数重播一遍 */
+  function requestLiveReplay() {
+    pendingReplay = true;
+    if (!running) {
+      pendingReplay = false;
+      replay();
+    }
+  }
+
+  function updateLabels() {
+    var dTok = nearest(MOVE, state.dist);
+    var tTok = nearest(DUR, state.dur);
+    var sTok = nearest(STAG, state.stagger);
+    var total = (state.count - 1) * state.stagger;
+    var rec = recommend(state.dist);
+
+    $('distOut').textContent = state.dist + 'px';
+    $('durOut').textContent = state.dur + 'ms';
+    $('easeOut').textContent = state.ease;
+    $('staggerOut').textContent = state.stagger + 'ms';
+    $('countOut').textContent = state.count + ' 项';
+
+    $('distHint').textContent = state.dist === dTok[0]
+      ? '= ' + dTok[1]
+      : '最接近 ' + dTok[1] + '（' + dTok[0] + 'px）';
+    $('durHint').textContent = '最接近 ' + tTok[1] + ' · 当前距离建议 ' + rec + 'ms';
+    $('easeHint').textContent = EASE[state.ease][0];
+    $('staggerHint').textContent = '最接近 ' + sTok[1] + ' · 最后一项等 ' + total + 'ms';
+    $('countHint').textContent = state.count + ' 项 · 总错峰 ' + total + 'ms';
+  }
+
+  function updateChecks() {
+    var rec = recommend(state.dist);
+    var ratio = state.dur / rec;
+    var total = (state.count - 1) * state.stagger;
+    var statuses = [];
+
+    setChecks('intent', 'info', '实验只验证入场；真实界面里先问这个状态变化是否真的需要动。');
+    statuses.push('info');
+
+    if (state.dist < 2) {
+      setChecks('duration', 'ok', '没有位移，时长只影响透明度，可以更短。');
+      statuses.push('ok');
+    } else if (ratio < .72) {
+      setChecks('duration', 'warn', '太快：' + state.dist + 'px 建议 ' + rec + 'ms，当前只有 ' + state.dur + 'ms。');
+      statuses.push('warn');
+    } else if (ratio > 1.45) {
+      setChecks('duration', 'warn', '太慢：' + state.dist + 'px 建议 ' + rec + 'ms，当前 ' + state.dur + 'ms。');
+      statuses.push('warn');
+    } else {
+      setChecks('duration', 'ok', '和推荐时长 ' + rec + 'ms 同一档，距离与时间匹配。');
+      statuses.push('ok');
+    }
+
+    if (state.ease === 'exit') {
+      setChecks('ease', 'warn', '进入用了 ease-exit，会慢起快走；换成 enter 或 standard。');
+      statuses.push('warn');
+    } else if (state.ease === 'spring') {
+      setChecks('ease', 'ok', '回弹适合非关键路径；表单、错误态和删除确认不要用。');
+      statuses.push('ok');
+    } else {
+      setChecks('ease', 'ok', '进入用 ease-enter / standard，收尾自然。');
+      statuses.push('ok');
+    }
+
+    if (state.decor) {
+      setChecks('multi', 'warn', '装饰循环和主运动同屏；一次只留一个主运动，其余降级为 opacity。');
+      statuses.push('warn');
+    } else {
+      setChecks('multi', 'ok', '预览里只有一个主运动（入场），进度条是第二条独立路径。');
+      statuses.push('ok');
+    }
+
+    if (state.count <= 1) {
+      setChecks('stagger', 'ok', '只有一项，错峰不起作用。');
+      statuses.push('ok');
+    } else if (state.count > 8) {
+      setChecks('stagger', 'warn', '项数 ' + state.count + ' > 8，应分 2–3 波；当前最后一项等 ' + total + 'ms。');
+      statuses.push('warn');
+    } else if (total > 600) {
+      setChecks('stagger', 'warn', '最后一项要等 ' + total + 'ms，超过 600ms 上限。');
+      statuses.push('warn');
+    } else {
+      setChecks('stagger', 'ok', '最后一项在 ' + total + 'ms 内入场，总时长可控。');
+      statuses.push('ok');
+    }
+
+    setChecks('spatial', 'info', '本实验不涉及页面转场；共享元素去 3 屏流程看封面怎么长大。');
+    statuses.push('info');
+
+    setChecks('interrupt', 'ok', '重播会清掉上一轮状态，不会叠帧；真实页面里再加 busy 锁。');
+    statuses.push('ok');
+
+    setChecks('drag', 'info', '拖拽跟手不在本实验；见拖拽排序与底部抽屉。');
+    statuses.push('info');
+
+    if (state.reduce) {
+      setChecks('reduce', 'ok', '已模拟减动效：直接给终态，状态仍然清楚。');
+      statuses.push('ok');
+    } else {
+      setChecks('reduce', 'info', '真实项目里加 prefers-reduced-motion 兜底，别只把时长改成 1ms。');
+      statuses.push('info');
+    }
+
+    if (state.prop === 'width') {
+      setChecks('perf', 'warn', '进度条用 width 会触发布局；改回 transform: scaleX。');
+      statuses.push('warn');
+    } else {
+      setChecks('perf', 'ok', '只动 transform / opacity，在合成层完成。');
+      statuses.push('ok');
+    }
+
+    var pass = statuses.filter(function (s) { return s === 'ok'; }).length;
+    var warn = statuses.filter(function (s) { return s === 'warn'; }).length;
+    var info = statuses.filter(function (s) { return s === 'info'; }).length;
+    verdict.classList.toggle('warn', warn > 0);
+    verdict.innerHTML = '<b>' + pass + '</b> 条通过 · ' +
+      (warn ? '<b>' + warn + '</b> 条需要注意' : '参数可以上桌') +
+      (info ? ' · ' + info + ' 条需在真实页面判断' : '');
+  }
+
+  function updateCss() {
+    var e = EASE[state.ease][0];
+    var css = '/* 当前配置：' + state.dist + 'px / ' + state.dur + 'ms / ' + state.ease + ' / ' +
+      state.stagger + 'ms × ' + state.count + ' 项 */\n' +
+      '.item {\n' +
+      '  opacity: 0;\n' +
+      '  transform: translate3d(0, ' + state.dist + 'px, 0);\n' +
+      '  transition:\n' +
+      '    opacity ' + state.dur + 'ms ' + e + ',\n' +
+      '    transform ' + state.dur + 'ms ' + e + ';\n' +
+      '  transition-delay: calc(var(--i) * ' + state.stagger + 'ms);\n' +
+      '}\n' +
+      '.item.is-in {\n' +
+      '  opacity: 1;\n' +
+      '  transform: none;\n' +
+      '}\n\n';
+
+    if (state.prop === 'transform') {
+      css += '.bar {\n' +
+        '  transform-origin: 0 50%;\n' +
+        '  transform: scaleX(0);\n' +
+        '  transition: transform ' + state.dur + 'ms ' + e + ';\n' +
+        '}\n' +
+        '.bar.is-in { transform: scaleX(1); }\n';
+    } else {
+      css += '/* width 会触发布局，仅用于对比 */\n' +
+        '.bar {\n' +
+        '  width: 0;\n' +
+        '  transition: width ' + state.dur + 'ms ' + e + ';\n' +
+        '}\n' +
+        '.bar.is-in { width: 100%; }\n';
+    }
+
+    css += '\n@media (prefers-reduced-motion: reduce) {\n' +
+      '  .item, .bar { transition: none; }\n' +
+      '  .item { opacity: 1; transform: none; }\n' +
+      '  .bar { transform: scaleX(1); width: 100%; }\n' +
+      '}\n';
+    cssOut.textContent = css;
+  }
+
+  function syncHash() {
+    var p = new URLSearchParams();
+    p.set('d', state.dist);
+    p.set('t', state.dur);
+    p.set('e', state.ease);
+    p.set('s', state.stagger);
+    p.set('n', state.count);
+    p.set('p', state.prop);
+    if (state.decor) p.set('x', '1');
+    if (state.reduce) p.set('r', '1');
+    history.replaceState(null, '', '#' + p.toString());
+  }
+
+  function update(animate) {
+    applyStage();
+    renderCards();
+    updateLabels();
+    updateChecks();
+    updateCss();
+    syncHash();
+    if (animate) replay(); else finalState();
+  }
+
+  function liveUpdate() {
+    applyStage();
+    updateLabels();
+    updateChecks();
+    updateCss();
+    syncHash();
+  }
+
+  function setControls() {
+    $('dist').value = state.dist;
+    $('dur').value = state.dur;
+    $('ease').value = state.ease;
+    $('stagger').value = state.stagger;
+    $('count').value = state.count;
+    $('decor').checked = state.decor;
+    $('reduce').checked = state.reduce;
+    document.querySelectorAll('#propSeg button').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.dataset.prop === state.prop ? 'true' : 'false');
+    });
+  }
+
+  function clearPreset() {
+    presetKey = '';
+    document.querySelectorAll('#presets button').forEach(function (b) {
+      b.setAttribute('aria-pressed', 'false');
+    });
+  }
+
+  function matchPreset() {
+    var keys = Object.keys(PRESETS);
+    for (var i = 0; i < keys.length; i++) {
+      var p = PRESETS[keys[i]];
+      var same = Object.keys(p).every(function (k) { return state[k] === p[k]; });
+      if (same) return keys[i];
+    }
+    return '';
+  }
+
+  function reflectPreset() {
+    presetKey = matchPreset();
+    document.querySelectorAll('#presets button').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.dataset.preset === presetKey ? 'true' : 'false');
+    });
+  }
+
+  function applyPreset(key) {
+    var p = PRESETS[key];
+    if (!p) return;
+    Object.keys(p).forEach(function (k) { state[k] = p[k]; });
+    presetKey = key;
+    document.querySelectorAll('#presets button').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.dataset.preset === key ? 'true' : 'false');
+    });
+    setControls();
+    update(true);
+  }
+
+  function bindRange(id, key, rebuild) {
+    var el = $(id);
+    el.addEventListener('input', function () {
+      state[key] = +el.value;
+      clearPreset();
+      if (rebuild) {
+        running = false;
+        clearTimeout(runTimer);
+        renderCards();
+      }
+      liveUpdate();
+      requestLiveReplay();
+    });
+    el.addEventListener('change', function () {
+      state[key] = +el.value;
+      clearPreset();
+      update(true);
+    });
+  }
+
+  function copy(text, btn) {
+    var done = function () {
+      var old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(function () { btn.textContent = old; }, 1100);
+    };
+    var fallback = function () {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      done();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  function init() {
+    state = readHash();
+    setControls();
+    reflectPreset();
+    bindRange('dist', 'dist', false);
+    bindRange('dur', 'dur', false);
+    bindRange('stagger', 'stagger', false);
+    bindRange('count', 'count', true);
+
+    $('ease').addEventListener('change', function (e) {
+      state.ease = e.target.value;
+      clearPreset();
+      update(true);
+    });
+    $('decor').addEventListener('change', function (e) {
+      state.decor = e.target.checked;
+      clearPreset();
+      update(true);
+    });
+    $('reduce').addEventListener('change', function (e) {
+      state.reduce = e.target.checked;
+      clearPreset();
+      update(true);
+    });
+    document.querySelectorAll('#propSeg button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        state.prop = b.dataset.prop;
+        document.querySelectorAll('#propSeg button').forEach(function (x) {
+          x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+        });
+        clearPreset();
+        update(true);
+      });
+    });
+    document.querySelectorAll('#presets button').forEach(function (b) {
+      b.addEventListener('click', function () { applyPreset(b.dataset.preset); });
+    });
+    $('replay').addEventListener('click', replay);
+    $('copyCss').addEventListener('click', function () { copy(cssOut.textContent, this); });
+    $('copyLink').addEventListener('click', function () { copy(location.href, this); });
+
+    addEventListener('hashchange', function () {
+      state = readHash();
+      setControls();
+      reflectPreset();
+      update(true);
+    });
+
+    update(false);
+    setTimeout(replay, 240);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

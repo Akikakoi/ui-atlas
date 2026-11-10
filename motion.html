@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>动效系统 · UI Atlas</title>
+<meta name="description" content="把 50 个动效片段收成一套语法：时长、曲线、距离、错峰四组 token，10 条编排规则，6 组反例，以及一个 3 屏真实流程。">
+<link rel="stylesheet" href="site.css?v=13">
+<link rel="stylesheet" href="motion/tokens.css">
+<style>
+.ms{max-width:1080px;margin:0 auto;padding:0 22px}
+.hero{padding:52px 0 34px;border-bottom:1px solid var(--line)}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+.hero h1{margin:0 0 16px;font-size:clamp(36px,7vw,64px);line-height:1.02;letter-spacing:-.05em;font-weight:650}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .lede{margin:0;max-width:38em;font-size:14px;line-height:1.9;color:var(--muted)}
+.hero-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px}
+.map{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:28px}
+.map div{padding:14px 15px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.62)}
+.map b{display:flex;align-items:center;gap:7px;font-size:12.5px;letter-spacing:-.01em}
+.map b i{width:18px;height:18px;border-radius:5px;background:#e9eef8;color:#3d5680;display:grid;place-items:center;
+  font:600 9px/1 ui-monospace,Consolas,monospace;font-style:normal}
+.map span{display:block;margin-top:6px;font-size:11.5px;line-height:1.65;color:var(--muted)}
+.ms section{padding:36px 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.sec-head .idx{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
+.sec-head h2{margin:0;font-size:clamp(24px,4.4vw,34px);line-height:1.1;letter-spacing:-.04em;font-weight:650}
+.sec-lede{margin:0;max-width:38em;font-size:12.5px;line-height:1.85;color:var(--muted)}
+.token-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
+.token-group{padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel)}
+.token-group h3{margin:0 0 4px;font-size:12px;letter-spacing:-.01em}
+.token-group > p{margin:0 0 10px;font-size:11px;color:var(--muted)}
+.tok-list{display:grid;gap:5px}
+.tok{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;
+  padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fbfaf5;font:inherit;text-align:left;cursor:pointer}
+.tok:hover{border-color:var(--accent)}
+.tok code{background:none;padding:0;font-size:10px;color:#5a5d65}
+.tok b{font:600 11.5px/1.4 ui-monospace,Consolas,monospace;color:var(--ink);text-align:right;overflow-wrap:anywhere}
+.tok .tok-note{min-width:46px;font-size:10px;color:var(--muted);text-align:right}
+.rules{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:20px}
+.rule{padding:15px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.rule .no{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent)}
+.rule h3{margin:8px 0 5px;font-size:13.5px;letter-spacing:-.01em}
+.rule p{margin:0;font-size:11.5px;line-height:1.75;color:var(--muted)}
+.anti-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}
+.anti{padding:13px;border:1px solid var(--line);border-radius:14px;background:var(--panel);display:grid;gap:9px;align-content:start}
+.anti h3{margin:0;font-size:13px;letter-spacing:-.01em}
+.anti p{margin:0;font-size:11.5px;line-height:1.7;color:var(--muted)}
+.anti .fix{color:#2f6b45}
+.anti-demo{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;border-radius:10px;background:#f3f0e7;min-height:136px}
+.mini{position:relative;border:1px solid #e2ddd0;border-radius:8px;background:#fff;overflow:hidden;padding:10px;min-height:120px}
+.badge{position:absolute;top:6px;right:6px;z-index:2;padding:2px 6px;border-radius:999px;font:600 8px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.08em}
+.bad .badge{background:#fbe4e1;color:#8d3a30}
+.good .badge{background:#e8f2ec;color:#2f6b45}
+.cap{position:absolute;left:8px;bottom:6px;font:600 8px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:#9a978d}
+/* 1 全屏模糊 */
+.anti[data-anti="blur"] .mini-page{display:grid;gap:4px;padding-top:18px;font-size:9px;color:#8a8d94}
+.anti[data-anti="blur"] .mini-page b{font-size:12px;color:var(--ink)}
+.anti[data-anti="blur"] .bad .mini-page{filter:blur(2.5px)}
+.anti[data-anti="blur"] .good .mini-sheet{position:absolute;left:12px;right:12px;bottom:8px;height:45%;border:1px solid #e2ddd0;border-radius:7px 7px 0 0;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(5px);display:grid;place-items:center;font-size:9px;color:#555}
+/* 2 滚动劫持 */
+.rail,.snaprail{display:flex;gap:5px;margin-top:20px;overflow:hidden}
+.rail{width:100%;animation:rail 4s linear infinite}
+.rail i,.snaprail i{width:42px;height:56px;border-radius:6px;background:#dbe3f4;flex:0 0 42px}
+.snaprail{overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.snaprail i{scroll-snap-align:start}
+.snaprail i:nth-child(2){background:#e5dfd1}
+.snaprail i:nth-child(3){background:#dcead9}
+@keyframes rail{to{transform:translateX(-94px)}}
+/* 3 过度错峰 */
+.dots{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:22px}
+.dots i{aspect-ratio:1;border-radius:4px;background:#cfd9ee;opacity:0;animation:dotIn 3.4s ease infinite;animation-delay:var(--d,0ms)}
+@keyframes dotIn{0%,8%{opacity:0;transform:translateY(4px)}22%,80%{opacity:1;transform:none}100%{opacity:0}}
+/* 4 缺减动效 */
+.bounce{width:30px;height:30px;margin:24px auto 0;border-radius:8px;background:#c9a06a;animation:bounce 1.2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.still{width:30px;height:30px;margin:24px auto 0;border-radius:8px;background:#93a67f}
+.setting{display:block;margin-top:8px;text-align:center;font:600 8px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:#2f6b45}
+/* 5 多个主运动 */
+.busycard{position:relative;margin-top:20px;padding:11px 9px;border:1px solid #e2ddd0;border-radius:8px;overflow:hidden;
+  animation:wiggle 2.6s ease-in-out infinite}
+.busycard b{font-size:11px;position:relative;z-index:1}
+.busycard .glow{position:absolute;inset:-20%;background:radial-gradient(circle at 60% 40%,rgba(201,160,106,.55),transparent 55%);
+  animation:pulse 1.8s ease-in-out infinite}
+.busycard .marquee{display:block;margin-top:8px;font:600 7px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:#9a978d;
+  white-space:nowrap;animation:slide 2.2s linear infinite}
+@keyframes wiggle{0%,100%{transform:rotate(0)}50%{transform:rotate(1.2deg)}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:.9}}
+@keyframes slide{to{transform:translateX(-40px)}}
+.calmcard{position:relative;margin-top:20px;padding:11px 9px;border:1px solid #e2ddd0;border-radius:8px;overflow:hidden}
+.calmcard b{font-size:11px}
+.calmcard .sweep{display:block;height:2px;margin-top:12px;background:#2f5fd0;transform-origin:0 50%;transform:scaleX(0);
+  animation:sweep 2.6s ease-in-out infinite}
+@keyframes sweep{0%,10%{transform:scaleX(0)}55%,100%{transform:scaleX(1)}}
+/* 6 宽高动画 */
+.bar-wrap{height:8px;margin-top:30px;border-radius:4px;background:#ece9e0;overflow:hidden}
+.bar{display:block;height:100%;border-radius:4px;background:var(--accent)}
+.badbar{width:0;animation:growW 2.4s ease infinite}
+.goodbar{transform-origin:0 50%;transform:scaleX(0);animation:growX 2.4s ease infinite}
+@keyframes growW{0%,10%{width:0}60%,100%{width:100%}}
+@keyframes growX{0%,10%{transform:scaleX(0)}60%,100%{transform:scaleX(1)}}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
+.code-card{border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
+.code-card h3{margin:0;padding:10px 13px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.06em;color:var(--muted)}
+.code-card pre{margin:0;padding:13px;overflow:auto;background:#fbfaf6;font:11.5px/1.8 ui-monospace,Consolas,monospace;color:#2f3238}
+.note{margin:16px 0 0;padding:11px 13px;border:1px solid #efe4cc;border-radius:10px;background:#fbf6ea;
+  font-size:11.5px;line-height:1.75;color:#7a5a30}
+.ms .foot{margin-top:0}
+@media (max-width:900px){
+  .anti-grid,.token-groups{grid-template-columns:1fr}
+  .map{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .ms{padding:0 14px}
+  .hero{padding:38px 0 28px}
+  .rules,.code-grid{grid-template-columns:1fr}
+  .anti-demo{min-height:128px}
+  .mini{min-height:112px}
+}
+@media (prefers-reduced-motion:reduce){
+  .anti-demo *{animation:none!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#tokens">跳到 token</a>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">◆</span>
+      <div>
+        <h1>UI Atlas</h1>
+        <p>动效系统 · Motion System</p>
+      </div>
+    </div>
+    <div class="tools">
+      <span class="spacer"></span>
+      <a class="ref-link" href="motion/flow.html">打开 3 屏流程 →</a>
+      <a class="ref-link" href="motion/lab.html">参数实验台 →</a>
+      <a class="ref-link" href="effects.html">← 动效图鉴</a>
+      <a class="ref-link" href="index.html">风格图鉴</a>
+    </div>
+  </div>
+</header>
+
+<main class="ms">
+  <section class="hero">
+    <p class="kicker">MOTION SYSTEM · 01</p>
+    <h1>不是更多效果，<br><em>是一套能复用的语法。</em></h1>
+    <p class="lede">50 个片段已经够多。这里把它们收成 5 个时长、4 条曲线、5 个距离、3 档错峰，再用一个 3 屏真实流程验证：列表怎么进、封面怎么长、按钮怎么收尾。</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="motion/flow.html">打开 3 屏流程 →</a>
+      <a class="btn" href="motion/lab.html">参数实验台 →</a>
+      <a class="btn" href="effects.html">回到 50 条动效</a>
+    </div>
+    <div class="map" aria-label="动效系统的三层">
+      <div><b><i>01</i>Tokens</b><span>时长、曲线、距离、错峰。所有组件只引用变量，不写魔法数字。</span></div>
+      <div><b><i>02</i>Rules</b><span>什么时候动、动多久、谁先谁后、什么时候必须停。10 条可判定规则。</span></div>
+      <div><b><i>03</i>Flow</b><span>列表 → 详情 → 完成。共享封面、错峰入场、按钮加载、toast、成功对勾在同一条时间线上。</span></div>
+    </div>
+  </section>
+
+  <section id="tokens">
+    <div class="sec-head"><span class="idx">01</span><h2>Token：先定尺子</h2></div>
+    <p class="sec-lede">点击任意一行可以复制变量引用。减动效时 <code>tokens.css</code> 会把时长压到 1ms、距离归零，组件不需要自己写第二套逻辑。</p>
+    <div class="token-groups">
+      <div class="token-group">
+        <h3>时长</h3>
+        <p>距离越远，时长越长；不要所有效果都用同一个 300ms。</p>
+        <div class="tok-list">
+          <button class="tok" type="button" data-copy="var(--dur-1)"><code>--dur-1</code><b>120ms</b><span class="tok-note">微反馈</span></button>
+          <button class="tok" type="button" data-copy="var(--dur-2)"><code>--dur-2</code><b>200ms</b><span class="tok-note">按钮 / 标签</span></button>
+          <button class="tok" type="button" data-copy="var(--dur-3)"><code>--dur-3</code><b>320ms</b><span class="tok-note">卡片 / 抽屉</span></button>
+          <button class="tok" type="button" data-copy="var(--dur-4)"><code>--dur-4</code><b>480ms</b><span class="tok-note">面板 / 页面</span></button>
+          <button class="tok" type="button" data-copy="var(--dur-5)"><code>--dur-5</code><b>720ms</b><span class="tok-note">首次叙事</span></button>
+        </div>
+      </div>
+      <div class="token-group">
+        <h3>曲线</h3>
+        <p>进入快出慢收，退出慢起快走；原地变化用 standard。</p>
+        <div class="tok-list">
+          <button class="tok" type="button" data-copy="var(--ease-standard)"><code>--ease-standard</code><b>cubic-bezier(.2,.8,.2,1)</b><span class="tok-note">原地</span></button>
+          <button class="tok" type="button" data-copy="var(--ease-enter)"><code>--ease-enter</code><b>cubic-bezier(0,0,.2,1)</b><span class="tok-note">进入</span></button>
+          <button class="tok" type="button" data-copy="var(--ease-exit)"><code>--ease-exit</code><b>cubic-bezier(.4,0,1,1)</b><span class="tok-note">退出</span></button>
+          <button class="tok" type="button" data-copy="var(--ease-spring)"><code>--ease-spring</code><b>cubic-bezier(.34,1.56,.64,1)</b><span class="tok-note">回弹</span></button>
+        </div>
+      </div>
+      <div class="token-group">
+        <h3>距离</h3>
+        <p>位移只取五档；不要出现 13px、27px 这种无法解释的数。</p>
+        <div class="tok-list">
+          <button class="tok" type="button" data-copy="var(--move-1)"><code>--move-1</code><b>4px</b><span class="tok-note">按下</span></button>
+          <button class="tok" type="button" data-copy="var(--move-2)"><code>--move-2</code><b>8px</b><span class="tok-note">小位移</span></button>
+          <button class="tok" type="button" data-copy="var(--move-3)"><code>--move-3</code><b>16px</b><span class="tok-note">卡片</span></button>
+          <button class="tok" type="button" data-copy="var(--move-4)"><code>--move-4</code><b>26px</b><span class="tok-note">面板</span></button>
+          <button class="tok" type="button" data-copy="var(--move-5)"><code>--move-5</code><b>40px</b><span class="tok-note">整页</span></button>
+        </div>
+      </div>
+      <div class="token-group">
+        <h3>错峰</h3>
+        <p>同组元素依次进入；超过 8 项就分组，不要每项都延迟。</p>
+        <div class="tok-list">
+          <button class="tok" type="button" data-copy="var(--stagger-1)"><code>--stagger-1</code><b>40ms</b><span class="tok-note">紧凑</span></button>
+          <button class="tok" type="button" data-copy="var(--stagger-2)"><code>--stagger-2</code><b>70ms</b><span class="tok-note">默认</span></button>
+          <button class="tok" type="button" data-copy="var(--stagger-3)"><code>--stagger-3</code><b>110ms</b><span class="tok-note">松散</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="sec-head"><span class="idx">02</span><h2>10 条编排规则</h2></div>
+    <p class="sec-lede">不是审美偏好，是可以在评审里直接判定的标准。每条都能在 <a href="motion/flow.html">3 屏流程</a> 或 <a href="motion/lab.html">参数实验台</a> 里找到对应实现。</p>
+    <div class="rules">
+      <article class="rule" data-rule><span class="no">01</span><h3>先决定要不要动</h3><p>只有状态变化才动：打开、完成、失败、切换。纯装饰的循环最多保留一个，否则页面一直在抢注意力。</p></article>
+      <article class="rule" data-rule><span class="no">02</span><h3>时长跟距离走</h3><p>4px / 120ms、8px / 200ms、16px / 320ms、26px / 480ms、整页 / 720ms。距离越远越慢，但不要超过 800ms。</p></article>
+      <article class="rule" data-rule><span class="no">03</span><h3>进入 ease-out，退出 ease-in</h3><p>进入要快出慢收，退出要慢起快走；原地变化用 standard。四条曲线够用，不要每个组件发明一条。</p></article>
+      <article class="rule" data-rule><span class="no">04</span><h3>一次只允许一个主运动</h3><p>同一时刻只让一个元素做主要位移或缩放，其余降级为 opacity。多个 transform 同时抢注意力，用户不知道该看哪。</p></article>
+      <article class="rule" data-rule><span class="no">05</span><h3>错峰 40–110ms，超过 8 项分组</h3><p>列表入场用 40–110ms 递进；10 项以上不要每项都延迟，分成 2–3 波，否则最后一项要等两秒。</p></article>
+      <article class="rule" data-rule><span class="no">06</span><h3>保持空间关系</h3><p>能共享元素就不要整页淡入：缩略图长成详情大图，用户知道「还是同一个东西」。没有空间关系时才用淡入。</p></article>
+      <article class="rule" data-rule><span class="no">07</span><h3>可打断</h3><p>新操作立即接管，旧动画不排队。用一个 busy 锁防止叠加；View Transition 未完成时不要再次导航。</p></article>
+      <article class="rule" data-rule><span class="no">08</span><h3>拖动跟手</h3><p>拖拽期间去掉 transition，直接把 dy 写进 transform；松手再做阈值判定。跟手的感觉来自「零延迟」，不是缓动。</p></article>
+      <article class="rule" data-rule><span class="no">09</span><h3>减动效不是 0ms</h3><p>直接给终态，保留状态反馈：加载完成、加入成功、页面切换都要有结果。不要只把时长改成 1ms 却留下位移。</p></article>
+      <article class="rule" data-rule><span class="no">10</span><h3>性能预算</h3><p>优先只动 transform / opacity；blur、canvas、大面积 clip-path 单独评估。4× CPU 降速下仍要能操作，不能掉到 20fps。</p></article>
+    </div>
+  </section>
+
+  <section id="anti">
+    <div class="sec-head"><span class="idx">03</span><h2>6 组反例：错在哪，怎么修</h2></div>
+    <p class="sec-lede">左边是「看起来有动效」，右边是「动效在解决问题」。每组都只差一个决定。</p>
+    <div class="anti-grid">
+      <article class="anti" data-anti="blur">
+        <div class="anti-demo">
+          <div class="mini bad"><span class="badge">错</span><div class="mini-page"><b>苔原笔记</b><span>布面 · 128 页</span><span>¥ 168</span></div></div>
+          <div class="mini good"><span class="badge">对</span><div class="mini-page"><b>苔原笔记</b><span>布面 · 128 页</span></div><div class="mini-sheet">装帧</div></div>
+        </div>
+        <h3>全屏模糊</h3>
+        <p>错：把整页都 blur，文字全糊，用户不知道弹层从哪里来。</p>
+        <p class="fix">对：只糊弹层背后的遮罩，内容保持可读；模糊半径 6–12px 就够。</p>
+      </article>
+      <article class="anti" data-anti="scroll">
+        <div class="anti-demo">
+          <div class="mini bad"><span class="badge">错</span><div class="rail"><i></i><i></i><i></i><i></i></div><span class="cap">横向钉住</span></div>
+          <div class="mini good"><span class="badge">对</span><div class="snaprail"><i></i><i></i><i></i><i></i></div><span class="cap">原生吸附</span></div>
+        </div>
+        <h3>滚动劫持</h3>
+        <p>错：桌面端把竖向滚轮改成横向推进，移动端手势完全对不上。</p>
+        <p class="fix">对：用原生横向 scroll-snap；只有桌面端才考虑钉住，并明确标出「慎用」。</p>
+      </article>
+      <article class="anti" data-anti="stagger">
+        <div class="anti-demo">
+          <div class="mini bad"><span class="badge">错</span><div class="dots">
+            <i style="--d:0ms"></i><i style="--d:140ms"></i><i style="--d:280ms"></i><i style="--d:420ms"></i><i style="--d:560ms"></i><i style="--d:700ms"></i>
+            <i style="--d:840ms"></i><i style="--d:980ms"></i><i style="--d:1120ms"></i><i style="--d:1260ms"></i><i style="--d:1400ms"></i><i style="--d:1540ms"></i>
+          </div><span class="cap">12 项 × 140ms</span></div>
+          <div class="mini good"><span class="badge">对</span><div class="dots">
+            <i style="--d:0ms"></i><i style="--d:0ms"></i><i style="--d:0ms"></i><i style="--d:0ms"></i><i style="--d:0ms"></i><i style="--d:0ms"></i>
+            <i style="--d:180ms"></i><i style="--d:180ms"></i><i style="--d:180ms"></i><i style="--d:180ms"></i><i style="--d:180ms"></i><i style="--d:180ms"></i>
+          </div><span class="cap">2 波 × 180ms</span></div>
+        </div>
+        <h3>过度错峰</h3>
+        <p>错：12 项每项延迟 140ms，最后一项要等 1.5 秒，用户以为页面没加载完。</p>
+        <p class="fix">对：超过 8 项就分组，两波各 180ms；总时长控制在 500ms 内。</p>
+      </article>
+      <article class="anti" data-anti="reduce">
+        <div class="anti-demo">
+          <div class="mini bad"><span class="badge">错</span><div class="bounce"></div><span class="cap">无限弹跳</span></div>
+          <div class="mini good"><span class="badge">对</span><div class="still"></div><span class="setting">减少动态效果 ✓</span><span class="cap">静止终态</span></div>
+        </div>
+        <h3>缺 reduced-motion</h3>
+        <p>错：所有用户都播放同样的无限动画，前庭敏感的人无法关掉。</p>
+        <p class="fix">对：尊重 <code>prefers-reduced-motion</code>，直接给终态，但保留加载、成功、失败的结果。</p>
+      </article>
+      <article class="anti" data-anti="multi">
+        <div class="anti-demo">
+          <div class="mini bad"><span class="badge">错</span><div class="busycard"><span class="glow"></span><b>苔原笔记</b><span class="marquee">TUNDRA · TUNDRA · TUNDRA</span></div></div>
+          <div class="mini good"><span class="badge">对</span><div class="calmcard"><b>苔原笔记</b><span class="sweep"></span></div></div>
+        </div>
+        <h3>同时多个主运动</h3>
+        <p>错：卡片在倾斜、光斑在呼吸、字幕在跑，用户不知道先看哪里。</p>
+        <p class="fix">对：只保留一个主运动（下划线扫过），其余静止；一次只讲一件事。</p>
+      </article>
+      <article class="anti" data-anti="layout">
+        <div class="anti-demo">
+          <div class="mini bad"><span class="badge">错</span><div class="bar-wrap"><i class="bar badbar"></i></div><span class="cap">width 0 → 100%</span></div>
+          <div class="mini good"><span class="badge">对</span><div class="bar-wrap"><i class="bar goodbar"></i></div><span class="cap">scaleX 0 → 1</span></div>
+        </div>
+        <h3>用 width 做进度</h3>
+        <p>错：每帧改 width，触发布局，长列表或低端机上会掉帧。</p>
+        <p class="fix">对：宽度写死，进度用 <code>transform: scaleX()</code>；只在合成层里跑。</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="code">
+    <div class="sec-head"><span class="idx">04</span><h2>落进代码</h2></div>
+    <p class="sec-lede">组件只引用语义 token，不在自己的 CSS 里写 320ms 或 cubic-bezier。减动效由 token 统一兜底。</p>
+    <div class="code-grid">
+      <div class="code-card">
+        <h3>CSS · 主运动与错峰</h3>
+        <pre><code>/* 一条主运动 */
+.card {
+  transition:
+    transform var(--dur-4) var(--ease-standard),
+    opacity var(--dur-3) var(--ease-standard);
+}
+
+/* 列表错峰 */
+.item {
+  transition-delay:
+    calc(var(--i) * var(--stagger-2));
+}</code></pre>
+      </div>
+      <div class="code-card">
+        <h3>JS · 先问系统，再决定播不播</h3>
+        <pre><code>const reduce = matchMedia(
+  '(prefers-reduced-motion: reduce)'
+).matches;
+
+if (reduce) {
+  el.classList.add('is-in'); // 直接终态
+} else {
+  el.animate(keyframes, {
+    duration: 480,
+    easing: 'cubic-bezier(.2,.8,.2,1)'
+  });
+}</code></pre>
+      </div>
+    </div>
+    <p class="note">View Transitions 也走同一套 token：<code>::view-transition-group(product-cover)</code> 用 <code>var(--dur-5)</code>，根转场用 <code>var(--dur-4)</code>。不支持的浏览器退化为直接切换，不阻塞主流程。</p>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>动效系统不是第 51 个效果，而是一层约束：token 决定尺子，规则决定取舍，流程负责验证。所有页面零依赖，可直接查看源码。</p>
+  <p><a href="motion/flow.html">3 屏流程</a> · <a href="effects.html">50 条动效</a> · <a href="README.md">说明</a></p>
+</footer>
+
+<script>
+(function () {
+  function fallback(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    var note = btn.querySelector('.tok-note');
+    var original = note ? note.textContent : '';
+    btn.addEventListener('click', function () {
+      var text = btn.dataset.copy;
+      var done = function () {
+        if (!note) return;
+        note.textContent = '已复制';
+        setTimeout(function () { note.textContent = original; }, 1200);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallback(text); done(); });
+      } else {
+        fallback(text);
+        done();
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

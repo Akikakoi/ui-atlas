@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>苔原笔记 · 动效系统流程 · UI Atlas</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+:root{
+  --bg:#f4f1e8;--panel:#fff;--ink:#141519;--muted:#777a81;--line:#e3ded2;
+  --accent:#2f5fd0;--ok:#2f6b45;--soft:#ece8dd;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(760px 440px at 50% 0%,#fbf9f2,#f4f1e8 64%);color:var(--ink);
+  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.appbar{position:sticky;top:0;z-index:12;background:rgba(244,241,232,.88);backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.appbar-in{max-width:620px;margin:0 auto;height:54px;display:flex;align-items:center;gap:10px;padding:0 20px}
+.back{width:30px;height:30px;flex:0 0 30px;border:1px solid var(--line);border-radius:50%;background:var(--panel);
+  color:var(--ink);font:16px/1 system-ui;cursor:pointer;display:grid;place-items:center}
+.back:hover{border-color:var(--accent);color:var(--accent)}
+.brand{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:650;letter-spacing:-.01em}
+.brand i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.bag{margin-left:auto;font-size:11.5px;color:var(--muted);display:inline-flex;align-items:center;gap:3px}
+.bag b{color:var(--ink);font-variant-numeric:tabular-nums}
+.bag.bump{animation:bump var(--dur-3) var(--ease-spring)}
+@keyframes bump{0%,100%{transform:none}45%{transform:scale(1.16)}}
+.app{max-width:620px;margin:0 auto;padding:26px 20px 100px}
+.screen{outline:none}
+.screen.anim-in{animation:screenIn var(--dur-4) var(--ease-enter)}
+@keyframes screenIn{from{opacity:0;transform:translate3d(0,var(--move-4),0)}to{opacity:1;transform:none}}
+.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0 0 12px;font-size:clamp(30px,7.8vw,44px);line-height:1.05;letter-spacing:-.045em;font-weight:650}
+h1[tabindex="-1"]:focus{outline:none}
+.lede{margin:0;font-size:13px;line-height:1.85;color:var(--muted);max-width:30em}
+.head{padding-bottom:22px}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:8px}
+.product{display:block;width:100%;padding:0;border:1px solid var(--line);border-radius:14px;background:var(--panel);
+  overflow:hidden;text-align:left;font:inherit;color:inherit;cursor:pointer;
+  transition:border-color var(--dur-2) var(--ease-standard),transform var(--dur-2) var(--ease-standard),box-shadow var(--dur-2) var(--ease-standard)}
+.product:hover{border-color:#c9c3b4;transform:translateY(-2px);box-shadow:0 10px 24px rgba(30,30,20,.08)}
+.product:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.cover{position:relative;display:block;aspect-ratio:4/3;overflow:hidden}
+.cover::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(120deg,rgba(255,255,255,.12) 0 5px,transparent 5px 16px)}
+.cover .tag{position:absolute;left:9px;bottom:8px;z-index:1;font:600 8.5px/1 ui-monospace,Consolas,monospace;
+  letter-spacing:.16em;color:rgba(255,255,255,.82)}
+.a1{background:radial-gradient(circle at 28% 22%,#f3dcb9,transparent 55%),linear-gradient(135deg,#c9a06a,#4f5f4a)}
+.a2{background:radial-gradient(circle at 70% 24%,#dce6f5,transparent 55%),linear-gradient(135deg,#7d94bd,#3f4d66)}
+.a3{background:radial-gradient(circle at 34% 70%,#f4ddd0,transparent 55%),linear-gradient(135deg,#c9906f,#5c4034)}
+.a4{background:radial-gradient(circle at 70% 70%,#e4edd8,transparent 55%),linear-gradient(135deg,#93a67f,#4a5c3e)}
+.p-body{display:grid;gap:2px;padding:10px 11px 12px}
+.p-body b{font-size:13px;letter-spacing:-.01em}
+.p-body span{font-size:10.5px;color:var(--muted)}
+.p-body em{font-style:normal;font:600 12px/1 ui-monospace,Consolas,monospace;margin-top:3px}
+.skeleton{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:8px}
+.sk-card{height:188px;border-radius:14px;
+  background:linear-gradient(100deg,#eee9dd 20%,#f8f5ec 40%,#eee9dd 60%) 0 0/200% 100%;
+  animation:sk 1.4s linear infinite}
+@keyframes sk{from{background-position:100% 0}to{background-position:-100% 0}}
+.skeleton.out{opacity:0;transition:opacity var(--dur-3) var(--ease-standard)}
+.detail-hero{height:210px;border-radius:16px;border:1px solid var(--line);position:relative;overflow:hidden}
+.detail-hero::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(120deg,rgba(255,255,255,.12) 0 5px,transparent 5px 16px)}
+.detail-body{padding-top:18px}
+.price{margin:12px 0 18px;font:600 26px/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em}
+.label{margin:0 0 7px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.seg{position:relative;display:grid;grid-template-columns:repeat(3,1fr);padding:4px;margin-bottom:18px;
+  background:#e9e5da;border-radius:11px}
+.seg-thumb{position:absolute;top:4px;bottom:4px;left:0;border-radius:8px;background:var(--panel);
+  box-shadow:0 2px 8px rgba(20,20,15,.12);
+  transition:transform var(--dur-3) var(--ease-standard),width var(--dur-3) var(--ease-standard)}
+.seg button{position:relative;z-index:1;border:0;background:transparent;padding:9px 0;border-radius:8px;
+  font:inherit;font-size:12px;color:var(--muted);cursor:pointer;transition:color var(--dur-2)}
+.seg button[aria-pressed="true"]{color:var(--ink);font-weight:600}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.actions{display:grid;gap:9px}
+.primary{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:46px;
+  border:0;border-radius:11px;background:var(--accent);color:#fff;font:inherit;font-size:13.5px;font-weight:600;
+  cursor:pointer;transition:background var(--dur-2) var(--ease-standard)}
+.primary.done{background:var(--ok)}
+.primary.added{background:#eef6f0;color:var(--ok);box-shadow:inset 0 0 0 1px #c8ddcc}
+.primary:disabled{opacity:.72;cursor:default}
+.spinner{display:none;width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;
+  border-radius:50%;animation:spin var(--dur-5) linear infinite}
+.primary.loading .spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ghost{height:42px;border:1px solid var(--line);border-radius:11px;background:var(--panel);color:var(--ink);
+  font:inherit;font-size:12.5px;cursor:pointer;transition:border-color var(--dur-2),color var(--dur-2)}
+.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.note{margin:16px 0 0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.success{text-align:center;padding-top:28px}
+.check-ring{width:72px;height:72px;margin:0 auto 20px;border-radius:50%;background:#eef6f0;display:grid;place-items:center}
+.check-ring svg{width:52px;height:52px}
+.check-ring circle,.check-ring path{fill:none;stroke:var(--ok);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.check-ring circle{stroke-dasharray:183;stroke-dashoffset:183;
+  transition:stroke-dashoffset var(--dur-5) var(--ease-standard)}
+.check-ring path{stroke-dasharray:34;stroke-dashoffset:34;
+  transition:stroke-dashoffset var(--dur-3) var(--ease-standard) 180ms}
+.success.in .check-ring circle,.success.in .check-ring path{stroke-dashoffset:0}
+.pop{opacity:1;transform:none}
+.success.in .pop{animation:pop var(--dur-4) var(--ease-enter) both;
+  animation-delay:calc(var(--i,0) * var(--stagger-2))}
+@keyframes pop{from{opacity:0;transform:translate3d(0,var(--move-3),0)}to{opacity:1;transform:none}}
+.summary{display:grid;gap:8px;margin:20px 0;padding:14px;border:1px solid var(--line);border-radius:12px;
+  background:var(--panel);text-align:left}
+.sum-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:12.5px;color:var(--muted)}
+.sum-row b{color:var(--ink);font-weight:600}
+.success .primary{max-width:240px;margin:0 auto}
+.toast{position:fixed;left:50%;bottom:20px;z-index:20;display:flex;align-items:center;gap:16px;
+  padding:11px 14px;border-radius:11px;background:#15171c;color:#fff;font-size:12.5px;
+  box-shadow:0 18px 40px rgba(0,0,0,.25);opacity:0;pointer-events:none;
+  transform:translate(-50%,calc(100% + 30px));
+  transition:transform var(--dur-3) var(--ease-enter),opacity var(--dur-2) var(--ease-standard)}
+.toast.on{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.toast button{border:0;background:transparent;color:#9db8ff;font:inherit;font-size:12px;cursor:pointer}
+.hint{position:fixed;left:16px;bottom:14px;z-index:9;display:flex;align-items:center;gap:6px;margin:0;
+  padding:4px 9px;border:1px solid rgba(128,128,128,.18);border-radius:999px;background:rgba(128,128,128,.10);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:var(--dur-4);animation-timing-function:var(--ease-standard)}
+::view-transition-group(product-cover){animation-duration:var(--dur-5);animation-timing-function:var(--ease-standard)}
+::view-transition-old(product-cover),::view-transition-new(product-cover){animation-duration:var(--dur-5);animation-timing-function:var(--ease-standard)}
+@media (max-width:420px){
+  .app{padding:22px 16px 90px}
+  .products,.skeleton{gap:9px}
+  .p-body b{font-size:12.5px}
+  .detail-hero{height:180px}
+  .toast{width:calc(100% - 32px);justify-content:space-between}
+}
+@media (prefers-reduced-motion:reduce){
+  .product{transition:none}
+  .screen.anim-in{animation:none}
+  .success.in .pop{animation:none;opacity:1;transform:none}
+  .skeleton{animation:none}
+}
+</style>
+</head>
+<body>
+<header class="appbar">
+  <div class="appbar-in">
+    <button class="back" id="back" type="button" aria-label="返回列表" hidden>←</button>
+    <span class="brand"><i aria-hidden="true"></i>苔原笔记</span>
+    <span class="bag" id="bag">清单 <b id="bagCount">0</b></span>
+  </div>
+</header>
+
+<main class="app">
+  <section class="screen" id="screen-list" data-screen="list">
+    <div class="head">
+      <p class="kicker">FIELD NOTES · 2026</p>
+      <h1 tabindex="-1">这一季，<br>带上纸和笔。</h1>
+      <p class="lede">四本布面笔记，纸页、装帧、价格都写在卡片上。点开一本，封面会自己长成详情大图。</p>
+    </div>
+    <div class="skeleton" id="skeleton" aria-hidden="true">
+      <div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div>
+    </div>
+    <div class="products" id="products" hidden>
+      <button class="product m-enter" style="--i:0" type="button"
+        data-title="苔原笔记" data-sub="布面 · 128 页" data-price="¥168" data-art="a1" data-kicker="FIELD NOTE · 01"
+        data-desc="米色布面，摊平不拱；内页 100g 米白纸，适合钢笔与铅笔。">
+        <span class="cover a1"><span class="tag">01 · TUNDRA</span></span>
+        <span class="p-body"><b>苔原笔记</b><span>布面 · 128 页</span><em>¥ 168</em></span>
+      </button>
+      <button class="product m-enter" style="--i:1" type="button"
+        data-title="潮汐手账" data-sub="纸面 · 96 页" data-price="¥128" data-art="a2" data-kicker="FIELD NOTE · 02"
+        data-desc="深蓝纸面，轻得像一本小册子；适合旅行清单与每日三行。">
+        <span class="cover a2"><span class="tag">02 · TIDE</span></span>
+        <span class="p-body"><b>潮汐手账</b><span>纸面 · 96 页</span><em>¥ 128</em></span>
+      </button>
+      <button class="product m-enter" style="--i:2" type="button"
+        data-title="山脊速写" data-sub="皮面 · 160 页" data-price="¥228" data-art="a3" data-kicker="FIELD NOTE · 03"
+        data-desc="棕色皮面，越用越软；内页偏厚，适合水彩与拼贴。">
+        <span class="cover a3"><span class="tag">03 · RIDGE</span></span>
+        <span class="p-body"><b>山脊速写</b><span>皮面 · 160 页</span><em>¥ 228</em></span>
+      </button>
+      <button class="product m-enter" style="--i:3" type="button"
+        data-title="松林便签" data-sub="裸脊 · 64 页" data-price="¥88" data-art="a4" data-kicker="FIELD NOTE · 04"
+        data-desc="裸脊装订，能完全摊平；适合速记、贴墙和随手撕。">
+        <span class="cover a4"><span class="tag">04 · PINE</span></span>
+        <span class="p-body"><b>松林便签</b><span>裸脊 · 64 页</span><em>¥ 88</em></span>
+      </button>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-detail" data-screen="detail" hidden>
+    <div class="detail-hero a1" id="detailHero" aria-hidden="true"></div>
+    <div class="detail-body">
+      <p class="kicker" id="dKicker">FIELD NOTE · 01</p>
+      <h1 tabindex="-1" id="dTitle">苔原笔记</h1>
+      <p class="lede" id="dDesc">米色布面，摊平不拱；内页 100g 米白纸，适合钢笔与铅笔。</p>
+      <p class="price" id="dPrice">¥ 168</p>
+      <p class="label">装帧</p>
+      <div class="seg" id="seg" role="group" aria-label="装帧">
+        <span class="seg-thumb" id="segThumb" aria-hidden="true"></span>
+        <button type="button" aria-pressed="true" data-label="布面精装">布面</button>
+        <button type="button" aria-pressed="false" data-label="纸面精装">纸面</button>
+        <button type="button" aria-pressed="false" data-label="皮面精装">皮面</button>
+      </div>
+      <div class="actions">
+        <button class="primary" id="addBtn" type="button">
+          <span class="spinner" aria-hidden="true"></span>
+          <span id="addLabel">加入清单</span>
+        </button>
+        <button class="ghost" id="viewBag" type="button">查看清单 →</button>
+      </div>
+      <p class="note">点「加入清单」会经历 loading → 成功；右下角提示可以继续进清单。所有时长、曲线、距离都来自 tokens.css。</p>
+    </div>
+  </section>
+
+  <section class="screen success" id="screen-success" data-screen="success" hidden>
+    <div class="check-ring" aria-hidden="true">
+      <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="29"></circle><path d="M19 33l9 9 18-20"></path></svg>
+    </div>
+    <p class="kicker pop" style="--i:0">ORDER · CONFIRMED</p>
+    <h1 class="pop" style="--i:1" tabindex="-1">已经放进清单。</h1>
+    <p class="lede pop" style="--i:2">装帧与价格已经确认；同一种笔记只会记一次，不会重复累加。</p>
+    <div class="summary pop" style="--i:3" id="summary"></div>
+    <button class="primary pop" style="--i:4" id="again" type="button">再逛一次</button>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span id="toastText">已加入清单</span>
+  <button id="toastAction" type="button">查看 →</button>
+</div>
+<p class="hint">点一本笔记 → 换装帧 → 加入清单；返回时封面会缩回卡片</p>
+
+<script>
+(function () {
+  'use strict';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var screens = {
+    list: document.getElementById('screen-list'),
+    detail: document.getElementById('screen-detail'),
+    success: document.getElementById('screen-success')
+  };
+  var backBtn = document.getElementById('back');
+  var skeleton = document.getElementById('skeleton');
+  var productsEl = document.getElementById('products');
+  var detailHero = document.getElementById('detailHero');
+  var dKicker = document.getElementById('dKicker'), dTitle = document.getElementById('dTitle');
+  var dDesc = document.getElementById('dDesc'), dPrice = document.getElementById('dPrice');
+  var seg = document.getElementById('seg'), segThumb = document.getElementById('segThumb');
+  var addBtn = document.getElementById('addBtn'), addLabel = document.getElementById('addLabel');
+  var viewBag = document.getElementById('viewBag'), again = document.getElementById('again');
+  var bagEl = document.getElementById('bag'), bagCountEl = document.getElementById('bagCount');
+  var summary = document.getElementById('summary');
+  var toast = document.getElementById('toast'), toastText = document.getElementById('toastText');
+  var toastAction = document.getElementById('toastAction');
+  var current = 'list', currentCard = null, busy = false, bag = new Set(), adding = new Set(), toastTimer = null, listScroll = 0;
+
+  function mount(name, before, scrollToY) {
+    Object.keys(screens).forEach(function (k) { screens[k].hidden = k !== name; });
+    if (name === 'success') {
+      screens.success.classList.remove('in');
+      void screens.success.offsetWidth;
+      screens.success.classList.add('in');
+    }
+    if (before) before();
+    current = name;
+    backBtn.hidden = name !== 'detail';
+    window.scrollTo(0, scrollToY || 0);
+    requestAnimationFrame(function () {
+      var h = screens[name].querySelector('h1');
+      if (h) h.focus({ preventScroll: true });
+    });
+  }
+
+  function animateIn(el) {
+    if (reduce) return;
+    el.classList.remove('anim-in');
+    void el.offsetWidth;
+    el.classList.add('anim-in');
+  }
+
+  /* View Transition 的 finished 在个别浏览器上缺失或迟迟不 settle；
+     用超时兜底，避免 busy 永久锁死。 */
+  function settle(t, fn) {
+    var done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      busy = false;
+      if (fn) fn();
+    }
+    if (t && t.finished && typeof t.finished.then === 'function') {
+      t.finished.then(finish, finish);
+    }
+    setTimeout(finish, 1200);
+  }
+
+  /* 转场期间点按钮不要静默丢掉：等 busy 释放后再执行。 */
+  function whenIdle(fn) {
+    if (busy) {
+      setTimeout(function () { whenIdle(fn); }, 60);
+      return;
+    }
+    fn();
+  }
+
+  function fillDetail(card) {
+    dKicker.textContent = card.dataset.kicker;
+    dTitle.textContent = card.dataset.title;
+    dDesc.textContent = card.dataset.desc;
+    dPrice.textContent = card.dataset.price;
+    detailHero.className = 'detail-hero ' + card.dataset.art;
+  }
+
+  function syncAddButton() {
+    var title = currentCard && currentCard.dataset.title;
+    var inBag = !!(title && bag.has(title));
+    var isAdding = !!(title && adding.has(title));
+    addBtn.disabled = isAdding;
+    addBtn.classList.toggle('loading', isAdding);
+    addBtn.classList.remove('done');
+    addBtn.classList.toggle('added', inBag && !isAdding);
+    addLabel.textContent = isAdding ? '加入中…' : inBag ? '已在清单' : '加入清单';
+  }
+
+  function openDetail(card) {
+    if (busy || current !== 'list') return;
+    currentCard = card;
+    listScroll = window.scrollY;
+    fillDetail(card);
+    syncAddButton();
+    hideToast();
+    var cover = card.querySelector('.cover');
+    var after = function () { setSeg(0, false); };
+
+    if (!document.startViewTransition || reduce) {
+      mount('detail', after);
+      animateIn(screens.detail);
+      return;
+    }
+    cover.style.viewTransitionName = 'product-cover';
+    busy = true;
+    var t;
+    try {
+      t = document.startViewTransition(function () {
+        cover.style.viewTransitionName = 'none';
+        detailHero.style.viewTransitionName = 'product-cover';
+        mount('detail', after);
+      });
+    } catch (e) {
+      busy = false;
+      cover.style.viewTransitionName = 'none';
+      mount('detail', after);
+      animateIn(screens.detail);
+      return;
+    }
+    settle(t, function () {
+      detailHero.style.viewTransitionName = '';
+    });
+  }
+
+  function backToList() {
+    if (busy || current !== 'detail') return;
+    hideToast();
+    var target = currentCard && currentCard.querySelector('.cover');
+    if (!document.startViewTransition || reduce || !target) {
+      mount('list', null, listScroll);
+      animateIn(screens.list);
+      if (target) target.focus({ preventScroll: true });
+      return;
+    }
+    detailHero.style.viewTransitionName = 'product-cover';
+    busy = true;
+    var t;
+    try {
+      t = document.startViewTransition(function () {
+        detailHero.style.viewTransitionName = 'none';
+        target.style.viewTransitionName = 'product-cover';
+        mount('list', null, listScroll);
+      });
+    } catch (e) {
+      busy = false;
+      detailHero.style.viewTransitionName = 'none';
+      target.style.viewTransitionName = 'none';
+      mount('list', null, listScroll);
+      animateIn(screens.list);
+      target.focus({ preventScroll: true });
+      return;
+    }
+    settle(t, function () {
+      target.style.viewTransitionName = '';
+      target.focus({ preventScroll: true });
+    });
+  }
+
+  function segButtons() { return [].slice.call(seg.querySelectorAll('button')); }
+
+  function setSeg(i, focus) {
+    var btns = segButtons();
+    if (!btns[i]) return;
+    btns.forEach(function (b, j) {
+      b.setAttribute('aria-pressed', j === i ? 'true' : 'false');
+      b.tabIndex = j === i ? 0 : -1;
+    });
+    requestAnimationFrame(function () {
+      var b = btns[i];
+      segThumb.style.width = b.offsetWidth + 'px';
+      segThumb.style.transform = 'translateX(' + b.offsetLeft + 'px)';
+    });
+    if (focus) btns[i].focus();
+  }
+
+  function binding() {
+    var b = seg.querySelector('button[aria-pressed="true"]');
+    return b ? b.dataset.label : '布面精装';
+  }
+
+  function fillSummary() {
+    var title = currentCard ? currentCard.dataset.title : '苔原笔记';
+    var price = currentCard ? currentCard.dataset.price : '¥ 168';
+    var rows = [['笔记', title], ['装帧', binding()], ['价格', price]];
+    summary.textContent = '';
+    rows.forEach(function (row) {
+      var d = document.createElement('div');
+      d.className = 'sum-row';
+      var k = document.createElement('span'); k.textContent = row[0];
+      var v = document.createElement('b'); v.textContent = row[1];
+      d.appendChild(k); d.appendChild(v);
+      summary.appendChild(d);
+    });
+  }
+
+  function showToast(msg, action) {
+    toastText.textContent = msg;
+    toastAction.hidden = action === false;
+    toast.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 3200);
+  }
+  function hideToast() {
+    clearTimeout(toastTimer);
+    toast.classList.remove('on');
+  }
+
+  function goSuccess() {
+    if (busy || current !== 'detail') return;
+    if (bag.size === 0) {
+      showToast('清单还是空的，先加入一本', false);
+      return;
+    }
+    hideToast();
+    fillSummary();
+    mount('success');
+    animateIn(screens.success);
+  }
+
+  function loadList() {
+    if (reduce) {
+      skeleton.hidden = true;
+      productsEl.hidden = false;
+      [].slice.call(productsEl.children).forEach(function (el) { el.classList.add('is-in'); });
+      return;
+    }
+    setTimeout(function () {
+      skeleton.classList.add('out');
+      productsEl.hidden = false;
+      requestAnimationFrame(function () {
+        [].slice.call(productsEl.children).forEach(function (el) { el.classList.add('is-in'); });
+      });
+      setTimeout(function () {
+        skeleton.hidden = true;
+        skeleton.classList.remove('out');
+      }, 340);
+    }, 780);
+  }
+
+  productsEl.addEventListener('click', function (e) {
+    var card = e.target.closest('.product');
+    if (card) openDetail(card);
+  });
+
+  seg.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    setSeg(segButtons().indexOf(b), false);
+  });
+
+  seg.addEventListener('keydown', function (e) {
+    var btns = segButtons(), i = btns.indexOf(document.activeElement), n = null;
+    if (i < 0) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = (i + 1) % btns.length;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = (i - 1 + btns.length) % btns.length;
+    if (e.key === 'Home') n = 0;
+    if (e.key === 'End') n = btns.length - 1;
+    if (n === null) return;
+    e.preventDefault();
+    setSeg(n, true);
+  });
+
+  addBtn.addEventListener('click', function () {
+    if (addBtn.disabled || !currentCard) return;
+    var title = currentCard.dataset.title;
+    if (bag.has(title)) {
+      showToast('《' + title + '》已经在清单里了');
+      return;
+    }
+    if (adding.has(title)) {
+      showToast('正在加入，请稍候', false);
+      return;
+    }
+    adding.add(title);
+    addBtn.disabled = true;
+    addBtn.classList.remove('added');
+    addBtn.classList.add('loading');
+    addLabel.textContent = '加入中…';
+    setTimeout(function () {
+      adding.delete(title);
+      bag.add(title);
+      bagCountEl.textContent = bag.size;
+      bagEl.classList.remove('bump');
+      void bagEl.offsetWidth;
+      bagEl.classList.add('bump');
+      if (!currentCard || currentCard.dataset.title !== title) return;
+      addBtn.classList.remove('loading');
+      addBtn.classList.add('done');
+      addLabel.textContent = '已加入';
+      showToast(title + ' 已加入清单');
+      setTimeout(function () {
+        if (!currentCard || currentCard.dataset.title !== title) return;
+        addBtn.classList.remove('done');
+        addBtn.disabled = false;
+        if (bag.has(title)) {
+          addBtn.classList.add('added');
+          addLabel.textContent = '已在清单';
+        } else {
+          addLabel.textContent = '加入清单';
+        }
+      }, 1400);
+    }, 900);
+  });
+
+  bagEl.addEventListener('animationend', function () { bagEl.classList.remove('bump'); });
+  backBtn.addEventListener('click', function () { whenIdle(backToList); });
+  viewBag.addEventListener('click', function () { whenIdle(goSuccess); });
+  toastAction.addEventListener('click', function () { hideToast(); whenIdle(goSuccess); });
+  again.addEventListener('click', function () {
+    whenIdle(function () {
+      screens.success.classList.remove('in');
+      hideToast();
+      mount('list', null, listScroll);
+      animateIn(screens.list);
+    });
+  });
+  addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && current === 'detail') whenIdle(backToList);
+  });
+
+  loadList();
+})();
+</script>
+</body>
+</html>

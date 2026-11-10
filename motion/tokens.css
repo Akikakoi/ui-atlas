@@ -1,0 +1,67 @@
+/* UI Atlas · 动效系统 token
+   规则：时长跟距离走；进入用 ease-out，退出用 ease-in，原地用 standard。
+   用法：transition: transform var(--dur-4) var(--ease-standard);
+   注意：减动效不是 0ms，而是把距离归零、时长压到 1ms，让状态直接到终态。 */
+
+:root {
+  /* 时长：微反馈 → 整页叙事 */
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+  --dur-4: 480ms;
+  --dur-5: 720ms;
+
+  /* 曲线：进入快出慢收，退出慢起快走 */
+  --ease-standard: cubic-bezier(.2, .8, .2, 1);
+  --ease-enter: cubic-bezier(0, 0, .2, 1);
+  --ease-exit: cubic-bezier(.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+
+  /* 距离：4 / 8 / 16 / 26 / 40 */
+  --move-1: 4px;
+  --move-2: 8px;
+  --move-3: 16px;
+  --move-4: 26px;
+  --move-5: 40px;
+
+  /* 错峰：同组元素依次进入 */
+  --stagger-1: 40ms;
+  --stagger-2: 70ms;
+  --stagger-3: 110ms;
+
+  /* 一条常用的主运动 */
+  --motion-primary: var(--dur-4) var(--ease-standard);
+}
+
+/* 系统级退路：组件不需要自己写 0ms，token 已经归零 */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 1ms;
+    --dur-2: 1ms;
+    --dur-3: 1ms;
+    --dur-4: 1ms;
+    --dur-5: 1ms;
+    --move-1: 0px;
+    --move-2: 0px;
+    --move-3: 0px;
+    --move-4: 0px;
+    --move-5: 0px;
+    --stagger-1: 0ms;
+    --stagger-2: 0ms;
+    --stagger-3: 0ms;
+  }
+}
+
+/* 可选的入场工具类：给列表项加 --i，再切换 .is-in */
+.m-enter {
+  opacity: 0;
+  transform: translate3d(0, var(--move-4), 0);
+  transition:
+    opacity var(--dur-4) var(--ease-enter),
+    transform var(--dur-4) var(--ease-enter);
+  transition-delay: calc(var(--i, 0) * var(--stagger-2));
+}
+.m-enter.is-in {
+  opacity: 1;
+  transform: none;
+}
