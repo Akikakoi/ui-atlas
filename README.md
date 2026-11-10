@@ -1,6 +1,10 @@
-# UI Atlas · 网页 UI 风格图鉴
+# UI Atlas · 网页 UI 风格与动效图鉴
 
 60 个 UI 风格样例，铺在**五套版式**（落地页 / 海报 / 长文 / 控制台 / 网格）与**三种产品形态**（落地页 / 后台 / App）上。每条都是**零依赖的单文件 HTML**：打开就是完整页面，颜色、圆角、阴影、字体全部写成 CSS 变量。
+
+另加一个 [动效图鉴](effects.html)：50 个可交互效果（指针 / 滚动 / 文字 / 布局 / 反馈 / 背景 / 转场）。和风格样例同一套约定——零依赖、单文件、尊重减动效——区别是这些页面要动手玩，并且能就地翻源码。
+
+再往上还有一层 [动效系统](motion.html)：把 50 个片段收成 token、10 条编排规则、6 组反例，并用一个 [3 屏流程](motion/flow.html) 验证组合效果。
 
 它不是截图集，是个能动手的工具：
 
@@ -28,6 +32,16 @@ ui-atlas/
 ├── app.js               # 渲染、hash 路由、token 编辑、分享、导出、对比
 ├── styles.json          # 60 条数据：tokens / 特征 / 提示词 / 来源 / demo 路径
 ├── demos/<id>.html      # 60 个自包含样例（无外部依赖、无脚本）
+├── effects.html         # 动效图鉴：50 个可交互效果，实时预览 + 源码弹层
+├── effects.css          # 动效页样式（卡片、类别、源码面板）
+├── effects.js           # 动效渲染、搜索、收藏、随机、hash 直达
+├── effects.json         # 50 条数据：类别 / 触发 / 深度档案 / 技术 / 做法 / 注意
+├── effects/<id>.html    # 50 个自包含动效（内联 CSS + JS，单文件可拷）
+├── motion.html          # 动效系统：token / 10 条编排规则 / 6 组反例
+├── motion/
+│   ├── tokens.css       # 17 个基础动效 token + 组合 token，含减动效兜底
+│   ├── flow.html        # 3 屏流程：列表 / 详情 / 完成
+│   └── lab.html         # 参数实验台：滑杆 / 规则体检 / 预设 / 复制 CSS
 ├── ref.html             # 参考实现总览：十屏 / token 表 / 判定规则
 ├── ref/glass/           # 把一条风格做穿（见下文）
 │   ├── tokens.css       # 75 个变量、12 组，含 [data-theme="light"]
@@ -39,7 +53,9 @@ ui-atlas/
 ├── 启动预览.bat          # Windows 一键启动
 └── tools/
     ├── gen_demos.py     # 生成器：改这里 → 重新生成全部样例与 styles.json
-    └── check.py         # 校验：结构、自包含、token、对比度
+    ├── check.py         # 校验：结构、自包含、token、对比度
+    ├── check_effects.py # 校验动效：数据、深度、自包含、结构、减动效
+    └── check_motion.py  # 校验动效系统：token、规则、反例、3 屏流程
 ```
 
 ## 两条轴：form 与 layout
@@ -91,6 +107,61 @@ ui-atlas/
 
 **搜索。** 同义词表 + token 特征词：`玻璃`/`glass`、`黑底`/`深色`、`圆角0`、`等宽` 都能命中；空结果时给三条相近的，而不是一句「没有」。收藏与最近浏览存 localStorage。
 
+## 动效图鉴：50 个能上手玩的效果
+
+风格回答「长什么样」，动效回答「动起来是什么感觉」。入口 [effects.html](effects.html)，50 条分 7 类：
+
+| 类别 | 数量 | 里面有什么 |
+|---|---|---|
+| 指针 | 7 | 磁吸按钮、光斑跟随卡片、3D 倾斜、自定义光标、列表悬停预览、点阵斥力、悬停放大镜 |
+| 滚动 | 10 | 逐段入场、视差分层、滚动钉住横向推进、滚动擦亮文字、阅读进度、数字滚动、滚动速度倾斜、卡片堆叠、滚动吸附、图文随行 |
+| 文字 | 9 | 逐字上浮、乱码解码、打字机、双行跑马灯、文字翻转替换、荧光笔划线、模糊聚焦、渐变扫光、文字波浪 |
+| 布局 | 7 | 光标裁切揭示、过滤网格 FLIP、无缝手风琴、滑动下划线标签页、胶囊滑块、拖拽排序、收缩顶栏 |
+| 反馈 | 6 | 点击涟漪、堆叠提示、骨架屏、点赞粒子、长按确认、按钮加载 |
+| 背景 | 5 | 流动网格渐变、粒子连线、胶片颗粒、等高线波浪、星空穿越 |
+| 转场 | 6 | 共享元素转场、遮罩擦除转场、拖拽底部抽屉、卡片展开、圆形主题切换、全屏菜单 |
+
+几条共同约定：
+
+- **优先只动 transform 与 opacity。** 入场、滚动、拖动都不碰 width / height，页面不重排；进度条也用 `scaleX`。少数效果必须动 `background-size`、`background-position`、`filter` 或 `clip-path`（荧光笔、渐变扫光、模糊聚焦、圆形擦除），代价写在各自的「注意」里。
+- **预览可以等比放大。** 卡片右下角「放大」会按 600 × 450 的同一构图铺到全屏；「原页」才是响应式页面，适合看真实断点下的样子。
+- **rAF 只在需要时跑。** 静止就停；canvas 在 `visibilitychange` 里暂停，别让几十个预览一起空转。
+- **每个效果都给退路。** `prefers-reduced-motion` 下直接到终态；触屏没有 hover 就藏起指针效果；只有真按钮才做涟漪。
+- **抢滚轮的效果标出来。** `pin`、`marquee` 这类在移动端要换原生横滑，卡片上标「慎用」。
+- **难度分 1–3。** 基础 = 看懂就能写；进阶 = 有一个坑；复杂 = 要处理手势、性能或兼容。
+
+**每条效果都有深度档案。** 点「代码」后，左侧除了做法与注意，还会给出：
+
+- **解剖**：触发 → 过程 → 收尾，三段拆开；
+- **参数**：时长、曲线、距离、错峰等实测值；
+- **变体**：同一效果的两种低成本改法；
+- **成本**：低 / 中 / 高与主要开销；
+- **什么时候别用**：与「注意」分开，讲适用边界。
+
+卡片上也会标出成本等级；手机上点弹层右上角的「深度」展开。
+
+源码弹层给深度档案，也保留「关键点」三条判定标准与「用到的」技术标签；代码可按 全部 / CSS / JS 切换，一键复制。
+
+### 加一个效果
+
+1. 在 `effects/<id>.html` 写一个自包含页面：内联 `<style>` 与 `<script>`，底部留 `<p class="hint">` 写清怎么玩，并处理 `prefers-reduced-motion`。
+2. 在 `effects.json` 里加一条：`id / name / name_en / cat / trigger / level / tech / features / how / watch / tags / demo`，再补 `depth`：`anatomy` ≥ 3 条、`params` ≥ 3 组、`variants` ≥ 2 条、`cost.tier` 取 `低 / 中 / 高`、`avoid` 一句话。
+3. 跑 `python tools/check_effects.py`。它查数据完整性、深度档案完整性、目录一一对应、无 `<link>` / 无外链 / 无 `<script src>`、有无 `.hint` 与减动效，并打印每条的行数与体积。
+
+`trigger` 取 `hover / scroll / click / view / load / auto / drag`，`cat` 取七个类别之一；画廊的筛选、搜索同义词与「随机一个」都直接读这份数据。
+
+## 动效系统：把 50 个片段收成一套语法
+
+单条效果回答「这个动起来是什么感觉」，系统回答「什么时候该用哪一条、用多久、怎么组合」。
+
+- **tokens**：5 个时长、4 条曲线、5 个距离、3 档错峰，共 17 个基础变量（另有一条 `--motion-primary` 组合）；`prefers-reduced-motion` 下统一压到 1ms / 0px，组件不写第二套逻辑。
+- **10 条规则**：先决定要不要动、时长跟距离走、进入 / 退出曲线、一次一个主运动、错峰分组、保持空间关系、可打断、拖动跟手、减动效不是 0ms、性能预算。
+- **6 组反例**：全屏模糊、滚动劫持、过度错峰、缺 reduced-motion、多个主运动、width 动画；每组给出错 / 对和修法。
+- **3 屏流程**：[motion/flow.html](motion/flow.html) 把共享封面、骨架屏、错峰列表、装帧滑块、按钮 loading、toast、成功对勾串在一条时间线上；支持 View Transitions，不支持时退化为直接切换；有 busy 锁，导航可打断。
+- **参数实验台**：[motion/lab.html](motion/lab.html) 拖动距离、时长、曲线、错峰、项数，实时跑 10 条规则体检；有推荐 / 太快 / 太慢 / 过度错峰 / 多运动 / width 六个预设，可复制 CSS 与分享链接。
+
+入口是 [motion.html](motion.html)，token 在 `motion/tokens.css`。`python tools/check_motion.py` 会校验 token 齐全、三屏齐全、View Transitions 与减动效处理、规则 ≥ 10、反例 ≥ 6，以及实验台的控件、体检与预设是否完整。
+
 ## 参考实现：把一条风格做穿
 
 首屏好看不等于能用——真实项目里决定成败的是表格、表单、错误态、空态和弹窗。所以拿 `glass` 做了一条**参考实现**（[`ref.html`](ref.html)）：75 个 token、12 组；十个页面覆盖三种产品形态；一张反例页和 7 条可判定规则（blur 12–32px、边框亮度 .10–.24、一屏最多三层玻璃、必须有不在透明锚点……）。
@@ -106,10 +177,16 @@ ui-atlas/
 
 ```bash
 python tools/gen_demos.py     # 生成 demos/ 与 styles.json
-python tools/check.py         # 校验：0 错误才算过
+python tools/check.py         # 校验 60 条风格：0 错误才算过
+python tools/check_effects.py # 校验 50 条动效：数据 / 自包含 / 减动效
+python tools/check_motion.py  # 校验动效系统：token / 规则 / 反例 / 3 屏流程
 ```
 
 `check.py` 检查：id 唯一、`styles.json` 与 `demos/` 一一对应、tokens 必填键齐全、样例不含外链与 `<script>`、`var(--x)` 必须已在 `:root` 定义、`features` ≥ 3 条、每条有 `sources` 与 `avoid`；参考实现的页面只能引用已定义的变量。最后打一张表：每条风格的圆角、三组 WCAG 对比度、字号阶梯。故意改坏一处，它会报出**文件与行号**。
+
+`check_effects.py` 额外检查：`total` 与条目数一致、`cat / trigger / level` 取值合法、demo 文件名与 id 对齐、没有 `<link>` 与远程 `src/href`（内联 SVG 的 `xmlns` 除外）、有 `.hint` 与 `prefers-reduced-motion`，并列出每条的行数、体积与是否含 JS。深度档案也在这里兜底：`anatomy` ≥ 3、`params` ≥ 3、`variants` ≥ 2、`cost.tier` 合法、`avoid` 非空。
+
+`check_motion.py` 检查动效系统：17 个基础 token 是否齐全、`tokens.css` 是否有减动效兜底、三屏是否齐全、是否使用 View Transitions 且有不支持时的退化、规则是否 ≥ 10 条、反例是否 ≥ 6 组；参数实验台还要有 ≥ 5 个控件、≥ 10 条体检、≥ 4 个预设与复制入口。
 
 ## 加一个新风格
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>参考实现 · Glass · UI Atlas</title>
 <meta name="description" content="把一条风格做穿：Glass 的完整 token 体系、7 个真实页面与状态样张、一张反例页和 7 条可判定规则。">
-<link rel="stylesheet" href="site.css?v=11">
+<link rel="stylesheet" href="site.css?v=13">
 </head>
 <body>
 
@@ -263,5 +263,24 @@
   </footer>
 </main>
 
+<script>
+(function () {
+  function fit() {
+    document.querySelectorAll('.screen .thumb').forEach(function (thumb) {
+      var f = thumb.querySelector('iframe');
+      if (!f) return;
+      var w = thumb.clientWidth, h = thumb.clientHeight;
+      if (w < 40 || h < 40) return;
+      var s = Math.min(w / 1280, h / 800);
+      f.style.transformOrigin = '0 0';
+      f.style.transform = 'translate(' + ((w - 1280 * s) / 2).toFixed(2) + 'px,' +
+        ((h - 800 * s) / 2).toFixed(2) + 'px) scale(' + s.toFixed(5) + ')';
+    });
+  }
+  addEventListener('resize', fit);
+  addEventListener('load', fit);
+  fit();
+})();
+</script>
 </body>
 </html>

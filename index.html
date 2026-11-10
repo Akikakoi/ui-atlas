@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>UI Atlas · 网页 UI 风格图鉴</title>
-<meta name="description" content="60 个网页 UI 风格样例：落地页 / 后台 / App 三种形态，全部颜色与圆角写成 CSS 变量，可实时改、可分享、可导出 Tailwind / shadcn。">
+<title>UI Atlas · 网页 UI 风格与动效图鉴</title>
+<meta name="description" content="60 个网页 UI 风格样例 + 50 个可交互动效：落地页 / 后台 / App 三种形态，颜色与圆角写成 CSS 变量，可实时改、可分享、可导出 Tailwind / shadcn。">
 <link rel="stylesheet" href="site.css?v=13">
 </head>
 <body>
@@ -16,7 +16,7 @@
       <span class="logo" aria-hidden="true">◆</span>
       <div>
         <h1>UI Atlas</h1>
-        <p><span id="n-sub">60</span> 个 UI 风格样例 · 落地页 / 后台 / App</p>
+        <p><span id="n-sub">60</span> 个风格 · 50 个动效 · 都可看源码</p>
       </div>
     </div>
     <div class="tools">
@@ -71,6 +71,8 @@
       </div>
     </div>
     <span class="spacer"></span>
+    <a class="ref-link" href="motion.html">动效系统 →</a>
+    <a class="ref-link" href="effects.html">动效图鉴 · 50 →</a>
     <a class="ref-link" href="ref.html">参考实现 · Glass →</a>
     <span class="count" id="count-info"></span>
   </div>
@@ -79,7 +81,7 @@
 <main id="grid" class="grid" aria-live="polite"></main>
 
 <footer class="foot">
-  <p>每个样例都是零依赖单文件 HTML，复制即可用；tokens 与提示词按同一套命名。样例由 <code>tools/gen_demos.py</code> 生成，数据由 <code>tools/check.py</code> 校验。</p>
+  <p>每个样例都是零依赖单文件 HTML，复制即可用；tokens 与提示词按同一套命名。样例由 <code>tools/gen_demos.py</code> 生成，数据由 <code>tools/check.py</code> 校验；动效在 <code>effects/</code>，由 <code>tools/check_effects.py</code> 校验。</p>
   <p>内容为学习与设计参考：所有样例均为本站自行实现，未复制任何第三方站点的代码或素材。</p>
 </footer>
 
@@ -106,9 +108,6 @@
   </div>
 </div>
 
-<script>
-try { sessionStorage.setItem('uiatlas.gallery', JSON.stringify({layout:'poster', y: 240})); } catch(e) {}
-</script>
 <script src="app.js?v=11"></script>
 
 </body>

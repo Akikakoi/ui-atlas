@@ -24,7 +24,14 @@
 </header>
 
 <div class="dp-body">
-  <div class="stage"><iframe id="d-frame" title="风格样例预览"></iframe></div>
+  <div class="stage" id="d-stage">
+    <div class="dp-fail" id="d-fail" role="status">
+      <span>预览加载失败</span>
+      <small id="d-fail-note">可能刚从 file:// 打开，或网络较慢。tokens 编辑与导出不受影响。</small>
+      <button id="d-retry" type="button">重试</button>
+    </div>
+    <iframe id="d-frame" title="风格样例预览"></iframe>
+  </div>
   <aside class="side">
     <p class="banner" id="d-banner" hidden></p>
 

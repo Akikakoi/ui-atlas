@@ -489,15 +489,21 @@
     });
 
     compare.hidden = false;
+    document.body.classList.add('compare-open');
     setTimeout(function () { document.getElementById('c-close').focus(); }, 30);
   }
 
-  document.getElementById('compare-btn').addEventListener('click', openCompare);
-  document.getElementById('c-close').addEventListener('click', function () {
+  function closeCompare() {
     compare.hidden = true;
     COMPARE_IDS = [];
+    document.body.classList.remove('compare-open');
+    var body = document.getElementById('c-body');
+    if (body) body.textContent = '';
     if (lastFocus && lastFocus.focus) lastFocus.focus();
-  });
+  }
+
+  document.getElementById('compare-btn').addEventListener('click', openCompare);
+  document.getElementById('c-close').addEventListener('click', closeCompare);
   document.getElementById('c-diff-toggle').addEventListener('click', function () {
     var d = document.getElementById('c-diff');
     var show = d.hidden;
@@ -596,8 +602,7 @@
     if (e.key === 'Escape') {
       closeMenus();
       if (!compare.hidden) {
-        compare.hidden = true;
-        if (lastFocus && lastFocus.focus) lastFocus.focus();
+        closeCompare();
         return;
       }
     }

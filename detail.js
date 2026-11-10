@@ -301,12 +301,41 @@
     banner.textContent = applied ? '已套用分享链接里的 ' + applied + ' 处改动（右侧高亮）。' : '';
 
     var df = document.getElementById('d-frame');
-    df.style.opacity = '.35';
+    var stage = document.getElementById('d-stage');
+    var failTimer = null;
+
+    function clearFail() {
+      clearTimeout(failTimer);
+      stage.classList.remove('fail');
+    }
+    function markFail() {
+      if (!df.src || df.src === 'about:blank') return;
+      stage.classList.add('fail');
+      df.style.opacity = '';
+    }
+    document.getElementById('d-retry').onclick = function () {
+      clearFail();
+      df.style.opacity = '.35';
+      loadDemo();
+    };
+    function loadDemo() {
+      df.style.opacity = '.35';
+      failTimer = setTimeout(markFail, 8000);
+      df.src = s.demo;
+    }
+
     df.onload = function () {
+      var bad = false;
+      try {
+        var d = df.contentDocument;
+        if (d && /^error/i.test(d.title || '')) bad = true;
+      } catch (e) {}
+      if (bad) { markFail(); return; }
+      clearFail();
       df.style.opacity = '1';
       applyVars(df, tokensOf(s));
     };
-    df.src = s.demo;
+    loadDemo();
     document.getElementById('d-open').href = s.demo;
 
     var ul = document.getElementById('d-features');

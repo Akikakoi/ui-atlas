@@ -104,6 +104,20 @@ code { font: 12.5px/1.5 ui-monospace, Consolas, monospace; background: #ece9e0; 
 .detail-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .detail-body { flex: 1; display: grid; grid-template-columns: 1fr 390px; min-height: 0; }
 .stage { background: #dcd8cc; min-height: 0; }
+.dp-fail {
+  position: absolute; inset: 0; z-index: 5; display: none;
+  place-items: center; align-content: center; gap: 8px; padding: 24px; text-align: center;
+  background: #faf8f2; color: #8d3a30; font-size: 14px; font-weight: 600;
+}
+.dp-fail small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); line-height: 1.7; }
+.dp-fail button {
+  border: 1px solid #f0c9c0; background: #fff; color: #8d3a30;
+  border-radius: 999px; padding: 6px 16px; font: inherit; font-size: 12.5px; cursor: pointer;
+}
+.dp-fail button:hover { border-color: var(--accent); color: var(--accent); }
+/* mobile 上 stage 是 static，失败时改为 relative，让遮罩定位在预览区里 */
+.dp-body .stage.fail { position: relative; }
+.stage.fail .dp-fail { display: grid; }
 .stage iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
 .side { border-left: 1px solid var(--line); padding: 16px 18px 28px; overflow: auto; display: grid; gap: 18px; align-content: start; }
 .side h3 { margin: 0 0 8px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
@@ -278,6 +292,7 @@ pre { margin: 0 0 8px; background: #f5f3ec; border: 1px solid var(--line); borde
 /* ================================================================ 详情：全页路由 */
 #detail-page[hidden] { display: none; }
 body.dp-open { padding-bottom: 0; }
+body.compare-open { overflow: hidden; }
 body.dp-open .top, body.dp-open #grid, body.dp-open .foot { display: none; }
 .dp-head { position: sticky; top: 0; z-index: 20; display: flex; align-items: center;
   gap: 16px; padding: 12px 22px; background: rgba(245,244,239,.94); backdrop-filter: blur(10px);
