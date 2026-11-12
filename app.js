@@ -5,7 +5,7 @@
 
   var DATA = null,
       grid = document.getElementById('grid'),
-      state = { q: '', group: '', form: '', layout: '', fav: false, recent: false, picked: new Set() },
+      state = { q: '', group: '', form: '', layout: '', fav: false, picked: new Set() },
       editState = {},   // id -> tokens（用户改过的值）
       S = null,         // 当前打开的样式
       lastFocus = null,
@@ -116,15 +116,6 @@
   }
   function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} }
   var FAV = new Set(load('uiatlas.fav', []));
-  var RECENT = load('uiatlas.recent', []);
-
-  function markRecent(id) {
-    RECENT = [id].concat(RECENT.filter(function (x) { return x !== id; })).slice(0, 10);
-    save('uiatlas.recent', RECENT);
-    var n = document.getElementById('n-recent');
-    if (n) n.textContent = RECENT.length;
-    syncDropdowns();
-  }
 
   /* ---------- 缩略图缩放 ---------- */
   function fitShot(shot) {
@@ -225,7 +216,6 @@
     if (state.form && s.form !== state.form) return false;
     if (state.layout && s.layout !== state.layout) return false;
     if (state.fav && !FAV.has(s.id)) return false;
-    if (state.recent && RECENT.indexOf(s.id) < 0) return false;
     if (!state.q) return true;
     var terms = state.q.toLowerCase().split(/\s+/).filter(Boolean);
     return terms.every(function (t) {
@@ -285,11 +275,7 @@
       save('uiatlas.fav', Array.from(FAV));
       star.textContent = FAV.has(s.id) ? '★' : '☆';
       star.setAttribute('aria-pressed', FAV.has(s.id) ? 'true' : 'false');
-      ['landing', 'grid', 'poster', 'console', 'article'].forEach(function (k) {
-      var n = document.getElementById('n-lay-' + k);
-      if (n) n.textContent = count(function (s) { return s.layout === k; });
-    });
-    document.getElementById('n-fav').textContent = FAV.size;
+      document.getElementById('n-fav').textContent = FAV.size;
       if (state.fav) render();
     });
 
@@ -543,11 +529,8 @@
       var v = dd.querySelector(".dd-v");
       if (!v) return;
       if (k === "mine") {
-        var mine = [];
-        if (state.fav) mine.push("收藏 " + FAV.size);
-        if (state.recent) mine.push("最近 " + RECENT.length);
-        v.textContent = mine.length ? mine.join(" · ") : "未设置";
-        dd.classList.toggle("is-set", mine.length > 0);
+        v.textContent = state.fav ? "收藏 " + FAV.size : "未设置";
+        dd.classList.toggle("is-set", state.fav);
       } else {
         var label = (DD_LABEL[k] || {})[state[k]];
         if (label === undefined) label = state[k] || "全部";
@@ -586,9 +569,9 @@
   document.querySelectorAll('.chip[data-k]').forEach(function (b) {
     b.addEventListener('click', function () {
       var k = b.getAttribute('data-k'), v = b.getAttribute('data-v');
-      if (k === 'fav' || k === 'recent') {
-        state[k] = !state[k];
-        b.setAttribute('aria-pressed', state[k] ? 'true' : 'false');
+      if (k === 'fav') {
+        state.fav = !state.fav;
+        b.setAttribute('aria-pressed', state.fav ? 'true' : 'false');
       } else {
         state[k] = v;
         document.querySelectorAll('.chip[data-k="' + k + '"]').forEach(function (x) {
@@ -640,7 +623,7 @@
     try {
       sessionStorage.setItem('uiatlas.gallery', JSON.stringify({
         q: state.q, group: state.group, form: state.form, layout: state.layout,
-        fav: state.fav, recent: state.recent, y: window.scrollY
+        fav: state.fav, y: window.scrollY
       }));
     } catch (e) {}
   }
@@ -649,7 +632,7 @@
       var s = JSON.parse(sessionStorage.getItem('uiatlas.gallery') || 'null');
       if (!s) return;
       state.q = s.q || ''; state.group = s.group || ''; state.form = s.form || '';
-      state.layout = s.layout || ''; state.fav = !!s.fav; state.recent = !!s.recent;
+      state.layout = s.layout || ''; state.fav = !!s.fav;
       q.value = state.q;
       window.__restoreY = s.y || 0;
     } catch (e) {}
@@ -658,7 +641,6 @@
     document.querySelectorAll('.chip[data-k]').forEach(function (c) {
       var k = c.getAttribute('data-k'), v = c.getAttribute('data-v');
       if (k === 'fav') c.setAttribute('aria-pressed', state.fav ? 'true' : 'false');
-      else if (k === 'recent') c.setAttribute('aria-pressed', state.recent ? 'true' : 'false');
       else c.setAttribute('aria-pressed', state[k] === v ? 'true' : 'false');
     });
   }
@@ -694,7 +676,6 @@
       if (n) n.textContent = count(function (s) { return s.layout === k; });
     });
     document.getElementById('n-fav').textContent = FAV.size;
-    document.getElementById('n-recent').textContent = RECENT.length;
 
     if ('IntersectionObserver' in window) {
       io = new IntersectionObserver(function (entries) {
