@@ -264,7 +264,7 @@ pre { margin: 0 0 8px; background: #f5f3ec; border: 1px solid var(--line); borde
 /* ================================================================ 筛选下拉 */
 .dd { position: relative; }
 .dd-btn { display: flex; align-items: center; gap: 7px; border: 1px solid var(--line);
-  background: var(--panel); border-radius: 999px; padding: 5px 12px; font: inherit;
+  background: var(--panel); border-radius: 9px; padding: 5px 12px; font: inherit;
   font-size: 12.5px; cursor: pointer; color: var(--ink); }
 .dd-btn:hover { border-color: #c9c6bc; }
 .dd-btn[aria-expanded="true"], .dd.is-set .dd-btn { border-color: var(--ink); }
