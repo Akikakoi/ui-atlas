@@ -330,21 +330,14 @@
 
     var shot = el('div', { class: 'fx-shot' }, [
       el('span', { class: 'fx-loading', text: '加载预览…' }),
-      f,
-      el('span', { class: 'fx-badge' }, [el('i'), document.createTextNode(e._cat)])
+      f
     ]);
-
-    var act = el('div', { class: 'fx-act' }, [
-      el('a', { href: viewHref(e.id), target: '_blank', rel: 'noopener', text: '原页' })
-    ]);
-    shot.appendChild(act);
 
     var zoomBtn = el('button', {
       class: 'fx-zoom-btn', type: 'button', text: '放大',
       title: '等比例放大预览', 'aria-label': '放大《' + e.name + '》'
     });
     zoomBtn.addEventListener('click', function (ev) { ev.stopPropagation(); openZoom(e.id); });
-    shot.appendChild(zoomBtn);
 
     shot.__fail = function () { failTimer = setTimeout(function () { fail(shot); }, 8000); };
 
@@ -387,6 +380,7 @@
         el('div', { class: 'fx-title' }, [el('b', { text: e.name }), el('span', { text: e.name_en })]),
         el('p', { class: 'fx-how', text: e.features[0] }),
         el('div', { class: 'fx-meta' }, [
+          e._cat ? el('i', { class: 'cat', text: e._cat }) : null,
           el('i', { class: 'trig', text: e._trig }),
           e._family ? el('i', { class: 'fam', title: '机制：' + e._family + (e._famNote ? ' · ' + e._famNote : ''), text: e._family }) : null,
           el('i', { text: (e.tech || [])[0] || 'CSS' }),
@@ -397,6 +391,10 @@
           el('span', {}, [star]),
           dots,
           el('span', { class: 'spacer' }),
+          el('span', { class: 'fx-acts' }, [
+            el('a', { href: viewHref(e.id), target: '_blank', rel: 'noopener', text: '原页' }),
+            zoomBtn
+          ]),
           more
         ])
       ])
