@@ -36,7 +36,7 @@ code { font: 12.5px/1.5 ui-monospace, Consolas, monospace; background: #ece9e0; 
 .btn {
   border: 1px solid var(--line); background: var(--panel); color: var(--ink);
   border-radius: 9px; padding: 8px 14px; font: inherit; font-size: 13.5px; cursor: pointer;
-  text-decoration: none; display: inline-block;
+  text-decoration: none; display: inline-block; white-space: nowrap;
 }
 .btn:hover { border-color: #c9c6bc; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
@@ -223,12 +223,6 @@ pre { margin: 0 0 8px; background: #f5f3ec; border: 1px solid var(--line); borde
 
 /* ================================================================ 参考实现页 */
 .refwrap { max-width: 1240px; margin: 0 auto; padding: 26px 22px 40px; }
-.ref-link {
-  margin-left: 4px; font-size: 12.5px; text-decoration: none;
-  color: #2b4f9e; background: #e9effc; border: 1px solid #ccd9f6;
-  border-radius: 999px; padding: 4px 12px; white-space: nowrap;
-}
-.ref-link:hover { background: #dde7fa; }
 .ref-lead { max-width: 74ch; margin: 0; color: #4a463c; font-size: 15px; line-height: 1.85; }
 .ref-lead b { color: var(--ink); }
 .ref-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 20px 0 6px; }
