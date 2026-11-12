@@ -3,66 +3,253 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>拖拽排序 · UI Atlas 动效</title>
+<title>拖拽排序 · CUE 演出编排</title>
 <style>
-:root{--bg:#f5f3ed;--ink:#111216;--muted:#7a7d84;--line:#e3dfd4;--accent:#2f5fd0}
+:root{--bg:#101216;--panel:#181b21;--panel2:#1d2129;--ink:#f2efe6;--muted:#8e9198;--line:rgba(255,255,255,.09);--accent:#e8b85a;--green:#7fd6a8}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:30px 22px 66px}
-.wrap{width:100%;max-width:420px}
-.kicker{margin:0 0 10px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
-h1{margin:0 0 18px;font-size:clamp(25px,6vw,34px);line-height:1.07;letter-spacing:-.04em;font-weight:650}
-.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-.item{display:flex;align-items:center;gap:11px;height:46px;padding:0 13px;background:#fff;border:1px solid var(--line);
-  border-radius:11px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;
-  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;will-change:transform}
-.item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.item.dragging{cursor:grabbing;z-index:2;border-color:var(--accent);box-shadow:0 14px 30px rgba(30,30,20,.18)}
-.item .grip{color:#b9b3a4;font-size:15px;line-height:1;letter-spacing:-1px}
-.item .no{width:17px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--accent)}
-.item b{font-size:13.5px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.item em{margin-left:auto;font-style:normal;font-size:10.5px;color:var(--muted);background:#f2efe7;border-radius:5px;padding:2px 7px;flex:0 0 auto}
-.note{margin:14px 0 0;font-size:11.5px;line-height:1.75;color:var(--muted)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip;
+  background-image:radial-gradient(60% 40% at 82% 0%,rgba(232,184,90,.06),transparent 70%)}
+a{color:inherit}
+button{font:inherit}
+.topbar{display:flex;align-items:center;gap:20px;height:58px;padding:0 max(20px,calc((100vw - 1040px)/2));border-bottom:1px solid var(--line);background:rgba(16,18,22,.9);position:sticky;top:0;z-index:8;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:750;letter-spacing:.24em;text-decoration:none;white-space:nowrap}
+.brand i{width:18px;height:18px;border-radius:5px;background:linear-gradient(145deg,#f0cb7f,#b98a2f);box-shadow:0 3px 12px -3px rgba(232,184,90,.7)}
+.proj{display:flex;flex-direction:column;line-height:1.3;padding-left:18px;border-left:1px solid var(--line)}
+.proj b{font-size:12px;font-weight:600;white-space:nowrap}
+.proj span{font:9px ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.nav{display:flex;gap:18px;margin-left:6px}
+.nav a{font-size:11.5px;color:var(--muted);text-decoration:none;padding:4px 0;border-bottom:1px solid transparent}
+.nav a:hover{color:var(--ink)}
+.nav a.on{color:var(--ink);border-color:var(--accent)}
+.grow{flex:1}
+.cue-pill{display:flex;align-items:center;gap:7px;font:9.5px ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+.cue-pill i{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.avatar{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(150deg,#3c4657,#1e2530);border:1px solid rgba(255,255,255,.14);font-size:9.5px;color:#cfd3da}
+.main{max-width:1040px;margin:0 auto;padding:26px 22px 34px}
+.pagehead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.crumb{margin:0 0 4px;font:9.5px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+h1{margin:0;font-size:clamp(24px,3.4vw,34px);line-height:1.08;letter-spacing:-.04em;font-weight:640}
+.sub{margin:7px 0 0;font-size:11.5px;color:var(--muted)}
+.sub b{color:#d8d3c6;font-weight:500}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 272px;gap:16px;align-items:start}
+.setlist{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#191d24,#15181e);overflow:hidden;box-shadow:0 30px 60px -50px #000}
+.list-head{display:grid;grid-template-columns:22px 26px minmax(0,1fr) 42px 52px 44px;gap:10px;align-items:center;
+  padding:10px 14px;border-bottom:1px solid var(--line);font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);background:rgba(255,255,255,.02)}
+.list-head span:nth-child(4),.list-head span:nth-child(5),.list-head span:nth-child(6){text-align:right}
+.list{list-style:none;margin:0;padding:8px;display:flex;flex-direction:column;gap:8px}
+.item{display:grid;grid-template-columns:22px 26px minmax(0,1fr) 42px 52px 44px;gap:10px;align-items:center;
+  height:56px;padding:0 8px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.025);
+  cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease;will-change:transform}
+.item:hover{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.16)}
+.item:focus-visible{outline:2px solid rgba(232,184,90,.65);outline-offset:2px}
+.item.dragging{cursor:grabbing;z-index:2;border-color:rgba(232,184,90,.6);background:#20242b;box-shadow:0 18px 34px -18px rgba(0,0,0,.9)}
+.item .grip{color:#5d636d;font-size:13px;line-height:1;letter-spacing:-1px;text-align:center}
+.item .no{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--accent)}
+.item.dragging .no{color:#ffe3a8}
+.song{min-width:0;display:flex;align-items:baseline;gap:8px}
+.song b{font-size:13px;font-weight:560;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song span{font-size:9.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta-k,.meta-b{font:9.5px ui-monospace,Consolas,monospace;color:#a9adb5;text-align:right;white-space:nowrap}
+.dur{font:10.5px ui-monospace,Consolas,monospace;color:#e4dfd2;text-align:right;white-space:nowrap}
+.note{margin:14px 2px 0;font-size:10.5px;line-height:1.75;color:var(--muted);max-width:52em}
+.note b{color:#cfc9bb;font-weight:500}
+.side{display:grid;gap:10px}
+.card{border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.03);padding:15px 16px}
+.card .k{display:block;margin-bottom:10px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
+.card .big{font:600 30px/1 ui-monospace,Consolas,monospace;letter-spacing:-.04em}
+.card .big small{font-size:.38em;color:var(--muted);font-weight:400;margin-left:3px;letter-spacing:0}
+.card .desc{margin:7px 0 0;font-size:10.5px;line-height:1.7;color:var(--muted)}
+.rows{display:grid;gap:7px;margin-top:12px}
+.row{display:flex;align-items:baseline;gap:8px;font-size:10.5px;color:var(--muted);padding-top:7px;border-top:1px solid rgba(255,255,255,.06)}
+.row:first-child{border-top:0;padding-top:0}
+.row b{margin-left:auto;color:#e6e1d5;font-weight:500;font-size:11px}
+.row em{font-style:normal;font-size:9px;color:var(--muted);font-family:ui-monospace,Consolas,monospace}
+.memo{font-size:10.5px;line-height:1.8;color:var(--muted);margin:0}
+.memo b{color:#d8d3c6;font-weight:500}
+.energy{display:flex;align-items:flex-end;gap:4px;height:44px;margin-top:12px}
+.energy i{flex:1;border-radius:3px 3px 0 0;background:linear-gradient(180deg,rgba(232,184,90,.7),rgba(232,184,90,.15))}
+.statusbar{display:flex;align-items:center;gap:16px;max-width:1040px;margin:0 auto;padding:0 22px 20px;
+  font:9px ui-monospace,Consolas,monospace;letter-spacing:.07em;color:var(--muted);white-space:nowrap;overflow:hidden}
+.statusbar .grow{flex:1}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:#575b62;
+  pointer-events:none;z-index:9;background:rgba(250,248,243,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(20,22,28,.14);border-radius:999px;padding:4px 9px;box-shadow:0 8px 18px -16px rgba(0,0,0,.55)}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.item{transition:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-width:840px){
+  .layout{grid-template-columns:1fr}
+  .nav{display:none}
+  .side{grid-template-columns:1fr 1fr;display:grid}
+}
+@media (max-width:560px){
+  .topbar{height:52px;padding:0 14px;gap:12px}
+  .proj{padding-left:12px}
+  .proj span{display:none}
+  .cue-pill{display:none}
+  .main{padding:20px 14px 26px}
+  .pagehead{margin-bottom:14px}
+  h1{font-size:22px}
+  .sub{font-size:10.5px}
+  .list-head{grid-template-columns:20px 22px minmax(0,1fr) 46px;padding:9px 10px}
+  .list-head span:nth-child(4),.list-head span:nth-child(5){display:none}
+  .list-head span:nth-child(6){text-align:right}
+  .list{padding:6px;gap:6px}
+  .item{grid-template-columns:16px 22px minmax(0,1fr) 46px;height:52px;padding:0 8px;gap:8px}
+  .meta-k,.meta-b{display:none}
+  .song{display:block}
+  .song b{display:block;font-size:12.5px}
+  .song span{font-size:9px}
+  .side{grid-template-columns:1fr}
+  .statusbar{padding:0 14px 18px;font-size:8px;gap:10px}
+  .statusbar .optional{display:none}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:44px;padding:0 16px;gap:14px}
+  .proj{padding-left:12px}
+  .proj span{display:none}
+  .nav{display:none}
+  .cue-pill{font-size:8.5px}
+  .avatar{width:22px;height:22px}
+  .main{padding:12px 20px 6px;max-width:760px}
+  .pagehead{margin-bottom:8px;align-items:center;flex-wrap:nowrap}
+  .crumb{display:none}
+  h1{font-size:18px;white-space:nowrap}
+  .sub{margin:0 0 0 6px;font-size:9.5px;white-space:nowrap}
+  .layout{grid-template-columns:1fr;gap:0}
+  .list-head{padding:6px 10px;grid-template-columns:18px 22px minmax(0,1fr) 38px 46px 40px;font-size:7.5px}
+  .list{padding:5px;gap:5px}
+  .item{height:44px;grid-template-columns:18px 22px minmax(0,1fr) 38px 46px 40px;gap:8px}
+  .song span{display:none}
+  .song b{font-size:12px}
+  .note{display:none}
+  .side,footer,.statusbar{display:none}
+  .hint{left:12px;bottom:10px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .item{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">LAYOUT / 07</p>
-    <h1>顺序，<br>可以拖出来。</h1>
-    <ul class="list" id="list">
-      <li class="item" tabindex="0"><span class="grip" aria-hidden="true">⠿</span><span class="no">01</span><b>先写内容，再排版</b><em>结构</em></li>
-      <li class="item" tabindex="0"><span class="grip" aria-hidden="true">⠿</span><span class="no">02</span><b>颜色只做最后一层</b><em>视觉</em></li>
-      <li class="item" tabindex="0"><span class="grip" aria-hidden="true">⠿</span><span class="no">03</span><b>动效要有退路</b><em>动效</em></li>
-      <li class="item" tabindex="0"><span class="grip" aria-hidden="true">⠿</span><span class="no">04</span><b>数据先对齐，再谈风格</b><em>数据</em></li>
-    </ul>
-    <p class="note">拖动时只移动被拖的那一行，其余行按目标索引让出空位；松手后先补完位移动画，再重排 DOM，所以不会跳一下。</p>
-    <p class="sr" id="status" role="status" aria-live="polite"></p>
+
+<header class="topbar">
+  <a class="brand" href="#"><i aria-hidden="true"></i>CUE</a>
+  <div class="proj"><b>夜航 · 上海场</b><span>LIVE / 2026-11-18</span></div>
+  <nav class="nav" aria-label="项目导航">
+    <a class="on" href="#setlist">歌单</a>
+    <a href="#meta">舞台</a>
+    <a href="#meta">物料</a>
+  </nav>
+  <span class="grow"></span>
+  <span class="cue-pill"><i aria-hidden="true"></i>开演 20:00</span>
+  <span class="avatar" aria-label="账户：阿遥">遥</span>
+</header>
+
+<main class="main">
+  <div class="pagehead">
+    <div>
+      <p class="crumb">SETLIST / 上海 · 育音堂</p>
+      <h1>夜航 · 上海场</h1>
+      <p class="sub"><b>5 首</b> · 总长 <b id="total">19:04</b> · 走台 19:30</p>
+    </div>
   </div>
+
+  <div class="layout">
+    <section class="setlist" id="setlist" aria-label="演出歌单">
+      <div class="list-head" aria-hidden="true">
+        <span></span><span>#</span><span>曲目</span><span>调性</span><span>BPM</span><span>时长</span>
+      </div>
+      <ul class="list" id="list">
+        <li class="item" tabindex="0" aria-describedby="drag-help">
+          <span class="grip" aria-hidden="true">⠿</span><span class="no">01</span>
+          <span class="song"><b>夜航</b><span>开场 · 慢板</span></span>
+          <span class="meta-k">Am</span><span class="meta-b">72</span><span class="dur">3:42</span>
+        </li>
+        <li class="item" tabindex="0" aria-describedby="drag-help">
+          <span class="grip" aria-hidden="true">⠿</span><span class="no">02</span>
+          <span class="song"><b>灯塔</b><span>主歌推进</span></span>
+          <span class="meta-k">C</span><span class="meta-b">96</span><span class="dur">4:18</span>
+        </li>
+        <li class="item" tabindex="0" aria-describedby="drag-help">
+          <span class="grip" aria-hidden="true">⠿</span><span class="no">03</span>
+          <span class="song"><b>潮汐</b><span>全场合唱</span></span>
+          <span class="meta-k">G</span><span class="meta-b">108</span><span class="dur">3:07</span>
+        </li>
+        <li class="item" tabindex="0" aria-describedby="drag-help">
+          <span class="grip" aria-hidden="true">⠿</span><span class="no">04</span>
+          <span class="song"><b>雾中</b><span>降速过渡</span></span>
+          <span class="meta-k">Em</span><span class="meta-b">64</span><span class="dur">2:51</span>
+        </li>
+        <li class="item" tabindex="0" aria-describedby="drag-help">
+          <span class="grip" aria-hidden="true">⠿</span><span class="no">05</span>
+          <span class="song"><b>返场</b><span>收尾 · 返场曲</span></span>
+          <span class="meta-k">D</span><span class="meta-b">84</span><span class="dur">5:06</span>
+        </li>
+      </ul>
+      <p class="sr" id="drag-help">拖动任意一行可以调整顺序；聚焦后按上下方向键也能换位。</p>
+      <p class="sr" id="live" role="status" aria-live="polite"></p>
+    </section>
+
+    <aside class="side" id="meta">
+      <div class="card">
+        <span class="k">SET 概览</span>
+        <div class="big" id="total-big">19:04<small>总长</small></div>
+        <div class="rows">
+          <div class="row"><span>开场曲</span><b id="opener">夜航</b></div>
+          <div class="row"><span>收尾曲</span><b id="closer">返场</b></div>
+          <div class="row"><span>曲目数</span><b>5 首</b></div>
+          <div class="row"><span>调音</span><b>18:50 <em>提前 40 分</em></b></div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="k">能量曲线</span>
+        <div class="energy" aria-hidden="true">
+          <i style="height:32%"></i><i style="height:55%"></i><i style="height:74%"></i><i style="height:46%"></i><i style="height:90%"></i>
+        </div>
+        <p class="memo" style="margin-top:10px">把最吵的一首压在倒数第二，再留一首慢的收。<b>顺序变了，灯和走位也要跟着改。</b></p>
+      </div>
+    </aside>
+  </div>
+
+  <p class="note">拖动时只移动被拖的那一行，其余行按目标索引让出空位；松手后先补完位移动画，再重排 DOM，所以不会跳一下。</p>
 </main>
+
+<div class="statusbar">
+  <span>自动保存 19:04</span>
+  <span class="optional">演出倒计时 6 天</span>
+  <span class="grow"></span>
+  <span class="optional">团队 4 人</span>
+  <span>CUE · SETLIST v2</span>
+</div>
+
 <p class="hint">拖住任意一行上下移动；聚焦后也可按 ↑ ↓</p>
 <script>
 (function () {
-  var list = document.getElementById('list'), status = document.getElementById('status');
+  var list = document.getElementById('list');
+  var live = document.getElementById('live');
+  var opener = document.getElementById('opener');
+  var closer = document.getElementById('closer');
   var items = [].slice.call(list.children);
-  var STEP = 54;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var drag = null, busy = false;
+  var drag = null, busy = false, STEP = 64, HALF = 28;
 
-  function renumber() {
+  function metrics() {
+    var gap = parseFloat(getComputedStyle(list).gap) || 8;
+    var h = items[0].offsetHeight || 56;
+    STEP = h + gap;
+    HALF = h / 2;
+  }
+
+  function summary() {
     items.forEach(function (el, i) {
       var no = el.querySelector('.no');
       if (no) no.textContent = String(i + 1).padStart(2, '0');
     });
+    opener.textContent = items[0].querySelector('.song b').textContent;
+    closer.textContent = items[items.length - 1].querySelector('.song b').textContent;
   }
 
   function clearAll() {
@@ -110,8 +297,8 @@ h1{margin:0 0 18px;font-size:clamp(25px,6vw,34px);line-height:1.07;letter-spacin
       el.style.transform = '';
     });
     d.item.classList.remove('dragging');
-    renumber();
-    status.textContent = '「' + d.item.querySelector('b').textContent + '」已移到第 ' + (d.to + 1) + ' 位';
+    summary();
+    live.textContent = '「' + d.item.querySelector('.song b').textContent + '」已移到第 ' + (d.to + 1) + ' 首';
     requestAnimationFrame(function () {
       items.forEach(function (el) { el.style.transition = ''; });
       busy = false;
@@ -146,6 +333,7 @@ h1{margin:0 0 18px;font-size:clamp(25px,6vw,34px);line-height:1.07;letter-spacin
   items.forEach(function (item) {
     item.addEventListener('pointerdown', function (e) {
       if (drag || busy || (e.button !== undefined && e.button > 0)) return;
+      metrics();
       var i = items.indexOf(item);
       drag = { item: item, from: i, to: i, startY: e.clientY, moved: false };
       item.classList.add('dragging');
@@ -162,7 +350,7 @@ h1{margin:0 0 18px;font-size:clamp(25px,6vw,34px);line-height:1.07;letter-spacin
       item.style.transform = 'translate3d(0,' + dy + 'px,0)';
 
       var box = list.getBoundingClientRect();
-      var to = Math.round((e.clientY - box.top - 23) / STEP);
+      var to = Math.round((e.clientY - box.top - HALF) / STEP);
       to = Math.max(0, Math.min(items.length - 1, to));
       if (to !== drag.to) { drag.to = to; shiftOthers(); }
     });
@@ -197,10 +385,69 @@ h1{margin:0 0 18px;font-size:clamp(25px,6vw,34px);line-height:1.07;letter-spacin
           { transform: 'none' }
         ], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' });
       }
-      renumber();
-      status.textContent = '「' + item.querySelector('b').textContent + '」已移到第 ' + (j + 1) + ' 位';
+      summary();
+      live.textContent = '「' + item.querySelector('.song b').textContent + '」已移到第 ' + (j + 1) + ' 首';
       item.focus({ preventScroll: true });
     });
+  });
+
+  addEventListener('resize', function () { if (!drag) metrics(); });
+  metrics();
+  summary();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

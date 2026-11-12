@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>图片内平移 · MONO 单株植物商店 · UI Atlas</title>
+<style>
+:root{--bg:#f3efe6;--paper:#faf7f0;--ink:#151c17;--muted:#6f746b;--line:#dcd5c6;--moss:#3f6b50;--clay:#c2603c}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(75% 55% at 50% 0%,#faf7f0,#efeade 70%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.head{position:sticky;top:0;z-index:8;height:68px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1160px)/2));background:rgba(243,239,230,.86);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;white-space:nowrap}
+.brand .mark{width:26px;height:26px;border-radius:50%;border:1px solid var(--moss);display:grid;place-items:center;color:var(--moss)}
+.brand .mark svg{width:14px;height:14px}
+.brand b{font-size:12px;letter-spacing:.28em;font-weight:700}
+.brand span{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.head nav{display:flex;gap:24px;margin-left:6px;font-size:12px;color:var(--muted)}
+.head nav a{text-decoration:none}
+.head nav a:hover{color:var(--ink)}
+.cart{margin-left:auto;border:1px solid var(--line);background:transparent;border-radius:999px;color:var(--ink);
+  font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;padding:10px 14px;cursor:pointer;white-space:nowrap}
+.cart:hover{border-color:var(--moss);color:var(--moss)}
+.cart:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
+.stage{max-width:1160px;margin:0 auto;padding:clamp(26px,4.4vw,50px) 22px 0}
+.product{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:clamp(30px,5vw,68px);align-items:center;
+  min-height:calc(100vh - 68px - clamp(26px,4.4vw,50px))}
+.shot-wrap{margin:0;min-width:0}
+.shot{position:relative;height:clamp(410px,50vw,548px);border-radius:18px;overflow:hidden;border:1px solid var(--line);
+  background:#e4d7c1;cursor:crosshair;box-shadow:0 30px 70px -46px rgba(48,40,26,.55)}
+.photo{position:absolute;inset:-9%;transform:scale(1.18);transition:transform .5s cubic-bezier(.22,.8,.2,1);will-change:transform}
+.shot.panning .photo{transition:none}
+.photo svg{display:block;width:100%;height:100%}
+.shot::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;opacity:.11;mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+.badge{position:absolute;left:16px;top:16px;z-index:3;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;
+  color:#6f6656;background:rgba(250,247,240,.7);border:1px solid rgba(111,102,86,.22);border-radius:999px;padding:6px 9px;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.shot-wrap figcaption{display:flex;justify-content:space-between;align-items:baseline;gap:14px;margin-top:11px;
+  font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.shot-wrap figcaption b{font-weight:600;color:var(--ink);letter-spacing:.04em}
+.info{min-width:0}
+.crumb{margin:0 0 16px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted)}
+h1{margin:0;font-size:clamp(44px,5.6vw,68px);line-height:1;letter-spacing:-.05em;font-weight:620}
+.head-serif{display:block;margin-top:12px;font:400 11px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.price{display:flex;align-items:baseline;gap:14px;margin:24px 0 0;flex-wrap:wrap}
+.price b{font:500 28px/1 ui-monospace,Consolas,monospace;letter-spacing:-.04em}
+.price span{font-size:11px;color:var(--muted)}
+.desc{margin:16px 0 0;max-width:30em;font-size:12.5px;line-height:1.9;color:#5f645c}
+.desc b{font-weight:600;color:var(--ink)}
+.opts{margin-top:24px}
+.opts .lab{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:9px;
+  font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.opts .lab b{font-weight:600;color:var(--ink);letter-spacing:.04em}
+.opt-row{display:flex;gap:8px;flex-wrap:wrap}
+.opt{border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 12px 8px 9px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;font:600 11px/1.4 -apple-system,"Segoe UI","PingFang SC",sans-serif;color:var(--ink);
+  transition:border-color .2s,background-color .2s}
+.opt i{width:12px;height:12px;border-radius:50%;background:var(--sw,#e8ddca);border:1px solid rgba(0,0,0,.12);display:block}
+.opt:hover{border-color:#b9b09c}
+.opt[aria-pressed="true"]{border-color:var(--moss);background:rgba(63,107,80,.08)}
+.opt:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
+.spec{display:flex;justify-content:space-between;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+  font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.spec b{font-weight:600;color:var(--ink);letter-spacing:.02em}
+.buy{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:22px}
+.add{border:0;border-radius:999px;background:var(--moss);color:#f7f4ea;padding:14px 23px;cursor:pointer;
+  font:600 12.5px/1 -apple-system,"Segoe UI","PingFang SC",sans-serif;letter-spacing:.02em;transition:background-color .2s}
+.add:hover{background:#345a43}
+.add:focus-visible{outline:2px solid var(--moss);outline-offset:3px}
+.buy small{font:600 9px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.care-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
+.care-facts div{display:flex;flex-direction:column;gap:5px}
+.care-facts span{font:600 8px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.care-facts b{font-size:11.5px;font-weight:600;letter-spacing:-.01em}
+.fine{margin:18px 0 0;font-size:10.5px;line-height:1.75;color:var(--muted);max-width:32em}
+.care{max-width:1160px;margin:clamp(38px,6vw,62px) auto 0;padding:clamp(26px,4vw,38px) 22px 8px;border-top:1px solid var(--line)}
+.care-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:22px;flex-wrap:wrap}
+.care h2{margin:0;font-size:clamp(24px,3.2vw,36px);line-height:1.12;letter-spacing:-.04em;font-weight:620}
+.care h2 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--moss)}
+.care-head p{margin:0;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.care-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.care-grid article{border:1px solid var(--line);border-radius:13px;padding:20px 18px;background:rgba(255,255,255,.4)}
+.care-grid span{display:block;margin-bottom:12px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--moss)}
+.care-grid h3{margin:0 0 7px;font-size:14.5px;letter-spacing:-.01em}
+.care-grid p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.band{max-width:1160px;margin:clamp(30px,5vw,48px) auto 0;padding:0 22px}
+.band>div{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:25px 0;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.band h2{margin:0;font-size:clamp(20px,2.6vw,28px);letter-spacing:-.03em;font-weight:620}
+.band p{margin:5px 0 0;font-size:12px;color:var(--muted)}
+.band a{margin-left:auto;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--moss);
+  text-decoration:none;border-bottom:1px solid rgba(63,107,80,.35);padding-bottom:3px;white-space:nowrap}
+.foot{max-width:1160px;margin:20px auto 0;padding:0 22px 30px;display:flex;gap:18px;flex-wrap:wrap;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.07em;color:var(--muted)}
+.foot span:last-child{margin-left:auto}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;
+  font-size:11px;letter-spacing:.04em;color:#6f746b;pointer-events:none;z-index:4;white-space:nowrap;
+  background:rgba(243,239,230,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--moss)}
+.sr{position:absolute;top:0;left:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:1100px){
+  .head nav{display:none}
+}
+@media (max-width:900px){
+  .product{grid-template-columns:1fr;min-height:0;gap:28px}
+  .shot{height:min(520px,82vw)}
+}
+@media (max-width:560px){
+  .head{height:56px;padding:0 16px;gap:12px}
+  .brand span{display:none}
+  .cart{padding:8px 11px;font-size:9.5px}
+  .stage{padding:24px 16px 0}
+  .product{gap:24px}
+  .shot{height:360px;border-radius:14px}
+  .shot-wrap figcaption{font-size:8px}
+  h1{font-size:clamp(40px,12.5vw,52px)}
+  .price{margin-top:18px}
+  .desc{font-size:12px}
+  .care,.band,.foot{padding-left:16px;padding-right:16px}
+  .care-grid{grid-template-columns:1fr}
+  .band a{margin-left:0}
+  .foot span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .head{height:48px;padding:0 20px;gap:16px}
+  .brand span{display:none}
+  .cart{padding:7px 10px;font-size:9px}
+  .stage{padding:12px 22px 0}
+  .product{grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:20px;min-height:calc(100vh - 48px - 12px);align-items:center}
+  .shot{height:calc(100vh - 48px - 44px);min-height:300px;max-height:376px;border-radius:12px}
+  .badge{left:11px;top:11px;font-size:7px;padding:4px 7px}
+  .shot-wrap figcaption{margin-top:7px;font-size:7.5px}
+  .crumb{display:none}
+  h1{font-size:clamp(28px,4.2vw,34px)}
+  .head-serif{margin-top:7px;font-size:8.5px}
+  .price{margin-top:13px;gap:9px}
+  .price b{font-size:20px}
+  .price span{font-size:9px}
+  .desc,.care-facts,.fine{display:none}
+  .opts{margin-top:14px}
+  .opts .lab{margin-bottom:6px;font-size:8px}
+  .opt{padding:6px 9px 6px 7px;font-size:9.5px;gap:5px}
+  .opt i{width:9px;height:9px}
+  .spec{margin-top:10px;padding-top:9px;font-size:8.5px}
+  .buy{margin-top:12px;gap:10px}
+  .add{padding:10px 16px;font-size:11px}
+  .buy small{font-size:8px}
+  .care,.band,.foot{display:none}
+  .hint{font-size:10px;padding:3px 8px;left:auto;right:104px;transform:translateY(-50%)}
+}
+@media (hover:none),(max-width:560px){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .photo{transition:none}
+  .opt,.add{transition:none}
+  *{animation:none!important}
+}
+</style>
+</head>
+<body>
+<header class="head">
+  <a class="brand" href="#top"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21c0-7 3-12 8-15-1 8-4 12-8 15Z"/><path d="M12 21C12 14 9 9 4 6c1 8 4 12 8 15Z"/></svg></span><b>MONO</b><span>单株 · 植物商店</span></a>
+  <nav aria-label="主导航">
+    <a href="#care">植物</a>
+    <a href="#care">花器</a>
+    <a href="#care">养护</a>
+  </nav>
+  <p class="hint">把光标移到植物上，视角会轻轻移动</p>
+  <button class="cart" type="button" id="cartBtn">购物袋 (0)</button>
+</header>
+
+<main id="top">
+  <div class="stage">
+    <section class="product">
+      <figure class="shot-wrap">
+        <div class="shot" id="shot">
+          <div class="photo" id="photo" aria-hidden="true">
+            <svg viewBox="0 0 600 760" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <radialGradient id="wall" cx="34%" cy="20%" r="82%">
+                  <stop offset="0" stop-color="#f3e8d2"/>
+                  <stop offset=".55" stop-color="#e6d8bf"/>
+                  <stop offset="1" stop-color="#c9b99f"/>
+                </radialGradient>
+                <linearGradient id="potG" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" style="stop-color:var(--pot1,#eddfc8)"/>
+                  <stop offset=".55" style="stop-color:var(--pot2,#d3c2a4)"/>
+                  <stop offset="1" style="stop-color:var(--pot3,#b09c7f)"/>
+                </linearGradient>
+                <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="18"/></filter>
+                <g id="leaf">
+                  <path d="M0 0 C-26 -32 -19 -68 0 -78 C19 -68 26 -32 0 0 Z" fill="currentColor"/>
+                  <path d="M0 -4 C-9 -22 -8 -44 0 -58" stroke="#d7e2c8" stroke-opacity=".3" stroke-width="1.1" fill="none"/>
+                  <ellipse cx="-7" cy="-38" rx="8" ry="3.4" fill="#cfdcc0" opacity=".42" transform="rotate(-16 -7 -38)"/>
+                  <ellipse cx="8" cy="-52" rx="6" ry="2.8" fill="#cfdcc0" opacity=".34" transform="rotate(20 8 -52)"/>
+                  <ellipse cx="-3" cy="-63" rx="5" ry="2.4" fill="#cfdcc0" opacity=".28" transform="rotate(-8 -3 -63)"/>
+                </g>
+              </defs>
+
+              <rect width="600" height="760" fill="url(#wall)"/>
+              <polygon points="64,0 252,0 430,760 196,760" fill="#fff" opacity=".14"/>
+              <polygon points="382,0 486,0 600,420 600,760 520,760" fill="#7d6e55" opacity=".08"/>
+              <ellipse cx="302" cy="690" rx="222" ry="40" fill="#7d6a4e" opacity=".26" filter="url(#soft)"/>
+
+              <g fill="none" stroke="#34503a" stroke-linecap="round">
+                <path d="M300 522 C288 438 236 396 176 344" stroke-width="4.2"/>
+                <path d="M300 522 C310 430 372 394 444 330" stroke-width="4.2"/>
+                <path d="M300 522 C300 440 296 360 300 300" stroke-width="3.6"/>
+                <path d="M300 522 C346 548 388 574 414 626" stroke-width="3.4"/>
+                <path d="M300 522 C270 552 214 572 182 616" stroke-width="3"/>
+              </g>
+
+              <use href="#leaf" transform="translate(176 344) rotate(-54) scale(.92)" color="#35523b"/>
+              <use href="#leaf" transform="translate(444 330) rotate(48) scale(1)" color="#3c5c42"/>
+              <use href="#leaf" transform="translate(300 300) rotate(-4) scale(1.14)" color="#456a4a"/>
+              <use href="#leaf" transform="translate(232 382) rotate(-30) scale(.82)" color="#4f7250"/>
+              <use href="#leaf" transform="translate(368 388) rotate(28) scale(.88)" color="#3f6248"/>
+              <use href="#leaf" transform="translate(300 390) rotate(-11) scale(.95)" color="#557a54"/>
+              <use href="#leaf" transform="translate(142 402) rotate(-76) scale(.68)" color="#3c5c42"/>
+              <use href="#leaf" transform="translate(466 394) rotate(70) scale(.62)" color="#456a4a"/>
+
+              <ellipse cx="300" cy="526" rx="101" ry="14" fill="#393025"/>
+              <ellipse cx="300" cy="522" rx="112" ry="15" fill="#4a3d2e"/>
+              <path d="M194 528 L406 528 L374 652 Q371 664 358 664 L242 664 Q229 664 226 652 Z" fill="url(#potG)"/>
+              <rect x="186" y="506" width="228" height="28" rx="9" fill="url(#potG)"/>
+              <ellipse cx="300" cy="508" rx="108" ry="13" fill="#f2e7d3" opacity=".45"/>
+              <path d="M204 538 Q212 610 232 648" stroke="#fff" stroke-opacity=".24" stroke-width="14" fill="none" stroke-linecap="round"/>
+              <rect x="272" y="579" width="56" height="19" rx="3" fill="#f7efdf" opacity=".82"/>
+              <text x="300" y="592" text-anchor="middle" font-family="ui-monospace,Consolas,monospace" font-size="8" letter-spacing="2" fill="#8a7a62">MONO</text>
+
+              <use href="#leaf" transform="translate(414 626) rotate(152) scale(.8)" color="#4f7250"/>
+              <use href="#leaf" transform="translate(390 590) rotate(118) scale(.72)" color="#3c5c42"/>
+              <use href="#leaf" transform="translate(438 600) rotate(172) scale(.62)" color="#456a4a"/>
+              <use href="#leaf" transform="translate(182 616) rotate(-150) scale(.7)" color="#4a6d4c"/>
+            </svg>
+          </div>
+          <span class="badge">NO. 12 / INDOOR</span>
+        </div>
+        <figcaption><span><b>银斑葛</b> · Scindapsus pictus</span><span>45° 侧光 · 室内</span></figcaption>
+      </figure>
+
+      <div class="info">
+        <p class="crumb">植物 / 藤本 / 银斑葛</p>
+        <h1>银斑葛</h1>
+        <span class="head-serif">SCINDAPSUS PICTUS · 15 CM 盆</span>
+        <p class="price"><b>¥168</b><span>含手作陶盆与底托</span></p>
+        <p class="desc">叶片上散着不规则的银斑，像被谁用铅笔轻轻扫过。它耐阴、好养，垂下来的藤蔓会慢慢爬上你的书架——<b>每一株的斑纹都不一样</b>。</p>
+
+        <div class="opts" role="group" aria-label="盆器颜色">
+          <div class="lab"><span>盆器</span><b id="potName">陶白</b></div>
+          <div class="opt-row">
+            <button class="opt" type="button" aria-pressed="true" data-name="陶白" data-p1="#eddfc8" data-p2="#d3c2a4" data-p3="#b09c7f" style="--sw:#e8ddca"><i aria-hidden="true"></i>陶白</button>
+            <button class="opt" type="button" aria-pressed="false" data-name="赤陶" data-p1="#d38a67" data-p2="#b4674a" data-p3="#8f4d35" style="--sw:#c87a58"><i aria-hidden="true"></i>赤陶</button>
+            <button class="opt" type="button" aria-pressed="false" data-name="水泥" data-p1="#b8b4aa" data-p2="#98948a" data-p3="#7a766d" style="--sw:#a9a69d"><i aria-hidden="true"></i>水泥</button>
+          </div>
+        </div>
+
+        <div class="spec"><span>SPEC</span><b>株高约 25 cm · 藤长 40 cm</b></div>
+        <div class="buy">
+          <button class="add" type="button" id="addBtn">加入购物袋</button>
+          <small>上海同城次日达<br>植物破损包赔</small>
+        </div>
+        <div class="care-facts">
+          <div><span>LIGHT</span><b>明亮散射光</b></div>
+          <div><span>WATER</span><b>7–10 天一次</b></div>
+          <div><span>LEVEL</span><b>新手友好</b></div>
+        </div>
+        <p class="fine">植物是活的，叶形与斑纹以实物为准。收到后先放在通风处缓苗两天，再换位置。</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="care" id="care">
+    <div class="care-head">
+      <h2>养活它，<br><em>只需要三件事。</em></h2>
+      <p>CARE / LIGHT · WATER · SOIL</p>
+    </div>
+    <div class="care-grid">
+      <article><span>01 / LIGHT</span><h3>别晒正午的太阳</h3><p>放在离窗一米的位置最好。光线太强，银斑会褪成白色；太暗，藤蔓会越长越细。</p></article>
+      <article><span>02 / WATER</span><h3>等土干透再浇</h3><p>手指插进土里两指节，干了再浇透。底托别积水，根比叶子更怕闷。</p></article>
+      <article><span>03 / SOIL</span><h3>松一点，透一点</h3><p>泥炭、珍珠岩和树皮按 5:3:2 配。每年春天换一次盆，根系会更有力气。</p></article>
+    </div>
+  </section>
+
+  <section class="band">
+    <div>
+      <div>
+        <h2>养不好，拿回来换一盆。</h2>
+        <p>30 天内非人为枯萎，拍照告诉我们，下一盆免费寄出。</p>
+      </div>
+      <a href="#top">看看养护指南 →</a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>MONO 单株 · 植物商店</span>
+    <span>上海 · 静安 愚园路 1088 弄</span>
+    <span>© 2026</span>
+  </footer>
+</main>
+
+<span class="sr" role="status" id="cartStatus"></span>
+<script>
+(function () {
+  var shot = document.getElementById('shot'), photo = document.getElementById('photo');
+  var add = document.getElementById('addBtn'), cart = document.getElementById('cartBtn');
+  var status = document.getElementById('cartStatus'), potName = document.getElementById('potName');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+  if (!reduce && fine) {
+    shot.addEventListener('pointermove', function (e) {
+      var r = shot.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - .5;
+      var y = (e.clientY - r.top) / r.height - .5;
+      shot.classList.add('panning');
+      photo.style.transform = 'scale(1.18) translate3d(' + (-x * 18).toFixed(2) + 'px,' + (-y * 18).toFixed(2) + 'px,0)';
+    });
+    shot.addEventListener('pointerleave', function () {
+      shot.classList.remove('panning');
+      photo.style.transform = 'scale(1.18)';
+    });
+  }
+
+  var opts = [].slice.call(document.querySelectorAll('.opt'));
+  opts.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      opts.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      shot.style.setProperty('--pot1', btn.dataset.p1);
+      shot.style.setProperty('--pot2', btn.dataset.p2);
+      shot.style.setProperty('--pot3', btn.dataset.p3);
+      potName.textContent = btn.dataset.name;
+      status.textContent = '盆器已切换为' + btn.dataset.name;
+    });
+  });
+
+  var count = 0;
+  add.addEventListener('click', function () {
+    count += 1;
+    cart.textContent = '购物袋 (' + count + ')';
+    add.textContent = '已放入 · ' + count + ' 件';
+    status.textContent = '银斑葛已加入购物袋，共 ' + count + ' 件';
+    setTimeout(function () { add.textContent = '加入购物袋'; }, 1600);
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

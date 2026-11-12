@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滚动缩放 · NORTH COVE 山林旅舍</title>
+<style>
+:root{--bg:#0d1210;--ink:#f2f4ea;--muted:rgba(242,244,234,.58);--accent:#f0c674;--line:rgba(242,244,234,.14)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+a{color:inherit}
+.nav{position:fixed;inset:0 0 auto;z-index:6;height:68px;display:flex;align-items:center;gap:28px;
+  padding:0 max(22px,calc((100vw - 1160px)/2));border-bottom:1px solid transparent;
+  transition:background .3s ease,border-color .3s ease}
+.nav.solid{background:rgba(8,12,10,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-color:var(--line)}
+.brand{display:flex;align-items:baseline;gap:10px;font-size:12px;font-weight:650;letter-spacing:.28em;text-decoration:none;white-space:nowrap}
+.brand span{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.nav-links{display:flex;gap:22px;margin-left:10px}
+.nav-links a{font-size:12px;color:rgba(242,244,234,.68);text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.book{margin-left:auto;border:1px solid rgba(240,198,116,.5);color:var(--accent);border-radius:999px;padding:8px 16px;font-size:11.5px;text-decoration:none;white-space:nowrap}
+.book:hover{background:var(--accent);color:#191307}
+.sec{height:180vh;position:relative}
+.stick{position:sticky;top:0;height:100vh;overflow:hidden;display:grid;place-items:center}
+.frame{position:relative;width:min(1080px,100vw);height:100vh;overflow:hidden;display:grid;place-items:center;
+  transform:scale(1.28);transform-origin:50% 52%;will-change:transform}
+.scene{position:absolute;inset:0;background:
+  radial-gradient(70% 55% at 50% 18%,rgba(255,226,170,.55),transparent 62%),
+  radial-gradient(80% 60% at 18% 88%,rgba(58,94,74,.9),transparent 70%),
+  linear-gradient(160deg,#254233 0%,#13221c 46%,#080c0a 100%)}
+.scene::before{content:"";position:absolute;left:-6%;right:-6%;bottom:-2%;height:46%;
+  background:linear-gradient(180deg,transparent,rgba(6,10,8,.92)),
+  repeating-linear-gradient(96deg,rgba(255,255,255,.05) 0 2px,transparent 2px 11px);
+  clip-path:polygon(0 62%,12% 44%,25% 58%,38% 26%,52% 52%,66% 34%,80% 56%,92% 38%,100% 52%,100% 100%,0 100%)}
+.scene::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,transparent 40%,rgba(3,6,5,.72) 100%)}
+.copy{position:relative;z-index:1;text-align:center;padding:0 24px}
+.kicker{margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:rgba(242,244,234,.62)}
+h1{margin:0;font-size:clamp(36px,7.2vw,76px);line-height:.98;letter-spacing:-.05em;font-weight:600;text-shadow:0 2px 30px rgba(0,0,0,.35)}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:#ffe1a8}
+.sub{margin:18px auto 0;max-width:30em;font-size:12.5px;line-height:1.8;color:rgba(242,244,234,.66)}
+.cue{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:8px;
+  font:600 9px ui-monospace,Consolas,monospace;letter-spacing:.22em;color:rgba(242,244,234,.42);white-space:nowrap}
+.cue::after{content:"";width:1px;height:22px;background:linear-gradient(rgba(242,244,234,.5),transparent)}
+.cap{position:absolute;left:24px;right:24px;bottom:44px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;gap:18px;
+  opacity:0;transform:translateY(10px);max-width:1080px;margin:0 auto}
+.cap p{margin:0;max-width:32em;font-size:12px;line-height:1.8;color:var(--muted)}
+.cap span{font:600 10px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(255,225,168,.8);white-space:nowrap;text-align:right}
+.after{position:relative;z-index:1;background:var(--bg);border-top:1px solid rgba(242,244,234,.06)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);max-width:1160px;margin:0 auto;padding:0 22px;
+  border-bottom:1px solid var(--line)}
+.stat{padding:26px 8px;border-left:1px solid var(--line)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{display:block;font:500 26px/1 ui-monospace,Consolas,monospace;letter-spacing:-.04em;color:#ffe1a8}
+.stat span{display:block;margin-top:7px;font-size:10.5px;color:var(--muted);letter-spacing:.04em}
+.rooms,.about,.band,footer{max-width:1160px;margin:0 auto;padding-left:22px;padding-right:22px}
+.rooms{padding-top:58px;padding-bottom:24px}
+.kicker2{margin:0 0 12px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h2{margin:0 0 22px;font-size:clamp(22px,3vw,34px);line-height:1.12;letter-spacing:-.035em;font-weight:560}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.room{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#11160f}
+.room .img{height:168px;position:relative;overflow:hidden;background:linear-gradient(150deg,#274434,#0d1712)}
+.room .img::before{content:"";position:absolute;inset:38% -8% -18%;background:
+  repeating-linear-gradient(102deg,rgba(255,255,255,.07) 0 2px,transparent 2px 12px),
+  linear-gradient(180deg,transparent,rgba(5,9,7,.9));
+  clip-path:polygon(0 70%,18% 42%,34% 64%,52% 30%,68% 56%,84% 36%,100% 60%,100% 100%,0 100%)}
+.room.r2 .img{background:linear-gradient(150deg,#223f47,#0b1518)}
+.room.r2 .img::before{clip-path:polygon(0 56%,14% 38%,30% 58%,48% 24%,66% 50%,82% 32%,100% 54%,100% 100%,0 100%)}
+.room.r3 .img{background:linear-gradient(150deg,#3a3a2a,#14140e)}
+.room.r3 .img::before{clip-path:polygon(0 64%,20% 34%,36% 58%,54% 22%,72% 54%,88% 30%,100% 58%,100% 100%,0 100%)}
+.room .body{padding:16px 16px 18px}
+.room h3{margin:0;font-size:15px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px;font-weight:560}
+.room h3 span{margin-left:auto;font:500 14px ui-monospace,Consolas,monospace;color:#ffe1a8}
+.room p{margin:6px 0 0;font-size:11px;color:var(--muted);line-height:1.7}
+.room .line{margin-top:12px;padding-top:10px;border-top:1px solid rgba(242,244,234,.08);display:flex;justify-content:space-between;font:9.5px ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.06em}
+.about{padding-top:46px;padding-bottom:46px;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:46px;align-items:center;border-top:1px solid var(--line)}
+.about p{font-size:13px;line-height:1.9;color:rgba(242,244,234,.72);margin:0 0 14px;max-width:34em}
+.about .book{display:inline-flex;margin-top:8px;border-color:rgba(240,198,116,.4);padding:9px 16px}
+.figure{position:relative;height:300px;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+  background:linear-gradient(165deg,#35543f,#13211a 60%,#0a0f0c)}
+.figure::before{content:"";position:absolute;left:50%;top:22%;width:64px;height:64px;border-radius:50%;
+  background:radial-gradient(circle,#ffe3ae,rgba(255,227,174,.18) 70%);transform:translateX(-50%);filter:blur(1px)}
+.figure::after{content:"";position:absolute;inset:44% -6% -10%;background:
+  repeating-linear-gradient(98deg,rgba(255,255,255,.06) 0 2px,transparent 2px 13px),
+  linear-gradient(180deg,rgba(8,13,10,.1),rgba(5,9,7,.94));
+  clip-path:polygon(0 62%,16% 40%,32% 60%,48% 26%,64% 54%,82% 34%,100% 58%,100% 100%,0 100%)}
+.band{padding-top:10px;padding-bottom:58px}
+.inner-band{border:1px solid rgba(240,198,116,.24);border-radius:16px;padding:30px 28px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(240,198,116,.09),rgba(240,198,116,.015) 60%)}
+.inner-band h2{margin:0 0 6px;font-size:clamp(22px,3vw,30px)}
+.inner-band p{margin:0;font-size:12px;color:var(--muted);line-height:1.8}
+.inner-band .book{margin-left:auto;border-color:var(--accent);background:var(--accent);color:#191307;font-weight:600}
+.inner-band .book:hover{filter:brightness(1.05)}
+footer{border-top:1px solid var(--line);padding-top:20px;padding-bottom:26px;display:flex;gap:18px;flex-wrap:wrap;font:10px ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.06em}
+footer span:last-child{margin-left:auto}
+.hint{position:absolute;left:16px;top:80px;bottom:auto;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:7}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-width:860px){
+  .nav{gap:16px}
+  .nav-links{display:none}
+  .cards{grid-template-columns:1fr}
+  .about{grid-template-columns:1fr;gap:24px}
+  .figure{height:230px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stat:nth-child(3){border-left:0;padding-left:0}
+  .stat{padding:18px 8px}
+  .inner-band .book{margin-left:0}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px}
+  .brand span{display:none}
+  .rooms,.about,.band,footer{padding-left:16px;padding-right:16px}
+  .stats{padding:0 16px}
+  .cap{left:16px;right:16px;bottom:26px}
+  .sub{font-size:11.5px}
+  .figure{height:200px}
+  .hint{left:16px;top:66px}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:44px;padding:0 14px;gap:14px}
+  .brand{font-size:9.5px;letter-spacing:.2em}
+  .brand span{display:none}
+  .nav-links{display:none}
+  .book{padding:5px 11px;font-size:10px}
+  .kicker{display:none}
+  h1{font-size:clamp(28px,6vw,46px)}
+  .sub{display:none}
+  .copy{padding:0 16px}
+  .cue{display:none}
+  .cap{left:14px;right:14px;bottom:20px;gap:10px}
+  .cap p{font-size:10px;line-height:1.6;max-width:26em}
+  .cap span{font-size:8.5px}
+  .hint{left:12px;top:54px;bottom:auto;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .frame{transform:none}
+  .cap{opacity:1;transform:none}
+  .nav{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#">NORTH COVE<span>山林旅舍</span></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#">住宿</a>
+    <a href="#">体验</a>
+    <a href="#">路线</a>
+    <a href="#">日志</a>
+  </nav>
+  <a class="book" href="#book">预订</a>
+</header>
+
+<section class="sec" id="sec">
+  <div class="stick">
+    <div class="frame" id="frame">
+      <div class="scene" aria-hidden="true"></div>
+      <div class="copy">
+        <p class="kicker">NORTH COVE · 62°N</p>
+        <h1>住进山里，<br><em>听潮水退去。</em></h1>
+        <p class="sub">十二间木屋，一条走到海边的路。冬天有柴火，夏天有雾。</p>
+      </div>
+      <p class="cue" aria-hidden="true">SCROLL</p>
+    </div>
+    <div class="cap" id="cap">
+      <p>从海岸公路拐进来，手机就没了信号。晚上只有潮声、柴火和一间烧饭的屋子。</p>
+      <span>海拔 240 m<br>12 间木屋 · 4.9 分</span>
+    </div>
+  </div>
+</section>
+
+<main class="after">
+  <div class="stats" aria-label="旅舍数据">
+    <div class="stat"><b>4.9</b><span>住客评分</span></div>
+    <div class="stat"><b>240 m</b><span>海拔</span></div>
+    <div class="stat"><b>600 m</b><span>走到海边</span></div>
+    <div class="stat"><b>12 间</b><span>木屋</span></div>
+  </div>
+
+  <section class="rooms">
+    <p class="kicker2">STAY</p>
+    <h2>三间房，三种潮声。</h2>
+    <div class="cards">
+      <article class="room r1">
+        <div class="img" aria-hidden="true"></div>
+        <div class="body">
+          <h3>松屋<span>¥1,280</span></h3>
+          <p>32 m² · 见山 · 一张大床。窗对着北坡的松林，早上有雾。</p>
+          <div class="line"><span>2 位住客</span><span>含早餐</span></div>
+        </div>
+      </article>
+      <article class="room r2">
+        <div class="img" aria-hidden="true"></div>
+        <div class="body">
+          <h3>潮屋<span>¥1,680</span></h3>
+          <p>41 m² · 见海 · 一张大床和一张榻。退潮时能听见石头翻动。</p>
+          <div class="line"><span>2–3 位住客</span><span>含早餐与晚餐</span></div>
+        </div>
+      </article>
+      <article class="room r3">
+        <div class="img" aria-hidden="true"></div>
+        <div class="body">
+          <h3>岩屋<span>¥2,400</span></h3>
+          <p>56 m² · 独享岩石平台 · 户外浴桶。离海最近的一间。</p>
+          <div class="line"><span>2 位住客</span><span>含晚餐与向导</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="about">
+    <div>
+      <p class="kicker2">ABOUT</p>
+      <h2>这里没有大堂，<br>只有一间烧柴的屋子。</h2>
+      <p>入住是一把钥匙和一张手绘地图。早餐是面包、鸡蛋和昨天摘的莓；晚饭看当天上岸的鱼。没有电视，也没有房卡。</p>
+      <p>冬天来，路会封一半，我们到公路口接你。夏天来，潮水退到最远，可以沿着礁石走到灯塔下面。</p>
+      <a class="book" href="#">查看空房</a>
+    </div>
+    <div class="figure" role="img" aria-label="北湾的山、海与落日"></div>
+  </section>
+
+  <section class="band" id="book">
+    <div class="inner-band">
+      <div>
+        <h2>下个月还有 4 个空位。</h2>
+        <p>写下日期，我们回信确认路线、天气和晚饭。</p>
+      </div>
+      <a class="book" href="#">写下日期 →</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>NORTH COVE · 北湾 7 号</span>
+    <span>62°N · 没有信号</span>
+    <span>© 2026</span>
+  </footer>
+</main>
+
+<p class="hint">往下滚，画面会收进画框</p>
+<script>
+(function () {
+  var nav = document.getElementById('nav');
+  function navState() {
+    nav.classList.toggle('solid', (scrollY || document.documentElement.scrollTop) > 36);
+  }
+  addEventListener('scroll', navState, { passive: true });
+  navState();
+
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var sec = document.getElementById('sec'), frame = document.getElementById('frame'), cap = document.getElementById('cap');
+  var raf = null;
+  function render() {
+    raf = null;
+    var r = sec.getBoundingClientRect();
+    var total = sec.offsetHeight - innerHeight;
+    var p = Math.max(0, Math.min(1, -r.top / total));
+    var k = 1 - Math.pow(1 - p, 2.2);
+    frame.style.transform = 'scale(' + (1.28 - .28 * k).toFixed(4) + ')';
+    var c = Math.max(0, Math.min(1, (p - .35) / .45));
+    cap.style.opacity = c.toFixed(3);
+    cap.style.transform = 'translateY(' + ((1 - c) * 10).toFixed(2) + 'px)';
+  }
+  addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+  addEventListener('resize', render);
+  render();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

@@ -10,9 +10,10 @@
     2. motion/flow.html 引用 tokens.css，有三屏（list / detail / success）
     3. flow 有 View Transitions 与 fallback，处理 prefers-reduced-motion
     4. flow 自包含：无 <link> 外链、无 <script src>、无远程 src/href
-    5. motion.html 有 >= 10 条规则、>= 6 组反例，并链接到 flow 与 lab
+    5. motion.html 有 >= 10 条规则、>= 6 组反例，并链接到 flow / lab / components
     6. motion/lab.html 有 >= 5 个控件、>= 10 条规则体检、>= 4 个预设与复制入口
-    7. 页面结构：doctype / lang / viewport / title / .hint
+    7. motion/components.html 有 8 个组件、参数控件与复制入口
+    8. 页面结构：doctype / lang / viewport / title / .hint
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TOKENS = ROOT / "motion" / "tokens.css"
 FLOW = ROOT / "motion" / "flow.html"
 LAB = ROOT / "motion" / "lab.html"
+COMP = ROOT / "motion" / "components.html"
 PAGE = ROOT / "motion.html"
 
 RE_REMOTE = re.compile(r"""\b(?:src|href)\s*=\s*["']\s*(?:https?:)?//""", re.I)
@@ -98,6 +100,33 @@ def main() -> int:
         if "复制 CSS" not in src or "复制链接" not in src:
             errors.append("lab 缺少复制 CSS / 复制链接入口")
 
+    if not COMP.exists():
+        errors.append("缺少 motion/components.html")
+    else:
+        src = COMP.read_text(encoding="utf-8")
+        ids = set(re.findall(r"id: '([a-z-]+)'", src))
+        expected = {"reveal", "stagger", "magnetic", "tooltip", "toast", "skeleton", "accordion", "copy"}
+        missing = expected - ids
+        if missing:
+            errors.append("components 缺少组件：" + ", ".join(sorted(missing)))
+        for fn in ("fxReveal", "fxStagger", "fxMagnetic", "fxTooltip", "fxToast", "fxSkeleton", "fxAccordion", "fxCopy"):
+            if fn not in src:
+                errors.append(f"components 缺少实现 {fn}")
+        if "prefers-reduced-motion" not in src:
+            errors.append("components 没有 prefers-reduced-motion 处理")
+        if "复制当前" not in src:
+            errors.append("components 缺少复制入口")
+        if "type = 'range'" not in src and 'type="range"' not in src:
+            errors.append("components 缺少滑杆参数")
+        if RE_SCRIPT_SRC.search(src):
+            errors.append("components 出现 <script src>，应内联脚本")
+        if RE_REMOTE.search(src):
+            errors.append("components 出现远程 src/href")
+        if 'class="hint"' not in src:
+            warns.append("components 缺少 .hint 操作提示")
+        if not src.lstrip().lower().startswith("<!doctype html>"):
+            errors.append("components 缺少 <!doctype html>")
+
     page_src = PAGE.read_text(encoding="utf-8") if PAGE.exists() else ""
     rules = len(re.findall(r"data-rule\b", page_src))
     antis = len(set(re.findall(r'data-anti="([^"]+)"', page_src)))
@@ -115,6 +144,8 @@ def main() -> int:
             errors.append("motion.html 没有引用 tokens.css")
         if "motion/lab.html" not in page_src:
             errors.append("motion.html 没有链接到参数实验台")
+        if "motion/components.html" not in page_src:
+            errors.append("motion.html 没有链接到组件工坊")
         if RE_REMOTE.search(page_src):
             errors.append("motion.html 出现远程 src/href")
         if not page_src.lstrip().lower().startswith("<!doctype html>"):
@@ -123,6 +154,7 @@ def main() -> int:
     print(f"tokens: {TOKENS.relative_to(ROOT)}")
     print(f"flow:   {FLOW.relative_to(ROOT)}")
     print(f"lab:    {LAB.relative_to(ROOT)}")
+    print(f"comp:   {COMP.relative_to(ROOT)}")
     print(f"page:   {PAGE.relative_to(ROOT)}")
     print(f"规则:   {rules} 条")
     print(f"反例:   {antis} 组")

@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>透视网格 · NIGHTDRIVE 音乐节</title>
+<style>
+:root{--bg:#070912;--ink:#f7ecff;--muted:rgba(247,236,255,.54);--pink:#ff6a9d;--cyan:#7ee0ff;
+  --violet:#15122a;--line:rgba(247,236,255,.1)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:linear-gradient(180deg,#070912 0%,#15122a 46%,#3d1b3f 66%,#120a1c 100%) fixed;color:var(--ink);
+  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+
+/* 原始场景 */
+.sun{position:fixed;left:50%;bottom:26vh;width:min(280px,44vw);height:min(280px,44vw);transform:translateX(-50%);z-index:0;
+  border-radius:50%;background:radial-gradient(circle at 50% 40%,#ffe6b0,#ff8a5c 45%,#ff4f87 72%,rgba(255,79,135,0) 74%);
+  filter:blur(1px);opacity:.9;box-shadow:0 0 90px 30px rgba(255,79,135,.28)}
+.sun::after{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-linear-gradient(180deg,rgba(7,9,18,.82) 0 5px,transparent 5px 14px);
+  -webkit-mask-image:linear-gradient(180deg,transparent 30%,#000 62%);mask-image:linear-gradient(180deg,transparent 30%,#000 62%)}
+.floor{position:fixed;left:-55%;right:-55%;bottom:0;height:56vh;z-index:0;transform-origin:50% 100%;
+  transform:perspective(300px) rotateX(64deg) scale(1.2);
+  background-image:
+    repeating-linear-gradient(0deg,rgba(126,224,255,.55) 0 1px,transparent 1px 64px),
+    repeating-linear-gradient(90deg,rgba(255,106,157,.55) 0 1px,transparent 1px 64px);
+  background-size:100% 64px,64px 100%;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 26%);mask-image:linear-gradient(180deg,transparent 0,#000 26%);
+  animation:gridmove 1.5s linear infinite}
+@keyframes gridmove{to{background-position:0 64px,0 0}}
+.floor::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--pink),transparent);
+  box-shadow:0 0 18px 4px rgba(126,224,255,.35)}
+.scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(7,9,18,.82) 0%,rgba(7,9,18,.4) 46%,transparent 68%),
+  linear-gradient(180deg,rgba(7,9,18,.5),transparent 24%)}
+
+/* 顶栏 */
+.nav{position:sticky;top:0;z-index:6;background:rgba(7,9,18,.46);
+  backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);
+  border-bottom:1px solid rgba(247,236,255,.1)}
+.nav-in{width:min(1180px,calc(100% - 48px));margin:0 auto;height:64px;display:flex;align-items:center;gap:26px}
+.brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+  font:600 13px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em}
+.brand svg{width:20px;height:16px;display:block;overflow:visible}
+.brand span{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:rgba(247,236,255,.4)}
+.nav nav{display:flex;gap:22px}
+.nav nav a{font-size:11.5px;letter-spacing:.05em;color:rgba(247,236,255,.58);text-decoration:none;transition:color .2s}
+.nav nav a:hover{color:var(--ink)}
+.hint{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 auto;padding:4px 9px;
+  font-size:11px;color:rgba(247,236,255,.6);white-space:nowrap;
+  background:rgba(128,128,128,.1);border:1px solid rgba(128,128,128,.18);border-radius:999px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--pink);flex:0 0 5px}
+.nav-cta{flex:0 0 auto;height:31px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;
+  border:1px solid rgba(255,106,157,.4);color:#ffd9e8;text-decoration:none;font-size:11.5px;
+  background:rgba(255,106,157,.1);transition:background .2s}
+.nav-cta:hover{background:rgba(255,106,157,.2)}
+
+/* 首屏 */
+.page{position:relative;z-index:2}
+.hero{width:min(1180px,calc(100% - 48px));margin:0 auto;min-height:calc(100vh - 65px);
+  padding:clamp(34px,8vh,84px) 0 26px;display:flex;flex-direction:column}
+.kicker{margin:0;font:600 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(247,236,255,.5)}
+h1{margin:16px 0 0;font-size:clamp(40px,6.4vw,72px);line-height:.99;letter-spacing:-.045em;font-weight:600;max-width:9em;
+  text-shadow:0 2px 40px rgba(7,9,18,.55)}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:#ffd9e8}
+.lede{margin:20px 0 0;max-width:29em;font-size:13.5px;line-height:1.85;color:rgba(247,236,255,.68)}
+.actions{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{height:44px;padding:0 20px;border-radius:999px;display:inline-flex;align-items:center;
+  font-size:12px;letter-spacing:.03em;text-decoration:none;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s}
+.btn.solid{background:linear-gradient(100deg,var(--pink),#ff9dbb);border-color:var(--pink);color:#2a0613}
+.btn.solid:hover{background:linear-gradient(100deg,#ff87b0,#ffb3c9)}
+.btn.ghost{border-color:rgba(247,236,255,.26);color:var(--ink);background:rgba(7,9,18,.3);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.btn.ghost:hover{border-color:var(--pink);color:#ffd9e8}
+
+.hero-foot{margin-top:auto;padding-top:clamp(30px,8vh,70px);display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}
+.ticket-bar{flex:1 1 620px;display:flex;align-items:center;gap:0;padding:10px 10px 10px 4px;
+  border:1px solid rgba(247,236,255,.14);border-radius:14px;background:rgba(10,10,22,.55);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.tb{padding:0 18px;border-left:1px solid rgba(247,236,255,.1)}
+.tb:first-child{border-left:0}
+.tb span{display:block;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:rgba(247,236,255,.38)}
+.tb b{display:block;margin-top:3px;font:600 15px/1.3 ui-monospace,Consolas,monospace;letter-spacing:-.01em}
+.tb b small{font-size:9px;font-weight:500;color:rgba(247,236,255,.46);letter-spacing:.04em}
+.ticket-bar .btn{margin-left:auto;flex:0 0 auto;height:38px;padding:0 16px}
+.count{margin:0;font:500 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:rgba(247,236,255,.42);white-space:nowrap}
+
+/* 实底内容 */
+.solid{background:var(--bg);border-top:1px solid rgba(247,236,255,.08)}
+.lineup{padding:clamp(62px,10vh,106px) 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px}
+.eyebrow{margin:0;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:rgba(255,106,157,.66)}
+h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spacing:-.04em;font-weight:600}
+.sec-head>p{margin:0;max-width:30em;font-size:12.5px;line-height:1.85;color:var(--muted);justify-self:end;text-align:right}
+.days{margin-top:42px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.day{border-top:2px solid var(--dc,var(--pink))}
+.day:nth-child(2){--dc:var(--cyan)}
+.day:nth-child(3){--dc:#c9a0ff}
+.day-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 0 10px;
+  border-bottom:1px solid rgba(247,236,255,.08)}
+.day-head span{font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--dc,var(--pink))}
+.day-head b{font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:rgba(247,236,255,.4)}
+.day ul{list-style:none;margin:0;padding:0}
+.day li{display:flex;gap:14px;padding:13px 0;border-bottom:1px dashed rgba(247,236,255,.1)}
+.day li:last-child{border-bottom:0}
+.day .time{flex:0 0 38px;font:600 9.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:rgba(247,236,255,.42)}
+.day h3{margin:0;font-size:14.5px;letter-spacing:-.01em;font-weight:600}
+.day li p{margin:3px 0 0;font:400 8.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(247,236,255,.34)}
+.day .headliner h3{color:#ffd9e8}
+.lineup .cap{margin:20px 0 0;font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(247,236,255,.32)}
+
+/* 场地 */
+.venue{background:#0b0714;border-top:1px solid rgba(247,236,255,.08);padding:clamp(58px,9vh,98px) 0}
+.facts{margin:38px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.fact{border-left:1px solid rgba(247,236,255,.14);padding-left:18px}
+.fact b{font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--pink)}
+.fact h3{margin:9px 0 0;font-size:15px;letter-spacing:-.01em}
+.fact p{margin:8px 0 0;max-width:20em;font-size:11.5px;line-height:1.85;color:rgba(247,236,255,.52)}
+.venue .cap{margin:22px 0 0;font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(247,236,255,.3)}
+
+/* 引文 */
+.quote{background:var(--bg);border-top:1px solid rgba(247,236,255,.08);padding:clamp(62px,10vh,108px) 0}
+.quote blockquote{margin:0;max-width:22em;font:400 clamp(26px,3.6vw,44px)/1.28 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+.quote blockquote em{font-style:italic;color:#ffd9e8}
+.quote .cite{margin:20px 0 0;font:400 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(247,236,255,.4)}
+
+/* 票务 */
+.cta{padding:clamp(72px,12vh,132px) 0;border-top:1px solid rgba(247,236,255,.12);
+  background:linear-gradient(180deg,rgba(7,9,18,.62),rgba(7,9,18,.9))}
+.cta-in{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.cta .kicker{color:rgba(247,236,255,.46)}
+.cta h2{margin:12px 0 0;font-size:clamp(32px,5vw,58px);line-height:1.02}
+.cta .note{margin:16px 0 0;max-width:31em;font-size:12px;line-height:1.85;color:var(--muted)}
+.cta-actions{display:flex;gap:10px;flex-wrap:wrap}
+.foot{background:#06040b;border-top:1px solid rgba(247,236,255,.08);padding:22px 0 28px}
+.foot-in{display:flex;flex-wrap:wrap;gap:10px 22px;font:400 9.5px/1.8 ui-monospace,Consolas,monospace;
+  letter-spacing:.08em;color:rgba(247,236,255,.34)}
+.foot-in span:last-child{margin-left:auto}
+
+/* 平板 */
+@media (max-width:900px){
+  .nav nav{display:none}
+  .sec-head{grid-template-columns:1fr;gap:12px}
+  .sec-head>p{justify-self:start;text-align:left}
+  .days{grid-template-columns:1fr;gap:26px}
+  .facts{grid-template-columns:1fr;gap:20px}
+}
+
+/* 手机 */
+@media (max-width:560px){
+  .nav-in{width:calc(100% - 32px);height:56px;gap:12px}
+  .brand span{display:none}
+  .hint{display:none}
+  .nav-cta{margin-left:auto;height:29px;padding:0 12px;font-size:11px}
+  .wrap,.hero{width:calc(100% - 32px)}
+  .hero{min-height:calc(100vh - 57px);padding:34px 0 20px}
+  h1{font-size:clamp(38px,11vw,48px);max-width:8em}
+  .lede{font-size:12.5px;margin-top:16px}
+  .actions{margin-top:20px}
+  .btn{height:42px;padding:0 17px}
+  .scrim{background:linear-gradient(180deg,rgba(7,9,18,.5),transparent 30%),linear-gradient(90deg,rgba(7,9,18,.7),rgba(7,9,18,.18) 80%)}
+  .hero-foot{padding-top:26px;gap:12px}
+  .ticket-bar{flex-wrap:wrap;padding:8px;gap:8px 0}
+  .tb{flex:1 1 50%;padding:4px 12px;border-left:0}
+  .tb:nth-child(even){border-left:1px solid rgba(247,236,255,.1)}
+  .ticket-bar .btn{margin:6px 0 0;width:100%;justify-content:center;height:40px}
+  .count{font-size:8.5px}
+  .lineup{padding-top:52px}
+  .days{margin-top:30px}
+  .cta-in{align-items:flex-start}
+  .foot-in span:last-child{margin-left:0}
+}
+
+/* 画廊 600×450 紧凑首屏 */
+@media (max-height:560px) and (min-width:561px){
+  .nav-in{height:44px;gap:14px}
+  .brand span{display:none}
+  .nav nav{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .nav-cta{height:27px;padding:0 11px;font-size:10.5px}
+  .hero{min-height:calc(100vh - 45px);padding:10px 0}
+  .hero-copy{max-width:320px}
+  .sun{left:72%;width:min(230px,36vw);height:min(230px,36vw);bottom:24vh}
+  .count{display:none}
+  .kicker{font-size:9px}
+  h1{margin-top:7px;font-size:clamp(28px,4.7vw,38px);max-width:9em}
+  .lede{margin-top:8px;font-size:10.5px;line-height:1.6;max-width:34em}
+  .actions{margin-top:10px;gap:8px}
+  .btn{height:32px;padding:0 13px;font-size:11px}
+  .hero-foot{padding-top:10px;gap:12px}
+  .ticket-bar{padding:6px 8px 6px 2px;border-radius:11px}
+  .tb{padding:0 12px}
+  .tb span{font-size:7px}
+  .tb b{font-size:12px;margin-top:2px}
+  .tb b small{font-size:7.5px}
+  .ticket-bar .btn{height:30px;padding:0 13px;font-size:10.5px}
+  .count{font-size:8px}
+}
+
+@media (hover:none){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .floor{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="sun" aria-hidden="true"></div>
+<div class="floor" aria-hidden="true"></div>
+<div class="scrim" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top" aria-label="NIGHTDRIVE 音乐节">
+      <svg viewBox="0 0 20 16" aria-hidden="true" fill="none">
+        <circle cx="10" cy="9" r="5.4" fill="#ff6a9d" opacity=".85"/>
+        <path d="M0 14h20M3 16l4-5M10 16V9.5M17 16l-4-5" stroke="#7ee0ff" stroke-width="1.1" opacity=".7"/>
+      </svg>
+      NIGHTDRIVE<span>FESTIVAL</span>
+    </a>
+    <nav aria-label="主导航">
+      <a href="#lineup">阵容</a>
+      <a href="#venue">场地</a>
+      <a href="#tickets">票务</a>
+    </nav>
+    <p class="hint">背景在往脚下涌，不用操作</p>
+    <a class="nav-cta" href="#tickets">买票</a>
+  </div>
+</header>
+
+<main class="page" id="top">
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="kicker">NIGHTDRIVE · 2026.08.21 — 23 · 海边旧跑道</p>
+      <h1>把日落，<br><em>开成 120 拍。</em></h1>
+      <p class="lede">三个夜晚，四座舞台，四十二组合成器。主舞台架在跑道尽头，太阳会从音箱后面落下去。</p>
+      <div class="actions">
+        <a class="btn solid" href="#tickets">买三日票 →</a>
+        <a class="btn ghost" href="#lineup">先看阵容</a>
+      </div>
+    </div>
+    <div class="hero-foot">
+      <div class="ticket-bar">
+        <div class="tb"><span>日期 / DATES</span><b>08.21 — 23</b></div>
+        <div class="tb"><span>场地 / VENUE</span><b>海边旧跑道</b></div>
+        <div class="tb"><span>三日票 / 3-DAY</span><b>¥1,280 <small>含营位</small></b></div>
+        <a class="btn solid" href="#tickets">买三日票 →</a>
+      </div>
+      <p class="count">距离首夜 284 天</p>
+    </div>
+  </section>
+
+  <section class="lineup solid" id="lineup">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">01 / 阵容</p>
+          <h2>三天，四座舞台。</h2>
+        </div>
+        <p>每晚十点后主舞台进入 live 时段。完整阵容四十二组，六月公布其余名单。</p>
+      </div>
+      <div class="days">
+        <article class="day">
+          <div class="day-head"><span>DAY 01</span><b>08.21 周五</b></div>
+          <ul>
+            <li class="headliner"><span class="time">22:40</span><div><h3>NIGHTDRIVE</h3><p>主舞台 · LIVE</p></div></li>
+            <li><span class="time">21:00</span><div><h3>MIRA 96</h3><p>主舞台 · LIVE</p></div></li>
+            <li><span class="time">19:20</span><div><h3>The Neon Sea</h3><p>副舞台 · DJ SET</p></div></li>
+          </ul>
+        </article>
+        <article class="day">
+          <div class="day-head"><span>DAY 02</span><b>08.22 周六</b></div>
+          <ul>
+            <li class="headliner"><span class="time">22:30</span><div><h3>ITALO VELVET</h3><p>主舞台 · LIVE</p></div></li>
+            <li><span class="time">20:50</span><div><h3>Laser Nun</h3><p>主舞台 · LIVE</p></div></li>
+            <li><span class="time">18:40</span><div><h3>SUNSET FM</h3><p>日落台 · DJ SET</p></div></li>
+          </ul>
+        </article>
+        <article class="day">
+          <div class="day-head"><span>DAY 03</span><b>08.23 周日</b></div>
+          <ul>
+            <li class="headliner"><span class="time">22:10</span><div><h3>CHROME HEART</h3><p>主舞台 · LIVE</p></div></li>
+            <li><span class="time">20:30</span><div><h3>午夜电报</h3><p>主舞台 · LIVE</p></div></li>
+            <li><span class="time">18:30</span><div><h3>Aurora 404</h3><p>日落台 · DJ SET</p></div></li>
+          </ul>
+        </article>
+      </div>
+      <p class="cap">阵容以现场为准 · 每晚 18:00 开门 · 主舞台 02:00 结束</p>
+    </div>
+  </section>
+
+  <section class="venue" id="venue">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">02 / 场地</p>
+          <h2>一条跑道，<br>三种住法。</h2>
+        </div>
+        <p>场地距高铁站 18 分钟车程。演出期间有接驳车，末班车等到最后一场结束。</p>
+      </div>
+      <div class="facts">
+        <div class="fact">
+          <b>RUNWAY / 01</b>
+          <h3>海边旧跑道</h3>
+          <p>2.4 公里直线，主舞台架在跑道尽头。脚下是三米宽的旧标线，白天免费开放。</p>
+        </div>
+        <div class="fact">
+          <b>SHUTTLE / 02</b>
+          <h3>接驳车</h3>
+          <p>高铁站每 30 分钟一班，演出日延到凌晨 02:00。凭手环免费，不需要预约。</p>
+        </div>
+        <div class="fact">
+          <b>CAMP / 03</b>
+          <h3>草地露营</h3>
+          <p>三日票含一个营位，可自带帐篷。租赁 200 元 / 顶，含防潮垫和一盏营地灯。</p>
+        </div>
+      </div>
+      <p class="cap">禁止携带玻璃器皿与明火 · 营地 24 小时供电 · 有淋浴</p>
+    </div>
+  </section>
+
+  <section class="quote solid">
+    <div class="wrap">
+      <blockquote>太阳每晚会落，<br><em>但今晚它落在音箱后面。</em></blockquote>
+      <p class="cite">NIGHTDRIVE 2025 · 观众留言 · 第 0842 条</p>
+    </div>
+  </section>
+
+  <section class="cta" id="tickets">
+    <div class="wrap cta-in">
+      <div>
+        <p class="kicker">TICKETS · 08.21 — 23</p>
+        <h2>三日票 ¥1,280，<br>含一个营位。</h2>
+        <p class="note">单日票 ¥520，不含营位。三日票限量 6,000 张，售完不补。</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn solid" href="#tickets">买三日票</a>
+        <a class="btn ghost" href="#lineup">看单日票</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>NIGHTDRIVE FESTIVAL · 北纬 30° 海边旧跑道 · 2026.08.21—23</span>
+    <span>地面网格由 CSS 3D 变换驱动</span>
+  </div>
+</footer>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>故障文字 · TAPEHEAD 磁带修复所</title>
+<style>
+:root{--bg:#0b0d10;--panel:#12151a;--ink:#f3f1e9;--muted:#868a94;--line:rgba(243,241,233,.12);
+  --cyan:#7ee0ff;--pink:#ff6a9d;--accent:#ffcf6e;--dark:#090b0e}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(80% 60% at 50% 25%,#161a22,#090b0e 72%);color:var(--ink);
+  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+body::after{content:"";position:fixed;inset:0;z-index:9;pointer-events:none;opacity:.22;
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px)}
+a{color:inherit}
+button{font:inherit}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.nav{position:sticky;top:0;z-index:20;height:64px;display:flex;align-items:center;gap:30px;
+  padding:0 max(24px,calc((100vw - 1180px)/2));background:rgba(11,13,16,.82);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-size:14px;font-weight:700;letter-spacing:.02em;text-decoration:none;white-space:nowrap}
+.brand .mark{width:26px;height:26px;display:grid;place-items:center;border:1.5px solid var(--accent);border-radius:3px;
+  font:700 11px/1 ui-monospace,Consolas,monospace;color:var(--accent)}
+.brand i{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:#a3a8b2;text-decoration:none}
+.nav-links a:hover{color:var(--cyan)}
+.cta{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--accent);background:var(--accent);color:#17130a;
+  border-radius:999px;padding:9px 17px;font-size:12px;font-weight:650;text-decoration:none;cursor:pointer;white-space:nowrap;
+  transition:background .2s,color .2s,border-color .2s}
+.cta:hover{background:transparent;color:var(--accent)}
+.nav .cta{margin-left:auto;padding:7px 14px;font-size:11.5px}
+.hero{max-width:1180px;margin:0 auto;padding:clamp(36px,5vw,66px) 24px 34px;
+  display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:clamp(30px,5vw,64px);align-items:center}
+.kicker{margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+.glitch{position:relative;margin:0;font-size:clamp(54px,10.8vw,128px);line-height:.9;letter-spacing:-.06em;font-weight:700;
+  color:var(--ink);cursor:default;outline:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;opacity:0;pointer-events:none;clip-path:inset(0 0 100% 0)}
+.glitch::before{color:var(--cyan);transform:translateX(-3px)}
+.glitch::after{color:var(--pink);transform:translateX(3px)}
+.glitch:hover::before,.glitch:focus-visible::before,.glitch.fire::before{opacity:.82;animation:sliceA .62s steps(2,end) 1}
+.glitch:hover::after,.glitch:focus-visible::after,.glitch.fire::after{opacity:.82;animation:sliceB .62s steps(2,end) 1}
+.glitch:focus-visible{outline:1px dashed rgba(255,207,110,.5);outline-offset:10px}
+@keyframes sliceA{
+  0%{clip-path:inset(8% 0 70% 0)}
+  22%{clip-path:inset(42% 0 34% 0)}
+  44%{clip-path:inset(66% 0 12% 0)}
+  66%{clip-path:inset(24% 0 58% 0)}
+  88%{clip-path:inset(52% 0 26% 0)}
+  100%{clip-path:inset(0 0 100% 0)}
+}
+@keyframes sliceB{
+  0%{clip-path:inset(62% 0 18% 0)}
+  24%{clip-path:inset(18% 0 62% 0)}
+  48%{clip-path:inset(48% 0 30% 0)}
+  72%{clip-path:inset(74% 0 6% 0)}
+  92%{clip-path:inset(30% 0 48% 0)}
+  100%{clip-path:inset(0 0 100% 0)}
+}
+.sub{margin:14px 0 0;font-size:13px;line-height:1.8;color:#a3a8b2;letter-spacing:.01em}
+.lede{margin:14px 0 0;max-width:32em;font-size:13.5px;line-height:1.95;color:#8f949f}
+.actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:26px}
+.link{font-size:12.5px;text-decoration:none;border-bottom:1px solid rgba(243,241,233,.3);padding-bottom:2px;transition:color .2s,border-color .2s}
+.link:hover{border-color:var(--cyan);color:var(--cyan)}
+.meta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:24px;
+  font:600 9.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.meta-row i{width:1px;height:10px;background:var(--line)}
+.tape{position:relative;overflow:hidden;background:linear-gradient(165deg,#1a1e25,#101318 62%);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px 14px;box-shadow:0 40px 90px -50px rgba(0,0,0,.9)}
+.tape::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(180deg,transparent 0 26px,rgba(255,255,255,.025) 26px 27px)}
+.tape-top{position:relative;display:flex;justify-content:space-between;gap:12px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.tape-top b{color:var(--cyan);font-weight:600}
+.cassette{position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;margin:18px 0 0;
+  padding:20px 22px;border:1px solid rgba(243,241,233,.16);border-radius:10px;
+  background:linear-gradient(160deg,#232833,#171b21 70%);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.reel{width:54px;height:54px;border-radius:50%;flex:0 0 auto;border:1px solid rgba(243,241,233,.2);
+  background:repeating-conic-gradient(#2d333e 0 12deg,#1b2028 12deg 30deg);position:relative}
+.reel::after{content:"";position:absolute;inset:17px;border-radius:50%;background:#12151a;border:1px solid rgba(243,241,233,.18)}
+.window{flex:1;height:42px;border-radius:6px;background:#0c0e12;border:1px solid rgba(243,241,233,.14);
+  display:flex;align-items:center;justify-content:center;gap:5px;overflow:hidden}
+.window i{display:block;width:3px;height:22px;background:rgba(126,224,255,.36);border-radius:2px}
+.window i:nth-child(3n){height:14px;background:rgba(255,106,157,.34)}
+.window i:nth-child(4n){height:18px;background:rgba(255,207,110,.28)}
+.tape-label{position:relative;margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:rgba(243,241,233,.03)}
+.tape-label p{margin:0;font:650 13px/1.3 ui-monospace,Consolas,monospace;letter-spacing:.08em}
+.tape-label span{display:block;margin-top:6px;font-size:10px;line-height:1.7;color:var(--muted)}
+.diag{list-style:none;position:relative;margin:12px 0 0;padding:0}
+.diag li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);
+  font:600 9.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.diag li b{color:var(--ink);font-weight:600}
+.diag li b.ok{color:var(--cyan)}
+.diag li b.warn{color:var(--accent)}
+.figures{max-width:1180px;margin:0 auto;padding:6px 24px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.figure{border:1px solid var(--line);border-radius:12px;padding:15px 18px;background:rgba(18,21,26,.55);display:flex;align-items:baseline;gap:10px}
+.figure span{font-size:10px;color:var(--muted);letter-spacing:.03em}
+.figure b{margin-left:auto;font:600 clamp(17px,2vw,24px)/1 ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.figure b small{font-size:9px;color:var(--muted);font-weight:500;margin-left:2px;letter-spacing:0}
+.sec{max-width:1180px;margin:0 auto;padding:clamp(44px,6.4vw,78px) 24px 0}
+.sec-head{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:22px;margin-bottom:20px}
+.sec-head .kicker{margin:0 0 8px}
+h2{margin:0;font:650 clamp(23px,2.8vw,34px)/1.18 -apple-system,"Segoe UI","PingFang SC",sans-serif;letter-spacing:-.03em}
+.sec-head p{margin:0 0 3px auto;max-width:27em;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.dmgs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.dmg{display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:14px;
+  background:linear-gradient(170deg,rgba(243,241,233,.045),rgba(243,241,233,.01));padding:18px 20px 16px}
+.dmg-top{display:flex;justify-content:space-between;gap:10px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.dmg-top b{font-weight:600;color:var(--pink)}
+.dmg-top b.mid{color:var(--accent)}
+.dmg-top b.low{color:var(--cyan)}
+.dmg h3{margin:12px 0 0;font-size:15.5px;font-weight:650;letter-spacing:-.01em}
+.dmg p{margin:7px 0 0;font-size:10.5px;line-height:1.85;color:#8f949f;flex:1}
+.dmg .sym{margin-top:14px;height:26px;display:flex;align-items:flex-end;gap:2px;opacity:.7}
+.dmg .sym i{display:block;width:3px;height:8px;background:var(--cyan);border-radius:1px}
+.dmg .sym i:nth-child(2n){height:16px;background:var(--pink)}
+.dmg .sym i:nth-child(3n){height:22px;background:var(--accent)}
+.dmg .sym i:nth-child(4n){height:11px}
+.dmg-foot{display:flex;justify-content:space-between;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);
+  font:600 8.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.dmg-foot b{color:var(--ink);font-weight:600}
+.flow-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(24px,4vw,54px);align-items:start}
+.flow{list-style:none;margin:0;padding:0}
+.flow li{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;
+  padding:16px 0;border-top:1px solid var(--line)}
+.flow li:first-child{border-top:0;padding-top:0}
+.flow .no{font:600 10px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--cyan)}
+.flow b{font-size:13.5px;font-weight:650}
+.flow p{margin:3px 0 0;font-size:10.5px;line-height:1.75;color:var(--muted)}
+.flow .time{font:600 9px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.flow-card{border:1px solid var(--line);border-radius:14px;background:rgba(18,21,26,.6);padding:18px 20px 15px;min-width:0}
+.flow-card .fc-top{display:flex;justify-content:space-between;gap:10px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.flow-card .fc-top b{color:var(--accent);font-weight:600}
+.waveform{display:flex;align-items:center;gap:2px;height:74px;margin:16px 0 12px}
+.waveform i{display:block;flex:1;background:linear-gradient(180deg,var(--cyan),rgba(126,224,255,.16));border-radius:1px;min-width:1px}
+.waveform i:nth-child(5n){background:linear-gradient(180deg,var(--pink),rgba(255,106,157,.16))}
+.waveform i:nth-child(7n){background:linear-gradient(180deg,var(--accent),rgba(255,207,110,.16))}
+.flow-card p{margin:0;font-size:10.5px;line-height:1.8;color:#8f949f}
+.flow-card .fc-foot{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);
+  font:600 8.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.flow-card .fc-foot b{color:var(--ink);font-weight:600}
+.prices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.price-card{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;padding:18px 20px 16px;
+  background:rgba(18,21,26,.5);min-width:0}
+.price-card.hot{border-color:rgba(126,224,255,.4);background:linear-gradient(150deg,rgba(126,224,255,.08),transparent 62%),rgba(18,21,26,.8)}
+.pname{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.price{margin-top:12px;font:600 clamp(24px,2.6vw,30px)/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em}
+.price small{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:0}
+.price-card ul{list-style:none;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line);font-size:10.5px;line-height:2;color:#8f949f}
+.price-card li::before{content:"—";margin-right:7px;color:var(--cyan)}
+.price-card .link{margin-top:14px;align-self:flex-start;font-size:11.5px}
+.band{max-width:1180px;margin:clamp(44px,6.4vw,78px) auto 0;padding:0 24px}
+.band-inner{display:flex;align-items:center;gap:28px;flex-wrap:wrap;border-radius:18px;padding:clamp(24px,3.6vw,36px);
+  background:linear-gradient(115deg,rgba(126,224,255,.14),rgba(255,106,157,.08) 60%,transparent),#101318;border:1px solid var(--line)}
+.band h2{font-size:clamp(22px,2.7vw,32px)}
+.band p{margin:8px 0 0;font-size:11.5px;line-height:1.8;color:#8f949f;max-width:34em}
+.band .cta{margin-left:auto}
+footer{max-width:1180px;margin:48px auto 0;padding:20px 24px 30px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
+  font:600 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:10;
+  font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}
+  .brand .mark{width:20px;height:20px;font-size:9px}
+  .brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .hero{grid-template-columns:minmax(0,1fr) 258px;gap:22px;padding:12px 20px 6px;align-items:start}
+  .kicker{margin-bottom:6px;font-size:8.5px}
+  .glitch{font-size:clamp(54px,8.6vw,74px)}
+  .sub{margin-top:6px;font-size:10px;line-height:1.5}
+  .lede{margin-top:6px;font-size:10px;line-height:1.7;max-width:34em}
+  .actions{margin-top:9px;gap:12px}
+  .cta{padding:7px 13px;font-size:10.5px}
+  .link{font-size:10.5px}
+  .meta-row{display:none}
+  .tape{padding:10px 12px 8px;border-radius:12px;box-shadow:none}
+  .tape-top{font-size:6.5px}
+  .cassette{margin-top:9px;padding:10px 12px;gap:8px;border-radius:7px}
+  .reel{width:32px;height:32px}
+  .reel::after{inset:10px}
+  .window{height:26px;gap:3px}
+  .window i{height:14px}
+  .window i:nth-child(3n){height:9px}
+  .tape-label{margin-top:8px;padding:7px 9px;border-radius:6px}
+  .tape-label p{font-size:9.5px}
+  .tape-label span{font-size:6.5px;margin-top:3px;line-height:1.5}
+  .diag{margin-top:6px}
+  .diag li{padding:4px 0;font-size:6.5px}
+  .figures{grid-template-columns:repeat(4,1fr);gap:8px;padding:4px 20px 0}
+  .figure{padding:8px 10px;border-radius:9px;gap:6px}
+  .figure span{font-size:7px}
+  .figure b{font-size:14px}
+  .figure b small{font-size:6px}
+  .sec,.band,footer{display:none}
+  .sec.dmg-sec{display:block;padding:10px 20px 0}
+  .dmg-sec .sec-head{display:none}
+  .dmgs{grid-template-columns:repeat(3,1fr);gap:8px}
+  .dmg{padding:9px 11px 8px;border-radius:10px}
+  .dmg-top{font-size:6px}
+  .dmg h3{font-size:10.5px;margin-top:6px}
+  .dmg p{font-size:6.5px;line-height:1.55;margin-top:3px}
+  .dmg .sym{height:16px;margin-top:7px;gap:1px}
+  .dmg .sym i{width:2px}
+  .dmg-foot{margin-top:7px;padding-top:5px;font-size:6px;gap:6px}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#c9ccd3;
+    background:rgba(20,23,28,.82);border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 1px 6px rgba(0,0,0,.4)}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav-links{display:none}
+  .nav .cta{margin-left:auto;padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}
+  .brand i{display:none}
+  .hero{grid-template-columns:1fr;gap:24px;padding:28px 16px 18px}
+  .glitch{font-size:clamp(54px,17vw,80px)}
+  .sub{font-size:12px;margin-top:10px}
+  .lede{font-size:12px;line-height:1.9;margin-top:12px}
+  .actions{margin-top:18px}
+  .meta-row{margin-top:18px;font-size:8.5px;gap:10px}
+  .tape{padding:14px 16px 12px;border-radius:14px}
+  .figures{grid-template-columns:repeat(2,1fr);gap:8px;padding:4px 16px 0}
+  .figure{padding:11px 13px}
+  .figure b{font-size:18px}
+  .sec{padding-left:16px;padding-right:16px}
+  .sec-head{padding-top:18px;margin-bottom:16px}
+  .sec-head p{display:none}
+  .dmgs{grid-template-columns:1fr;gap:10px}
+  .flow-grid{grid-template-columns:1fr;gap:24px}
+  .prices{grid-template-columns:1fr;gap:10px}
+  .band{padding:0 16px;margin-top:38px}
+  .band-inner{padding:22px 20px;gap:16px}
+  .band .cta{margin-left:0}
+  footer{padding-left:16px;padding-right:16px;font-size:8.5px;margin-top:34px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .glitch::before,.glitch::after{display:none}
+  .cta,.link{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark" aria-hidden="true">T</span>TAPEHEAD 磁带修复所<i>TAPE RESTORATION</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#damage">常见损伤</a>
+    <a href="#process">修复流程</a>
+    <a href="#prices">价目</a>
+  </nav>
+  <a class="cta" href="#prices">预约寄修</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">VHS / 16 · 一盘带子的第二次生命</p>
+      <h1 class="glitch" id="glitch" tabindex="0" data-text="SIGNAL" aria-label="SIGNAL，悬停、聚焦或点按触发一次磁带故障演示">SIGNAL</h1>
+      <p class="sub">1994 年 6 月 18 日，上海，一盘被霉斑盖住的现场录像。</p>
+      <p class="lede">我们把每一盘带子先清洗、再校准、最后无损采集。信号丢了多少，修复完能读回多少，都会写在报告里。</p>
+      <div class="actions">
+        <a class="cta" href="#prices">预约寄修</a>
+        <a class="link" href="#process">看修复流程</a>
+      </div>
+      <p class="meta-row"><span>VHS / VHS-C / Hi8</span><i></i><span>4K 10bit 采集</span><i></i><span>7 天交付</span></p>
+    </div>
+    <aside class="tape" aria-label="待修复磁带信息">
+      <div class="tape-top"><span>T-120 / VHS / SP</span><b>RECEIVED</b></div>
+      <div class="cassette" aria-hidden="true">
+        <div class="reel"></div>
+        <div class="window"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="reel"></div>
+      </div>
+      <div class="tape-label">
+        <p>LIVE / SHANGHAI 1994</p>
+        <span>霉斑 3 处 · 磁粉脱落 2 段 · 带基拉伸 1 处</span>
+      </div>
+      <ul class="diag">
+        <li><span>清洗与脱水</span><b class="ok">已排期</b></li>
+        <li><span>采集规格</span><b>4K / 10bit</b></li>
+        <li><span>可读率预估</span><b class="warn">98.2%</b></li>
+      </ul>
+    </aside>
+  </section>
+
+  <section class="figures" aria-label="修复所数据">
+    <div class="figure"><span>已修复</span><b>1,284<small>盘</small></b></div>
+    <div class="figure"><span>平均可读率</span><b>98.2<small>%</small></b></div>
+    <div class="figure"><span>采集规格</span><b>4K<small>/10bit</small></b></div>
+    <div class="figure"><span>交付周期</span><b>7<small>天</small></b></div>
+  </section>
+
+  <section class="sec dmg-sec" id="damage">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">DAMAGE / 先诊断，再报价</p>
+        <h2>带子坏在哪</h2>
+      </div>
+      <p>不是所有损伤都能救。寄来先做免费诊断，救不了原样退回。</p>
+    </div>
+    <div class="dmgs">
+      <article class="dmg">
+        <div class="dmg-top"><span>01 / 霉斑</span><b>高</b></div>
+        <h3>白色菌丝蚀进带基</h3>
+        <p>南方梅雨季最常见。霉斑会让磁头读不到信号，强行播放还会把霉蹭到整盘带上。</p>
+        <div class="sym" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="dmg-foot"><span>可修复率</span><b>约 86%</b></div>
+      </article>
+      <article class="dmg">
+        <div class="dmg-top"><span>02 / 磁粉脱落</span><b class="mid">中</b></div>
+        <h3>画面一格一格掉</h3>
+        <p>带基上的磁粉成片脱落，画面出现雪花与色块。需要先做磁粉固着，再低速走带采集。</p>
+        <div class="sym" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="dmg-foot"><span>可修复率</span><b>约 72%</b></div>
+      </article>
+      <article class="dmg">
+        <div class="dmg-top"><span>03 / 带基拉伸</span><b class="low">低</b></div>
+        <h3>声音被拉长半音</h3>
+        <p>老机器张力不稳，把带子拉长。画面还能看，声音却慢下来。用时基校正逐帧找回。</p>
+        <div class="sym" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="dmg-foot"><span>可修复率</span><b>约 94%</b></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" id="process">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">PROCESS / 03 STEPS</p>
+        <h2>修复流程</h2>
+      </div>
+      <p>全程不剪带、不拼接。每一步都留原始采集文件，交付时一起给你。</p>
+    </div>
+    <div class="flow-grid">
+      <ol class="flow">
+        <li><span class="no">01</span><div><b>清洗与脱水</b><p>无水乙醇手工清洗带面，恒温箱脱水 12 小时，去掉霉斑与潮气。</p></div><span class="time">2 小时</span></li>
+        <li><span class="no">02</span><div><b>走带校准</b><p>在维护过的广播级机器上校准张力与磁迹，先空跑一遍确认不掉粉。</p></div><span class="time">4 小时</span></li>
+        <li><span class="no">03</span><div><b>无损采集</b><p>SDI 直采 4K / 10bit，音轨单独提取，做时基校正与降噪。</p></div><span class="time">3 小时</span></li>
+      </ol>
+      <div class="flow-card">
+        <div class="fc-top"><span>CAPTURE / CH-02</span><b>SYNC OK</b></div>
+        <div class="waveform" aria-hidden="true"><i style="height:18%"></i><i style="height:34%"></i><i style="height:52%"></i><i style="height:76%"></i><i style="height:94%"></i><i style="height:66%"></i><i style="height:42%"></i><i style="height:58%"></i><i style="height:82%"></i><i style="height:70%"></i><i style="height:44%"></i><i style="height:28%"></i><i style="height:54%"></i><i style="height:88%"></i><i style="height:62%"></i><i style="height:36%"></i><i style="height:20%"></i><i style="height:46%"></i><i style="height:74%"></i><i style="height:92%"></i><i style="height:60%"></i><i style="height:38%"></i><i style="height:56%"></i><i style="height:80%"></i><i style="height:48%"></i><i style="height:26%"></i><i style="height:64%"></i><i style="height:86%"></i><i style="height:40%"></i><i style="height:22%"></i></div>
+        <p>修复前的音频波形：第 12 分钟有一段 8 秒的磁粉脱落，采集时会用相邻帧补回。</p>
+        <div class="fc-foot"><span>采样 <b>48 kHz</b></span><span>位深 <b>24 bit</b></span><span>丢帧 <b>0</b></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="prices">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">PRICING / 诊断免费</p>
+        <h2>价目</h2>
+      </div>
+      <p>按盘计价，不含来回运费。修不好不收修复费，只收寄回运费。</p>
+    </div>
+    <div class="prices">
+      <article class="price-card">
+        <span class="pname">单盘诊断</span>
+        <b class="price">¥180</b>
+        <ul><li>清洗与可读性检测</li><li>书面诊断报告</li><li>可抵扣修复费</li></ul>
+        <a class="link" href="#top">预约诊断</a>
+      </article>
+      <article class="price-card hot">
+        <span class="pname">全套修复</span>
+        <b class="price">¥680<small> / 盘</small></b>
+        <ul><li>清洗、校准、4K 采集</li><li>时基校正与降噪</li><li>原始文件一起交付</li></ul>
+        <a class="link" href="#top">预约修复</a>
+      </article>
+      <article class="price-card">
+        <span class="pname">档案级</span>
+        <b class="price">¥1,680<small> / 盘</small></b>
+        <ul><li>逐帧修复与色彩重建</li><li>双备份 + 校验报告</li><li>机构存档格式交付</li></ul>
+        <a class="link" href="#top">联系我们</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="band-inner">
+      <div>
+        <h2>别把带子扔进阁楼。</h2>
+        <p>霉斑每多放一年，可读率就再掉一截。先寄来诊断，救不了原样退回。</p>
+      </div>
+      <a class="cta" href="#top">预约寄修</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>TAPEHEAD · 磁带修复所 · 上海杨浦</span>
+  <span>VHS / VHS-C / Hi8 / 4K 10bit</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">悬停标题，或点按触发一次故障</p>
+
+<script>
+(function () {
+  var glitch = document.getElementById('glitch');
+  if (!glitch || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var timer = null;
+  function fire() {
+    glitch.classList.remove('fire');
+    void glitch.offsetWidth;
+    glitch.classList.add('fire');
+    clearTimeout(timer);
+    timer = setTimeout(function () { glitch.classList.remove('fire'); }, 700);
+  }
+  glitch.addEventListener('pointerdown', fire);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

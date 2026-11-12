@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>瀑布流重排 · 材料板 MATERIAL BOARD</title>
+<style>
+:root{--bg:#f4f1e8;--ink:#16140f;--muted:#7d786c;--line:#ded6c4;--accent:#a9502c;--paper:#faf8f2}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+a{color:inherit}
+.nav{position:sticky;top:0;z-index:8;height:64px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1120px)/2));background:rgba(244,241,232,.86);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:9px;font-size:13px;font-weight:650;letter-spacing:.06em;text-decoration:none;white-space:nowrap}
+.brand::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--accent);transform:translateY(-1px)}
+.brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+.nav-links{display:flex;gap:20px}
+.nav-links a{font-size:12px;color:#5f5a4f;text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a[aria-current="page"]{color:var(--ink);font-weight:600}
+.cta{margin-left:auto;border:1px solid var(--ink);border-radius:999px;padding:7px 14px;font-size:11.5px;
+  text-decoration:none;font-weight:600;white-space:nowrap;transition:background .2s,color .2s}
+.cta:hover{background:var(--ink);color:var(--paper)}
+.stage{padding:0 22px 40px}
+.wrap{width:100%;max-width:1120px;margin:0 auto}
+.intro{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:46px;align-items:end;
+  padding:42px 0 26px}
+.kicker{margin:0 0 14px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0;font-size:clamp(28px,4.6vw,48px);line-height:1.06;letter-spacing:-.042em;font-weight:640}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.sub{margin:0 0 18px;font-size:13px;line-height:1.9;color:#5f5a4f;max-width:32em}
+.tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tools button{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);background:var(--ink);
+  color:#fff;border-radius:999px;padding:8px 16px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;
+  transition:background .2s,border-color .2s,transform .2s}
+.tools button:hover{background:var(--accent);border-color:var(--accent)}
+.tools button:active{transform:scale(.97)}
+.tools button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.tools button svg{width:14px;height:14px}
+.status{font:500 10.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted)}
+.board{position:relative;padding-top:6px}
+.masonry{position:relative;transition:height .45s cubic-bezier(.2,.8,.2,1)}
+.card{position:absolute;top:0;left:0;border-radius:14px;overflow:hidden;padding:15px;color:#fff;
+  display:flex;flex-direction:column;background:linear-gradient(155deg,var(--c1),var(--c2));
+  opacity:0;box-shadow:0 18px 26px -26px rgba(28,22,14,.55);
+  transition:transform .5s cubic-bezier(.2,.8,.2,1),opacity .3s ease,box-shadow .3s ease;will-change:transform}
+.masonry.ready .card{opacity:1}
+.card:hover{box-shadow:0 22px 34px -24px rgba(28,22,14,.6)}
+.card::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(20,16,11,.16),transparent 34%,rgba(20,15,10,.56) 100%)}
+.card::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.34;mix-blend-mode:overlay}
+.card>*{position:relative;z-index:2}
+.t-wood::after{background-image:repeating-linear-gradient(92deg,rgba(255,255,255,.26) 0 1px,transparent 1px 8px)}
+.t-weave::after{background-image:repeating-linear-gradient(0deg,rgba(20,12,6,.2) 0 1px,transparent 1px 6px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.2) 0 1px,transparent 1px 6px);opacity:.3}
+.t-stone::after{background-image:radial-gradient(circle,rgba(30,22,12,.3) 0 1px,transparent 1.7px);
+  background-size:15px 15px;opacity:.3}
+.t-speckle::after{background-image:radial-gradient(circle at 24% 30%,rgba(255,228,190,.6) 0 2px,transparent 3px),
+  radial-gradient(circle at 72% 62%,rgba(20,15,10,.34) 0 2px,transparent 3px),
+  radial-gradient(circle at 46% 86%,rgba(255,255,255,.4) 0 1.5px,transparent 2.6px);
+  background-size:27px 27px,34px 34px,21px 21px;opacity:.42}
+.t-metal::after{background-image:repeating-linear-gradient(114deg,rgba(255,255,255,.28) 0 1px,transparent 1px 5px);opacity:.42}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.code{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(255,255,255,.72)}
+.cat{font-size:9px;letter-spacing:.08em;color:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.32);
+  border-radius:999px;padding:2.5px 7px;white-space:nowrap}
+.foot{margin-top:auto;padding-top:22px}
+.name{margin:0;font-size:16.5px;line-height:1.2;letter-spacing:-.015em;font-weight:650;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.name em{font:italic 400 11px/1 Georgia,"Songti SC",serif;letter-spacing:.04em;color:rgba(255,255,255,.7)}
+.foot p{margin:6px 0 0;font-size:11px;line-height:1.65;color:rgba(255,255,255,.76);max-width:26em}
+.spec{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:11px;padding-top:9px;
+  border-top:1px solid rgba(255,255,255,.18);font:500 9px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.05em;color:rgba(255,255,255,.66)}
+.notes{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px;padding-top:22px;border-top:1px solid var(--line)}
+.notes div span{display:block;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent);margin-bottom:8px}
+.notes b{display:block;font-size:12.5px;letter-spacing:-.005em}
+.notes p{margin:5px 0 0;font-size:11px;line-height:1.75;color:var(--muted);max-width:26em}
+.page-foot{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+  font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.page-foot span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;z-index:9;display:flex;align-items:center;gap:6px;
+  font-size:11px;letter-spacing:.04em;color:#575b62;pointer-events:none;
+  background:rgba(250,248,243,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(20,22,28,.14);border-radius:999px;padding:4px 9px;box-shadow:0 8px 18px -16px rgba(0,0,0,.55)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:860px){
+  .intro{grid-template-columns:1fr;gap:18px;padding:30px 0 20px}
+  .sub{margin-bottom:14px}
+  .notes{grid-template-columns:1fr;gap:16px;margin-top:32px}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .brand span{display:none}
+  .nav-links{display:none}
+  .cta{padding:6px 12px;font-size:10.5px}
+  .stage{padding:0 16px 30px}
+  .intro{padding:24px 0 16px}
+  h1{font-size:clamp(26px,8vw,34px)}
+  .sub{font-size:12px;line-height:1.8}
+  .card{padding:13px;border-radius:12px}
+  .name{font-size:15px}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 16px;gap:14px}
+  .brand{font-size:11px}
+  .brand span{display:none}
+  .nav-links{display:none}
+  .cta{padding:5px 11px;font-size:10px}
+  .stage{padding:0 16px 20px}
+  .intro{grid-template-columns:1fr;gap:12px;padding:18px 0 14px}
+  .kicker{display:none}
+  h1{font-size:clamp(22px,4.2vw,30px)}
+  .sub{display:none}
+  .tools button{padding:6px 13px;font-size:11px}
+  .notes{display:none}
+  .page-foot{margin-top:20px;padding-top:12px}
+  .hint{left:12px;bottom:10px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .masonry,.card,.tools button{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#">材料板<span>MATERIA</span></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#" aria-current="page">材料库</a>
+    <a href="#">项目</a>
+    <a href="#">关于</a>
+  </nav>
+  <a class="cta" href="#">索取样品</a>
+</header>
+
+<main class="stage">
+  <div class="wrap">
+    <section class="intro">
+      <div>
+        <p class="kicker">LIBRARY / 05 · MASONRY</p>
+        <h1>高度不一样，<br><em>就别硬排成一行。</em></h1>
+      </div>
+      <div>
+        <p class="sub">十二块常用材料，各自有各自的尺寸与故事。每次落位都把下一块放进当前最矮的一列，底部自然错落。</p>
+        <div class="tools">
+          <button id="shuffle" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h3.5l9 10H20"/><path d="M18 4l3 3-3 3"/><path d="M4 17h3.5l2.2-2.4"/><path d="M18 20l3-3-3-3"/></svg>
+            换一批
+          </button>
+          <span class="status" id="status" role="status" aria-live="polite">12 件样品 · 最短列落位</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="board" aria-label="材料样品板">
+      <div class="masonry" id="masonry">
+        <article class="card t-wood" style="min-height:206px;--c1:#7d5f37;--c2:#c9a878">
+          <div class="card-head"><span class="code">MAT-014</span><span class="cat">木作</span></div>
+          <div class="foot">
+            <h2 class="name">白蜡木 <em>Ash</em></h2>
+            <p>浅色直纹，适合大面积的墙板。</p>
+            <div class="spec"><span>2440 × 1220 mm</span><span>¥480 / m²</span></div>
+          </div>
+        </article>
+        <article class="card t-weave" style="min-height:154px;--c1:#8a7a5e;--c2:#c9b794">
+          <div class="card-head"><span class="code">MAT-022</span><span class="cat">织物</span></div>
+          <div class="foot">
+            <h2 class="name">亚麻原色 <em>Flax</em></h2>
+            <p>没染过色，洗两水会更软。</p>
+            <div class="spec"><span>幅宽 2800 mm</span><span>¥320 / m</span></div>
+          </div>
+        </article>
+        <article class="card t-stone" style="min-height:238px;--c1:#a08a63;--c2:#d9c8a4">
+          <div class="card-head"><span class="code">MAT-031</span><span class="cat">石材</span></div>
+          <div class="foot">
+            <h2 class="name">洞石 <em>Travertine</em></h2>
+            <p>孔洞是它自己长出来的，不打腻子。</p>
+            <div class="spec"><span>600 × 400 mm</span><span>¥760 / m²</span></div>
+          </div>
+        </article>
+        <article class="card t-speckle" style="min-height:172px;--c1:#6c6b66;--c2:#a9a49a">
+          <div class="card-head"><span class="code">MAT-035</span><span class="cat">石材</span></div>
+          <div class="foot">
+            <h2 class="name">水磨石 <em>Terrazzo</em></h2>
+            <p>骨料是工地剩下的碎料。</p>
+            <div class="spec"><span>800 × 800 mm</span><span>¥540 / m²</span></div>
+          </div>
+        </article>
+        <article class="card t-metal" style="min-height:194px;--c1:#6d4f1f;--c2:#c39a4c">
+          <div class="card-head"><span class="code">MAT-041</span><span class="cat">金属</span></div>
+          <div class="foot">
+            <h2 class="name">黄铜拉丝 <em>Brass</em></h2>
+            <p>半年后会暗下来，这是好事。</p>
+            <div class="spec"><span>0.8 × 1219 mm</span><span>¥1,180 / m²</span></div>
+          </div>
+        </article>
+        <article class="card" style="min-height:146px;--c1:#64615a;--c2:#9d978a">
+          <div class="card-head"><span class="code">MAT-048</span><span class="cat">涂料</span></div>
+          <div class="foot">
+            <h2 class="name">微水泥 <em>Microcement</em></h2>
+            <p>一整面墙，没有一条缝。</p>
+            <div class="spec"><span>2–3 mm 厚度</span><span>¥260 / m²</span></div>
+          </div>
+        </article>
+        <article class="card t-stone" style="min-height:218px;--c1:#6b3a2b;--c2:#a8624a">
+          <div class="card-head"><span class="code">MAT-052</span><span class="cat">砌体</span></div>
+          <div class="foot">
+            <h2 class="name">再生砖 <em>Rebrick</em></h2>
+            <p>旧厂房拆下来的，编号还在砖上。</p>
+            <div class="spec"><span>230 × 110 mm</span><span>¥8 / 块</span></div>
+          </div>
+        </article>
+        <article class="card t-weave" style="min-height:164px;--c1:#7a5a2e;--c2:#bb8f50">
+          <div class="card-head"><span class="code">MAT-057</span><span class="cat">编织</span></div>
+          <div class="foot">
+            <h2 class="name">藤编 <em>Rattan</em></h2>
+            <p>手工编的，每一格都不太一样。</p>
+            <div class="spec"><span>幅宽 900 mm</span><span>¥450 / m</span></div>
+          </div>
+        </article>
+        <article class="card t-metal" style="min-height:202px;--c1:#4f6163;--c2:#93aeb0">
+          <div class="card-head"><span class="code">MAT-063</span><span class="cat">玻璃</span></div>
+          <div class="foot">
+            <h2 class="name">磨砂玻璃 <em>Frost</em></h2>
+            <p>透光，但不透人。</p>
+            <div class="spec"><span>8 mm 厚</span><span>¥680 / m²</span></div>
+          </div>
+        </article>
+        <article class="card t-weave" style="min-height:140px;--c1:#6f675a;--c2:#a89d89">
+          <div class="card-head"><span class="code">MAT-069</span><span class="cat">织物</span></div>
+          <div class="foot">
+            <h2 class="name">羊毛 <em>Wool</em></h2>
+            <p>北岛的羊毛，粗，但保暖。</p>
+            <div class="spec"><span>幅宽 1600 mm</span><span>¥520 / m</span></div>
+          </div>
+        </article>
+        <article class="card t-stone" style="min-height:226px;--c1:#743c25;--c2:#b9663f">
+          <div class="card-head"><span class="code">MAT-074</span><span class="cat">陶瓷</span></div>
+          <div class="foot">
+            <h2 class="name">陶土 <em>Terracotta</em></h2>
+            <p>不上釉，手摸得到砂。</p>
+            <div class="spec"><span>200 × 100 mm</span><span>¥12 / 块</span></div>
+          </div>
+        </article>
+        <article class="card" style="min-height:156px;--c1:#706b60;--c2:#a9a294">
+          <div class="card-head"><span class="code">MAT-081</span><span class="cat">涂料</span></div>
+          <div class="foot">
+            <h2 class="name">纸面石膏 <em>Plaster</em></h2>
+            <p>留着批刀的痕，不打算磨平。</p>
+            <div class="spec"><span>1200 × 2400 mm</span><span>¥180 / 张</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="notes" aria-label="排版说明">
+      <div><span>01</span><b>最短列先行</b><p>每一块都放进当前最矮的一列，底部自然错落，不会出现空洞。</p></div>
+      <div><span>02</span><b>只动 transform</b><p>重排时只用 translate3d 移动卡片，位置变化交给合成层处理。</p></div>
+      <div><span>03</span><b>高度由容器接管</b><p>容器高度跟着最长的一列过渡，滚动条不会突然弹跳。</p></div>
+    </section>
+
+    <footer class="page-foot">
+      <span>MATERIA · 材料库</span>
+      <span>上海 / 米兰</span>
+      <span>© 2026</span>
+    </footer>
+  </div>
+</main>
+
+<p class="hint">点「换一批」，看样品重新落位</p>
+<script>
+(function () {
+  var box = document.getElementById('masonry'), btn = document.getElementById('shuffle');
+  var status = document.getElementById('status');
+  var cards = [].slice.call(box.querySelectorAll('.card'));
+  var rounds = 0;
+
+  function layout() {
+    var w = box.clientWidth;
+    if (!w) return;
+    var cols = w < 520 ? 1 : w < 860 ? 2 : 3;
+    var gap = w < 520 ? 10 : 14;
+    var cw = (w - gap * (cols - 1)) / cols;
+    var heights = [];
+    for (var i = 0; i < cols; i++) heights.push(0);
+
+    cards.forEach(function (card) {
+      var col = heights.indexOf(Math.min.apply(null, heights));
+      var x = col * (cw + gap);
+      var y = heights[col];
+      card.style.width = cw + 'px';
+      card.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
+      heights[col] += card.offsetHeight + gap;
+    });
+    box.style.height = (Math.max.apply(null, heights) - gap) + 'px';
+    box.classList.add('ready');
+  }
+
+  layout();
+  var rt = null;
+  addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(layout, 120);
+  });
+
+  btn.addEventListener('click', function () {
+    for (var i = cards.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = cards[i]; cards[i] = cards[j]; cards[j] = t;
+    }
+    cards.forEach(function (c) { box.appendChild(c); });
+    layout();
+    rounds++;
+    status.textContent = '已重排 ' + cards.length + ' 件 · 第 ' + rounds + ' 次';
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

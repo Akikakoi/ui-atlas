@@ -3,73 +3,215 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>堆叠提示 · UI Atlas 动效</title>
+<title>堆叠提示 · HALO 家庭网络 · UI Atlas</title>
 <style>
-:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0;--ok:#1f7a4d;--warn:#a8481f}
+:root{--bg:#f1efe8;--paper:#fbfaf6;--ink:#14161b;--muted:#7c7f87;--line:#ddd8cb;--accent:#2f5fd0;--ok:#2c7a58;--warn:#a8481f;--chip:#f4f1e8}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:38px 22px 74px}
-.wrap{width:100%;max-width:480px}
-.kicker{margin:0 0 14px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-h1{margin:0 0 24px;font-size:clamp(24px,5.8vw,36px);line-height:1.14;letter-spacing:-.035em;font-weight:640}
-h1 em{font-style:normal;color:var(--accent)}
-.row{display:flex;gap:8px;flex-wrap:wrap}
-.btn{height:40px;padding:0 15px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--ink);
-  font:inherit;font-size:12.5px;cursor:pointer}
-.btn:hover{border-color:#c9c5b9}
-.btn.p{background:var(--accent);border-color:var(--accent);color:#fff}
-.note{margin:24px 0 0;font-size:12.5px;line-height:1.85;color:var(--muted);max-width:30em}
-.stack{position:fixed;right:14px;bottom:14px;left:14px;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none;z-index:9}
-.toast{position:relative;pointer-events:auto;width:min(320px,100%);background:#15171b;color:#f4f5f7;border-radius:11px;
-  padding:11px 34px 11px 13px;display:flex;gap:10px;align-items:flex-start;overflow:hidden;
-  box-shadow:0 14px 34px rgba(15,18,24,.32);transform:translateY(14px) scale(.97);opacity:0;
-  transition:transform .34s cubic-bezier(.2,.8,.2,1),opacity .3s}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.page{min-height:100svh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:20;flex:0 0 auto;height:54px;display:flex;align-items:center;gap:22px;padding:0 clamp(16px,3vw,36px);border-bottom:1px solid var(--line);background:rgba(251,250,246,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:750;font-size:12px;letter-spacing:.18em}
+.brand .mark{width:26px;height:26px;border-radius:8px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:700 10px/1 ui-monospace,Consolas,monospace}
+.brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.topbar nav{display:flex;gap:18px;font-size:11.5px;color:var(--muted)}
+.topbar nav a.on{color:var(--ink);font-weight:600}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.02em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.net{margin-left:auto;display:flex;align-items:center;gap:7px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
+.net::before{content:"";width:6px;height:6px;border-radius:50%;background:#3f8f74;box-shadow:0 0 0 3px rgba(63,143,116,.14)}
+.shell{flex:1;width:100%;max-width:1240px;margin:0 auto;display:grid;grid-template-columns:184px minmax(0,1fr);gap:clamp(24px,4vw,52px);padding:clamp(18px,3vh,30px) clamp(16px,3.4vw,40px) 34px;align-items:start}
+.side{position:sticky;top:78px;display:flex;flex-direction:column;gap:2px}
+.side-k{margin:0 0 8px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.17em;color:var(--muted)}
+.side a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:8px;font-size:11.5px;color:var(--muted);transition:background .18s,color .18s}
+.side a:hover{background:rgba(255,255,255,.6);color:var(--ink)}
+.side a.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 10px 22px -20px rgba(20,22,30,.5)}
+.side a small{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted)}
+.side .box{margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.5)}
+.side .box b{display:block;font-size:11px;font-weight:600}
+.side .box span{display:block;margin-top:3px;font-size:10px;line-height:1.6;color:var(--muted)}
+.side .box a{display:inline-block;margin-top:8px;padding:0;color:var(--accent);font:600 9px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.08em}
+.main{min-width:0}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.greet{padding-left:2px}
+.kicker{margin:0 0 9px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+.greet h1{margin:0;font-size:clamp(25px,3.2vw,34px);line-height:1.12;letter-spacing:-.04em;font-weight:640}
+.greet h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.greet p{margin:7px 0 0;font-size:11.5px;color:var(--muted)}
+.head .stamp{font:600 8px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);text-align:right}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.stat{border:1px solid var(--line);border-radius:11px;background:var(--paper);padding:11px 12px;position:relative;overflow:hidden}
+.stat small{display:block;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.stat b{display:block;margin-top:7px;font-size:20px;line-height:1;letter-spacing:-.04em;font-weight:650;font-variant-numeric:tabular-nums}
+.stat b i{font:500 9px/1 ui-monospace,Consolas,monospace;color:var(--muted);font-style:normal;margin-left:2px;letter-spacing:0}
+.stat .spark{position:absolute;right:9px;bottom:9px;display:flex;align-items:flex-end;gap:2px;height:17px;opacity:.55}
+.stat .spark i{width:3px;border-radius:1.5px;background:var(--accent)}
+.stat:nth-child(2) .spark i{background:var(--ok)}
+.stat:nth-child(3) .spark i{background:var(--warn)}
+.stat:nth-child(4) .spark i{background:#7a6bb0}
+.panel{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:var(--paper);overflow:hidden;box-shadow:0 34px 60px -58px rgba(20,22,30,.5)}
+.panel-head{display:flex;align-items:center;gap:12px;padding:12px 15px;border-bottom:1px solid #ebe6da}
+.panel-head b{font-size:12px;font-weight:650}
+.panel-head span{font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.panel-head .live{margin-left:auto;display:flex;align-items:center;gap:5px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--ok)}
+.panel-head .live::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--ok)}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 15px 14px}
+.act{display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 11px;cursor:pointer;transition:border-color .18s,background .18s,transform .15s}
+.act:hover{border-color:#c7c1b2;background:#fdfcf8}
+.act:active{transform:translateY(1px)}
+.act:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.act b{font-size:11.5px;font-weight:600}
+.act small{font-size:9.5px;color:var(--muted);line-height:1.45}
+.act .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);margin-bottom:1px}
+.act.warn .dot{background:var(--warn)}
+.act.ok .dot{background:var(--ok)}
+.devices{padding:2px 15px 8px}
+.dev{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #f0ece2;font-size:11.5px}
+.dev:first-child{border-top:0}
+.dev .ico{width:26px;height:26px;border-radius:8px;background:var(--chip);display:grid;place-items:center;font:600 8px/1 ui-monospace,Consolas,monospace;color:var(--muted);flex:0 0 26px}
+.dev b{font-weight:600;font-size:11.5px}
+.dev small{display:block;font-size:9.5px;color:var(--muted);margin-top:1px}
+.dev .st{margin-left:auto;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--ok)}
+.dev .st.warn{color:var(--warn)}
+.foot{flex:0 0 auto;border-top:1px solid var(--line);padding:11px clamp(16px,3.4vw,40px);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.stack{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none;z-index:30}
+.toast{position:relative;pointer-events:auto;width:min(318px,calc(100vw - 32px));background:#15171b;color:#f4f5f7;border-radius:11px;padding:11px 34px 11px 13px;display:flex;gap:10px;align-items:flex-start;overflow:hidden;box-shadow:0 16px 38px rgba(15,18,24,.34);transform:translateY(14px) scale(.97);opacity:0;transition:transform .34s cubic-bezier(.2,.8,.2,1),opacity .3s}
 .toast.in{transform:none;opacity:1}
 .toast.out{transform:translateY(8px) scale(.97);opacity:0}
 .toast .dot{width:7px;height:7px;border-radius:50%;margin-top:6px;flex:0 0 7px;background:var(--accent)}
 .toast.ok .dot{background:#5fd39a}
 .toast.warn .dot{background:#f0a06a}
-.toast .t{font-size:12.5px;line-height:1.55}
-.toast .t small{display:block;font-size:11px;color:#9aa0ac;margin-top:1px}
+.toast .t{font-size:12px;line-height:1.5}
+.toast .t small{display:block;font-size:10.5px;color:#9aa0ac;margin-top:1px}
 .toast .x{position:absolute;right:8px;top:8px;border:0;background:none;color:#8c929e;font-size:14px;line-height:1;cursor:pointer;padding:2px 5px;border-radius:5px}
 .toast .x:hover{background:rgba(255,255,255,.08);color:#fff}
+.toast .x:focus-visible{outline:2px solid #5fd39a;outline-offset:1px}
 .toast .life{position:absolute;left:0;bottom:0;height:2px;width:100%;background:#5b6270;transform-origin:left;animation:life 3.2s linear forwards}
-.toast.ok .life{background:#5fd39a}.toast.warn .life{background:#f0a06a}
+.toast.ok .life{background:#5fd39a}
+.toast.warn .life{background:#f0a06a}
 @keyframes life{to{transform:scaleX(0)}}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:10}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.toast{transition:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;padding-top:16px}
+  .side{display:none}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .head .stamp{display:none}
+}
+@media (max-width:560px){
+  .topbar{height:50px;padding:0 14px;gap:10px}
+  .topbar nav,.hint,.net{display:none}
+  .shell{padding:16px 14px 24px}
+  .greet h1{font-size:26px}
+  .stats{grid-template-columns:repeat(2,1fr);gap:7px}
+  .stat b{font-size:18px}
+  .actions{grid-template-columns:1fr;gap:6px}
+  .act{flex-direction:row;align-items:center;gap:8px}
+  .act small{display:none}
+  .devices{padding-bottom:4px}
+  .foot{display:none}
+  .stack{right:10px;left:10px;bottom:10px;align-items:stretch}
+  .toast{width:100%}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:40px;padding:0 16px;gap:14px}
+  .topbar nav,.net{display:none}
+  .hint{left:auto;right:14px;top:50%;transform:translateY(-50%);font-size:9px;padding:2px 7px}
+  .shell{grid-template-columns:1fr;max-width:600px;padding:10px 16px 12px;gap:0}
+  .side{display:none}
+  .head{margin-bottom:8px}
+  .kicker{margin-bottom:4px;font-size:8px}
+  .greet h1{font-size:21px}
+  .greet p{display:none}
+  .stats{gap:7px}
+  .stat{padding:8px 10px;border-radius:9px}
+  .stat b{font-size:16px;margin-top:4px}
+  .stat .spark{height:12px;bottom:6px;right:7px}
+  .panel{margin-top:8px;border-radius:12px}
+  .panel-head{padding:8px 12px}
+  .actions{padding:8px 12px 10px;gap:6px}
+  .act{padding:7px 9px;gap:2px}
+  .act small{display:none}
+  .devices{display:none}
+  .foot{display:none}
+  .stack{right:12px;bottom:10px}
+  .toast{padding:9px 32px 9px 12px;border-radius:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .toast{transition:none}
+  .act,.side a{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">FEEDBACK / 02</p>
-    <h1>提示不该<br><em>打断操作。</em></h1>
-    <div class="row">
-      <button class="btn p" type="button" data-t="save">保存成功</button>
-      <button class="btn" type="button" data-t="err">网络错误</button>
-      <button class="btn" type="button" data-t="note">有更新</button>
-    </div>
-    <p class="note">最多同时三条，新的从底部推入；3.2 秒自动收起，底部细线就是剩余时间。手动关掉时直接淡出，不等计时器。</p>
+<div class="page">
+  <header class="topbar">
+    <a class="brand" href="#main"><span class="mark">H</span>HALO<small>家庭网络</small></a>
+    <nav aria-label="主导航"><a class="on" href="#main">概览</a><a href="#main">设备</a><a href="#main">家长控制</a><a href="#main">设置</a></nav>
+    <p class="hint">点右边三个操作，看提示堆叠</p>
+    <span class="net">全屋在线 · 14 台设备</span>
+  </header>
+
+  <div class="shell">
+    <aside class="side" aria-label="控制台导航">
+      <p class="side-k">CONTROL / 控制台</p>
+      <a class="on" href="#main">概览 <small>●</small></a>
+      <a href="#main">无线网络 <small>2</small></a>
+      <a href="#main">设备 <small>14</small></a>
+      <a href="#main">访客网络 <small>关</small></a>
+      <a href="#main">自动化 <small>3</small></a>
+      <div class="box"><b>本月流量</b><span>1.84 TB / 不限量</span><a href="#main">查看明细 →</a></div>
+    </aside>
+
+    <main class="main" id="main">
+      <div class="head">
+        <div class="greet">
+          <p class="kicker">NOV 12 · 21:40 · 第 46 周</p>
+          <h1>晚上好，<em>林家。</em></h1>
+          <p>今晚三台设备在看视频，主卧的加湿器刚重新连上。</p>
+        </div>
+        <span class="stamp">HALO OS 4.1.8<br>运行 12 天 04 小时</span>
+      </div>
+
+      <section class="stats" aria-label="网络概况">
+        <div class="stat"><small>下载</small><b>320<i>Mbps</i></b><span class="spark" aria-hidden="true"><i style="height:7px"></i><i style="height:11px"></i><i style="height:9px"></i><i style="height:14px"></i><i style="height:12px"></i><i style="height:17px"></i></span></div>
+        <div class="stat"><small>上传</small><b>42<i>Mbps</i></b><span class="spark" aria-hidden="true"><i style="height:5px"></i><i style="height:8px"></i><i style="height:6px"></i><i style="height:10px"></i><i style="height:8px"></i><i style="height:11px"></i></span></div>
+        <div class="stat"><small>延迟</small><b>9<i>ms</i></b><span class="spark" aria-hidden="true"><i style="height:9px"></i><i style="height:6px"></i><i style="height:11px"></i><i style="height:5px"></i><i style="height:8px"></i><i style="height:7px"></i></span></div>
+        <div class="stat"><small>在线</small><b>14<i>/ 16</i></b><span class="spark" aria-hidden="true"><i style="height:12px"></i><i style="height:12px"></i><i style="height:14px"></i><i style="height:13px"></i><i style="height:15px"></i><i style="height:14px"></i></span></div>
+      </section>
+
+      <section class="panel" aria-label="常用操作">
+        <div class="panel-head"><b>常用操作</b><span>改动会即时同步到主路由</span><span class="live">已连接</span></div>
+        <div class="actions">
+          <button class="act ok" type="button" data-t="save"><i class="dot"></i><b>保存配置</b><small>访客网络与家长控制已就绪</small></button>
+          <button class="act warn" type="button" data-t="err"><i class="dot"></i><b>模拟断网</b><small>断开 10 秒，检验自动重连</small></button>
+          <button class="act" type="button" data-t="note"><i class="dot"></i><b>检查更新</b><small>当前 4.1.8 · 有新固件</small></button>
+        </div>
+        <div class="devices" aria-label="最近设备">
+          <div class="dev"><span class="ico">TV</span><div><b>客厅电视</b><small>5 GHz · 192.168.1.12</small></div><span class="st">在线</span></div>
+          <div class="dev"><span class="ico">MBP</span><div><b>林一的 MacBook Pro</b><small>5 GHz · 192.168.1.18</small></div><span class="st">在线</span></div>
+          <div class="dev"><span class="ico">AQ</span><div><b>主卧加湿器</b><small>2.4 GHz · 刚重新连接</small></div><span class="st warn">信号弱</span></div>
+        </div>
+      </section>
+    </main>
   </div>
-</main>
+
+  <footer class="foot">
+    <span>HALO · 家庭网络控制台</span>
+    <span>固件 4.1.8 · 自动更新已开启</span>
+    <span>本页为零依赖单文件演示</span>
+  </footer>
+</div>
 <div class="stack" id="stack" aria-live="polite" aria-relevant="additions"></div>
-<p class="hint">点按钮，提示从右下角堆上来</p>
 <script>
 (function () {
   var stack = document.getElementById('stack');
-  var seq = 0;
   var COPY = {
-    save: { cls: 'ok', t: '已保存', s: '改动已写入版本 42' },
-    err: { cls: 'warn', t: '网络请求失败', s: '重试中，第 2 次' },
-    note: { cls: '', t: '有新的构建可用', s: 'v1.8.2 · 现在更新' }
+    save: { cls: 'ok', t: '已保存', s: '访客网络与家长控制配置已写入' },
+    err: { cls: 'warn', t: '连接中断', s: '主路由无响应，正在重试第 2 次' },
+    note: { cls: '', t: '有新固件可用', s: 'HALO OS 4.2 · 现在更新' }
   };
+
   function push(kind) {
     var c = COPY[kind] || COPY.note;
     var t = document.createElement('div');
@@ -81,16 +223,73 @@ h1 em{font-style:normal;color:var(--accent)}
     requestAnimationFrame(function () { t.classList.add('in'); });
     var timer = setTimeout(function () { dismiss(t); }, 3200);
     t.querySelector('.x').addEventListener('click', function () { clearTimeout(timer); dismiss(t); });
-    return t;
   }
+
   function dismiss(t) {
     if (t.dataset.out) return;
     t.dataset.out = '1';
-    t.classList.remove('in'); t.classList.add('out');
+    t.classList.remove('in');
+    t.classList.add('out');
     setTimeout(function () { t.remove(); }, 350);
   }
-  document.querySelectorAll('[data-t]').forEach(function (b) {
+
+  [].forEach.call(document.querySelectorAll('[data-t]'), function (b) {
     b.addEventListener('click', function () { push(b.dataset.t); });
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

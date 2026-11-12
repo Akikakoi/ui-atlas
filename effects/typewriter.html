@@ -3,46 +3,243 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>打字机 · UI Atlas 动效</title>
+<title>打字机 · 长文 LONGHAND 写作工具</title>
 <style>
-:root{--bg:#f6f5f1;--ink:#111216;--muted:#7c7f86;--accent:#2f5fd0;--line:#dfdcd2}
+:root{--bg:#f4efe3;--paper:#fbf8f0;--ink:#1b1914;--muted:#7b7669;--accent:#b4522e;--line:#dcd3c0;--serif:"Songti SC","Noto Serif SC",Georgia,"Times New Roman",serif;--mono:ui-monospace,Consolas,monospace}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:38px 22px 74px}
-.wrap{width:100%;max-width:560px}
-.kicker{margin:0 0 16px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-.line{display:flex;align-items:baseline;gap:2px;min-height:1.5em;font-size:clamp(24px,6vw,40px);line-height:1.45;
-  letter-spacing:-.035em;font-weight:600}
-.line .prompt{color:var(--accent);font-family:ui-monospace,Consolas,monospace;font-size:.62em;transform:translateY(-.12em);margin-right:6px}
-#txt{white-space:pre-wrap}
-.caret{display:inline-block;width:2px;height:1em;background:var(--accent);translate:0 .14em;animation:blink 1.05s steps(1) infinite}
+html,body{margin:0}
+body{background:
+  radial-gradient(60% 40% at 78% 4%,rgba(180,82,46,.07),transparent 62%),
+  var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.head{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:30px;padding:16px max(22px,calc((100vw - 1120px)/2));
+  background:rgba(244,239,227,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:9px;font-family:var(--serif);font-size:17px;font-weight:700;text-decoration:none;letter-spacing:.02em;white-space:nowrap}
+.brand i{font:400 8.5px var(--mono);letter-spacing:.16em;color:var(--muted);font-style:normal}
+.head nav{display:flex;gap:24px;margin-left:6px}
+.head nav a{font-size:12.5px;color:#5a5548;text-decoration:none}
+.head nav a:hover{color:var(--ink)}
+.head .hint{margin-left:auto}
+.cta{display:inline-flex;align-items:center;gap:7px;background:var(--ink);color:#faf5e8;border:1px solid var(--ink);border-radius:999px;
+  padding:9px 17px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap}
+.cta:hover{background:var(--accent);border-color:var(--accent)}
+.head .cta{padding:7px 14px;font-size:11.5px}
+.hero{max-width:1120px;margin:0 auto;padding:clamp(36px,5.2vw,70px) 22px 44px;
+  display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:clamp(28px,5vw,64px);align-items:center}
+.kicker{margin:0 0 18px;font:600 10px/1 var(--mono);letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;font-family:var(--serif);font-size:clamp(42px,5.6vw,74px);line-height:1.08;font-weight:600;letter-spacing:-.02em}
+h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+.lede{margin:22px 0 0;max-width:30em;font-size:13.5px;line-height:1.95;color:#5a5548}
+.actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:26px}
+.link{font-size:12.5px;text-decoration:none;border-bottom:1px solid rgba(27,25,20,.35);padding-bottom:2px}
+.link:hover{color:var(--accent);border-color:var(--accent)}
+.meta{margin:24px 0 0;font:600 9.5px/1.7 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.meta b{color:var(--accent);font-weight:600}
+.editor{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  box-shadow:0 34px 80px -54px rgba(45,36,22,.65),0 2px 0 rgba(255,255,255,.6) inset}
+.ed-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-bottom:1px solid rgba(27,25,20,.08);
+  font:600 8.5px/1 var(--mono);letter-spacing:.12em;color:var(--muted)}
+.ed-state{display:flex;align-items:center;gap:6px;color:#6c7a58}
+.ed-state i{width:5px;height:5px;border-radius:50%;background:#7c9a58;box-shadow:0 0 0 3px rgba(124,154,88,.14)}
+.ed-body{position:relative;padding:24px 24px 20px 46px;min-height:236px;
+  background:repeating-linear-gradient(180deg,transparent 0 37px,rgba(27,25,20,.055) 37px 38px);
+  background-position:0 15px}
+.ed-body::before{content:"";position:absolute;left:28px;top:0;bottom:0;width:1px;background:rgba(180,82,46,.22)}
+.ed-title{margin:0 0 12px;font-family:var(--serif);font-size:14px;color:#8d8675;letter-spacing:.02em}
+.ed-line{margin:0;font-family:var(--serif);font-size:clamp(19px,1.9vw,24px);line-height:1.58;font-weight:600;letter-spacing:.01em;
+  min-height:4.74em;white-space:pre-wrap;word-break:break-all}
+.caret{display:inline-block;width:2px;height:1.05em;background:var(--accent);vertical-align:-.14em;margin-left:2px;
+  animation:blink 1.05s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-.sub{margin:26px 0 0;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.85;color:var(--muted);max-width:32em}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.caret{animation:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+.ed-note{margin:12px 0 0;font-size:10.5px;color:#a39b89;letter-spacing:.03em}
+.ed-foot{display:flex;align-items:center;gap:14px;padding:10px 18px;border-top:1px solid rgba(27,25,20,.08);
+  font:600 8.5px/1 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.ed-foot b{font-size:10px;color:var(--ink);font-weight:600}
+.ed-foot span:nth-child(2){margin-left:auto}
+.ed-foot .goal{color:#a39b89}
+.points{max-width:1120px;margin:0 auto;padding:0 22px;display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)}
+.point{padding:24px 26px 26px;border-left:1px solid var(--line)}
+.point:first-child{border-left:0;padding-left:0}
+.point span{font:600 8.5px/1 var(--mono);letter-spacing:.14em;color:var(--accent)}
+.point h3{margin:10px 0 8px;font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:.01em}
+.point p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted);max-width:24em}
+.quote{max-width:1120px;margin:34px auto 0;padding:38px 22px 42px;border-top:1px solid var(--line);text-align:center}
+.quote blockquote{margin:0;font-family:var(--serif);font-size:clamp(24px,3.1vw,38px);line-height:1.5;font-weight:400;letter-spacing:.01em}
+.quote blockquote em{font-style:italic;color:var(--accent)}
+.quote p{margin:14px 0 0;font:600 9px/1 var(--mono);letter-spacing:.16em;color:var(--muted)}
+.band{max-width:1120px;margin:0 auto 50px;padding:0 22px}
+.band-inner{border:1px solid var(--line);border-radius:12px;padding:26px 28px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(180,82,46,.06),transparent 55%),var(--paper)}
+.band h2{margin:0 0 6px;font-family:var(--serif);font-size:clamp(20px,2.5vw,28px);font-weight:600;letter-spacing:-.01em}
+.band p{margin:0;font-size:11.5px;color:var(--muted);line-height:1.8}
+.band .cta{margin-left:auto}
+footer{max-width:1120px;margin:0 auto;padding:18px 22px 28px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
+  font:500 9px/1.7 var(--mono);letter-spacing:.08em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.04em;color:var(--muted);pointer-events:none;white-space:nowrap;
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px) and (min-width:561px){
+  .head{padding:10px 20px;gap:16px}
+  .head nav,.brand i{display:none}
+  .head .hint{font-size:9.5px;padding:3px 8px;margin-left:auto}
+  .head .cta{padding:5px 11px;font-size:10px}
+  .hero{grid-template-columns:minmax(0,1fr) 272px;gap:24px;padding:14px 22px 8px}
+  .kicker{margin-bottom:6px;font-size:8px}
+  h1{font-size:31px}
+  .lede{margin-top:10px;font-size:10px;line-height:1.7;max-width:34em}
+  .actions{margin-top:11px;gap:12px}
+  .cta{padding:6px 11px;font-size:10px}
+  .link{font-size:10px}
+  .meta{display:none}
+  .editor{border-radius:10px}
+  .ed-top{padding:7px 11px;font-size:6.5px}
+  .ed-body{padding:12px 14px 10px 30px;min-height:150px;background-size:auto 29px}
+  .ed-body::before{left:18px}
+  .ed-title{font-size:9.5px;margin-bottom:6px}
+  .ed-line{font-size:12.5px;line-height:1.56;min-height:4.68em}
+  .ed-note{display:none}
+  .ed-foot{padding:6px 11px;font-size:6.5px;gap:8px}
+  .ed-foot b{font-size:7.5px}
+  .points{grid-template-columns:repeat(3,1fr);padding:0 22px}
+  .point{padding:10px 12px 12px}
+  .point span{font-size:6.5px}
+  .point h3{font-size:11px;margin:4px 0 3px}
+  .point p{font-size:8px;line-height:1.55}
+  .quote{display:block;margin:0;padding:12px 22px 0;border-top:1px solid var(--line);text-align:left}
+  .quote blockquote{font-size:14px;line-height:1.6}
+  .quote blockquote br{display:none}
+  .quote p{display:inline;margin:0 0 0 10px;font-size:7px}
+  .band,footer{display:none}
+}
+@media (max-width:560px){
+  .head{padding:12px 16px;gap:12px}
+  .head nav,.brand i{display:none}
+  .head .cta{margin-left:auto;padding:5px 11px;font-size:10px}
+  .hero{grid-template-columns:1fr;gap:24px;padding:28px 16px 22px}
+  h1{font-size:clamp(40px,11.6vw,54px)}
+  .lede{font-size:12px;line-height:1.85;margin-top:16px}
+  .actions{margin-top:18px}
+  .meta{margin-top:16px;font-size:8.5px}
+  .ed-body{padding:18px 16px 14px 34px;min-height:196px}
+  .ed-body::before{left:22px}
+  .ed-line{font-size:17px;min-height:5.1em}
+  .ed-note{font-size:9.5px}
+  .ed-foot{padding:8px 16px;font-size:7.5px;gap:10px}
+  .points{grid-template-columns:1fr;padding:0 16px}
+  .point{padding:16px 0;border-left:0;border-top:1px solid var(--line)}
+  .point:first-child{border-top:0;padding-top:18px}
+  .point h3{font-size:16px;margin:7px 0 4px}
+  .point p{font-size:11px}
+  .quote{padding:28px 16px 32px;margin-top:20px}
+  .band{padding:0 16px;margin-bottom:32px}
+  .band-inner{padding:20px;gap:14px}
+  .band .cta{margin-left:0}
+  footer{padding-left:16px;padding-right:16px;font-size:8px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .caret{animation:none}
+  .cta{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">TYPE / 03</p>
-    <div class="line"><span class="prompt">&gt;</span><span id="txt"></span><span class="caret" id="caret"></span></div>
-    <p class="sub">打字用 55ms/字，删字快一倍（28ms）；整句停 1.4 秒再退格。光标单独闪烁，不跟着字一起重绘。</p>
-  </div>
+
+<header class="head">
+  <a class="brand" href="#top">长文<i>LONGHAND</i></a>
+  <nav aria-label="主导航">
+    <a href="#top">写作</a>
+    <a href="#top">方法</a>
+    <a href="#top">定价</a>
+  </nav>
+  <p class="hint">看编辑器里的句子自己写下去</p>
+  <a class="cta" href="#start">开始写</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">A QUIET PLACE TO WRITE · 每日一页</p>
+      <h1>先把第一句，<br><em>写出来。</em></h1>
+      <p class="lede">没有格式、没有工具栏、没有红色提醒。打开就是一张纸，写满一页，再管别的。</p>
+      <div class="actions">
+        <a class="cta" href="#start">打开一张纸 →</a>
+        <a class="link" href="#points">看看别人怎么写</a>
+      </div>
+      <p class="meta"><b>2,410,882</b> 页已经写下 · 平均 <b>17 分钟</b>进入状态</p>
+    </div>
+
+    <div class="editor" role="group" aria-label="写作编辑器示意：示例句子会自动输入、删除并循环">
+      <div class="ed-top"><span>DAY 01 · 09:41</span><span class="ed-state"><i></i>专注中</span></div>
+      <div class="ed-body">
+        <p class="ed-title">没有名字的草稿</p>
+        <p class="ed-line" aria-hidden="true"><span id="typed"></span><span class="caret"></span></p>
+        <p class="ed-note" aria-hidden="true">从这里开始，写慢一点也没关系。</p>
+      </div>
+      <div class="ed-foot" aria-hidden="true"><span><b id="count">000</b> 字</span><span class="goal">今日目标 500</span><span>···</span></div>
+    </div>
+  </section>
+
+  <section class="points" id="points" aria-label="写作方法">
+    <article class="point">
+      <span>01 / OPEN</span>
+      <h3>打开就写</h3>
+      <p>不用新建文档。今天的一页已经在等你，标题以后再取。</p>
+    </article>
+    <article class="point">
+      <span>02 / FOCUS</span>
+      <h3>一次只做一件事</h3>
+      <p>工具栏在你停笔 8 秒后才回来。专心这件事，不靠意志力。</p>
+    </article>
+    <article class="point">
+      <span>03 / SHAPE</span>
+      <h3>写完再排版</h3>
+      <p>标题、引用、注释留到第二遍。第一遍只负责把话说完。</p>
+    </article>
+  </section>
+
+  <section class="quote">
+    <blockquote>写作不是把话说漂亮，<br>是把自己<em>说清楚</em>。</blockquote>
+    <p>陈默 ·《慢写》作者</p>
+  </section>
+
+  <section class="band" id="start">
+    <div class="band-inner">
+      <div>
+        <h2>今天还有 12 个小时可以写。</h2>
+        <p>不用挑日子。打开一张纸，先写一句。</p>
+      </div>
+      <a class="cta" href="#start">打开一张纸 →</a>
+    </div>
+  </section>
 </main>
-<p class="hint">它会自己循环</p>
+
+<footer>
+  <span>长文 LONGHAND · 一个安静的地方</span>
+  <span>WRITE SLOWLY</span>
+  <span>© 2026</span>
+</footer>
+
 <script>
 (function () {
-  var txt = document.getElementById('txt');
-  var lines = ['把一个想法做完。', '让页面会呼吸。', '把复杂留给自己。'];
-  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduce) { txt.textContent = lines[0]; return; }
+  var txt = document.getElementById('typed');
+  var count = document.getElementById('count');
+  var lines = [
+    '海风把窗帘吹起来，像一封还没写完的信。',
+    '我决定先把今天记下来，再想它有没有用。',
+    '写作不是把话说漂亮，是把自己说清楚。'
+  ];
+  function setCount() {
+    count.textContent = String(txt.textContent.length).padStart(3, '0');
+  }
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    txt.textContent = lines[0];
+    setCount();
+    return;
+  }
 
   var i = 0, pos = 0, deleting = false;
   function tick() {
@@ -50,11 +247,13 @@ body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI
     if (!deleting) {
       pos++;
       txt.textContent = s.slice(0, pos);
+      setCount();
       if (pos === s.length) { deleting = true; return setTimeout(tick, 1400); }
       return setTimeout(tick, 62 + Math.random() * 48);
     }
     pos--;
     txt.textContent = s.slice(0, pos);
+    setCount();
     if (pos === 0) {
       deleting = false;
       i = (i + 1) % lines.length;
@@ -63,6 +262,61 @@ body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI
     setTimeout(tick, 28);
   }
   setTimeout(tick, 400);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>流光边框 · AURUM 金属卡</title>
+<style>
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+:root{--bg:#090b10;--bg2:#0b0e14;--ink:#f1f3f0;--muted:rgba(241,243,240,.52);--line:rgba(255,255,255,.08);--gold:#ffcf6e;--ice:#8ef0ff}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(90% 70% at 50% 0%,#121721,#090b10 68%) fixed;color:var(--ink);
+  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+
+/* 顶栏 */
+.nav{position:sticky;top:0;z-index:6;background:rgba(9,11,16,.5);
+  backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);
+  border-bottom:1px solid var(--line)}
+.nav-in{width:min(1180px,calc(100% - 48px));margin:0 auto;height:64px;display:flex;align-items:center;gap:26px}
+.brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+  font:600 13px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em}
+.brand i{width:17px;height:17px;border-radius:5px;flex:0 0 17px;
+  background:conic-gradient(from var(--ang),#ffcf6e,#8ef0ff 38%,#ffcf6e 72%,#ffcf6e);
+  animation:turn 6.4s linear infinite}
+.brand span{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:rgba(241,243,240,.4)}
+.nav nav{display:flex;gap:22px}
+.nav nav a{font-size:11.5px;letter-spacing:.05em;color:rgba(241,243,240,.58);text-decoration:none;transition:color .2s}
+.nav nav a:hover{color:var(--ink)}
+.hint{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 auto;padding:4px 9px;
+  font-size:11px;color:rgba(241,243,240,.6);white-space:nowrap;
+  background:rgba(128,128,128,.1);border:1px solid rgba(128,128,128,.18);border-radius:999px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);flex:0 0 5px}
+.nav-cta{flex:0 0 auto;height:31px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;
+  border:1px solid rgba(255,207,110,.36);color:var(--gold);text-decoration:none;font-size:11.5px;
+  background:rgba(255,207,110,.07);transition:background .2s}
+.nav-cta:hover{background:rgba(255,207,110,.15)}
+
+/* 首屏 */
+.hero{min-height:calc(100vh - 65px);padding:clamp(40px,8vh,88px) 0 42px;
+  display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(32px,5vw,70px);align-items:center}
+.hero-copy{max-width:560px}
+.kicker{margin:0;font:600 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(241,243,240,.48)}
+h1{margin:16px 0 0;font-size:clamp(40px,6.2vw,70px);line-height:1;letter-spacing:-.045em;font-weight:600;max-width:8.5em}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;
+  background:linear-gradient(100deg,var(--gold),#fff2cf 42%,var(--ice));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{margin:20px 0 0;max-width:31em;font-size:13.5px;line-height:1.85;color:var(--muted)}
+.actions{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{height:44px;padding:0 20px;border-radius:999px;display:inline-flex;align-items:center;
+  font-size:12px;letter-spacing:.03em;text-decoration:none;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s}
+.btn.solid{background:linear-gradient(100deg,var(--gold),#ffe6b0);border-color:var(--gold);color:#1a1408}
+.btn.solid:hover{background:linear-gradient(100deg,#ffd98a,#fff0cd)}
+.btn.ghost{border-color:rgba(241,243,240,.24);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold)}
+.terms{margin:16px 0 0;font:400 9.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(241,243,240,.36)}
+
+/* 两张卡：流动边框在 1.5px 的 padding 里，内部盖实底 */
+.cards{position:relative;justify-self:end;width:min(460px,100%);
+  display:flex;flex-direction:column;align-items:flex-start}
+.ring{position:relative;width:86%;aspect-ratio:1.66;border-radius:18px;padding:1.5px;overflow:hidden;
+  background:conic-gradient(from var(--ang),rgba(255,255,255,.07) 0 66%,var(--gold) 77%,var(--ice) 85%,rgba(255,255,255,.07) 95%);
+  animation:turn 6.4s linear infinite;
+  box-shadow:0 26px 60px -30px rgba(0,0,0,.9)}
+.ring.alt{animation:turn 8.2s linear infinite reverse;align-self:flex-end;margin-top:-7%;z-index:2}
+@keyframes turn{to{--ang:360deg}}
+.ring .in{position:relative;z-index:1;border-radius:16.5px;background:linear-gradient(155deg,#11151d,#0b0e14 62%,#0c1017);
+  height:100%;padding:17px 18px 15px;display:flex;flex-direction:column;justify-content:space-between}
+.ring.alt .in{background:linear-gradient(155deg,#0c1420,#090d14 62%,#0b1119)}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-top b{font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.28em;color:var(--gold)}
+.ring.alt .card-top b{color:var(--ice)}
+.card-top span{font:500 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(241,243,240,.34)}
+.card-mid{display:flex;align-items:center;gap:14px}
+.chip{width:32px;height:23px;border-radius:5px;flex:0 0 32px;border:1px solid rgba(255,207,110,.42);
+  background:linear-gradient(135deg,rgba(255,207,110,.36),rgba(142,240,255,.14));position:relative}
+.chip::before{content:"";position:absolute;inset:6px 5px;border-left:1px solid rgba(10,10,10,.4);border-right:1px solid rgba(10,10,10,.4)}
+.ring.alt .chip{border-color:rgba(142,240,255,.42);background:linear-gradient(135deg,rgba(142,240,255,.26),rgba(255,207,110,.16))}
+.card-num{font:500 clamp(11px,1.5vw,15px)/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:rgba(241,243,240,.82);white-space:nowrap}
+.card-foot{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  font:500 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(241,243,240,.36)}
+.card-foot .mark{font-size:8.5px;letter-spacing:.2em;color:rgba(241,243,240,.6)}
+
+/* 权益 */
+.solid{background:var(--bg);border-top:1px solid rgba(255,255,255,.07)}
+.benefits{padding:clamp(62px,10vh,106px) 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px}
+.eyebrow{margin:0;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:rgba(255,207,110,.62)}
+h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spacing:-.04em;font-weight:600}
+.sec-head>p{margin:0;max-width:30em;font-size:12.5px;line-height:1.85;color:var(--muted);justify-self:end;text-align:right}
+.benefit-grid{margin-top:42px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.benefit{border:1px solid var(--line);border-radius:14px;padding:20px;
+  background:linear-gradient(180deg,rgba(20,25,34,.6),rgba(10,13,19,.86));transition:border-color .25s,transform .25s}
+.benefit:hover{border-color:rgba(255,207,110,.28);transform:translateY(-3px)}
+.benefit b{font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--gold)}
+.benefit h3{margin:10px 0 0;font-size:16px;letter-spacing:-.01em}
+.benefit p{margin:8px 0 0;font-size:11.5px;line-height:1.85;color:rgba(241,243,240,.52)}
+.benefit .meta{margin-top:16px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.12);
+  font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(241,243,240,.36)}
+
+/* 费率 */
+.rates{background:var(--bg2);border-top:1px solid rgba(255,255,255,.07);padding:clamp(58px,9vh,98px) 0}
+.rates-table{width:100%;margin-top:36px;border-collapse:collapse;text-align:left}
+.rates-table th,.rates-table td{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
+.rates-table thead th{font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(241,243,240,.38)}
+.rates-table thead th:nth-child(2){color:var(--gold)}
+.rates-table thead th:nth-child(3){color:var(--ice)}
+.rates-table tbody th{font-size:11.5px;font-weight:400;color:rgba(241,243,240,.5)}
+.rates-table td{font:500 12.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.02em;color:rgba(241,243,240,.85)}
+.rates-table tr:last-child th,.rates-table tr:last-child td{border-bottom:0}
+.rates .cap{margin:16px 0 0;font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(241,243,240,.32)}
+
+/* 工艺 */
+.craft{background:var(--bg);border-top:1px solid rgba(255,255,255,.07);padding:clamp(58px,9vh,98px) 0}
+.craft-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(30px,5vw,72px);align-items:start}
+.craft-copy p{max-width:30em;margin:18px 0 0;font-size:12.5px;line-height:1.9;color:var(--muted)}
+.craft-copy .aside{margin-top:26px;padding-left:16px;border-left:1px solid rgba(255,207,110,.32);
+  font:400 12.5px/1.8 Georgia,"Songti SC",serif;color:rgba(241,243,240,.66)}
+.craft-copy .aside em{color:var(--gold)}
+.params{margin:0;border-top:1px solid rgba(255,255,255,.12)}
+.params div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:9px 0;
+  border-bottom:1px dashed rgba(255,255,255,.1);font:400 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em}
+.params dt{color:rgba(241,243,240,.42)}
+.params dd{margin:0;color:rgba(241,243,240,.82);text-align:right}
+.craft .cap{margin:14px 0 0;font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(241,243,240,.32)}
+
+/* 引文 */
+.quote{background:var(--bg2);border-top:1px solid rgba(255,255,255,.07);padding:clamp(62px,10vh,108px) 0}
+.quote blockquote{margin:0;max-width:20em;font:400 clamp(27px,3.7vw,46px)/1.26 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+.quote blockquote em{font-style:italic;background:linear-gradient(100deg,var(--gold),var(--ice));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.quote .cite{margin:20px 0 0;font:400 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(241,243,240,.4)}
+
+/* 申请 */
+.cta{padding:clamp(72px,12vh,132px) 0;border-top:1px solid rgba(255,255,255,.09);
+  background:linear-gradient(180deg,rgba(9,11,16,.4),rgba(9,11,16,.8))}
+.cta-in{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.cta .kicker{color:rgba(255,207,110,.72)}
+.cta h2{margin:12px 0 0;font-size:clamp(32px,5vw,58px);line-height:1.02}
+.cta .note{margin:16px 0 0;max-width:31em;font-size:12px;line-height:1.85;color:var(--muted)}
+.cta-actions{display:flex;gap:10px;flex-wrap:wrap}
+.foot{background:#07090d;border-top:1px solid rgba(255,255,255,.08);padding:22px 0 28px}
+.foot-in{display:flex;flex-wrap:wrap;gap:10px 22px;font:400 9.5px/1.8 ui-monospace,Consolas,monospace;
+  letter-spacing:.08em;color:rgba(241,243,240,.34)}
+.foot-in span:last-child{margin-left:auto}
+
+/* 平板 */
+@media (max-width:900px){
+  .nav nav{display:none}
+  .hero{grid-template-columns:1fr;gap:36px;padding-top:44px;align-items:start;min-height:0}
+  .hero-copy{max-width:none}
+  .cards{justify-self:start;width:min(440px,100%)}
+  .sec-head{grid-template-columns:1fr;gap:12px}
+  .sec-head>p{justify-self:start;text-align:left}
+  .benefit-grid{grid-template-columns:1fr;gap:14px}
+  .craft-grid{grid-template-columns:1fr;gap:32px}
+}
+
+/* 手机 */
+@media (max-width:560px){
+  .nav-in{width:calc(100% - 32px);height:56px;gap:12px}
+  .brand span{display:none}
+  .hint{display:none}
+  .nav-cta{margin-left:auto;height:29px;padding:0 12px;font-size:11px}
+  .wrap{width:calc(100% - 32px)}
+  .hero{min-height:calc(100vh - 57px);padding:30px 0 28px;gap:30px}
+  h1{font-size:clamp(38px,11vw,48px);max-width:8em}
+  .lede{font-size:12.5px;margin-top:16px}
+  .actions{margin-top:20px}
+  .btn{height:42px;padding:0 17px}
+  .terms{font-size:8.5px}
+  .cards{width:100%}
+  .ring{width:100%}
+  .ring.alt{width:94%;margin-top:14px}
+  .ring .in{padding:14px 14px 12px}
+  .card-num{font-size:10.5px;letter-spacing:.1em}
+  .card-foot{font-size:6.5px;letter-spacing:.12em}
+  .card-foot .mark{font-size:7.5px}
+  .benefits{padding-top:52px}
+  .benefit-grid{margin-top:30px}
+  .rates-table th,.rates-table td{padding:11px 10px}
+  .rates-table td{font-size:11px}
+  .rates-table tbody th{font-size:10.5px}
+  .cta-in{align-items:flex-start}
+  .foot-in span:last-child{margin-left:0}
+}
+
+/* 画廊 600×450 紧凑首屏 */
+@media (max-height:560px) and (min-width:561px){
+  .nav-in{height:44px;gap:14px}
+  .brand span{display:none}
+  .nav nav{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .nav-cta{height:27px;padding:0 11px;font-size:10.5px}
+  .hero{min-height:calc(100vh - 45px);padding:10px 0;gap:26px;grid-template-columns:1.06fr .94fr;align-items:center}
+  .kicker{font-size:9px}
+  h1{margin-top:7px;font-size:clamp(27px,4.5vw,36px)}
+  .lede{margin-top:8px;font-size:10.5px;line-height:1.6;max-width:30em}
+  .actions{margin-top:10px;gap:8px}
+  .btn{height:32px;padding:0 13px;font-size:11px}
+  .terms{margin-top:8px;font-size:8px}
+  .cards{width:100%}
+  .ring{width:88%;border-radius:14px}
+  .ring .in{border-radius:12.5px;padding:11px 12px 10px}
+  .card-top b{font-size:9px}
+  .card-top span{font-size:6px}
+  .card-mid{gap:9px}
+  .chip{width:24px;height:17px;flex-basis:24px}
+  .chip::before{inset:4px 4px}
+  .card-num{font-size:9px;letter-spacing:.1em}
+  .card-foot{font-size:6px;letter-spacing:.1em}
+  .card-foot .mark{font-size:7px}
+}
+
+@media (hover:none){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .ring,.brand i{animation:none}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top"><i></i>AURUM<span>METAL CARD</span></a>
+    <nav aria-label="主导航">
+      <a href="#benefits">权益</a>
+      <a href="#rates">费率</a>
+      <a href="#craft">工艺</a>
+    </nav>
+    <p class="hint">边框自己在走，不需要操作</p>
+    <a class="nav-cta" href="#apply">申请</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <p class="kicker">AURUM · 金属信用卡 · 首批 2,000 张</p>
+      <h1>让卡面，<br><em>先亮起来。</em></h1>
+      <p class="lede">1.5 毫米的航空铝，边缘一圈会流动的光。结账的时候，收银台会多看你一眼。</p>
+      <div class="actions">
+        <a class="btn solid" href="#apply">申请这张卡 →</a>
+        <a class="btn ghost" href="#benefits">看权益</a>
+      </div>
+      <p class="terms">年费 ¥2,400 · 首年免 · 全球免货币转换费</p>
+    </div>
+    <div class="cards" aria-label="两种卡面">
+      <div class="ring">
+        <div class="in">
+          <div class="card-top"><b>AURUM</b><span>PRIMARY · 18 G</span></div>
+          <div class="card-mid">
+            <div class="chip" aria-hidden="true"></div>
+            <div class="card-num">•••• •••• •••• 4021</div>
+          </div>
+          <div class="card-foot"><span>LIN WEI</span><span>09 / 29</span><span class="mark">AURUM PAY</span></div>
+        </div>
+      </div>
+      <div class="ring alt">
+        <div class="in">
+          <div class="card-top"><b>AURUM</b><span>SUPPLEMENTARY</span></div>
+          <div class="card-mid">
+            <div class="chip" aria-hidden="true"></div>
+            <div class="card-num">•••• •••• •••• 8848</div>
+          </div>
+          <div class="card-foot"><span>SU YAO</span><span>09 / 29</span><span class="mark">AURUM PAY</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="benefits solid" id="benefits">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">01 / 权益</p>
+          <h2>卡是金属的，<br>服务也是。</h2>
+        </div>
+        <p>不积分、不玩阶梯。把最常用的三件事做好，其余写进费率表里，随时可查。</p>
+      </div>
+      <div class="benefit-grid">
+        <article class="benefit">
+          <b>LOUNGE / 01</b>
+          <h3>全球机场贵宾厅</h3>
+          <p>主卡无限次，可带一位同行。副卡每年六次，落地四小时内的转机也能用。</p>
+          <div class="meta">600+ 间 · 覆盖 110 个机场</div>
+        </article>
+        <article class="benefit">
+          <b>CASHBACK / 02</b>
+          <h3>餐饮返现 3.6%</h3>
+          <p>餐厅、咖啡馆、外卖都算。其余消费 1.2%，每月 5 号自动入账，不用手动兑换。</p>
+          <div class="meta">无上限 · 直接抵账单</div>
+        </article>
+        <article class="benefit">
+          <b>METAL / 03</b>
+          <h3>卡面终身保新</h3>
+          <p>铝面磨花了就换，一年一次免费。旧卡寄回后压成一块小铭牌，留给你。</p>
+          <div class="meta">18 g · 喷砂阳极氧化</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="rates" id="rates">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">02 / 费率</p>
+          <h2>主卡与副卡。</h2>
+        </div>
+        <p>副卡共享主卡额度，权益分开计算。两张卡都用同一圈流光边框，只是转速不同。</p>
+      </div>
+      <table class="rates-table">
+        <thead>
+          <tr><th scope="col">项目</th><th scope="col">主卡</th><th scope="col">副卡</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">年费</th><td>¥2,400，首年免</td><td>免费</td></tr>
+          <tr><th scope="row">餐饮返现</th><td>3.6%</td><td>1.2%</td></tr>
+          <tr><th scope="row">机场贵宾厅</th><td>无限次 · 可带一人</td><td>6 次 / 年</td></tr>
+          <tr><th scope="row">外币手续费</th><td>0</td><td>0</td></tr>
+          <tr><th scope="row">卡面换新</th><td>1 次 / 年</td><td>1 次 / 年</td></tr>
+        </tbody>
+      </table>
+      <p class="cap">利率与年费以申请页最终条款为准。副卡需主卡持有人担保。</p>
+    </div>
+  </section>
+
+  <section class="craft" id="craft">
+    <div class="wrap craft-grid">
+      <div class="craft-copy">
+        <p class="eyebrow">03 / 工艺</p>
+        <h2>光只走<br>1.5 毫米。</h2>
+        <p>边框不是贴图，是一条 conic-gradient 藏在 1.5px 的内边距里，内部再盖一块实底。只有角度变量在走，内容一动不动，所以整张卡很轻。</p>
+        <p class="aside">“金属会旧，光不会。<em>它只是慢下来。</em>”<br><span style="font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(241,243,240,.36)">卡片设计师 · 第 12 版样卡</span></p>
+      </div>
+      <div>
+        <dl class="params">
+          <div><dt>边框厚度</dt><dd>1.5 px</dd></div>
+          <div><dt>渐变</dt><dd>conic-gradient</dd></div>
+          <div><dt>动画变量</dt><dd>--ang（@property angle）</dd></div>
+          <div><dt>主卡</dt><dd>6.4s linear infinite</dd></div>
+          <div><dt>副卡</dt><dd>8.2s linear infinite reverse</dd></div>
+          <div><dt>内层</dt><dd>实底 #0d1017</dd></div>
+          <div><dt>降级</dt><dd>静态渐变描边，内容仍可读</dd></div>
+        </dl>
+        <p class="cap">不支持 @property 的浏览器只会看到静止的渐变环，不会闪烁。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="quote">
+    <div class="wrap">
+      <blockquote>第一次刷卡，<br>店员问我这是不是<em>真的能刷。</em></blockquote>
+      <p class="cite">持卡人 0174 · 上海 · 使用第 9 个月</p>
+    </div>
+  </section>
+
+  <section class="cta" id="apply">
+    <div class="wrap cta-in">
+      <div>
+        <p class="kicker">FIRST ISSUE · 318 / 2,000 LEFT</p>
+        <h2>第一批 2,000 张，<br>只剩 318 张。</h2>
+        <p class="note">申请后 3 个工作日内出额度结果。卡片从深圳寄出，顺丰保价。</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn solid" href="#apply">申请主卡</a>
+        <a class="btn ghost" href="#rates">再看费率</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>AURUM METAL CARD · 深圳 · 仅限受邀用户申请</span>
+    <span>边框由 conic-gradient 与 @property 驱动</span>
+  </div>
+</footer>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

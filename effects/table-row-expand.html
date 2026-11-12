@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>表格行展开 · NORTH 项目台</title>
+<style>
+:root{--bg:#f5f3ed;--ink:#121317;--muted:#7b7e85;--line:#e3dfd4;--accent:#2f5fd0;--card:#fff;--ok:#2f7a52}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+button{font:inherit}
+a{color:inherit}
+.topbar{height:56px;display:flex;align-items:center;gap:22px;padding:0 22px;border-bottom:1px solid var(--line);background:rgba(250,248,242,.9)}
+.brand{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;letter-spacing:.14em;text-decoration:none;white-space:nowrap}
+.brand i{width:15px;height:15px;border-radius:4px;background:var(--ink);position:relative}
+.brand i::after{content:"";position:absolute;inset:4px;background:var(--bg);border-radius:2px}
+.search{flex:1;max-width:360px;display:flex;align-items:center;gap:8px;height:32px;padding:0 11px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--muted);font-size:12px}
+.search input{border:0;outline:0;background:transparent;font:inherit;color:var(--ink);width:100%;min-width:0}
+.search kbd{font:9.5px ui-monospace,Consolas,monospace;border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--muted)}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+.icon-btn{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--muted);font-size:13px;cursor:pointer}
+.icon-btn:hover{color:var(--ink)}
+.avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(150deg,#dfe7fa,#a9bdea);color:#1d2c4d;font-size:10.5px;font-weight:700}
+.shell{display:grid;grid-template-columns:212px minmax(0,1fr);min-height:calc(100vh - 56px)}
+.sidebar{border-right:1px solid var(--line);padding:20px 12px;display:flex;flex-direction:column;gap:22px;background:rgba(250,248,242,.55)}
+.side-k{margin:0 0 7px;padding:0 9px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted)}
+.side-nav{display:grid;gap:2px}
+.side-nav a{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;font-size:12px;color:#5b5e65;text-decoration:none}
+.side-nav a:hover{background:rgba(20,20,15,.04);color:var(--ink)}
+.side-nav a.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(20,20,15,.06)}
+.side-nav a span{margin-left:auto;font:9.5px ui-monospace,Consolas,monospace;color:var(--muted)}
+.side-foot{margin-top:auto;padding:12px 9px 0;border-top:1px solid var(--line);font-size:10px;color:var(--muted);line-height:1.7}
+.usage{height:4px;border-radius:2px;background:#e7e3d8;margin:7px 0 5px;overflow:hidden}
+.usage i{display:block;height:100%;background:var(--accent);border-radius:inherit}
+.main{min-width:0;padding:22px 24px 24px}
+.pagehead{display:flex;align-items:flex-end;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.crumb{margin:0 0 4px;font:10px ui-monospace,Consolas,monospace;letter-spacing:.13em;color:var(--muted)}
+h1{margin:0;font-size:24px;letter-spacing:-.03em;font-weight:650}
+.sub{margin:4px 0 0;font-size:12px;color:var(--muted)}
+.primary{margin-left:auto;border:0;border-radius:8px;background:var(--ink);color:#fff;font-size:12px;font-weight:600;padding:9px 14px;cursor:pointer}
+.primary:hover{opacity:.9}
+.toolbar{display:flex;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);min-width:0;overflow-x:auto}
+.tabs button{border:0;background:transparent;font:inherit;font-size:12px;color:var(--muted);padding:8px 10px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--ink);font-weight:600;border-color:var(--accent)}
+.tabs button span{font:9.5px ui-monospace,Consolas,monospace;color:var(--muted);margin-left:3px}
+.filter{margin-left:auto;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:7px;background:#fff;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.contentgrid{display:grid;grid-template-columns:minmax(0,1fr) 264px;gap:18px;align-items:start}
+.panel{border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden;min-width:0}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);text-align:left;padding:11px 13px;background:#fbfaf7;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 13px;border-bottom:1px solid #efede6;vertical-align:middle}
+tbody:last-child tr:last-child td{border-bottom:0}
+tr:last-child td{border-bottom:0}
+td.name{font-weight:600;white-space:nowrap}
+td.name .code{display:block;font:9px ui-monospace,Consolas,monospace;font-weight:400;letter-spacing:.08em;color:var(--muted);margin-top:1px}
+td.dim{color:var(--muted);white-space:nowrap}
+.toggle{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;padding:0;color:inherit;font:inherit;font-weight:600;cursor:pointer}
+.toggle i{display:inline-block;width:0;height:0;border-left:4.5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;
+  transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.toggle[aria-expanded="true"] i{transform:rotate(90deg)}
+.toggle:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.who{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.who i{width:21px;height:21px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:9px;font-weight:700}
+.a1{background:#e4e9f7;color:#2c3f6b}
+.a2{background:#f4e5dc;color:#7b4a2d}
+.a3{background:#e0efe6;color:#2c6147}
+.st{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:500;white-space:nowrap}
+.st::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.doing{color:#2f5fd0;background:#eaf0fc}
+.review{color:#9a6500;background:#fbf0d9}
+.done{color:var(--ok);background:#e7f4ec}
+.prog{display:flex;align-items:center;gap:8px;min-width:90px}
+.bar{width:54px;height:4px;border-radius:2px;background:#eceadf;overflow:hidden;flex:0 0 54px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:inherit}
+.bar.done i{background:var(--ok)}
+.prog b{font:9.5px ui-monospace,Consolas,monospace;color:var(--muted);font-weight:400}
+.detail td{padding:0;border-bottom:0;background:#faf9f5}
+.detail .gridwrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(.2,.8,.2,1)}
+.detail.open .gridwrap{grid-template-rows:1fr}
+.detail .inner{overflow:hidden}
+.detail .body{padding:12px 14px 14px 28px;font-size:11.5px;line-height:1.75;color:#555861}
+.detailgrid{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
+.detailgrid > div{max-width:38em;min-width:200px}
+.detailgrid b{color:var(--ink);font-weight:600}
+.detailgrid p{margin:3px 0 0}
+.detailgrid dl{display:flex;gap:22px;margin:0;flex-wrap:wrap}
+.detailgrid dt{font:9px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);margin-bottom:2px}
+.detailgrid dd{margin:0;font-size:11px;color:var(--ink)}
+.chips{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.chips span{border:1px solid var(--line);border-radius:999px;padding:2px 8px;font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);background:#fff}
+.sidecards{display:grid;gap:14px}
+.mini{border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px}
+.mini-k{margin:0 0 10px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats b{display:block;font:600 22px/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em}
+.stats span{font-size:10px;color:var(--muted)}
+.risk{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:10.5px;line-height:1.7;color:#7b5a2d;background:#fdf8ee;border-radius:6px;padding:8px 9px;border:1px solid #f0e4ca}
+.feed{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+.feed li{display:flex;gap:8px;align-items:flex-start}
+.feed i{flex:0 0 20px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:8.5px;font-weight:700}
+.feed p{margin:0;font-size:10.5px;line-height:1.55;color:#55585f}
+.feed p b{color:var(--ink);font-weight:600}
+.feed span{display:block;font:9px ui-monospace,Consolas,monospace;color:var(--muted);margin-top:2px}
+.pager{display:flex;align-items:center;gap:14px;margin-top:12px;font-size:10.5px;color:var(--muted)}
+.pages{margin-left:auto;display:flex;gap:4px}
+.pages button{width:24px;height:24px;border:1px solid var(--line);border-radius:6px;background:#fff;font:10px ui-monospace,Consolas,monospace;color:var(--muted);cursor:pointer}
+.pages button[aria-current="page"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.hint{position:fixed;left:auto;right:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:3}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-width:980px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .contentgrid{grid-template-columns:1fr}
+  .sidecards{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .topbar{gap:10px;padding:0 14px;height:50px}
+  .search{max-width:none}
+  .search kbd{display:none}
+  .main{padding:16px 14px}
+  h1{font-size:20px}
+  th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5){display:none}
+  th,td{padding:9px 9px}
+  .pagehead .sub{display:none}
+  .filter{display:none}
+  .sidecards{grid-template-columns:1fr}
+  .detail .body{padding-left:12px}
+  .detailgrid{gap:10px}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:42px;padding:0 14px}
+  .search{height:28px}
+  .shell{min-height:calc(100vh - 42px)}
+  .main{padding:12px 14px}
+  .pagehead{margin-bottom:8px;align-items:center}
+  .crumb{display:none}
+  h1{font-size:18px}
+  .sub{display:none}
+  .primary{padding:6px 10px;font-size:11px}
+  .toolbar{margin-bottom:8px}
+  .tabs button{padding:6px 9px}
+  .filter{display:block}
+  th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5){display:table-cell}
+  th{padding:8px 12px}
+  td{padding:7px 12px}
+  .detail .body{padding:9px 12px 10px 26px;line-height:1.65}
+  .detailgrid dl{gap:14px}
+  .pager{display:none}
+  .hint{left:auto;right:12px;bottom:10px;font-size:10px}
+}
+@media (max-height:560px) and (min-width:561px) and (max-width:980px){
+  .sidecards{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .detail .gridwrap,.toggle i{transition:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#"><i></i>NORTH</a>
+  <label class="search">
+    <span aria-hidden="true">⌕</span>
+    <input type="search" placeholder="搜索项目、成员或文档" aria-label="搜索项目、成员或文档">
+    <kbd>/</kbd>
+  </label>
+  <div class="top-actions">
+    <button class="icon-btn" type="button" aria-label="通知">◔</button>
+    <span class="avatar" aria-label="账户：陈默">陈</span>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="sidebar" aria-label="侧栏">
+    <div>
+      <p class="side-k">工作区</p>
+      <nav class="side-nav">
+        <a href="#">工作台</a>
+        <a class="on" href="#" aria-current="page">项目<span>12</span></a>
+        <a href="#">成员<span>8</span></a>
+        <a href="#">报表</a>
+      </nav>
+    </div>
+    <div>
+      <p class="side-k">设置</p>
+      <nav class="side-nav">
+        <a href="#">偏好</a>
+        <a href="#">集成</a>
+      </nav>
+    </div>
+    <div class="side-foot">
+      存储 68%
+      <div class="usage"><i style="width:68%"></i></div>
+      34.2 GB / 50 GB
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="pagehead">
+      <div>
+        <p class="crumb">工作区 / 项目</p>
+        <h1>项目</h1>
+        <p class="sub">本季度 12 个项目，5 个正在进行。</p>
+      </div>
+      <button class="primary" type="button">＋ 新建项目</button>
+    </div>
+
+    <div class="toolbar">
+      <div class="tabs" role="tablist" aria-label="按状态筛选">
+        <button role="tab" type="button" aria-selected="true" data-filter="all">全部 <span>3</span></button>
+        <button role="tab" type="button" aria-selected="false" data-filter="doing" tabindex="-1">进行中 <span>1</span></button>
+        <button role="tab" type="button" aria-selected="false" data-filter="review" tabindex="-1">待评审 <span>1</span></button>
+        <button role="tab" type="button" aria-selected="false" data-filter="done" tabindex="-1">已完成 <span>1</span></button>
+      </div>
+      <button class="filter" type="button">排序：最近更新 ▾</button>
+    </div>
+
+    <div class="contentgrid">
+      <section class="panel">
+        <table>
+          <thead><tr><th scope="col">项目</th><th scope="col">负责人</th><th scope="col">状态</th><th scope="col">更新</th><th scope="col">进度</th></tr></thead>
+          <tbody data-status="doing">
+            <tr>
+              <td class="name"><button class="toggle" type="button" aria-expanded="true" aria-controls="d1"><i></i>星野计划</button><span class="code">PRJ-104</span></td>
+              <td><span class="who"><i class="a1">林</i>林一</span></td>
+              <td><span class="st doing">进行中</span></td>
+              <td class="dim">2 小时前</td>
+              <td><div class="prog"><span class="bar"><i style="width:68%"></i></span><b>68%</b></div></td>
+            </tr>
+            <tr class="detail open" id="d1"><td colspan="5"><div class="gridwrap"><div class="inner"><div class="body">
+              <div class="detailgrid">
+                <div><b>下一步</b><p>首页三屏的排版定稿，再补一版移动端。封面素材还没齐，先用占位顶住。</p></div>
+                <dl><div><dt>截止</dt><dd>11 月 20 日</dd></div><div><dt>评论</dt><dd>8 条</dd></div><div><dt>参与</dt><dd>3 人</dd></div></dl>
+              </div>
+              <div class="chips"><span>DESIGN</span><span>封面待补</span><span>本周五评审</span></div>
+            </div></div></div></td></tr>
+          </tbody>
+          <tbody data-status="review">
+            <tr>
+              <td class="name"><button class="toggle" type="button" aria-expanded="false" aria-controls="d2"><i></i>潮汐笔记</button><span class="code">PRJ-097</span></td>
+              <td><span class="who"><i class="a2">周</i>周舟</span></td>
+              <td><span class="st review">待评审</span></td>
+              <td class="dim">昨天</td>
+              <td><div class="prog"><span class="bar"><i style="width:42%"></i></span><b>42%</b></div></td>
+            </tr>
+            <tr class="detail" id="d2"><td colspan="5"><div class="gridwrap"><div class="inner"><div class="body">
+              <div class="detailgrid">
+                <div><b>下一步</b><p>长文的目录与边注再收一轮，重点检查 390 宽下的折行，周四前交给编辑。</p></div>
+                <dl><div><dt>截止</dt><dd>11 月 14 日</dd></div><div><dt>评论</dt><dd>3 条</dd></div><div><dt>参与</dt><dd>2 人</dd></div></dl>
+              </div>
+              <div class="chips"><span>EDITORIAL</span><span>等待评审</span><span>390 宽</span></div>
+            </div></div></div></td></tr>
+          </tbody>
+          <tbody data-status="done">
+            <tr>
+              <td class="name"><button class="toggle" type="button" aria-expanded="false" aria-controls="d3"><i></i>苔原后台</button><span class="code">PRJ-082</span></td>
+              <td><span class="who"><i class="a3">陈</i>陈默</span></td>
+              <td><span class="st done">已完成</span></td>
+              <td class="dim">10 月 28 日</td>
+              <td><div class="prog"><span class="bar done"><i style="width:100%"></i></span><b>100%</b></div></td>
+            </tr>
+            <tr class="detail" id="d3"><td colspan="5"><div class="gridwrap"><div class="inner"><div class="body">
+              <div class="detailgrid">
+                <div><b>结论</b><p>表格密度与筛选状态已经稳定，剩下的是导出与权限两件事，已拆到下一期。</p></div>
+                <dl><div><dt>完成</dt><dd>10 月 28 日</dd></div><div><dt>评论</dt><dd>12 条</dd></div><div><dt>参与</dt><dd>4 人</dd></div></dl>
+              </div>
+              <div class="chips"><span>DASHBOARD</span><span>已归档</span><span>下一期跟进</span></div>
+            </div></div></div></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <aside class="sidecards" aria-label="项目概览">
+        <div class="mini">
+          <p class="mini-k">本周概览</p>
+          <div class="stats">
+            <div><b>3</b><span>完成</span></div>
+            <div><b>2</b><span>待评审</span></div>
+            <div><b>1</b><span>风险</span></div>
+          </div>
+          <div class="risk">苔原后台的导出任务延迟 2 天，已通知负责人。</div>
+        </div>
+        <div class="mini">
+          <p class="mini-k">最近活动</p>
+          <ul class="feed">
+            <li><i class="a1">林</i><p><b>林一</b> 更新了「星野计划」的封面<span>12 分钟前</span></p></li>
+            <li><i class="a2">周</i><p><b>周舟</b> 提交了「潮汐笔记」评审<span>1 小时前</span></p></li>
+            <li><i class="a3">陈</i><p><b>陈默</b> 关闭了 3 个导出任务<span>昨天 18:40</span></p></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <div class="pager">
+      显示 1–3 / 共 3 个项目
+      <div class="pages"><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button></div>
+    </div>
+  </main>
+</div>
+
+<p class="hint">点项目名展开一行细节</p>
+<script>
+(function () {
+  var btns = [].slice.call(document.querySelectorAll('.toggle'));
+
+  function closeAll(except) {
+    btns.forEach(function (b) {
+      if (b === except) return;
+      b.setAttribute('aria-expanded', 'false');
+      var r = document.getElementById(b.getAttribute('aria-controls'));
+      if (r) r.classList.remove('open');
+    });
+  }
+
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var row = document.getElementById(btn.getAttribute('aria-controls'));
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      closeAll(btn);
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      row.classList.toggle('open', !open);
+    });
+  });
+
+  var tabs = [].slice.call(document.querySelectorAll('.tabs [role="tab"]'));
+  var groups = [].slice.call(document.querySelectorAll('tbody[data-status]'));
+
+  function select(tab, focus) {
+    var filter = tab.dataset.filter;
+    tabs.forEach(function (t) {
+      t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+      t.tabIndex = t === tab ? 0 : -1;
+    });
+    groups.forEach(function (g) {
+      g.hidden = filter !== 'all' && g.dataset.status !== filter;
+    });
+    closeAll(null);
+    if (focus) tab.focus();
+  }
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () { select(tab); });
+    tab.addEventListener('keydown', function (e) {
+      var i = tabs.indexOf(tab), n = null;
+      if (e.key === 'ArrowRight') n = tabs[(i + 1) % tabs.length];
+      if (e.key === 'ArrowLeft') n = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (e.key === 'Home') n = tabs[0];
+      if (e.key === 'End') n = tabs[tabs.length - 1];
+      if (!n) return;
+      e.preventDefault();
+      select(n, true);
+    });
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

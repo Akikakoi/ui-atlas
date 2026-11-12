@@ -3,73 +3,338 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>阅读进度与章节 · UI Atlas 动效</title>
+<title>阅读进度与章节 · ATLAS 工程博客</title>
 <style>
-:root{--bg:#f6f5f1;--ink:#121316;--muted:#7b7e85;--line:#e5e2d9;--accent:#2f5fd0}
+:root{--bg:#f7f8fa;--panel:#fff;--ink:#101319;--muted:#667085;--line:#e2e6ee;--accent:#2f5fd0;--soft:#eaefff;--code:#0e1524}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-#bar{position:fixed;left:0;top:0;height:3px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:0 50%;z-index:5}
-.stage{max-width:600px;margin:0 auto;padding:46px 54px 100px 22px;position:relative}
-.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-h1{margin:0 0 10px;font-size:clamp(25px,5.8vw,38px);line-height:1.12;letter-spacing:-.032em;font-weight:650}
-.lede{margin:0 0 34px;font-size:13.5px;line-height:1.85;color:var(--muted);max-width:32em}
-section{padding:26px 0;border-top:1px solid var(--line)}
-section h2{margin:0 0 8px;font-size:17px;letter-spacing:-.01em}
-section h2 span{font:600 10px/1 ui-monospace,Consolas,monospace;color:var(--accent);letter-spacing:.12em;margin-right:9px}
-section p{margin:0;font-size:13.5px;line-height:1.9;color:#4b4e55;max-width:34em}
-.dots{position:fixed;right:14px;top:50%;transform:translateY(-50%);display:grid;gap:12px;z-index:4}
-.dots a{display:flex;align-items:center;gap:8px;justify-content:flex-end;text-decoration:none;color:var(--muted);font-size:10px;letter-spacing:.08em}
-.dots a i{width:6px;height:6px;border-radius:50%;background:#cbc7bc;transition:background .25s,transform .25s}
-.dots a.on i{background:var(--accent);transform:scale(1.6)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+#bar{position:fixed;left:0;top:0;height:3px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:0 50%;z-index:30}
+.nav{position:sticky;top:0;z-index:20;height:58px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1080px)/2));background:rgba(247,248,250,.9);border-bottom:1px solid var(--line);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:baseline;gap:9px;font:700 14px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;white-space:nowrap}
+.brand span{font:500 9px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.nav-links{display:flex;gap:22px;margin-left:auto;font-size:12px;color:var(--muted)}
+.nav-links a:hover{color:var(--ink)}
+.nav-sub{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--ink);white-space:nowrap}
+.nav-sub:hover{border-color:var(--accent);color:var(--accent)}
+
+.dots{position:fixed;right:max(18px,calc((100vw - 1200px)/2));top:50%;transform:translateY(-50%);z-index:6;display:grid;gap:13px}
+.dots a{display:flex;align-items:center;justify-content:flex-end;gap:9px;text-decoration:none;color:var(--muted);
+  font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em}
+.dots a i{width:6px;height:6px;border-radius:50%;background:#c9d0dd;transition:background .25s,transform .25s}
 .dots a.on{color:var(--ink)}
+.dots a.on i{background:var(--accent);transform:scale(1.6)}
 .dots b{font-weight:600;opacity:0;transition:opacity .2s}
 .dots a.on b{opacity:1}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (max-width:520px){.dots{display:none}.stage{padding-right:22px}}
-@media (prefers-reduced-motion:reduce){#bar{transition:none}}
 
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.stage{max-width:780px;margin:0 auto;padding:54px 22px 84px}
+.kicker{margin:0 0 16px;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--accent)}
+h1{margin:0;font-size:clamp(38px,5.6vw,62px);line-height:1.04;letter-spacing:-.05em;font-weight:650}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{margin:20px 0 0;max-width:36em;font-size:14.5px;line-height:1.95;color:#4b5565}
+.byline{display:flex;flex-wrap:wrap;gap:6px 20px;margin:22px 0 0;font:600 9px/1.7 ui-monospace,Consolas,monospace;
+  letter-spacing:.1em;color:var(--muted)}
+.byline b{color:var(--ink);font-weight:600}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:28px 0 0;background:var(--line);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.metrics div{background:var(--panel);padding:15px 16px}
+.metrics b{display:block;font:600 25px/1 ui-monospace,Consolas,monospace;letter-spacing:-.04em;color:var(--accent)}
+.metrics span{display:block;margin-top:7px;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+article>section{padding:34px 0 4px;border-top:1px solid var(--line);margin-top:38px;scroll-margin-top:80px}
+article>section:first-of-type{margin-top:44px}
+h2{margin:0 0 16px;font-size:clamp(21px,2.7vw,27px);line-height:1.3;letter-spacing:-.025em;font-weight:640}
+h2 .no{display:inline-block;margin-right:10px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--accent);vertical-align:2px}
+section p{margin:0 0 16px;font-size:14.5px;line-height:2;color:#3f4856;max-width:36em}
+section p:last-child{margin-bottom:22px}
+section code{font:12px/1.5 ui-monospace,Consolas,monospace;background:var(--soft);border-radius:4px;padding:1px 5px;color:#274bb0}
+.fixlist{list-style:none;margin:0 0 20px;padding:0;border-top:1px solid var(--line)}
+.fixlist li{display:grid;grid-template-columns:92px minmax(0,1fr);gap:14px;padding:13px 0;border-bottom:1px solid var(--line);
+  font-size:13.5px;line-height:1.85;color:#3f4856}
+.fixlist b{font:600 9px/1.9 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+pre{margin:0 0 20px;padding:18px 20px;border-radius:12px;background:var(--code);color:#d7e0f4;overflow-x:auto;
+  font:12px/1.75 ui-monospace,Consolas,monospace;letter-spacing:0}
+pre .c{color:#7583a3}
+pre .k{color:#8fb4ff}
+pre .s{color:#a9d9b4}
+blockquote{margin:30px 0 26px;padding:22px 0 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  font:italic 400 clamp(22px,2.7vw,28px)/1.5 Georgia,"Songti SC",serif;letter-spacing:-.015em;color:#232a36}
+blockquote span{color:var(--accent)}
+table{width:100%;border-collapse:collapse;margin:0 0 22px;font-size:13px}
+caption{caption-side:top;text-align:left;margin-bottom:9px;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line)}
+th{font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+td:nth-child(2),td:nth-child(3){font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+td:last-child{text-align:right}
+tr:last-child td{border-bottom:0}
+.recap{margin:26px 0 0;padding:18px 20px;border:1px solid #d3ddf5;border-radius:12px;background:linear-gradient(120deg,#f2f6ff,#fafbff);
+  font-size:12.5px;line-height:1.9;color:#3f4a5c}
+.recap b{color:var(--accent);font-weight:650}
+.next{margin:38px 0 0;padding-top:20px;border-top:1px solid var(--line);display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  font:10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.next b{display:block;font:600 14px/1.5 -apple-system,"PingFang SC",sans-serif;letter-spacing:-.01em;color:var(--ink)}
+.next a{margin-left:auto;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent)}
+footer{max-width:1080px;margin:0 auto;padding:22px 22px 30px;border-top:1px solid var(--line);
+  display:flex;gap:18px;flex-wrap:wrap;font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+footer b{font-weight:600;color:var(--ink)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;pointer-events:none;
+  font-size:11px;letter-spacing:.04em;color:var(--muted);background:rgba(128,128,128,.1);border:1px solid rgba(128,128,128,.18);
+  border-radius:999px;padding:4px 9px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:820px){
+  .nav{gap:16px}
+  .nav-links{display:none}
+  .dots{display:none}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:10px}
+  .brand{font-size:12px}
+  .brand span{display:none}
+  .nav-sub{margin-left:auto;padding:6px 11px;font-size:9px}
+  .stage{padding:32px 16px 58px}
+  h1{font-size:clamp(34px,10.4vw,46px)}
+  .lede{font-size:13px;line-height:1.9;margin-top:14px}
+  .byline{gap:5px 14px;font-size:8.5px;margin-top:16px}
+  .metrics{margin-top:20px}
+  .metrics div{padding:10px 9px}
+  .metrics b{font-size:18px}
+  .metrics span{font-size:7.5px;margin-top:5px}
+  article>section{margin-top:28px;padding-top:26px}
+  section p{font-size:13px;line-height:1.9}
+  .fixlist li{grid-template-columns:68px minmax(0,1fr);gap:10px;font-size:12px;padding:10px 0}
+  .fixlist b{font-size:8px}
+  pre{font-size:10.5px;padding:14px 12px}
+  blockquote{font-size:20px;margin:24px 0}
+  caption{display:none}
+  th,td{padding:9px 4px;font-size:11.5px}
+  td:nth-child(2),td:nth-child(3){font-size:11px}
+  .next{gap:8px}
+  .next a{margin-left:0}
+  footer{padding:18px 16px 24px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:44px;padding:0 18px;gap:16px}
+  .brand{font-size:11px}
+  .brand span,.nav-links{display:none}
+  .nav-sub{padding:5px 10px;font-size:9px}
+  .stage{max-width:none;padding:18px 64px 40px 20px}
+  .kicker{font-size:8px;margin-bottom:8px}
+  h1{font-size:clamp(26px,3.8vw,32px);letter-spacing:-.04em}
+  h1 br{display:none}
+  .lede{display:none}
+  .byline{margin-top:8px;font-size:8px;gap:5px 14px}
+  .metrics{margin-top:12px}
+  .metrics div{padding:8px 10px}
+  .metrics b{font-size:17px}
+  .metrics span{font-size:7.5px;margin-top:4px}
+  article>section{margin-top:18px;padding:14px 0 0}
+  article>section:first-of-type{margin-top:18px}
+  h2{font-size:16px;margin-bottom:7px}
+  section p{font-size:10.5px;line-height:1.7;margin-bottom:8px}
+  section p:last-child{margin-bottom:10px}
+  .fixlist li{font-size:10px;grid-template-columns:54px 1fr;padding:6px 0}
+  .fixlist b{font-size:7px}
+  pre{display:none}
+  blockquote{display:none}
+  table,.recap,.next{display:none}
+  .dots{display:grid;right:12px;gap:9px}
+  .dots a{font-size:8px}
+  .dots a i{width:5px;height:5px}
+  footer{display:none}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:25;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c4048;
+    background:rgba(255,255,255,.82);border:1px solid rgba(22,21,15,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (prefers-reduced-motion:reduce){
+  #bar{transition:none}
+  .dots a i,.dots b{transition:none}
+}
 </style>
 </head>
 <body>
-<div id="bar"></div>
-<nav class="dots" id="dots" aria-label="章节">
-  <a href="#s1" data-t="s1"><b>01</b><i></i></a>
-  <a href="#s2" data-t="s2"><b>02</b><i></i></a>
-  <a href="#s3" data-t="s3"><b>03</b><i></i></a>
-  <a href="#s4" data-t="s4"><b>04</b><i></i></a>
+
+<div id="bar" aria-hidden="true"></div>
+
+<header class="nav">
+  <a class="brand" href="#top">ATLAS<span>ENGINEERING</span></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#s1">文章</a>
+    <a href="#s4">团队</a>
+    <a href="#sub">订阅</a>
+  </nav>
+  <a class="nav-sub" href="#sub">订阅更新</a>
+</header>
+
+<nav class="dots" id="dots" aria-label="章节导航">
+  <a href="#s1" data-t="s1" aria-label="01 先量，再改"><b>01</b><i></i></a>
+  <a href="#s2" data-t="s2" aria-label="02 拆掉三件事"><b>02</b><i></i></a>
+  <a href="#s3" data-t="s3" aria-label="03 让图片排队"><b>03</b><i></i></a>
+  <a href="#s4" data-t="s4" aria-label="04 把预算写进流程"><b>04</b><i></i></a>
 </nav>
-<main class="stage">
-  <p class="kicker">SCROLL / 05</p>
-  <h1>读到哪儿，<br>一眼就知道。</h1>
-  <p class="lede">顶部一条 3px 的进度线，和右侧四颗点。滚动位置、章节归属、读完多少，三个问题一次答完。</p>
-  <section id="s1"><h2><span>01</span>进度线不是装饰</h2><p>它告诉读者「还有多长」。长文里这比目录更直接：手指还在滚，眼睛已经知道快到头了。用 scaleX 而不是改 width，避免每帧重排。</p></section>
-  <section id="s2"><h2><span>02</span>章节点用位置判断</h2><p>不是监听「点被滚过去」，而是取每个 section 的 offsetTop，看当前滚动落在哪一段。窗口缩放要重算，否则线会错位。</p></section>
-  <section id="s3"><h2><span>03</span>侧栏标签要克制</h2><p>默认只留一颗点，当前章节才展开编号。侧栏越安静，正文越像正文。窄屏直接隐藏，不挤占行宽。</p></section>
-  <section id="s4"><h2><span>04</span>滚到底给个交代</h2><p>进度到 100% 时，顶部线满格，最后一颗点点亮。读者会下意识确认「确实读完了」，这比一句「到底了」自然。</p></section>
+
+<main class="stage" id="top">
+  <article>
+    <header>
+      <p class="kicker">PERFORMANCE · 2026-11-12 · 8 MIN READ</p>
+      <h1>把首屏压进 <em>1 秒</em>：<br>一次图片管线的重写。</h1>
+      <p class="lede">LCP 从 2.8 秒降到 0.9 秒，不是换了一个框架，而是把图片从「先下载再说」改成了「按顺序入场」。这篇记录我们删掉的四件事，以及最后守住的那条预算线。</p>
+      <p class="byline"><span><b>作者</b> 林野</span><span><b>团队</b> 基础架构组</span><span>数据截至 2026 年 10 月</span></p>
+      <div class="metrics" aria-label="优化结果">
+        <div><b>0.9 s</b><span>LCP · P75</span></div>
+        <div><b>620 KB</b><span>首屏传输 · −67%</span></div>
+        <div><b>0.02</b><span>CLS · −86%</span></div>
+      </div>
+    </header>
+
+    <section id="s1">
+      <h2><span class="no">01</span>先量，再改。</h2>
+      <p>优化之前先回答一个问题：慢在哪。我们在真实用户上采集了三个月的 Web Vitals，按地区、机型和网络切片，发现 78% 的慢请求集中在首屏的三张图上。</p>
+      <p>所以目标不是「更快的框架」，而是「更少的首屏字节」。所有改动都围绕一条预算：首屏传输不超过 620 KB，LCP 不超过 1 秒。超出预算的改动不合并，哪怕它看起来很聪明。</p>
+      <div class="recap"><b>先定门槛。</b>预算不是 KPI，是合并请求的门槛。没有门槛的优化，最后都会退回去。</div>
+    </section>
+
+    <section id="s2">
+      <h2><span class="no">02</span>拆掉阻塞首屏的三件事。</h2>
+      <p>第一，预加载全站字体。第二，首屏图片按原始尺寸输出。第三，所有模块同步 hydration。三件事各自看起来都不大，叠在一起就是一堵墙。</p>
+      <ul class="fixlist">
+        <li><b>字体</b><span>只留首屏用到的两个字重，<code>font-display:swap</code>，其余字重按需加载。</span></li>
+        <li><b>图片</b><span>首屏三张图输出 AVIF / WebP，按容器宽度给 <code>srcset</code>，最大边不超过 1440。</span></li>
+        <li><b>脚本</b><span>首屏只 hydrate 交互部分，列表和页脚延后到空闲时段。</span></li>
+      </ul>
+      <p>做完这三件事，LCP 从 2.8 秒降到 1.4 秒。最意外的是字体：两个未使用的字重，占了首屏 180 KB。</p>
+      <blockquote>“性能优化不是把每一处都做快，<br>而是决定<span>什么必须先到</span>。”</blockquote>
+    </section>
+
+    <section id="s3">
+      <h2><span class="no">03</span>让图片自己排队。</h2>
+      <p>剩下的 0.5 秒来自加载顺序。浏览器并不知道哪张图是首屏主角，它只会按发现顺序下载。我们给首屏主图加了 <code>fetchpriority="high"</code>，其余图片全部懒加载，并让占位图先撑出正确高度。</p>
+<pre><code><span class="c">&lt;!-- 首屏主图：先到 --&gt;</span>
+&lt;<span class="k">img</span> src=<span class="s">"hero.avif"</span> width=<span class="s">"1440"</span> height=<span class="s">"810"</span>
+     fetchpriority=<span class="s">"high"</span> decoding=<span class="s">"async"</span> alt=<span class="s">"山间木屋的清晨"</span>&gt;
+
+<span class="c">&lt;!-- 首屏以下：延后 --&gt;</span>
+&lt;<span class="k">img</span> src=<span class="s">"room.avif"</span> width=<span class="s">"720"</span> height=<span class="s">"480"</span>
+     loading=<span class="s">"lazy"</span> decoding=<span class="s">"async"</span> alt=<span class="s">"潮屋的内景"</span>&gt;</code></pre>
+      <p>占位图的高度和最终图一致，CLS 因此从 0.14 降到 0.02。用户看到的是同一张图慢慢变清楚，而不是页面在脚下跳一下。</p>
+    </section>
+
+    <section id="s4">
+      <h2><span class="no">04</span>把预算写进流程。</h2>
+      <p>最后一步不是技术，是流程。我们把预算写进 CI：首屏资源超过 620 KB，构建直接失败；任何图片缺少宽高属性，lint 报错。三个月里，这条线拦下了 27 次合并。</p>
+      <table>
+        <caption>首屏预算 · 2026 Q3 均值</caption>
+        <thead><tr><th>指标</th><th>当前</th><th>上限</th></tr></thead>
+        <tbody>
+          <tr><td>首屏传输</td><td>600 KB</td><td>620 KB</td></tr>
+          <tr><td>LCP · P75</td><td>0.9 s</td><td>1.0 s</td></tr>
+          <tr><td>CLS</td><td>0.02</td><td>0.05</td></tr>
+          <tr><td>首屏 JS</td><td>84 KB</td><td>120 KB</td></tr>
+        </tbody>
+      </table>
+      <p>现在回头看，真正有效的不是某个技巧，而是把「首屏」当成一条产品线来维护：有预算、有回归、有人负责。速度不会自己保持，它只会慢慢退回去。</p>
+    </section>
+
+    <div class="next" id="sub">
+      <div>
+        <b>下一篇 · 缓存命中率 99.2% 之后，我们还在修什么</b>
+        基础架构组 · 预计 11 月 20 日
+      </div>
+      <a href="#top">回顶部 ↑</a>
+    </div>
+  </article>
 </main>
-<p class="hint">滚动看顶部线与右侧章节点</p>
+
+<footer>
+  <b>ATLAS ENGINEERING</b>
+  <span>博客</span>
+  <span>团队</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">滚动看进度线与章节点</p>
 <script>
 (function () {
-  var bar = document.getElementById('bar'), links = [].slice.call(document.querySelectorAll('.dots a'));
+  var bar = document.getElementById('bar');
+  var links = [].slice.call(document.querySelectorAll('.dots a'));
   var secs = links.map(function (a) { return document.getElementById(a.dataset.t); });
   var raf = null;
+
   function render() {
     raf = null;
     var max = document.documentElement.scrollHeight - innerHeight;
     var p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 1;
     bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
     var cur = 0;
-    secs.forEach(function (s, i) { if (s.getBoundingClientRect().top <= innerHeight * .38) cur = i; });
+    secs.forEach(function (s, i) {
+      if (s && s.getBoundingClientRect().top <= innerHeight * .38) cur = i;
+    });
     links.forEach(function (a, i) { a.classList.toggle('on', i === cur); });
+    links.forEach(function (a, i) { a.setAttribute('aria-current', i === cur ? 'true' : 'false'); });
   }
   addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
   addEventListener('resize', render);
   render();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

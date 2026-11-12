@@ -54,16 +54,16 @@
 }
 .fx-badge i { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
 .fx-act {
-  position: absolute; right: 8px; top: 8px; z-index: 3; display: flex; gap: 5px;
-  opacity: 0; transform: translateY(-3px); transition: opacity .2s ease, transform .2s ease;
+  position: absolute; right: 58px; bottom: 8px; z-index: 3; display: flex; gap: 5px;
+  opacity: 0; transform: translateY(3px); transition: opacity .2s ease, transform .2s ease;
 }
 .fx-card:hover .fx-act, .fx-card:focus-within .fx-act { opacity: 1; transform: none; }
-.fx-act button, .fx-act a {
+.fx-act a {
   border: 1px solid rgba(20,20,20,.1); background: rgba(255,255,255,.94); color: #2a2d33;
   border-radius: 7px; padding: 5px 9px; font: inherit; font-size: 11px; cursor: pointer;
   text-decoration: none; backdrop-filter: blur(8px);
 }
-.fx-act button:hover, .fx-act a:hover { border-color: var(--accent); color: var(--accent); }
+.fx-act a:hover { border-color: var(--accent); color: var(--accent); }
 .fx-zoom-btn {
   position: absolute; right: 8px; bottom: 8px; z-index: 4;
   border: 1px solid rgba(20,20,20,.12); background: rgba(255,255,255,.92); color: #2a2d33;
@@ -83,6 +83,7 @@
 .fx-meta { display: flex; gap: 5px; flex-wrap: wrap; }
 .fx-meta i { font-style: normal; font-size: 10.5px; color: var(--muted); background: #f2f0e9; border-radius: 5px; padding: 1px 7px; }
 .fx-meta i.trig { background: #e9eef8; color: #3d5680; }
+.fx-meta i.fam { background: #edf3ec; color: #4a6b52; }
 .fx-meta i.cost[data-tier="中"] { background: #fdf0dd; color: #8a5a1c; }
 .fx-meta i.cost[data-tier="高"] { background: #fbe4e1; color: #8d3a30; }
 .fx-foot { display: flex; align-items: center; gap: 8px; padding-top: 1px; }

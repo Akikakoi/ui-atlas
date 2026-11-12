@@ -27,6 +27,11 @@ class Handler(SimpleHTTPRequestHandler):
     def log_message(self, fmt, *args):
         pass
 
+    def end_headers(self):
+        # 本地预览不做缓存，改完文件刷新即生效
+        self.send_header("Cache-Control", "no-store, max-age=0")
+        super().end_headers()
+
 
 def pick_port(start: int = 8760, tries: int = 20) -> int:
     for port in range(start, start + tries):

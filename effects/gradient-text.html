@@ -3,50 +3,278 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>渐变扫光 · UI Atlas 动效</title>
+<title>渐变扫光 · 光弧 ARC 环形台灯</title>
 <style>
-:root{--bg:#0b0c10;--ink:#f4f1e8;--muted:rgba(244,241,232,.5);--line:rgba(244,241,232,.14);--accent:#9db8ff}
+:root{--bg:#0b0c10;--ink:#f4f1e8;--muted:rgba(244,241,232,.52);--line:rgba(244,241,232,.14);--accent:#9db8ff;--g1:#7aa2ff;--g2:#c9a0ff;--g3:#ffd479;--g4:#9df0c8}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{background:radial-gradient(760px 480px at 50% 0%,#151a26,#0b0c10 70%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:38px 24px 84px}
-.wrap{width:100%;max-width:640px}
-.kicker{margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
-.sweep{margin:0;font-size:clamp(34px,8.6vw,62px);line-height:1.02;letter-spacing:-.05em;font-weight:650;
-  background:linear-gradient(100deg,#7aa2ff 0%,#c9a0ff 22%,#ffd479 44%,#9df0c8 62%,#7aa2ff 84%,#c9a0ff 100%);
-  background-size:250% 100%;
-  -webkit-background-clip:text;background-clip:text;
-  color:transparent;-webkit-text-fill-color:transparent;
-  animation:sweep 7s linear infinite;
-  cursor:default;padding-bottom:.08em}
+body{background:radial-gradient(820px 520px at 68% -10%,#171c29,#0b0c10 66%) fixed;color:var(--ink);font:14px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.head{max-width:1220px;margin:0 auto;height:72px;padding:0 40px;display:flex;align-items:center;gap:34px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:.02em}
+.brand .dot{width:15px;height:15px;border-radius:50%;background:conic-gradient(from 210deg,var(--g1),var(--g2),var(--g3),var(--g4),var(--g1));box-shadow:0 0 14px rgba(201,160,255,.45);display:inline-block}
+.brand i{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted);font-style:normal;margin-left:2px}
+.nav{display:flex;gap:26px;font-size:12.5px;color:var(--muted)}
+.nav a:hover{color:var(--ink)}
+.hint{margin:0 0 0 auto;display:inline-flex;align-items:center;gap:7px;font:400 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);background:rgba(244,241,232,.05);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.cta{border:1px solid rgba(244,241,232,.28);border-radius:999px;padding:8px 15px;font-size:12px;font-weight:600}
+.cta:hover{border-color:var(--accent);color:var(--accent)}
+.hero{max-width:1220px;margin:0 auto;padding:66px 40px 74px;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:52px;align-items:center}
+.kicker{margin:0 0 20px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+.sweep{margin:0;font-size:clamp(42px,4.9vw,64px);line-height:1.04;letter-spacing:-.05em;font-weight:650;padding-bottom:.08em;background:linear-gradient(100deg,var(--g1) 0%,var(--g2) 22%,var(--g3) 44%,var(--g4) 62%,var(--g1) 84%,var(--g2) 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:sweep 7s linear infinite;cursor:default}
 .sweep:hover{animation-play-state:paused}
 @keyframes sweep{from{background-position:0% 50%}to{background-position:250% 50%}}
-.sub{margin:22px 0 0;font-size:13px;line-height:1.9;color:var(--muted);max-width:30em}
-.swatches{display:flex;gap:8px;margin-top:24px}
-.swatches i{width:34px;height:7px;border-radius:999px;background:var(--c);opacity:.9}
-.meta{display:flex;align-items:center;gap:8px;margin-top:16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.lede{margin:22px 0 0;max-width:29em;font-size:13.5px;line-height:1.9;color:var(--muted)}
+.actions{display:flex;align-items:center;gap:16px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(100deg,var(--g1),var(--g2) 55%,var(--g4));color:#0c0d12;border-radius:999px;padding:11px 20px;font-size:12.5px;font-weight:700}
+.btn:hover{filter:brightness(1.08)}
+.ghost{font-size:12px;color:var(--muted);border-bottom:1px solid rgba(244,241,232,.28);padding-bottom:2px}
+.ghost:hover{color:var(--ink);border-color:var(--ink)}
+.meta{display:flex;align-items:center;gap:10px;margin-top:32px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .meta b{color:var(--accent);font-weight:600}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.sweep{animation:none;background-position:32% 50%}}
+.meta i{width:1px;height:10px;background:var(--line)}
+.stage{position:relative;height:430px;display:flex;flex-direction:column;align-items:center;justify-content:center;isolation:isolate}
+.stage::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(201,160,255,.22),rgba(122,162,255,.07) 46%,transparent 68%);z-index:-1}
+.ring{width:250px;height:250px;border-radius:50%;background:conic-gradient(from 215deg,var(--g1),var(--g2) 26%,var(--g3) 48%,var(--g4) 64%,var(--g1) 84%,var(--g2));padding:13px;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 13px),#000 calc(100% - 13px));mask:radial-gradient(farthest-side,transparent calc(100% - 13px),#000 calc(100% - 13px));filter:drop-shadow(0 0 34px rgba(157,184,255,.28))}
+.stem{width:2px;height:74px;background:linear-gradient(rgba(201,160,255,.5),rgba(244,241,232,.08))}
+.base{width:150px;height:9px;border-radius:50%;background:linear-gradient(90deg,transparent,rgba(244,241,232,.34),transparent)}
+.stage-tag{position:absolute;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:rgba(11,12,16,.6)}
+.tag-a{left:2%;top:34%}
+.tag-b{right:2%;top:47%}
+.stage-foot{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding-top:12px;border-top:1px solid var(--line)}
+.stage-foot p{margin:0;font-size:11px;color:var(--muted)}
+.stage-foot p b{display:block;font-size:12.5px;color:var(--ink);margin-bottom:3px;letter-spacing:.02em}
+.stage-foot .price{font:600 15px/1 ui-monospace,Consolas,monospace;color:var(--ink)}
+.stage-foot .price small{display:block;font-size:8px;letter-spacing:.14em;color:var(--muted);margin-top:5px}
+.presets{max-width:1220px;margin:0 auto 68px;padding:40px 40px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.preset{padding:0}
+.preset .bar{height:5px;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b));margin-bottom:16px;opacity:.9}
+.preset .time{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.preset h3{margin:10px 0 6px;font-size:16px;letter-spacing:.01em}
+.preset h3 span{font-weight:500;color:var(--muted);font-size:11px;margin-left:8px;letter-spacing:.04em}
+.preset p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.specs{max-width:1140px;margin:0 auto 72px;padding:26px 38px;border:1px solid var(--line);border-radius:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.spec b{display:block;font:600 17px/1.2 ui-monospace,Consolas,monospace;letter-spacing:-.02em;margin-bottom:6px}
+.spec span{font-size:9px;letter-spacing:.14em;color:var(--muted);font-family:ui-monospace,Consolas,monospace}
+.band{max-width:1140px;margin:0 auto 76px;padding:40px 44px;border-radius:16px;border:1px solid rgba(201,160,255,.24);background:radial-gradient(620px 280px at 12% 0%,rgba(122,162,255,.14),transparent 68%),radial-gradient(480px 240px at 88% 100%,rgba(255,212,121,.09),transparent 70%);display:flex;align-items:center;justify-content:space-between;gap:32px}
+.band h2{margin:0;font-size:clamp(22px,2.3vw,30px);line-height:1.4;font-weight:600;letter-spacing:-.01em}
+.band h2 em{font-style:normal;background:linear-gradient(100deg,var(--g1),var(--g2),var(--g3));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+footer{max-width:1220px;margin:0 auto;padding:20px 40px 26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-height:560px) and (min-width:561px){
+  .head{height:44px;padding:0 18px;gap:14px}
+  .brand{font-size:13px;gap:7px}
+  .brand .dot{width:12px;height:12px}
+  .brand i{display:none}
+  .nav{display:none}
+  .hint{margin-left:auto;font-size:8px;padding:5px 8px;gap:5px}
+  .hint::before{width:4px;height:4px}
+  .cta{font-size:9.5px;padding:6px 11px}
+  .hero{padding:14px 18px 10px;gap:22px;grid-template-columns:minmax(0,1fr) 330px;align-items:center}
+  .kicker{font-size:7.5px;margin-bottom:9px}
+  .sweep{font-size:31px}
+  .lede{font-size:9.5px;line-height:1.7;margin-top:10px}
+  .actions{margin-top:12px;gap:12px}
+  .btn{font-size:9.5px;padding:7px 12px}
+  .ghost{font-size:9px}
+  .meta{display:none}
+  .stage{height:292px}
+  .stage::before{width:260px;height:260px}
+  .ring{width:160px;height:160px;padding:9px;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 9px));mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 9px))}
+  .stem{height:30px}
+  .base{width:110px;height:7px}
+  .stage-tag{font-size:6.5px;padding:4px 7px}
+  .tag-a{left:0;top:36%}
+  .tag-b{right:0;top:48%}
+  .stage-foot{padding-top:7px}
+  .stage-foot p{font-size:8px}
+  .stage-foot p b{font-size:9px}
+  .stage-foot .price{font-size:11px}
+  .stage-foot .price small{font-size:6px;margin-top:3px}
+  .presets{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:0;padding:10px 18px 12px;border-top:1px solid var(--line)}
+  .preset .bar{height:3px;margin-bottom:7px}
+  .preset .time{font-size:6.5px}
+  .preset h3{font-size:9.5px;margin:4px 0 2px}
+  .preset h3 span{font-size:7px;margin-left:4px}
+  .preset p{font-size:7.5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .specs,.band,footer{display:none}
+}
+@media (max-width:560px){
+  .head{height:56px;padding:0 16px;gap:10px}
+  .brand{font-size:13.5px;gap:8px}
+  .brand .dot{width:13px;height:13px}
+  .brand i{display:none}
+  .nav{display:none}
+  .hint{display:none}
+  .cta{margin-left:auto;font-size:10.5px;padding:7px 12px}
+  .hero{grid-template-columns:1fr;gap:22px;padding:30px 16px 30px}
+  .kicker{font-size:8.5px;margin-bottom:12px}
+  .sweep{font-size:clamp(34px,10.6vw,46px)}
+  .lede{font-size:12px;line-height:1.8;margin-top:14px}
+  .actions{margin-top:18px;gap:14px}
+  .btn{font-size:11px;padding:9px 16px}
+  .ghost{font-size:10.5px}
+  .meta{margin-top:18px;font-size:8px;flex-wrap:wrap;gap:8px}
+  .stage{height:330px}
+  .stage::before{width:300px;height:300px}
+  .ring{width:190px;height:190px;padding:10px;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 10px),#000 calc(100% - 10px));mask:radial-gradient(farthest-side,transparent calc(100% - 10px),#000 calc(100% - 10px))}
+  .stem{height:48px}
+  .base{width:120px;height:8px}
+  .tag-a{left:0;top:32%}
+  .tag-b{right:0;top:44%}
+  .stage-foot p{font-size:10px}
+  .stage-foot p b{font-size:11.5px}
+  .stage-foot .price{font-size:13px}
+  .presets{grid-template-columns:1fr;gap:0;padding:0 16px 30px;border-top:none}
+  .preset{padding:18px 0;border-top:1px solid var(--line)}
+  .preset h3{font-size:14px}
+  .preset p{font-size:11.5px}
+  .specs{grid-template-columns:1fr 1fr;gap:16px;margin:0 16px 40px;padding:22px 20px}
+  .spec b{font-size:15px}
+  .band{flex-direction:column;align-items:flex-start;gap:18px;margin:0 16px 44px;padding:24px 22px}
+  .band h2{font-size:20px}
+  footer{flex-wrap:wrap;padding:16px 16px 22px;font-size:8px}
+  footer span:last-child{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .sweep{animation:none;background-position:32% 50%}
+  .btn,.cta{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">TYPE / 08</p>
-    <h1 class="sweep">颜色在字里，<br>慢慢走一遍。</h1>
-    <p class="sub">同一段渐变铺在文字上，再用 background-clip: text 把字形之外的部分裁掉；真正动的只有 background-position，字本身没有位移。</p>
-    <div class="swatches" aria-hidden="true">
-      <i style="--c:#7aa2ff"></i><i style="--c:#c9a0ff"></i><i style="--c:#ffd479"></i><i style="--c:#9df0c8"></i>
+
+<header class="head">
+  <a class="brand" href="#top"><span class="dot"></span>光弧<i>ARC</i></a>
+  <nav class="nav" aria-label="主导航">
+    <a href="#presets">光</a>
+    <a href="#specs">台灯</a>
+    <a href="#order">预购</a>
+  </nav>
+  <p class="hint">悬停标题，让扫光停住</p>
+  <a class="cta" href="#order">预购 HALO 01</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">SMART LIGHT / ARC 01</p>
+      <h1 class="sweep">把黄昏，<br>留在桌上。</h1>
+      <p class="lede">光弧是一盏会自己调色的环形台灯。2700K 到 5600K，从清晨到深夜慢慢走；字面的颜色，只是它落在纸上的样子。</p>
+      <div class="actions">
+        <a class="btn" href="#order">预购 HALO 01 <span aria-hidden="true">→</span></a>
+        <a class="ghost" href="#presets">看三段光</a>
+      </div>
+      <p class="meta"><b>CRI 97</b> 色准<i></i>2500 lm<i></i>2700–5600K</p>
     </div>
-    <p class="meta"><b>background-size: 250%</b> · 7s linear · 悬停暂停</p>
-  </div>
+
+    <div class="stage" aria-label="HALO 01 环形台灯">
+      <span class="stage-tag tag-a">CRI 97</span>
+      <span class="stage-tag tag-b">2500 lm</span>
+      <div class="ring" aria-hidden="true"></div>
+      <div class="stem" aria-hidden="true"></div>
+      <div class="base" aria-hidden="true"></div>
+      <div class="stage-foot">
+        <p><b>HALO 01 · 桌面环形灯</b>磨砂铝 · 270° 可调</p>
+        <p class="price">¥1,280<small>PRE-ORDER</small></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="presets" id="presets" aria-label="三段光">
+    <div class="preset" style="--a:#ffd479;--b:#c9a0ff">
+      <div class="bar"></div>
+      <p class="time">07:00 / WAKE</p>
+      <h3>清醒<span>5600K</span></h3>
+      <p>冷白偏蓝，起床后半小时自动亮起，把注意力拉回桌面。</p>
+    </div>
+    <div class="preset" style="--a:#9df0c8;--b:#7aa2ff">
+      <div class="bar"></div>
+      <p class="time">15:00 / FOCUS</p>
+      <h3>专注<span>4000K</span></h3>
+      <p>中性光，不偏黄也不刺眼；长时间读屏时，眼睛不容易发涩。</p>
+    </div>
+    <div class="preset" style="--a:#c9a0ff;--b:#ffd479">
+      <div class="bar"></div>
+      <p class="time">21:00 / WIND DOWN</p>
+      <h3>收工<span>2700K</span></h3>
+      <p>暖黄，亮度压到 18%。光落下来，像把白天的边角收好。</p>
+    </div>
+  </section>
+
+  <section class="specs" id="specs" aria-label="规格">
+    <div class="spec"><b>97</b><span>CRI 显色指数</span></div>
+    <div class="spec"><b>2500</b><span>LM 光通量</span></div>
+    <div class="spec"><b>2700–5600</b><span>K 色温范围</span></div>
+    <div class="spec"><b>12W</b><span>满载功耗</span></div>
+  </section>
+
+  <section class="band" id="order">
+    <h2>把光，调成<em>你的时间</em>。</h2>
+    <a class="btn" href="#top">预购 HALO 01 <span aria-hidden="true">→</span></a>
+  </section>
 </main>
-<p class="hint">悬停标题，可以让扫光停住</p>
+
+<footer>
+  <span>© 2026 光弧 ARC · 深圳</span>
+  <span>规格 · 发货 · 联系</span>
+</footer>
+
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
 </body>
 </html>

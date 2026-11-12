@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>描边填充文字 · 空腔 HOLLOW 字样工坊</title>
+<style>
+:root{--bg:#e9e6dc;--paper:#f6f3ea;--ink:#17181b;--muted:#6b6961;--line:#d5d0c2;--fill:#2f47e0;
+  --dark:#15161a;--darkline:rgba(246,243,234,.14);--cream:#f2eee2}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip;
+  background-image:radial-gradient(900px 520px at 88% -6%,rgba(47,71,224,.07),transparent 60%)}
+a{color:inherit}
+button{font:inherit}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.nav{position:sticky;top:0;z-index:10;height:64px;display:flex;align-items:center;gap:30px;
+  padding:0 max(24px,calc((100vw - 1180px)/2));background:rgba(233,230,220,.9);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-size:14px;font-weight:700;letter-spacing:.04em;text-decoration:none;white-space:nowrap}
+.brand .mark{width:26px;height:26px;display:grid;place-items:center;border:1.5px solid var(--ink);border-radius:2px;
+  font:600 12px/1 "Songti SC","SimSun",Georgia,serif;color:transparent;-webkit-text-stroke:.8px var(--ink)}
+.brand i{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:#57554d;text-decoration:none}
+.nav-links a:hover{color:var(--fill)}
+.cta{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ink);background:var(--ink);color:#f7f4ea;
+  border-radius:999px;padding:9px 17px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
+.cta:hover{background:var(--fill);border-color:var(--fill)}
+.nav .cta{margin-left:auto;padding:7px 14px;font-size:11.5px}
+.hero{max-width:1180px;margin:0 auto;padding:clamp(36px,5vw,68px) 24px 34px;
+  display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:clamp(30px,5vw,64px);align-items:center}
+.kicker{margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;font:600 clamp(42px,5.8vw,76px)/1.05 Georgia,"Songti SC","SimSun",serif;letter-spacing:-.035em}
+h1 em{font-style:normal;color:var(--fill)}
+.lede{margin:22px 0 0;max-width:31em;font-size:13.5px;line-height:1.95;color:#57554d}
+.actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:26px}
+.link{font-size:12.5px;text-decoration:none;border-bottom:1px solid rgba(23,24,27,.35);padding-bottom:2px;transition:color .2s,border-color .2s}
+.link:hover{border-color:var(--fill);color:var(--fill)}
+.meta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:24px;
+  font:600 9.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.meta-row i{width:1px;height:10px;background:var(--line)}
+.specimen{position:relative;overflow:hidden;background:var(--paper);border:1px solid var(--line);border-radius:18px;
+  padding:18px 22px 16px;box-shadow:0 40px 80px -58px rgba(23,24,27,.8)}
+.specimen::before{content:"";position:absolute;inset:46px 0 54px;pointer-events:none;opacity:.6;
+  background:repeating-linear-gradient(180deg,transparent 0 33px,rgba(23,24,27,.05) 33px 34px)}
+.spec-top{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.spec-top b{color:var(--fill);font-weight:600}
+.word{position:relative;display:block;width:100%;margin:2px 0 0;padding:0;border:0;background:none;cursor:pointer;
+  font:600 clamp(150px,16vw,218px)/.98 "Songti SC","SimSun",Georgia,serif;letter-spacing:0;text-align:center;
+  color:transparent;-webkit-text-stroke:1.6px rgba(23,24,27,.62);outline:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.word::after{content:attr(data-text);position:absolute;inset:0;color:var(--fill);-webkit-text-stroke:0;
+  clip-path:inset(0 100% 0 0);transition:clip-path .72s cubic-bezier(.22,.8,.2,1);pointer-events:none}
+.word:hover::after,.word:focus-visible::after,.word.filled::after{clip-path:inset(0)}
+.word:focus-visible{outline:1px dashed rgba(47,71,224,.55);outline-offset:8px;border-radius:6px}
+.spec-cap{position:relative;display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:10px 0 0;
+  font-size:11px;line-height:1.6;color:var(--muted)}
+.spec-cap b{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--fill);white-space:nowrap}
+.spec-foot{position:relative;display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);
+  font:600 8.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.spec-foot b{color:var(--ink);font-weight:600}
+.spec-foot span:last-child{margin-left:auto}
+.figures{max-width:1180px;margin:0 auto;padding:6px 24px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.figure{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:rgba(246,243,234,.55);display:flex;align-items:baseline;gap:12px}
+.figure span{font-size:10.5px;color:var(--muted);letter-spacing:.03em}
+.figure b{margin-left:auto;font:600 clamp(20px,2.4vw,28px)/1 ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.figure b small{font-size:10px;color:var(--muted);font-weight:500;margin-left:2px;letter-spacing:0}
+.sec{max-width:1180px;margin:0 auto;padding:clamp(44px,6.4vw,78px) 24px 0}
+.sec-head{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:22px;margin-bottom:20px}
+.sec-head .kicker{margin:0 0 8px}
+h2{margin:0;font:600 clamp(23px,2.8vw,34px)/1.18 Georgia,"Songti SC","SimSun",serif;letter-spacing:-.02em}
+.sec-head p{margin:0 0 3px auto;max-width:26em;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.weights{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.weight{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:16px 18px 15px;min-width:0;overflow:hidden}
+.weight .tag{display:flex;justify-content:space-between;gap:10px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.weight .glyph{margin:4px 0 2px;text-align:center;font:600 clamp(56px,7vw,84px)/1.12 "Songti SC","SimSun",Georgia,serif;
+  color:transparent;-webkit-text-stroke:1.6px var(--ink)}
+.weight.light .glyph{-webkit-text-stroke:.8px var(--ink)}
+.weight.bold .glyph{-webkit-text-stroke:2.6px var(--ink)}
+.wmeta{display:flex;align-items:baseline;gap:10px;padding-top:9px;border-top:1px solid var(--line)}
+.wmeta b{font-size:12.5px;font-weight:650;white-space:nowrap}
+.wmeta span{font-size:9.5px;line-height:1.5;color:var(--muted)}
+.specimen-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:clamp(24px,4vw,54px);align-items:start}
+.quote{margin:0;font:600 clamp(24px,3.2vw,38px)/1.5 Georgia,"Songti SC","SimSun",serif;letter-spacing:-.015em}
+.quote em{font-style:normal;color:var(--fill)}
+.quote-src{margin:14px 0 0;font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.spec-note{margin:18px 0 0;padding-top:14px;border-top:1px solid var(--line);max-width:32em;font-size:11.5px;line-height:1.95;color:#5f5d55}
+.glyphs{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.glyphs span{display:grid;place-items:center;aspect-ratio:1;border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  font:600 22px/1 "Songti SC","SimSun",Georgia,serif;color:transparent;-webkit-text-stroke:.9px rgba(23,24,27,.55)}
+.glyphs span.on{color:var(--fill);-webkit-text-stroke:0}
+.lics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.lic{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;padding:18px 20px 16px;
+  background:rgba(246,243,234,.55);min-width:0}
+.lic.hot{border-color:rgba(47,71,224,.42);background:linear-gradient(150deg,rgba(47,71,224,.07),transparent 62%),rgba(246,243,234,.85)}
+.lname{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.price{margin-top:12px;font:600 clamp(24px,2.6vw,30px)/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em}
+.price small{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:0}
+.lic ul{list-style:none;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line);font-size:10.5px;line-height:2;color:#5f5d55}
+.lic li::before{content:"—";margin-right:7px;color:var(--fill)}
+.lic .link{margin-top:14px;align-self:flex-start;font-size:11.5px}
+.band{max-width:1180px;margin:clamp(44px,6.4vw,78px) auto 0;padding:0 24px}
+.band-inner{display:flex;align-items:center;gap:28px;flex-wrap:wrap;border-radius:18px;padding:clamp(24px,3.6vw,36px);
+  background:linear-gradient(115deg,rgba(47,71,224,.3),transparent 58%),var(--dark);color:var(--cream)}
+.band h2{font-size:clamp(22px,2.7vw,32px)}
+.band p{margin:8px 0 0;font-size:11.5px;line-height:1.8;color:#a5a293;max-width:34em}
+.band .cta{margin-left:auto;background:var(--cream);border-color:var(--cream);color:var(--dark)}
+.band .cta:hover{background:#2f47e0;border-color:#2f47e0;color:#f7f4ea}
+footer{max-width:1180px;margin:48px auto 0;padding:20px 24px 30px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
+  font:600 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;
+  font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--fill)}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}
+  .brand .mark{width:20px;height:20px;font-size:10px}
+  .brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .hero{grid-template-columns:minmax(0,1fr) 300px;gap:22px;padding:12px 20px 6px}
+  .kicker{margin-bottom:6px;font-size:8.5px}
+  h1{font-size:28px;line-height:1.1}
+  .lede{margin-top:9px;font-size:10.5px;line-height:1.65;max-width:34em}
+  .actions{margin-top:11px;gap:12px}
+  .cta{padding:7px 13px;font-size:10.5px}
+  .link{font-size:10.5px}
+  .meta-row{display:none}
+  .specimen{padding:12px 14px 10px;border-radius:14px;box-shadow:none}
+  .specimen::before{inset:34px 0 44px}
+  .spec-top{font-size:7px}
+  .word{font-size:150px;margin-top:0}
+  .spec-cap{margin-top:7px;font-size:8.5px}
+  .spec-cap b{font-size:6.5px}
+  .spec-foot{margin-top:7px;padding-top:6px;font-size:6.5px;gap:12px}
+  .figures{grid-template-columns:repeat(3,1fr);gap:8px;padding:4px 20px 0}
+  .figure{padding:8px 10px;border-radius:9px;gap:6px}
+  .figure span{font-size:8px}
+  .figure b{font-size:17px}
+  .figure b small{font-size:7px}
+  .sec,.band,footer{display:none}
+  .sec.weights-sec{display:block;padding:10px 20px 0}
+  .weights-sec .sec-head{display:none}
+  .weights{grid-template-columns:repeat(3,1fr);gap:8px}
+  .weight{padding:8px 10px;border-radius:10px}
+  .weight .tag{font-size:6.5px}
+  .weight .glyph{font-size:34px;margin:2px 0 0}
+  .wmeta{padding-top:5px;gap:6px}
+  .wmeta b{font-size:9px}
+  .wmeta span{font-size:6.5px;line-height:1.3}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c4048;
+    background:rgba(255,255,255,.82);border:1px solid rgba(22,21,15,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav-links{display:none}
+  .nav .cta{margin-left:auto;padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}
+  .brand i{display:none}
+  .hero{grid-template-columns:1fr;gap:22px;padding:28px 16px 18px}
+  h1{font-size:clamp(38px,12vw,54px);line-height:1.08}
+  .lede{font-size:12px;line-height:1.9;margin-top:16px}
+  .actions{margin-top:18px}
+  .meta-row{margin-top:18px;font-size:8.5px;gap:10px}
+  .specimen{padding:15px 16px 13px;border-radius:16px}
+  .spec-cap{font-size:10px}
+  .spec-cap b{display:none}
+  .word{font-size:clamp(150px,52vw,210px)}
+  .figures{grid-template-columns:1fr;gap:8px;padding:4px 16px 0}
+  .figure{padding:12px 14px}
+  .figure b{font-size:22px}
+  .sec{padding-left:16px;padding-right:16px}
+  .sec-head{padding-top:18px;margin-bottom:16px}
+  .sec-head p{display:none}
+  .weights{grid-template-columns:1fr;gap:10px}
+  .weight .glyph{font-size:64px}
+  .specimen-grid{grid-template-columns:1fr;gap:24px}
+  .glyphs span{font-size:19px}
+  .lics{grid-template-columns:1fr;gap:10px}
+  .band{padding:0 16px;margin-top:38px}
+  .band-inner{padding:22px 20px;gap:16px}
+  .band .cta{margin-left:0}
+  footer{padding-left:16px;padding-right:16px;font-size:8.5px;margin-top:34px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .word::after{transition:none}
+  .cta,.link{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark" aria-hidden="true">空</span>空腔 HOLLOW<i>TYPE FOUNDRY</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#weights">字重</a>
+    <a href="#specimen">字样</a>
+    <a href="#license">授权</a>
+  </nav>
+  <a class="cta" href="#download">下载试排</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">KONG SERIF / 初号试排 · 2026</p>
+      <h1>先看见，<br>字的<em>骨头</em>。</h1>
+      <p class="lede">空腔明朝是一套为标题而生的中文衬线字。我们先把每个字画成 1.6px 的骨架，再让墨从左边慢慢灌进去——现在，轮到你把光标放上去。</p>
+      <div class="actions">
+        <a class="cta" href="#download">下载试排</a>
+        <a class="link" href="#weights">查看三种字重</a>
+      </div>
+      <p class="meta-row"><span>6,412 字符</span><i></i><span>3 档字重</span><i></i><span>GB18030</span></p>
+    </div>
+    <div class="specimen">
+      <div class="spec-top"><span>SPECIMEN NO.01 · 初号</span><b>HOVER TO INK</b></div>
+      <button class="word" id="word" type="button" data-text="空" aria-label="空，悬停、聚焦或点按后填墨" aria-pressed="false">空</button>
+      <p class="spec-cap"><span>悬停、聚焦或点按，墨从左灌满整个字。</span><b>1.6px → 100%</b></p>
+      <div class="spec-foot"><span>描边 <b>1.6px</b></span><span>填充 <b>720ms</b></span><span>字面 <b>98%</b></span></div>
+    </div>
+  </section>
+
+  <section class="figures" aria-label="字体数据">
+    <div class="figure"><span>字符集</span><b>6,412<small>字</small></b></div>
+    <div class="figure"><span>字重</span><b>3<small>档</small></b></div>
+    <div class="figure"><span>OpenType</span><b>12<small>项</small></b></div>
+  </section>
+
+  <section class="sec weights-sec" id="weights">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">THREE WEIGHTS / 300–700</p>
+        <h2>三种骨重</h2>
+      </div>
+      <p>骨架越厚，墨灌得越慢。三种字重共用同一套字面与基线。</p>
+    </div>
+    <div class="weights">
+      <article class="weight light">
+        <div class="tag"><span>KONG LIGHT</span><span>300</span></div>
+        <p class="glyph">永</p>
+        <div class="wmeta"><b>细骨</b><span>0.8px 描边 · 12px 以上的正文与小标题</span></div>
+      </article>
+      <article class="weight">
+        <div class="tag"><span>KONG REGULAR</span><span>500</span></div>
+        <p class="glyph">永</p>
+        <div class="wmeta"><b>常骨</b><span>1.6px 描边 · 默认字重，标题与短句</span></div>
+      </article>
+      <article class="weight bold">
+        <div class="tag"><span>KONG BOLD</span><span>700</span></div>
+        <p class="glyph">永</p>
+        <div class="wmeta"><b>粗骨</b><span>2.6px 描边 · 海报、封面与远距离招牌</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" id="specimen">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">SPECIMEN / 06,412 GLYPHS</p>
+        <h2>字的样子</h2>
+      </div>
+      <p>一套为标题写的字：横细竖粗，撇捺收得干净，留白比笔画更重要。</p>
+    </div>
+    <div class="specimen-grid">
+      <div>
+        <p class="quote">把字写成一条街，<br>让光从笔画的<em>缝隙</em>里漏进来。</p>
+        <p class="quote-src">空腔明朝 · 初号 96PT · 字距 −1%</p>
+        <p class="spec-note">我们保留了宋体的横细竖粗，却把收笔的顿角削平。放大到海报尺寸时，骨架不会散；缩到 12px，笔画也不会糊成一片。</p>
+      </div>
+      <div class="glyphs" aria-hidden="true">
+        <span class="on">空</span><span>腔</span><span>明</span><span>朝</span><span>骨</span><span>架</span>
+        <span class="on">墨</span><span>线</span><span>横</span><span>竖</span><span>撇</span><span>捺</span>
+        <span>点</span><span>折</span><span>钩</span><span>提</span><span class="on">永</span><span>字</span>
+        <span>八</span><span>法</span><span>春</span><span>风</span><span>一</span><span>夜</span>
+        <span>标</span><span>题</span><span>与</span><span>海</span><span>报</span><span>而</span>
+        <span>生</span><span>于</span><span class="on">杭</span><span>州</span><span>试</span><span>排</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="license">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">LICENSE / 2026</p>
+        <h2>授权方式</h2>
+      </div>
+      <p>试排免费；真正拿去接活之前，再买商用授权。</p>
+    </div>
+    <div class="lics">
+      <article class="lic">
+        <span class="lname">个人试排</span>
+        <b class="price">¥0</b>
+        <ul><li>非商用练习与作业</li><li>2 台设备安装</li><li>保留署名</li></ul>
+        <a class="link" href="#download">下载试排</a>
+      </article>
+      <article class="lic hot">
+        <span class="lname">商用授权</span>
+        <b class="price">¥1,280<small> / 年</small></b>
+        <ul><li>广告、包装与网页</li><li>10 台设备 · 3 名成员</li><li>版本更新与技术支持</li></ul>
+        <a class="link" href="#download">购买授权</a>
+      </article>
+      <article class="lic">
+        <span class="lname">品牌定制</span>
+        <b class="price">询价</b>
+        <ul><li>独占字形与字重</li><li>定制骨架与字面</li><li>6 周交付</li></ul>
+        <a class="link" href="#download">联系我们</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="band" id="download">
+    <div class="band-inner">
+      <div>
+        <h2>先排一行，再决定买不买。</h2>
+        <p>试排包含完整 6,412 字与三种字重，仅限非商用。商用授权按年计，覆盖广告、包装与网页。</p>
+      </div>
+      <a class="cta" href="#top">下载试排</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>KONG SERIF · 空腔字样工坊 · 杭州</span>
+  <span>6,412 字符 / 3 字重 / GB18030</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">悬停「空」字，或点按填墨</p>
+
+<script>
+(function () {
+  var word = document.getElementById('word');
+  if (!word) return;
+  word.addEventListener('click', function () {
+    var on = !word.classList.contains('filled');
+    word.classList.toggle('filled', on);
+    word.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>步骤条 · HARBOR 工作区开通 · UI Atlas</title>
+<style>
+:root{--bg:#f0ece2;--paper:#fffdf8;--ink:#141519;--muted:#7a7b80;--line:#ded8c9;--accent:#2f5fd0;--ok:#2c7a58;--forest:#22352c;--warm:#a8643c}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.page{min-height:100svh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:10;flex:0 0 auto;height:56px;display:flex;align-items:center;gap:14px;padding:0 clamp(16px,3.4vw,38px);border-bottom:1px solid var(--line);background:rgba(255,253,248,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:26px;height:26px;border-radius:7px;background:var(--forest);color:#f7f2e6;display:grid;place-items:center;font:700 11px/1 ui-monospace,Consolas,monospace}
+.brand b{font-size:12px;font-weight:750;letter-spacing:.18em}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:4px 9px;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:11px;color:var(--muted)}
+.top-right a{color:var(--ink);font-weight:600;border-bottom:1px solid #c8c1b0;padding-bottom:1px}
+.stage{flex:1;width:100%;max-width:1140px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 452px;gap:clamp(28px,5vw,76px);align-items:center;padding:clamp(22px,4vh,48px) clamp(18px,4vw,40px) clamp(30px,5vh,58px)}
+.pitch{position:relative;min-width:0}
+.pitch::before{content:"";position:absolute;left:-46px;top:-38px;width:190px;height:190px;border:1px solid #ddd5c2;border-radius:50%;pointer-events:none}
+.kicker{margin:0 0 16px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+.pitch h1{position:relative;margin:0 0 18px;font-size:clamp(32px,4.4vw,50px);line-height:1.1;letter-spacing:-.042em;font-weight:640}
+.pitch h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--warm)}
+.lede{position:relative;margin:0;font-size:13px;line-height:1.95;color:#5c5d62;max-width:27em}
+.perks{list-style:none;margin:28px 0 0;padding:0;border-top:1px solid var(--line)}
+.perks li{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
+.perks b{font:600 8.5px/1.9 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--warm);flex:0 0 auto}
+.perks strong{display:block;font-size:12.5px;font-weight:650}
+.perks span{display:block;margin-top:2px;font-size:11px;line-height:1.7;color:var(--muted)}
+.quote{margin:26px 0 0;padding-left:14px;border-left:2px solid var(--forest)}
+.quote blockquote{margin:0;font:italic 14px/1.8 Georgia,"Songti SC",serif;color:#3c3e43}
+.quote figcaption{margin-top:6px;font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;margin-top:24px;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.meta span+span::before{content:"·";margin:0 9px;color:#b7b0a0}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:26px 26px 22px;box-shadow:0 46px 80px -70px rgba(20,22,30,.7)}
+.card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:20px}
+.card-k{margin:0;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.card-note{font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.card-note b{color:var(--ink);font-weight:700}
+.steps{position:relative;display:flex;justify-content:space-between;margin-bottom:24px}
+.track{position:absolute;left:18px;right:18px;top:17px;height:2px;background:#e9e4d8;overflow:hidden}
+.track i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:0 50%;transform:scaleX(0);transition:transform .45s cubic-bezier(.22,.8,.2,1)}
+.step{position:relative;z-index:1;display:grid;justify-items:center;gap:7px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:10.5px;cursor:pointer;padding:0;width:70px;transition:color .2s}
+.step b{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--paper);display:grid;place-items:center;font:600 12px/1 ui-monospace,Consolas,monospace;transition:background .25s,color .25s,border-color .25s,transform .25s}
+.step[aria-current="step"]{color:var(--ink)}
+.step[aria-current="step"] b{background:var(--ink);border-color:var(--ink);color:#fff;transform:scale(1.08)}
+.step.done{color:var(--ok)}
+.step.done b{background:var(--ok);border-color:var(--ok);color:#fff}
+.step:focus-visible{outline:none}
+.step:focus-visible b{outline:2px solid var(--accent);outline-offset:3px}
+.panel{min-height:158px;position:relative}
+.pane{position:absolute;inset:0;opacity:0;transform:translateY(7px);pointer-events:none;transition:opacity .24s,transform .3s cubic-bezier(.2,.8,.2,1)}
+.pane.on{opacity:1;transform:none;pointer-events:auto;position:relative}
+.pane h3{margin:0 0 7px;font-size:17px;letter-spacing:-.02em;outline:none}
+.pane p{margin:0 0 12px;font-size:12px;line-height:1.8;color:var(--muted);max-width:30em}
+.field{display:grid;gap:6px;margin-top:11px}
+.field label{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.field input{width:100%;height:38px;border:1px solid var(--line);border-radius:9px;background:#fbfaf5;padding:0 12px;font:12px/1 ui-monospace,Consolas,monospace;color:var(--ink);outline:none;transition:border-color .2s,background .2s,box-shadow .2s}
+.field input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(47,95,208,.12)}
+.sum{display:grid;margin-top:12px;border:1px solid var(--line);border-radius:10px;background:#fbfaf5;overflow:hidden}
+.sum div{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:9px 12px;border-top:1px solid #eee9dc;font-size:11.5px}
+.sum div:first-child{border-top:0}
+.sum small{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.09em;color:var(--muted);flex:0 0 auto}
+.sum b{font-weight:600;max-width:66%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid #efebe0}
+.actions button{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:8px 17px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s,opacity .2s}
+.actions button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.actions .primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.actions .primary:hover:not(:disabled){background:var(--accent);border-color:var(--accent);color:#fff}
+.actions button:disabled{opacity:.35;cursor:not-allowed}
+.actions button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ok{margin:12px 0 0;font-size:11.5px;font-weight:600;color:var(--ok);opacity:0;transform:translateY(4px);transition:opacity .25s,transform .3s}
+.ok.on{opacity:1;transform:none}
+.fine{margin:12px 0 0;font:500 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.03em;color:#a29d90;text-align:center}
+.foot{flex:0 0 auto;border-top:1px solid var(--line);padding:13px clamp(16px,4vw,40px);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr;gap:0;align-items:start;padding:22px 16px 40px}
+  .pitch{padding:0 2px 20px}
+  .pitch::before{display:none}
+  .pitch h1{font-size:31px;margin-bottom:10px}
+  .lede{font-size:12px;line-height:1.8}
+  .perks,.quote,.meta{display:none}
+  .card{width:100%;max-width:520px;margin:0 auto}
+}
+@media (max-width:560px){
+  .topbar{height:50px;padding:0 14px}
+  .hint{display:none}
+  .top-right span{display:none}
+  .stage{padding:18px 14px 34px}
+  .pitch h1{font-size:28px}
+  .card{padding:20px 18px 18px;border-radius:16px}
+  .card-head{margin-bottom:16px}
+  .steps{margin-bottom:18px}
+  .pane h3{font-size:16px}
+  .foot{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:42px;padding:0 16px}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .stage{grid-template-columns:1fr;align-items:center;padding:10px 16px 12px;max-width:560px}
+  .pitch{display:none}
+  .card{max-width:480px;margin:0 auto;padding:15px 18px 14px;border-radius:14px}
+  .card-head{margin-bottom:11px}
+  .steps{margin-bottom:12px}
+  .step b{width:30px;height:30px}
+  .track{top:15px}
+  .panel{min-height:112px}
+  .pane h3{font-size:15px;margin-bottom:5px}
+  .pane p{font-size:11px;margin-bottom:7px}
+  .field{gap:4px;margin-top:7px}
+  .field input{height:32px}
+  .sum{margin-top:7px}
+  .sum div{padding:6px 11px}
+  .actions{margin-top:10px;padding-top:10px}
+  .ok{margin-top:7px}
+  .fine,.foot{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .track i,.step,.step b,.pane,.ok,.actions button{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="topbar">
+    <a class="brand" href="#card" aria-label="HARBOR 首页"><span class="logo">H</span><b>HARBOR</b></a>
+    <p class="hint">点下一步，或直接点上面的步骤</p>
+    <div class="top-right"><span>已有工作区？</span><a href="#card">登录</a></div>
+  </header>
+
+  <main class="stage">
+    <section class="pitch">
+      <p class="kicker">WORKSPACE / SET UP</p>
+      <h1>先把门牌挂上，<br><em>再慢慢添家具。</em></h1>
+      <p class="lede">HARBOR 是给小组用的协作空间：任务、文档和讨论放在同一张桌上，不用来回切换。</p>
+      <ul class="perks">
+        <li><b>01</b><div><strong>三分钟建好</strong><span>不用等审批，也不用绑定信用卡。</span></div></li>
+        <li><b>02</b><div><strong>成员随加随减</strong><span>先拉两个人试，合适再邀请全组。</span></div></li>
+        <li><b>03</b><div><strong>数据可以带走</strong><span>随时导出，不拿格式当锁。</span></div></li>
+      </ul>
+      <figure class="quote">
+        <blockquote>“我们把周会搬进来之后，邮件少了一半。”</blockquote>
+        <figcaption>周玥 · 独立设计工作室</figcaption>
+      </figure>
+      <div class="meta"><span>2,400+ 团队</span><span>不用信用卡</span><span>随时可删</span></div>
+    </section>
+
+    <section class="card" id="card" aria-label="创建工作区">
+      <div class="card-head">
+        <p class="card-k">创建工作区</p>
+        <span class="card-note">步骤 <b id="step-now">1</b> / 3</span>
+      </div>
+      <div class="steps" id="steps">
+        <div class="track" aria-hidden="true"><i id="fill"></i></div>
+        <button class="step" type="button" data-step="0" aria-current="step"><b>1</b><span>账户</span></button>
+        <button class="step" type="button" data-step="1"><b>2</b><span>资料</span></button>
+        <button class="step" type="button" data-step="2"><b>3</b><span>确认</span></button>
+      </div>
+      <div class="panel">
+        <div class="pane on" data-step="0">
+          <h3 tabindex="-1">先留一个邮箱</h3>
+          <p>只用来收验证码与邀请，不发营销邮件。</p>
+          <div class="field"><label for="email">工作邮箱</label><input id="email" type="email" value="lin@harbor.studio" autocomplete="email"></div>
+        </div>
+        <div class="pane" data-step="1">
+          <h3 tabindex="-1">再补一点资料</h3>
+          <p>只需要称呼和团队名，其他都可以之后填。</p>
+          <div class="field"><label for="name">称呼</label><input id="name" type="text" value="林一" autocomplete="name"></div>
+          <div class="field"><label for="team">团队</label><input id="team" type="text" value="设计"></div>
+        </div>
+        <div class="pane" data-step="2">
+          <h3 tabindex="-1">最后确认</h3>
+          <p>提交后仍可在设置里修改，不会锁死。</p>
+          <div class="sum">
+            <div><small>邮箱</small><b id="out-email">lin@harbor.studio</b></div>
+            <div><small>称呼</small><b id="out-name">林一</b></div>
+            <div><small>团队</small><b id="out-team">设计</b></div>
+          </div>
+        </div>
+      </div>
+      <p class="ok" id="ok" role="status" aria-live="polite"></p>
+      <div class="actions">
+        <button id="back" type="button" disabled>上一步</button>
+        <button class="primary" id="next" type="button">下一步</button>
+      </div>
+      <p class="fine">继续即表示同意服务条款与隐私政策。</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>HARBOR · 小组协作空间</span>
+    <span>帮助中心</span>
+    <span>服务条款</span>
+    <span>隐私</span>
+  </footer>
+</div>
+<script>
+(function () {
+  var steps = [].slice.call(document.querySelectorAll('.step'));
+  var panes = [].slice.call(document.querySelectorAll('.pane'));
+  var fill = document.getElementById('fill'), back = document.getElementById('back'), next = document.getElementById('next');
+  var ok = document.getElementById('ok'), now = document.getElementById('step-now');
+  var email = document.getElementById('email'), name = document.getElementById('name'), team = document.getElementById('team');
+  var outs = {
+    email: document.getElementById('out-email'),
+    name: document.getElementById('out-name'),
+    team: document.getElementById('out-team')
+  };
+  var cur = 0, done = false;
+
+  function sync() {
+    outs.email.textContent = email.value.trim() || '待填写';
+    outs.name.textContent = name.value.trim() || '待填写';
+    outs.team.textContent = team.value.trim() || '待填写';
+  }
+
+  function render(focus) {
+    steps.forEach(function (s, i) {
+      s.classList.toggle('done', i < cur);
+      if (i === cur) s.setAttribute('aria-current', 'step');
+      else s.removeAttribute('aria-current');
+      s.querySelector('b').textContent = i < cur ? '✓' : String(i + 1);
+    });
+    panes.forEach(function (p, i) { p.classList.toggle('on', i === cur); });
+    fill.style.transform = 'scaleX(' + (cur / (steps.length - 1)) + ')';
+    now.textContent = String(cur + 1);
+    back.disabled = cur === 0 || done;
+    next.disabled = done;
+    next.textContent = done ? '已完成' : cur === steps.length - 1 ? '提交' : '下一步';
+    if (focus) panes[cur].querySelector('h3').focus();
+  }
+
+  function go(i) {
+    if (done) return;
+    cur = Math.max(0, Math.min(steps.length - 1, i));
+    render(true);
+  }
+
+  [email, name, team].forEach(function (el) { el.addEventListener('input', sync); });
+  sync();
+
+  steps.forEach(function (s, i) {
+    s.addEventListener('click', function () { go(i); });
+  });
+  back.addEventListener('click', function () { go(cur - 1); });
+  next.addEventListener('click', function () {
+    if (cur < steps.length - 1) { go(cur + 1); return; }
+    done = true;
+    steps.forEach(function (s, i) { s.classList.remove('done'); if (i < steps.length - 1) s.classList.add('done'); });
+    steps[steps.length - 1].removeAttribute('aria-current');
+    ok.textContent = '提交成功，确认邮件已发出。';
+    ok.classList.add('on');
+    render();
+    next.textContent = '已完成';
+  });
+
+  render();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

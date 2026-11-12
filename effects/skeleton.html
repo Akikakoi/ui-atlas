@@ -3,92 +3,245 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>骨架屏到内容 · UI Atlas 动效</title>
+<title>骨架屏到内容 · MOSS 山野志 · UI Atlas</title>
 <style>
-:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0}
+:root{--bg:#eef0e9;--paper:#fbfaf5;--ink:#161a15;--muted:#767d72;--line:#d9dccf;--accent:#3f6b4f;--warm:#a8643c}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:28px 22px 74px}
-.wrap{width:100%;max-width:420px}
-.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-h1{margin:0 0 20px;font-size:clamp(21px,5vw,30px);line-height:1.18;letter-spacing:-.03em;font-weight:620}
-.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;position:relative;min-height:252px}
-.sk,.real{position:absolute;inset:15px}
-.sk{display:grid;grid-template-columns:40px 1fr;gap:11px;align-content:start;transition:opacity .3s}
-.sk .av{width:40px;height:40px;border-radius:50%}
+body{background:radial-gradient(90% 70% at 50% 0%,#f5f6ef,#e8ebe1 75%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.page{min-height:100svh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:10;flex:0 0 auto;height:54px;display:flex;align-items:center;gap:22px;padding:0 clamp(16px,3.4vw,38px);border-bottom:1px solid var(--line);background:rgba(251,250,245,.84);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:750;font-size:12px;letter-spacing:.18em}
+.brand .mark{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#f5f7ef;display:grid;place-items:center;font:700 12px/1 Georgia,serif}
+.brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.topbar nav{display:flex;gap:19px;font-size:11.5px;color:var(--muted)}
+.topbar nav a.on{color:var(--ink);font-weight:600}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.02em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--muted)}
+.top-right .pub{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 11px;color:var(--ink)}
+.shell{flex:1;width:100%;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:clamp(24px,4vw,52px);padding:clamp(18px,3.4vh,34px) clamp(16px,3.4vw,40px) 36px;align-items:start}
+.main{min-width:0}
+.head-k{margin:0 0 12px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.head-k h1{margin:0;font-size:clamp(22px,2.6vw,28px);line-height:1.15;letter-spacing:-.035em;font-weight:640}
+.head-k h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.head-k span{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
+.card{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px;min-height:310px;box-shadow:0 40px 70px -66px rgba(20,30,20,.55)}
+.sk,.real{position:absolute;inset:16px}
+.sk{display:grid;grid-template-columns:42px 1fr;gap:11px;align-content:start;transition:opacity .3s}
+.sk .av{width:42px;height:42px;border-radius:50%}
 .sk .l{height:10px;border-radius:5px;margin-top:4px}
-.sk .l.w1{width:44%}.sk .l.w2{width:82%}.sk .l.w3{width:64%}
-.sk .media{grid-column:1/-1;height:92px;border-radius:9px;margin-top:4px}
-.sk i,.sk div{background:linear-gradient(100deg,#eeece5 20%,#f8f6ef 40%,#eeece5 60%) 0 0/220% 100%;animation:sh 1.35s linear infinite}
+.sk .l.w1{width:38%}
+.sk .l.w2{width:82%}
+.sk .l.w3{width:61%}
+.sk .media{grid-column:1/-1;height:158px;border-radius:10px;margin-top:2px}
+.sk i,.sk div{background:linear-gradient(100deg,#e9e9df 20%,#f6f6ee 40%,#e9e9df 60%) 0 0/220% 100%;animation:sh 1.35s linear infinite}
 @keyframes sh{from{background-position:110% 0}to{background-position:-110% 0}}
 .real{opacity:0;transform:translateY(5px);transition:opacity .42s ease,transform .42s cubic-bezier(.2,.8,.2,1)}
 .card.done .sk{opacity:0;pointer-events:none}
 .card.done .real{opacity:1;transform:none}
 .real .head{display:flex;gap:11px;align-items:center}
-.real .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2f5fd0,#8fb4ff);display:grid;place-items:center;
-  color:#fff;font-size:13px;font-weight:600}
-.real .who b{display:block;font-size:13.5px}
-.real .who span{font-size:11.5px;color:var(--muted)}
-.real .txt{margin:11px 0 0;font-size:12.5px;line-height:1.75;color:#4b4e55}
-.real .media{margin-top:11px;height:82px;border-radius:9px;background:
-  radial-gradient(circle at 25% 30%,#f0d7b4,transparent 55%),linear-gradient(135deg,#c9a06a,#5d6b52)}
-.again{display:block;margin:10px 0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;
-  padding:5px 11px;font:inherit;font-size:11.5px;cursor:pointer;color:var(--muted)}
+.real .av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#5d7d61,#28392c);display:grid;place-items:center;color:#f2f4ea;font:600 12px/1 ui-monospace,Consolas,monospace}
+.real .who b{display:block;font-size:13px}
+.real .who span{font-size:10.5px;color:var(--muted)}
+.real .flag{margin-left:auto;font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--accent);border:1px solid rgba(63,107,79,.3);border-radius:999px;padding:4px 7px}
+.real .txt{margin:11px 0 0;font-size:12.5px;line-height:1.8;color:#41493f}
+.real .media{margin-top:11px;height:158px;border-radius:10px;position:relative;overflow:hidden;background:linear-gradient(to bottom,#cfdcd0 0%,#a9bfa7 42%,#6e8b6a 62%,#3c5140 100%)}
+.real .media::before{content:"";position:absolute;left:-8%;right:40%;bottom:0;height:58%;background:linear-gradient(140deg,#42583f,#2c3b2e);clip-path:polygon(0 100%,18% 58%,34% 72%,55% 30%,72% 54%,100% 100%)}
+.real .media::after{content:"";position:absolute;left:38%;right:-10%;bottom:0;height:46%;background:linear-gradient(150deg,#597156,#33452f);clip-path:polygon(0 100%,22% 54%,44% 70%,66% 34%,100% 100%);opacity:.9}
+.real .media .sun{position:absolute;right:22%;top:18%;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,#fdf6df,rgba(253,246,223,0) 70%)}
+.real .media .cap{position:absolute;left:11px;bottom:9px;font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(255,255,255,.82)}
+.real .foot{display:flex;align-items:center;gap:16px;margin-top:11px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.real .foot span{display:flex;align-items:center;gap:5px}
+.real .foot b{color:var(--ink);font-weight:700}
+.again{display:inline-flex;align-items:center;gap:7px;margin-top:12px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:11.5px;color:var(--muted);cursor:pointer;transition:border-color .2s,color .2s}
 .again:hover{border-color:var(--accent);color:var(--accent)}
-.note{margin:12px 0 0;font-size:12px;line-height:1.8;color:var(--muted)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (max-height:560px){.note{display:none}.stage{padding-bottom:64px}}
-@media (prefers-reduced-motion:reduce){.sk i,.sk div{animation:none}.real{transition:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.again:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.note{margin:14px 2px 0;font-size:11px;line-height:1.8;color:var(--muted);max-width:36em}
+.side{position:sticky;top:78px}
+.side-k{margin:0 0 10px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.17em;color:var(--muted)}
+.route{display:flex;gap:11px;padding:10px 0;border-top:1px solid var(--line)}
+.route:first-of-type{border-top:0;padding-top:0}
+.route .no{font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--warm);flex:0 0 auto}
+.route b{display:block;font-size:11.5px;font-weight:600}
+.route span{display:block;margin-top:2px;font-size:10px;line-height:1.6;color:var(--muted)}
+.weather{margin-top:20px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.5);padding:12px 13px}
+.weather b{display:block;font-size:11.5px;font-weight:650}
+.weather .big{margin-top:4px;font-size:26px;line-height:1;letter-spacing:-.04em;font-weight:640}
+.weather p{margin:6px 0 0;font-size:10px;line-height:1.65;color:var(--muted)}
+.foot{flex:0 0 auto;border-top:1px solid var(--line);padding:11px clamp(16px,3.4vw,38px);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr;gap:22px}
+  .side{position:static;display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+  .side-k{grid-column:1/-1}
+  .weather{margin-top:10px;grid-column:1/-1}
+}
+@media (max-width:560px){
+  .topbar{height:50px;padding:0 14px;gap:10px}
+  .topbar nav,.hint,.top-right{display:none}
+  .shell{padding:18px 14px 28px}
+  .head-k h1{font-size:22px}
+  .card{padding:13px;border-radius:14px;min-height:304px}
+  .sk,.real{inset:13px}
+  .real .txt{font-size:12px;line-height:1.75}
+  .real .media,.sk .media{height:150px}
+  .side{grid-template-columns:1fr}
+  .route:nth-of-type(n+4){display:none}
+  .foot{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:40px;padding:0 16px;gap:14px}
+  .topbar nav,.top-right{display:none}
+  .hint{left:auto;right:14px;top:50%;transform:translateY(-50%);font-size:9px;padding:2px 7px}
+  .shell{grid-template-columns:1fr;max-width:560px;padding:10px 16px 12px}
+  .head-k{margin-bottom:7px}
+  .head-k h1{font-size:20px}
+  .head-k span{display:none}
+  .card{min-height:292px;padding:13px;border-radius:13px}
+  .sk,.real{inset:13px}
+  .sk .media{height:132px}
+  .real .media{height:132px}
+  .real .txt{margin-top:8px;font-size:11.5px;line-height:1.7}
+  .real .foot{margin-top:8px}
+  .again{display:none}
+  .note,.side,.foot{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .sk i,.sk div{animation:none}
+  .real{transition:none}
+  .card.done .sk{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">FEEDBACK / 03</p>
-    <h1>先给形状，<br>再给内容。</h1>
-    <div class="card" id="card" aria-busy="true">
-      <div class="sk" aria-hidden="true">
-        <div class="av"></div>
-        <div><div class="l w1"></div><div class="l w2"></div></div>
-        <div class="media"></div>
-        <div class="l w3" style="grid-column:1/-1"></div>
-        <div class="l w2" style="grid-column:1/-1"></div>
-      </div>
-      <div class="real">
-        <div class="head">
-          <div class="av">星</div>
-          <div class="who"><b>星野计划</b><span>2 分钟前 · 更新了封面</span></div>
+<div class="page">
+  <header class="topbar">
+    <a class="brand" href="#feed"><span class="mark">M</span>MOSS<small>山野志</small></a>
+    <nav aria-label="主导航"><a class="on" href="#feed">社区</a><a href="#feed">路线</a><a href="#feed">装备</a><a href="#feed">天气</a></nav>
+    <p class="hint">1.7 秒后替换为真实内容</p>
+    <div class="top-right"><span>杭州 · 12°C 多云</span><a class="pub" href="#feed">写一篇</a></div>
+  </header>
+
+  <div class="shell">
+    <main class="main" id="feed">
+      <div class="head-k"><h1>山里的 <em>今天</em></h1><span>COMMUNITY · 最新</span></div>
+      <article class="card" id="card" aria-busy="true">
+        <div class="sk" aria-hidden="true">
+          <div class="av"></div>
+          <div><div class="l w1"></div><div class="l w2"></div></div>
+          <div class="media"></div>
+          <div class="l w3" style="grid-column:1/-1"></div>
+          <div class="l w2" style="grid-column:1/-1"></div>
         </div>
-        <p class="txt">骨架的形状和最终内容一致：头像、两行标题、一块媒体、两行正文。位置不跳，眼睛就不用重新找。</p>
-        <div class="media"></div>
-      </div>
-    </div>
-    <button class="again" id="again" type="button">重新加载</button>
-    <p class="note">加载态用 aria-busy 标出；完成后只做一次淡入 + 5px 位移，不做逐元素弹跳。</p>
+        <div class="real">
+          <div class="head">
+            <div class="av">北</div>
+            <div class="who"><b>北纬 31°</b><span>2 分钟前 · 莫干山 · 大斗坞</span></div>
+            <span class="flag">轨迹已验证</span>
+          </div>
+          <p class="txt">清晨五点半从大斗坞上山，雾在竹林里走得很慢。走到第二道山脊时云刚好裂开一条缝，光落在谷底的茶田上，只持续了四十几秒。</p>
+          <div class="media"><span class="sun" aria-hidden="true"></span><span class="cap">MOGANSHAN · 05:47 · 海拔 612M</span></div>
+          <div class="foot"><span>收藏 <b>128</b></span><span>评论 <b>24</b></span><span>路线 <b>大斗坞环线</b></span></div>
+        </div>
+      </article>
+      <button class="again" id="again" type="button">重新加载这条动态</button>
+      <p class="note">骨架的形状和最终内容一致：头像、两行标题、一块图、两行正文。位置不跳，眼睛就不用重新找。加载态用 aria-busy 标出。</p>
+    </main>
+
+    <aside class="side" aria-label="本周精选">
+      <p class="side-k">本周精选 · PICKS</p>
+      <div class="route"><span class="no">01</span><div><b>临安 · 太子尖</b><span>海拔 1558m · 云海概率高</span></div></div>
+      <div class="route"><span class="no">02</span><div><b>余杭 · 径山古道</b><span>7.2km · 适合半日</span></div></div>
+      <div class="route"><span class="no">03</span><div><b>安吉 · 龙王山</b><span>1700m · 需向导</span></div></div>
+      <div class="weather"><b>莫干山 · 明晨</b><div class="big">6°</div><p>晴转多云，山脊风力 3 级。<br>日出 06:12，云海概率 62%。</p></div>
+    </aside>
   </div>
-</main>
-<p class="hint">1.7 秒后替换为真实内容</p>
+
+  <footer class="foot">
+    <span>MOSS 山野志 · 社区</span>
+    <span>走过的地方，写下坐标</span>
+    <span>本页为零依赖单文件演示</span>
+  </footer>
+</div>
+<p class="sr" id="live" role="status" aria-live="polite"></p>
 <script>
 (function () {
   var card = document.getElementById('card');
+  var live = document.getElementById('live');
   var timer = null;
+
   function load() {
     clearTimeout(timer);
     card.classList.remove('done');
     card.setAttribute('aria-busy', 'true');
+    live.textContent = '正在加载动态';
     timer = setTimeout(function () {
       card.classList.add('done');
       card.setAttribute('aria-busy', 'false');
+      live.textContent = '动态已加载';
     }, 1700);
   }
+
   document.getElementById('again').addEventListener('click', load);
   load();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

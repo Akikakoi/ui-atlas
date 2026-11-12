@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>速度跑马灯 · PACE 动态字体周</title>
+<style>
+:root{--bg:#0b0d10;--ink:#f2f3ec;--muted:rgba(242,243,236,.5);--accent:#8ef0c8;--line:rgba(255,255,255,.1)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+.nav{position:fixed;inset:0 0 auto;z-index:8;height:68px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1120px)/2));background:rgba(11,13,16,.78);
+  border-bottom:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:baseline;gap:10px;font:600 15px/1.1 Georgia,"Songti SC",serif;letter-spacing:.06em;white-space:nowrap}
+.brand .mark{width:24px;height:24px;display:grid;place-items:center;border-radius:3px;background:var(--accent);color:#0b0d10;
+  font:600 12px/1 ui-monospace,Consolas,monospace}
+.brand i{font:400 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:rgba(242,243,236,.6)}
+.nav-links a:hover{color:var(--accent)}
+.nav .cta{margin-left:auto;border:1px solid var(--accent);border-radius:999px;padding:7px 14px;font-size:11.5px;
+  font-weight:600;color:var(--accent);white-space:nowrap}
+.nav .cta:hover{background:var(--accent);color:#0b0d10}
+.sec{height:175vh;position:relative}
+.stick{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:26px;padding-top:68px}
+.head{padding:0 max(24px,calc((100vw - 1120px)/2)) 4px;max-width:820px}
+.kicker{margin:0 0 14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+h1{margin:0;font-size:clamp(30px,5.4vw,52px);line-height:1.06;letter-spacing:-.045em;font-weight:600}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{margin:14px 0 0;font:600 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.rows{display:grid;gap:6px}
+.row{overflow:hidden;white-space:nowrap}
+.track{display:flex;width:max-content;will-change:transform}
+.chunk{display:block;padding-right:.3em;font-size:clamp(52px,11vw,110px);line-height:1.02;letter-spacing:-.045em;font-weight:620}
+.row:nth-child(2) .chunk{color:transparent;-webkit-text-stroke:1.2px rgba(242,243,236,.34);font-weight:600}
+.row:nth-child(3) .chunk{font-family:Georgia,"Songti SC",serif;font-style:italic;font-weight:400;color:#c9c5b4;letter-spacing:-.02em}
+.hud{position:absolute;right:max(24px,calc((100vw - 1120px)/2));bottom:44px;display:flex;align-items:baseline;gap:7px;
+  font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.hud b{font-size:22px;letter-spacing:-.02em;color:var(--accent)}
+.program{max-width:1120px;margin:0 auto;padding:8px 22px 48px;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);
+  gap:clamp(26px,5vw,64px);align-items:start}
+.program h2{margin:0 0 10px;font-size:clamp(24px,3.2vw,34px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
+.program .intro p{margin:0;font-size:12.5px;line-height:1.9;color:var(--muted);max-width:28em}
+.program .note{margin-top:18px;font:600 8.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(242,243,236,.38)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{text-align:left;padding:14px 8px;border-bottom:1px solid var(--line)}
+th{font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+td:first-child{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--accent);white-space:nowrap}
+td:nth-child(2){font-weight:600}
+td:last-child{text-align:right;color:var(--muted);font-size:11px}
+.band{max-width:1120px;margin:0 auto;padding:0 22px 46px}
+.inner-band{border:1px solid rgba(142,240,200,.25);border-radius:16px;padding:28px 26px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(142,240,200,.07),rgba(142,240,200,.01) 62%)}
+.inner-band h2{margin:0 0 6px;font-size:clamp(21px,2.6vw,28px);letter-spacing:-.03em;font-weight:600}
+.inner-band p{margin:0;font-size:12px;color:var(--muted);line-height:1.8}
+.inner-band .cta{margin-left:auto;border:1px solid var(--accent);background:var(--accent);color:#0b0d10;border-radius:999px;
+  padding:9px 17px;font-size:12px;font-weight:650;white-space:nowrap}
+.inner-band .cta:hover{filter:brightness(1.08)}
+footer{max-width:1120px;margin:0 auto;padding:0 22px 26px;display:flex;gap:18px;flex-wrap:wrap;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;
+  color:rgba(242,243,236,.7);background:rgba(11,13,16,.6);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 9px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);pointer-events:none;z-index:9}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:860px){
+  .nav{gap:16px}.nav-links{display:none}
+  .program{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}.brand .mark{width:20px;height:20px;font-size:10px}.brand i{display:none}
+  .sec{height:160vh}
+  .stick{padding-top:54px;gap:20px}
+  .head{padding:0 16px}
+  .kicker{font-size:8px;margin-bottom:9px}
+  h1{font-size:clamp(26px,8.4vw,34px)}
+  .sub{display:none}
+  .chunk{font-size:clamp(40px,12vw,56px)}
+  .hud{right:16px;bottom:22px;font-size:8.5px}
+  .hud b{font-size:17px}
+  .program{padding:0 16px 36px}
+  .program h2{font-size:22px}
+  .program .intro p{font-size:11.5px}
+  table{font-size:11.5px}
+  th,td{padding:11px 5px}
+  td:last-child{display:none}
+  .band{padding:0 16px 38px}
+  .inner-band{padding:22px 18px}
+  .inner-band .cta{margin-left:0}
+  footer{padding:0 16px 22px;font-size:8.5px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}.brand .mark{width:19px;height:19px;font-size:10px}.brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .sec{height:150vh}
+  .stick{padding-top:46px;gap:12px;justify-content:center}
+  .head{padding:0 20px}
+  .kicker{margin-bottom:5px;font-size:7.5px}
+  h1{font-size:22px;line-height:1.08}
+  .sub{margin-top:5px;font-size:7px}
+  .rows{gap:2px}
+  .chunk{font-size:33px;line-height:1.04}
+  .hud{right:20px;bottom:12px;font-size:7.5px}
+  .hud b{font-size:14px}
+  .program,.band,footer{display:none}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c4048;
+    background:rgba(255,255,255,.82);border:1px solid rgba(22,21,15,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (prefers-reduced-motion:reduce){
+  .track{transform:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark">P</span>节奏<i>PACE TYPE WEEK</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#program">日程</a>
+    <a href="#program">讲者</a>
+    <a href="#tickets">购票</a>
+  </nav>
+  <a class="cta" href="#tickets">购票</a>
+</header>
+
+<section class="sec" id="top">
+  <div class="stick">
+    <div class="head">
+      <p class="kicker">PACE 2026 · 动态字体周 / 11.20–11.22</p>
+      <h1>滚得越快，<br><em>字幕跑得越快。</em></h1>
+      <p class="sub">西岸艺术中心 B 馆 · 三天 / 12 场演讲 / 4 个工作坊</p>
+    </div>
+    <div class="rows" id="rows" aria-hidden="true">
+      <div class="row"><div class="track"><span class="chunk">MOTION · RHYTHM · MOTION · RHYTHM · </span><span class="chunk">MOTION · RHYTHM · MOTION · RHYTHM · </span></div></div>
+      <div class="row"><div class="track"><span class="chunk">Type in motion, scroll in time.</span><span class="chunk">Type in motion, scroll in time.</span></div></div>
+      <div class="row"><div class="track"><span class="chunk">速度不是常量，节奏才是。</span><span class="chunk">速度不是常量，节奏才是。</span></div></div>
+    </div>
+    <div class="hud">SCROLL VELOCITY <b id="vel">0</b></div>
+    <p class="sr">三行滚动字幕：动态字体、排版节奏与速度。滚动越快，字幕跑得越快；停止滚动后逐渐回到常速。</p>
+  </div>
+</section>
+
+<section class="program" id="program">
+  <div class="intro">
+    <p class="kicker">PROGRAM / 03 DAYS</p>
+    <h2>三天，<br>把速度拆开看。</h2>
+    <p>从可变字体到滚动叙事，十二场演讲只谈一件事：字在时间里怎么动。工作坊限 20 人，需单独预约。</p>
+    <p class="note">PACE TYPE WEEK · 上海西岸</p>
+  </div>
+  <table>
+    <thead><tr><th>时间</th><th>场次</th><th>讲者</th></tr></thead>
+    <tbody>
+      <tr><td>11/20 10:30</td><td>可变字体的第二层节奏</td><td>林珂</td></tr>
+      <tr><td>11/20 14:00</td><td>滚动不是翻页</td><td>Mina Oka</td></tr>
+      <tr><td>11/21 11:00</td><td>字幕的速度曲线</td><td>周野</td></tr>
+      <tr><td>11/21 16:30</td><td>从活字到实时排版</td><td>Paul G.</td></tr>
+      <tr><td>11/22 13:30</td><td>工作坊：把节奏写进 CSS</td><td>林珂 / 周野</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="band" id="tickets">
+  <div class="inner-band">
+    <div>
+      <h2>三日通票，还剩 80 张。</h2>
+      <p>含全部演讲与展区；工作坊需在购票后单独预约，每场 20 人。</p>
+    </div>
+    <a class="cta" href="mailto:tickets@pace.type">购票 →</a>
+  </div>
+</section>
+
+<footer>
+  <span>节奏 · PACE TYPE WEEK</span>
+  <span>上海 · 西岸艺术中心 B 馆</span>
+  <span>11.20–11.22 / 2026</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">上下滚动，看字幕怎么加速</p>
+<script>
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var rows = [].slice.call(document.querySelectorAll('.row')).map(function (row, i) {
+    return {
+      track: row.querySelector('.track'),
+      chunk: row.querySelector('.chunk'),
+      x: 0,
+      speed: [.9, -1.45, .55][i] || .8,
+      k: [.55, -.9, .4][i] || .5,
+      w: 0
+    };
+  });
+  var vel = 0, last = scrollY, raf = null, running = true;
+  var out = document.getElementById('vel');
+
+  function measure() {
+    rows.forEach(function (r) { r.w = r.chunk.offsetWidth; });
+  }
+  measure();
+  addEventListener('resize', measure);
+
+  addEventListener('scroll', function () {
+    var now = scrollY;
+    vel += (now - last) * .55;
+    last = now;
+  }, { passive: true });
+
+  function frame() {
+    raf = null;
+    vel *= .9;
+    rows.forEach(function (r) {
+      if (!r.w) return;
+      r.x += r.speed + vel * r.k;
+      r.x = ((r.x % r.w) + r.w) % r.w;
+      r.track.style.transform = 'translate3d(' + (-r.x).toFixed(2) + 'px,0,0)';
+    });
+    out.textContent = Math.round(Math.abs(vel));
+    if (running) raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+
+  document.addEventListener('visibilitychange', function () {
+    running = !document.hidden;
+    if (running && !raf) raf = requestAnimationFrame(frame);
+    if (!running && raf) { cancelAnimationFrame(raf); raf = null; }
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滚动描边 · VIA 越岭山径手册</title>
+<style>
+:root{--bg:#0a1020;--ink:#eef1f8;--muted:rgba(238,241,248,.52);--line:#ffcf6e;--dim:rgba(255,207,110,.18)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(80% 60% at 50% 30%,#121a30,#080d19 70%);color:var(--ink);
+  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+.nav{position:fixed;inset:0 0 auto;z-index:8;height:68px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1120px)/2));background:rgba(8,13,25,.72);
+  border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:baseline;gap:10px;font:600 15px/1.1 Georgia,"Songti SC",serif;letter-spacing:.04em;white-space:nowrap}
+.brand .mark{width:24px;height:24px;display:grid;place-items:center;border:1px solid rgba(255,207,110,.55);border-radius:50%;
+  color:#ffcf6e;font:600 10px/1 ui-monospace,Consolas,monospace}
+.brand i{font:400 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:rgba(238,241,248,.62)}
+.nav-links a:hover{color:#ffe0a3}
+.nav .cta{margin-left:auto;border:1px solid rgba(255,207,110,.55);border-radius:999px;padding:7px 14px;
+  font-size:11.5px;font-weight:600;color:#ffe0a3;white-space:nowrap}
+.nav .cta:hover{background:#ffcf6e;color:#1a1206}
+.sec{height:175vh;position:relative}
+.stick{position:sticky;top:0;height:100vh;overflow:hidden;display:grid;place-items:center;padding:88px 24px 24px}
+.head{position:absolute;left:max(24px,calc((100vw - 1120px)/2));right:max(24px,calc((100vw - 1120px)/2));top:88px;z-index:2;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.kicker{margin:0 0 10px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+h1{margin:0;font-size:clamp(26px,4.6vw,40px);line-height:1.08;letter-spacing:-.04em;font-weight:600}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:#ffe0a3}
+.pct{font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:#ffe0a3;white-space:nowrap}
+svg{width:min(88vw,780px);height:auto;overflow:visible}
+.guide{fill:none;stroke:var(--dim);stroke-width:1.4;stroke-linecap:round}
+.draw{fill:none;stroke:var(--line);stroke-width:2.4;stroke-linecap:round;filter:drop-shadow(0 0 7px rgba(255,207,110,.55))}
+.tip{fill:#fff6dd;filter:drop-shadow(0 0 9px rgba(255,207,110,.9))}
+.baseline{stroke:rgba(255,255,255,.1);stroke-width:1}
+.contour{fill:none;stroke:rgba(255,224,163,.10);stroke-width:1}
+.wp{fill:#0a1020;stroke:#ffe0a3;stroke-width:1.6}
+.wp.start{fill:#ffe0a3}
+.wt{fill:rgba(238,241,248,.62);font:600 8px ui-monospace,Consolas,monospace;letter-spacing:1.5px}
+.alt{fill:rgba(238,241,248,.34);font:600 7px ui-monospace,Consolas,monospace;letter-spacing:1px}
+.foot{position:absolute;left:max(24px,calc((100vw - 1120px)/2));right:max(24px,calc((100vw - 1120px)/2));bottom:40px;z-index:2;
+  display:flex;justify-content:space-between;gap:16px;align-items:flex-end}
+.foot p{margin:0;max-width:34em;font-size:12px;line-height:1.8;color:var(--muted)}
+.foot .stats{display:flex;gap:20px;font:600 8.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.12em;
+  color:rgba(238,241,248,.45);text-align:right;white-space:nowrap}
+.foot .stats b{display:block;font-size:13px;letter-spacing:0;color:#ffe0a3}
+.stops{max-width:1120px;margin:0 auto;padding:8px 22px 50px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.stop{border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:20px 20px 18px;background:rgba(255,255,255,.025)}
+.stop .no{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:#ffe0a3;margin:0 0 14px}
+.stop h3{margin:0 0 7px;font-size:17px;letter-spacing:-.01em;font-weight:600}
+.stop p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.stop .line{display:flex;justify-content:space-between;gap:10px;margin-top:14px;padding-top:11px;border-top:1px solid rgba(255,255,255,.09);
+  font:600 8.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(238,241,248,.45)}
+.band{max-width:1120px;margin:0 auto;padding:0 22px 46px}
+.inner-band{border:1px solid rgba(255,207,110,.25);border-radius:16px;padding:28px 26px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(255,207,110,.08),rgba(255,207,110,.01) 62%)}
+.inner-band h2{margin:0 0 6px;font-size:clamp(21px,2.6vw,28px);letter-spacing:-.03em;font-weight:600}
+.inner-band p{margin:0;font-size:12px;color:var(--muted);line-height:1.8}
+.inner-band .cta{margin-left:auto;border:1px solid #ffcf6e;background:#ffcf6e;color:#1a1206;border-radius:999px;
+  padding:9px 17px;font-size:12px;font-weight:650;white-space:nowrap}
+.inner-band .cta:hover{background:#ffe0a3}
+footer{max-width:1120px;margin:0 auto;padding:0 22px 26px;display:flex;gap:18px;flex-wrap:wrap;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;
+  color:rgba(238,241,248,.7);background:rgba(10,16,32,.6);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 9px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);pointer-events:none;z-index:9}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:#ffcf6e}
+@media (max-width:820px){
+  .nav-links{display:none}
+  .stops{grid-template-columns:1fr}
+  .foot .stats{display:none}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}.brand .mark{width:20px;height:20px;font-size:9px}.brand i{display:none}
+  .sec{height:160vh}
+  .stick{padding:74px 16px 24px}
+  .head{left:16px;right:16px;top:74px}
+  .kicker{font-size:8px;margin-bottom:7px}
+  h1{font-size:clamp(24px,7.4vw,30px);line-height:1.12}
+  .pct{font-size:9.5px}
+  svg{width:100%}
+  .foot{left:16px;right:16px;bottom:20px}
+  .foot p{font-size:10.5px;line-height:1.7}
+  .stops{grid-template-columns:1fr;padding:0 16px 36px}
+  .band{padding:0 16px 38px}
+  .inner-band{padding:22px 18px}
+  .inner-band .cta{margin-left:0}
+  footer{padding:0 16px 22px;font-size:8.5px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}.brand .mark{width:19px;height:19px;font-size:9px}.brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .sec{height:155vh}
+  .stick{padding:112px 20px 8px}
+  .head{left:20px;right:20px;top:54px}
+  .kicker{font-size:7.5px;margin-bottom:5px}
+  h1{font-size:20px;line-height:1.1}
+  .pct{font-size:9px}
+  svg{width:min(78vw,470px);max-height:300px}
+  .foot{display:none}
+  .stops,.band,footer{display:none}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c4048;
+    background:rgba(255,255,255,.82);border:1px solid rgba(22,21,15,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (prefers-reduced-motion:reduce){
+  .draw{stroke-dashoffset:0!important}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#sec"><span class="mark">V</span>山径<i>VIA ALPINA · 越岭手册</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#stops">沿途</a>
+    <a href="#gear">装备</a>
+    <a href="#start">出发</a>
+  </nav>
+  <a class="cta" href="#start">下载 GPX</a>
+</header>
+
+<section class="sec" id="sec">
+  <div class="stick">
+    <div class="head">
+      <div>
+        <p class="kicker">VIA ALPINA · 第 3 段 / 18.4 KM</p>
+        <h1>这条线，<br><em>跟着你滚出来。</em></h1>
+      </div>
+      <span class="pct" id="pct">0%</span>
+    </div>
+    <svg viewBox="0 0 640 420" aria-hidden="true">
+      <path class="contour" d="M20 392 C120 360 210 392 310 366 C420 336 520 368 624 338"/>
+      <path class="contour" d="M14 300 C110 268 190 306 292 278 C404 246 512 282 626 246"/>
+      <path class="contour" d="M24 210 C120 184 208 218 306 190 C414 158 522 194 614 164"/>
+      <line class="baseline" x1="24" y1="356" x2="616" y2="356"/>
+      <path class="guide" d="M30 330 C90 300 120 250 170 260 C220 270 235 180 290 190 C340 199 355 135 405 150 C455 165 470 110 520 130 C560 146 585 118 610 96"/>
+      <path class="draw" id="line" d="M30 330 C90 300 120 250 170 260 C220 270 235 180 290 190 C340 199 355 135 405 150 C455 165 470 110 520 130 C560 146 585 118 610 96"/>
+      <circle class="wp start" cx="30" cy="330" r="4.5"/>
+      <circle class="wp" cx="290" cy="190" r="4"/>
+      <circle class="wp" cx="520" cy="130" r="4"/>
+      <circle class="tip" id="tip" cx="30" cy="330" r="4.5"/>
+      <text class="wt" x="18" y="352">VALLE</text>
+      <text class="wt" x="272" y="212">BOSCO</text>
+      <text class="wt" x="498" y="152">PASSO</text>
+      <text class="alt" x="600" y="82" text-anchor="end">2,140 M</text>
+      <text class="alt" x="30" y="400">820 M</text>
+      <text class="alt" x="560" y="398" text-anchor="end">第 3 段 · 7 H</text>
+    </svg>
+    <div class="foot">
+      <p>路径只写一次，用 getTotalLength 拿到长度，再把 stroke-dashoffset 从全长收到 0。滚动只喂进度，线条本身不重算，所以再长也不掉帧。</p>
+      <div class="stats">
+        <span>爬升<b>1,240 m</b></span>
+        <span>下降<b>1,080 m</b></span>
+        <span>最高<b>2,140 m</b></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stops" id="stops">
+  <article class="stop">
+    <p class="no">WAYPOINT 01 · KM 0</p>
+    <h3>谷口 · VALLE</h3>
+    <p>从旧邮局后面进山，第一段是碎石路。八点前有雾，路边水槽可以补最后一次水。</p>
+    <div class="line"><span>海拔 820 m</span><span>补水点</span></div>
+  </article>
+  <article class="stop">
+    <p class="no">WAYPOINT 02 · KM 9.6</p>
+    <h3>林线 · BOSCO</h3>
+    <p>过了林线就没有树荫了。这里有一间石头小屋，门不上锁，可以在里面等风小一点。</p>
+    <div class="line"><span>海拔 1,560 m</span><span>避风屋</span></div>
+  </article>
+  <article class="stop">
+    <p class="no">WAYPOINT 03 · KM 15.2</p>
+    <h3>垭口 · PASSO</h3>
+    <p>最后一段是之字形石阶。垭口的风从北面来，十月之后要加一层硬壳，再下撤到终点。</p>
+    <div class="line"><span>海拔 2,140 m</span><span>风口</span></div>
+  </article>
+</section>
+
+<section class="band" id="start">
+  <div class="inner-band">
+    <div>
+      <h2>本周六，第 3 段还有 6 个名额。</h2>
+      <p>下载 GPX、打印纸质地图，出发前我们会在谷口做一次路线说明。</p>
+    </div>
+    <a class="cta" href="mailto:trail@via.alpina">下载 GPX 并报名 →</a>
+  </div>
+</section>
+
+<footer id="gear">
+  <span>山径 · VIA ALPINA</span>
+  <span>第 3 段 · 谷口 → 垭口</span>
+  <span>18.4 km / 7 h</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">往下滚，一条线会沿路径画出来</p>
+<script>
+(function () {
+  var sec = document.getElementById('sec') || document.querySelector('.sec');
+  var line = document.getElementById('line');
+  var tip = document.getElementById('tip'), pct = document.getElementById('pct');
+  var len = line.getTotalLength();
+  line.style.strokeDasharray = len;
+
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    line.style.strokeDashoffset = 0;
+    var e = line.getPointAtLength(len);
+    tip.setAttribute('cx', e.x); tip.setAttribute('cy', e.y);
+    pct.textContent = '100%';
+    return;
+  }
+
+  line.style.strokeDashoffset = len;
+  var raf = null;
+  function render() {
+    raf = null;
+    var r = sec.getBoundingClientRect();
+    var total = sec.offsetHeight - innerHeight;
+    var p = Math.max(0, Math.min(1, -r.top / total));
+    var k = p * p * (3 - 2 * p);
+    line.style.strokeDashoffset = (len * (1 - k)).toFixed(2);
+    var pt = line.getPointAtLength(len * k);
+    tip.setAttribute('cx', pt.x.toFixed(2));
+    tip.setAttribute('cy', pt.y.toFixed(2));
+    pct.textContent = Math.round(k * 100) + '%';
+  }
+  addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+  addEventListener('resize', render);
+  render();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

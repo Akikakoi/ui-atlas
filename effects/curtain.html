@@ -3,92 +3,253 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>遮罩擦除转场 · UI Atlas 动效</title>
+<title>遮罩擦除转场 · TIDE 季刊第 04 期 · UI Atlas</title>
 <style>
-:root{--ink:#f4f1e9;--muted:rgba(244,241,233,.55);--accent:#e2683c}
+:root{--bg:#f0ebdf;--paper:#faf7ef;--ink:#1d1b16;--muted:#7d7668;--line:#dcd3c1;--accent:#b24a28;--sea:#2e4a44}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{background:#0d0e11;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
-.view{position:fixed;inset:0;display:grid;align-content:space-between;padding:32px 24px 26px;opacity:0;pointer-events:none;transition:opacity .25s}
-.view.show{opacity:1;pointer-events:auto}
-.a{background:radial-gradient(100% 80% at 20% 0%,#25304a,#0d0e11 70%)}
-.b{background:radial-gradient(100% 80% at 80% 0%,#3d241c,#0d0e11 70%)}
-.kicker{margin:0;font:600 9.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
-h1{margin:14px 0 0;font-size:clamp(30px,7.6vw,58px);line-height:1.02;letter-spacing:-.045em;font-weight:600;max-width:9em}
-h1 em{font-style:normal;color:var(--accent)}
-.lede{margin:16px 0 0;font-size:12.5px;line-height:1.85;color:var(--muted);max-width:26em}
-.foot{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
-.foot p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted);max-width:26em}
-.cta{border:1px solid rgba(255,255,255,.26);background:transparent;color:var(--ink);border-radius:999px;padding:9px 18px;
-  font:inherit;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-.cta:hover{border-color:var(--accent);color:#ffb99c}
-.curtain{position:fixed;inset:0;z-index:9;display:grid;grid-template-columns:repeat(4,1fr);pointer-events:none;visibility:hidden}
-.curtain i{background:#e2683c;transform:translateY(101%);transition:transform .5s cubic-bezier(.76,0,.24,1);transition-delay:calc(var(--i) * 42ms)}
-.curtain i:nth-child(2){background:#c2542f}
-.curtain i:nth-child(3){background:#9c4026}
-.curtain i:nth-child(4){background:#73301d}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.shell{min-height:100svh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;flex:0 0 auto;height:54px;display:flex;align-items:center;gap:14px;padding:0 clamp(16px,3vw,36px);border-bottom:1px solid var(--line);background:rgba(250,247,239,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:baseline;gap:9px;flex:0 0 auto}
+.brand b{font-size:15px;font-weight:750;letter-spacing:.28em}
+.brand span{font-size:9px;letter-spacing:.14em;color:var(--muted)}
+.crumb{display:flex;align-items:center;gap:8px;padding-left:13px;border-left:1px solid var(--line);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.crumb em{font-style:normal;color:var(--ink)}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:4px 9px;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex:0 0 auto}
+.issue{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
+.sub{border:1px solid var(--line);border-radius:999px;padding:5px 10px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+.main{flex:1;display:flex;flex-direction:column;min-height:0}
+.view{flex:1;flex-direction:column;min-height:0}
+.view.show{display:flex}
+.kicker{margin:0 0 16px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+.cover-body{flex:1;width:100%;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:clamp(26px,5vw,74px);padding:clamp(24px,4.5vw,58px) clamp(18px,4vw,44px) clamp(18px,3vw,36px);align-items:center}
+.cover-copy h1{margin:0 0 20px;font-size:clamp(38px,5.6vw,74px);line-height:1.02;letter-spacing:-.052em;font-weight:620}
+.cover-copy h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:0 0 24px;font-size:13.5px;line-height:1.9;color:#514b40;max-width:26em}
+.cta-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.cta{border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:999px;padding:11px 20px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:background .22s,border-color .22s,color .22s,transform .22s}
+.cta:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-1px)}
+.cta:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.cta span{font-size:14px}
+.meta{font:500 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.cover-art{margin:0}
+.pool{position:relative;aspect-ratio:4/4.7;max-height:58vh;border-radius:16px;overflow:hidden;background:
+  radial-gradient(circle at 50% 38%,rgba(239,231,208,.9) 0 1.2%,transparent 1.7%),
+  radial-gradient(circle at 50% 38%,transparent 0 12%,rgba(239,231,208,.42) 12.4% 13%,transparent 13.4% 20%,rgba(239,231,208,.3) 20.4% 21%,transparent 21.4% 26%,rgba(239,231,208,.2) 26.4% 27%,transparent 27.4%),
+  radial-gradient(ellipse 70% 40% at 50% 95%,rgba(19,35,32,.55),transparent 70%),
+  linear-gradient(158deg,#2e4a44 0%,#566f63 46%,#a08a68 78%,#d5c3a2 100%);
+  box-shadow:0 40px 80px -56px rgba(30,35,28,.6)}
+.pool::before{content:"";position:absolute;left:-12%;right:-12%;top:47%;height:22%;border-radius:50%;background:rgba(226,214,188,.16);filter:blur(10px);transform:rotate(-4deg)}
+.pool::after{content:"";position:absolute;left:14%;top:26%;width:16%;aspect-ratio:1.6;border-radius:58% 42% 62% 38%/46% 60% 40% 54%;background:rgba(13,25,23,.55);box-shadow:44px 34px 0 -6px rgba(13,25,23,.35),-18px 88px 0 -10px rgba(13,25,23,.28)}
+.cover-art figcaption{display:flex;justify-content:space-between;gap:12px;margin-top:9px;font:500 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.cover-foot{flex:0 0 auto;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:12px clamp(18px,4vw,44px);font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.contents-body{flex:1;width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(230px,.68fr) minmax(0,1.32fr);gap:clamp(28px,5vw,72px);padding:clamp(24px,4vw,52px) clamp(18px,4vw,44px) clamp(18px,3vw,34px);align-items:start}
+.contents-head{position:sticky;top:86px}
+.contents-head h2{margin:0 0 16px;font-size:clamp(28px,3.6vw,44px);line-height:1.08;letter-spacing:-.045em;font-weight:630;outline:none}
+.contents-head h2 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.contents-head .lede{font-size:12.5px;margin-bottom:20px}
+.backcta{background:transparent;color:var(--ink);border-color:var(--line);padding:9px 16px;font-size:11.5px}
+.backcta:hover{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.chapters{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.chapters li{display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:16px;padding:19px 0 20px;border-bottom:1px solid var(--line);align-items:start}
+.chapters .no{font:600 30px/.9 "Songti SC",Georgia,serif;letter-spacing:-.04em;color:#c2b49a}
+.chapters h3{margin:0 0 4px;font-size:16px;letter-spacing:-.02em;font-weight:650}
+.chapters p{margin:0;font-size:11.5px;line-height:1.85;color:var(--muted);max-width:34em}
+.chapters .page{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);white-space:nowrap;padding-top:4px}
+.pull{grid-column:2;margin:26px 0 0;padding:18px 20px;border-left:2px solid var(--accent);background:rgba(250,247,239,.72);border-radius:0 12px 12px 0;font:italic 17px/1.7 Georgia,"Songti SC",serif;color:#3c382f}
+.pull small{display:block;margin-top:8px;font:500 8.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);font-style:normal}
+.contents-foot{flex:0 0 auto;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:12px clamp(18px,4vw,44px);font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.curtain{position:fixed;inset:0;z-index:50;display:grid;grid-template-columns:repeat(4,1fr);pointer-events:none;visibility:hidden}
+.curtain i{background:#c2542f;transform:translateY(101%);transition:transform .5s cubic-bezier(.76,0,.24,1);transition-delay:calc(var(--i) * 42ms)}
+.curtain i:nth-child(2){background:#a14226}
+.curtain i:nth-child(3){background:#7e321d}
+.curtain i:nth-child(4){background:#5c2415}
 .curtain.on{visibility:visible}
 .curtain.on i{transform:none}
 .curtain.out i{transform:translateY(-101%);transition-delay:calc((3 - var(--i)) * 42ms)}
-.hint{position:fixed;left:16px;bottom:10px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);z-index:3;pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.curtain i{transition:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-width:900px){
+  .cover-body{grid-template-columns:1fr;gap:20px;padding-top:22px}
+  .cover-copy h1{font-size:clamp(34px,6.4vw,54px)}
+  .lede{max-width:34em}
+  .pool{aspect-ratio:16/8;max-height:none}
+  .contents-body{grid-template-columns:1fr;gap:20px}
+  .contents-head{position:static}
+  .pull{grid-column:1;margin-top:8px}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:42px;padding:0 16px;gap:10px}
+  .brand span,.crumb,.issue{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .cover-body{grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:24px;padding:12px 20px 8px}
+  .kicker{font-size:7.5px;margin-bottom:8px}
+  .cover-copy h1{font-size:clamp(28px,3.4vw,36px);line-height:1.08;margin-bottom:9px}
+  .lede{font-size:10.5px;line-height:1.7;margin-bottom:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .cta{padding:7px 13px;font-size:10.5px;gap:6px}
+  .meta{font-size:7.5px}
+  .pool{aspect-ratio:4/3.4;max-height:calc(100svh - 138px)}
+  .cover-art figcaption{font-size:7px;margin-top:6px}
+  .cover-foot{display:none}
+  .contents-body{grid-template-columns:198px minmax(0,1fr);gap:24px;padding:12px 20px 10px}
+  .contents-head{position:static}
+  .contents-head h2{font-size:23px;margin-bottom:8px}
+  .contents-head .lede{font-size:9.5px;line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .backcta{padding:6px 11px;font-size:9.5px}
+  .chapters li{padding:8px 0 9px;grid-template-columns:34px minmax(0,1fr) auto;gap:10px}
+  .chapters .no{font-size:21px}
+  .chapters h3{font-size:12.5px;margin-bottom:1px}
+  .chapters p{font-size:8.5px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  .chapters .page{font-size:7px;padding-top:2px}
+  .pull{display:none}
+  .contents-foot{display:none}
+}
+@media (max-width:560px){
+  .topbar{height:48px;padding:0 13px;gap:9px}
+  .brand span,.crumb,.issue,.sub,.hint{display:none}
+  .cover-body{grid-template-columns:1fr;gap:18px;padding:18px 16px 24px}
+  .cover-copy h1{font-size:37px;line-height:1.05}
+  .lede{font-size:12.5px;line-height:1.85;margin-bottom:16px}
+  .cta-row{gap:10px}
+  .meta{font-size:8px}
+  .pool{aspect-ratio:16/10;border-radius:12px}
+  .cover-foot{padding:11px 14px;font-size:7.5px}
+  .cover-foot span:nth-child(3){display:none}
+  .contents-body{grid-template-columns:1fr;gap:16px;padding:16px 16px 26px}
+  .contents-head h2{font-size:28px}
+  .contents-head .lede{font-size:11.5px}
+  .chapters li{grid-template-columns:38px minmax(0,1fr) auto;gap:11px;padding:13px 0}
+  .chapters .no{font-size:23px}
+  .chapters h3{font-size:14px}
+  .chapters p{font-size:10.5px;line-height:1.75}
+  .pull{font-size:15px;padding:14px 16px;margin-top:4px}
+  .contents-foot{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .curtain i{transition:none}
+  .cta{transition:none}
+}
 </style>
 </head>
 <body>
-<section class="view a show" id="va">
-  <div>
-    <p class="kicker">TRANSITION / 02</p>
-    <h1>换页时，<br>让四块板<em>先盖上来。</em></h1>
-    <p class="lede">四列色板错开 42ms 升起，完全遮住后换内容，再继续向上退出。用户看到的是同一块幕布在走，不是两次淡入。</p>
-  </div>
-  <div class="foot">
-    <p>与 View Transitions 的区别：这条不依赖新 API，纯 transform，任何浏览器都能跑。</p>
-    <button class="cta" type="button" data-go="b">进入案例 <span>→</span></button>
-  </div>
-</section>
-<section class="view b" id="vb">
-  <div>
-    <p class="kicker">TRANSITION / 02 · CASE</p>
-    <h1>遮罩把<br><em>两页缝在一起。</em></h1>
-    <p class="lede">返回时用同一套板，方向反过来。时长 500ms、错峰 42ms——总时长控制在 700ms 内，否则会等得不耐烦。</p>
-  </div>
-  <div class="foot">
-    <p>CASE 002 · 星野计划</p>
-    <button class="cta" type="button" data-go="a"><span>←</span> 回到封面</button>
-  </div>
-</section>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand"><b>TIDE</b><span>潮间带 · 季刊</span></div>
+    <span class="crumb">第 04 期 <em>/ 潮间带</em></span>
+    <p class="hint">点「进入本期」，四块色板会盖住页面再换页</p>
+    <div class="top-right">
+      <span class="issue">2026 秋 · 104 页</span>
+      <span class="sub">订阅</span>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="view cover show" id="viewA" aria-labelledby="coverTitle">
+      <div class="cover-body">
+        <div class="cover-copy">
+          <p class="kicker">QUARTERLY · ISSUE 04</p>
+          <h1 id="coverTitle" tabindex="-1">退潮之后，<br>礁石交出了<br><em>它的收藏。</em></h1>
+          <p class="lede">这一期我们把录音机、相机和笔记本带到潮间带。水退下去以后，礁石、盐霜与搁浅的船呈现出另一种秩序，像一间临时开放的陈列室。</p>
+          <div class="cta-row">
+            <button class="cta" type="button" data-go="b">进入本期 <span>→</span></button>
+            <span class="meta">104 页 · 3 篇长文 · 11 组图版</span>
+          </div>
+        </div>
+        <figure class="cover-art">
+          <div class="pool" aria-hidden="true"></div>
+          <figcaption><span>封面 / 潮间带 04</span><span>银盐 · 2026</span></figcaption>
+        </figure>
+      </div>
+      <footer class="cover-foot">
+        <span>TIDE 季刊 · 第 04 期</span>
+        <span>编辑：周玥 / 林一</span>
+        <span>封面：退潮后第 30 分钟</span>
+      </footer>
+    </section>
+
+    <section class="view contents" id="viewB" aria-labelledby="contentsTitle" hidden>
+      <div class="contents-body">
+        <header class="contents-head">
+          <p class="kicker">CONTENTS / 本期目录</p>
+          <h2 id="contentsTitle" tabindex="-1">三篇长文，<br>从退潮读到<em>夜里。</em></h2>
+          <p class="lede">本期没有访谈，也没有快问快答。三篇文章都很慢，适合在下午四点以后读。</p>
+          <button class="cta backcta" type="button" data-go="a">← 回到封面</button>
+        </header>
+        <ol class="chapters">
+          <li>
+            <span class="no" aria-hidden="true">01</span>
+            <div><h3>潮池里的微型海洋</h3><p>一块巴掌大的水洼里，住着海葵、小虾和一群来不及撤走的螺。作者蹲了三个小时。</p></div>
+            <span class="page">P. 08</span>
+          </li>
+          <li>
+            <span class="no" aria-hidden="true">02</span>
+            <div><h3>盐霜是一种时间</h3><p>盐在礁石上结晶的速度，和潮水退去的速度并不一样。这篇写了盐、风和等待。</p></div>
+            <span class="page">P. 34</span>
+          </li>
+          <li>
+            <span class="no" aria-hidden="true">03</span>
+            <div><h3>夜航船与灯塔</h3><p>最后一班渡轮离开以后，海岸线上只剩下一盏灯。摄影师的四分钟长曝光。</p></div>
+            <span class="page">P. 62</span>
+          </li>
+        </ol>
+        <aside class="pull">“海退下去以后，礁石才开始说话。”<small>本期卷首 · 第 03 页</small></aside>
+      </div>
+      <footer class="contents-foot">
+        <span>目录 / CONTENTS</span>
+        <span>共 104 页 · 广告页 6</span>
+        <span>TIDE 2026 秋季刊</span>
+      </footer>
+    </section>
+  </main>
+</div>
+
 <div class="curtain" id="curtain" aria-hidden="true">
   <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i>
 </div>
-<p class="hint">点「进入案例」或「回到封面」</p>
 <script>
 (function () {
-  var va = document.getElementById('va'), vb = document.getElementById('vb');
+  var viewA = document.getElementById('viewA'), viewB = document.getElementById('viewB');
   var curtain = document.getElementById('curtain');
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.querySelectorAll('.cta').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var to = b.dataset.go;
-        va.classList.toggle('show', to === 'a');
-        vb.classList.toggle('show', to === 'b');
-      });
-    });
-    return;
+  var hint = document.querySelector('.hint');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lock = false, current = 'a';
+
+  function setView(to) {
+    current = to;
+    var aOn = to === 'a', bOn = to === 'b';
+    viewA.classList.toggle('show', aOn);
+    viewB.classList.toggle('show', bOn);
+    viewA.hidden = !aOn;
+    viewB.hidden = !bOn;
+    viewA.setAttribute('aria-hidden', aOn ? 'false' : 'true');
+    viewB.setAttribute('aria-hidden', bOn ? 'false' : 'true');
+    viewA.inert = !aOn;
+    viewB.inert = !bOn;
+    hint.textContent = aOn ? '点「进入本期」，四块色板会盖住页面再换页' : '点「回到封面」，色板会反向擦回封面';
+    window.scrollTo(0, 0);
+    var target = aOn ? document.getElementById('coverTitle') : document.getElementById('contentsTitle');
+    setTimeout(function () { target.focus({ preventScroll: true }); }, reduce ? 0 : 720);
   }
-  var lock = false;
+
   function run(to) {
-    if (lock) return;
+    if (lock || to === current) return;
     lock = true;
+    if (reduce) {
+      setView(to);
+      lock = false;
+      return;
+    }
+    viewA.inert = true;
+    viewB.inert = true;
     curtain.classList.remove('out');
+    curtain.style.visibility = 'visible';
     curtain.classList.add('on');
     setTimeout(function () {
-      va.classList.toggle('show', to === 'a');
-      vb.classList.toggle('show', to === 'b');
+      setView(to);
       curtain.classList.remove('on');
       curtain.classList.add('out');
       setTimeout(function () {
@@ -98,8 +259,67 @@ h1 em{font-style:normal;color:var(--accent)}
       }, 780);
     }, 690);
   }
-  document.querySelectorAll('.cta').forEach(function (b) {
+
+  document.querySelectorAll('[data-go]').forEach(function (b) {
     b.addEventListener('click', function () { run(b.dataset.go); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && current === 'b') run('a');
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

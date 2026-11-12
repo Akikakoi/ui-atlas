@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滚动点亮文字 · MARGIN 夜间读书会</title>
+<style>
+:root{--bg:#f4f0e6;--ink:#1c1b17;--muted:#a29d90;--line:#ddd7c8;--accent:#b9432c}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+.nav{position:fixed;inset:0 0 auto;z-index:9;height:68px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1120px)/2));background:rgba(244,240,230,.92);
+  border-bottom:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:baseline;gap:10px;font:600 15px/1.1 Georgia,"Songti SC",serif;letter-spacing:.06em;white-space:nowrap}
+.brand .mark{width:24px;height:24px;display:grid;place-items:center;background:var(--accent);color:#fbf6ea;border-radius:2px;
+  font:600 11px/1 ui-monospace,Consolas,monospace}
+.brand i{font:400 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:#615d52}
+.nav-links a:hover{color:var(--accent)}
+.cta{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ink);background:var(--ink);color:#fbf6ea;
+  border-radius:999px;padding:9px 17px;font-size:12px;font-weight:600;white-space:nowrap}
+.cta:hover{background:var(--accent);border-color:var(--accent)}
+.nav .cta{margin-left:auto;padding:7px 14px;font-size:11.5px}
+.mast{max-width:1120px;margin:0 auto;padding:136px 22px 54px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);
+  gap:clamp(30px,5vw,70px);align-items:center}
+.kicker{margin:0 0 16px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;font-size:clamp(40px,5.8vw,70px);line-height:1.04;letter-spacing:-.05em;font-weight:620}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:22px 0 0;max-width:31em;font-size:13.5px;line-height:1.95;color:#5e5a4e}
+.meta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:24px;
+  font:600 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.meta-row i{width:1px;height:10px;background:var(--line)}
+.issue{border:1px solid var(--line);border-radius:14px;background:#faf6ec;overflow:hidden;box-shadow:0 24px 50px -44px rgba(50,40,22,.6)}
+.issue-top{display:flex;justify-content:space-between;align-items:baseline;padding:16px 18px;border-bottom:1px solid var(--line);
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.issue-top b{font:italic 400 24px/1 Georgia,serif;letter-spacing:-.02em;color:var(--accent)}
+.issue-list{padding:6px 18px 14px;margin:0;list-style:none}
+.issue-list li{display:flex;align-items:baseline;gap:12px;padding:13px 0;border-bottom:1px solid #e8e1d2;font-size:12.5px}
+.issue-list li:last-child{border-bottom:0}
+.issue-list b{font:600 8px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);min-width:3em}
+.issue-list span{flex:1}
+.issue-list i{font-style:normal;font:600 8px/1 ui-monospace,Consolas,monospace;color:var(--muted)}
+.issue-foot{padding:11px 18px;background:#f1ebdd;font:600 8px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.sec{height:175vh;position:relative}
+.stick{position:sticky;top:0;height:100vh;display:grid;place-items:center;padding:88px 24px 34px}
+.copy{width:100%;max-width:720px}
+.copy .kicker{margin-bottom:18px}
+p.body{margin:0;font-size:clamp(24px,3.5vw,37px);line-height:1.58;letter-spacing:-.025em;font-weight:560}
+p.body span{color:var(--muted);transition:color .22s ease}
+p.body span.on{color:var(--accent)}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:30px;padding-top:15px;border-top:1px solid var(--line)}
+.meta p{margin:0;font-size:12px;line-height:1.8;color:var(--muted);max-width:32em}
+.meta b{font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+.sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.picks{max-width:1120px;margin:0 auto;padding:6px 22px 48px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pick{border-top:1px solid var(--line);padding-top:18px}
+.pick .no{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent);margin:0 0 12px}
+.pick h3{margin:0 0 8px;font-size:17px;letter-spacing:-.01em;font-weight:620}
+.pick p{margin:0;font-size:12px;line-height:1.85;color:#6b675b}
+.pick .by{display:flex;justify-content:space-between;gap:10px;margin-top:14px;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;
+  letter-spacing:.08em;color:var(--muted)}
+.band{max-width:1120px;margin:0 auto;padding:0 22px 50px}
+.inner-band{border:1px solid rgba(185,67,44,.28);border-radius:16px;padding:30px 28px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(185,67,44,.07),rgba(185,67,44,.012) 62%)}
+.inner-band h2{margin:0 0 6px;font-size:clamp(22px,2.8vw,30px);letter-spacing:-.03em}
+.inner-band p{margin:0;font-size:12px;color:#615d52;line-height:1.8}
+.inner-band .cta{margin-left:auto;background:var(--accent);border-color:var(--accent)}
+footer{max-width:1120px;margin:0 auto;padding:0 22px 28px;display:flex;gap:18px;flex-wrap:wrap;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;pointer-events:none;
+  font-size:11px;letter-spacing:.04em;color:#57534a;background:rgba(250,246,236,.85);border:1px solid rgba(28,27,23,.12);
+  border-radius:999px;padding:4px 9px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:860px){
+  .nav{gap:16px}.nav-links{display:none}
+  .mast{grid-template-columns:1fr;padding-top:116px}
+  .issue{display:none}
+  .picks{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}.brand i{display:none}
+  .mast{padding:82px 16px 8px}
+  h1{font-size:clamp(34px,10.8vw,46px);line-height:1.08}
+  .lede{font-size:12px;line-height:1.9;margin-top:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .meta-row{margin-top:16px;font-size:8px;gap:9px}
+  .sec{height:165vh}
+  .stick{padding:70px 16px 26px}
+  .copy .kicker{margin-bottom:12px;font-size:8px}
+  p.body{font-size:clamp(21px,6.2vw,26px);line-height:1.6}
+  .meta{margin-top:20px;padding-top:12px;flex-direction:column;align-items:flex-start;gap:8px}
+  .meta p{font-size:11px}
+  .picks{padding:0 16px 32px;gap:20px}
+  .band{padding:0 16px 36px}
+  .inner-band{padding:22px 18px}
+  .inner-band .cta{margin-left:0}
+  footer{padding:0 16px 22px;font-size:8.5px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}.brand .mark{width:20px;height:20px;font-size:10px}.brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .mast{display:none}
+  .sec{height:155vh}
+  .stick{padding:62px 20px 14px}
+  .copy{max-width:600px}
+  .copy .kicker{margin-bottom:9px;font-size:8px}
+  p.body{font-size:20px;line-height:1.55;letter-spacing:-.02em}
+  .meta{margin-top:14px;padding-top:9px}
+  .meta p{font-size:9.5px;line-height:1.6;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .meta b{font-size:9px}
+  .picks,.band,footer{display:none}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c4048;
+    background:rgba(255,255,255,.82);border:1px solid rgba(22,21,15,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (prefers-reduced-motion:reduce){
+  p.body span{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark">M</span>边注<i>MARGIN · 夜读</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#read">本期</a>
+    <a href="#picks">选段</a>
+    <a href="#join">加入</a>
+  </nav>
+  <a class="cta" href="#join">订阅夜读</a>
+</header>
+
+<section class="mast" id="top">
+  <div>
+    <p class="kicker">MARGIN · 夜间读书会 / 第 12 期</p>
+    <h1>把一段话，<br>留到<em>天亮</em>。</h1>
+    <p class="lede">我们每周三晚上九点读一篇旧文。不赶进度，不做笔记，只把值得重读的句子留下来。这一期，关于「慢」。</p>
+    <div class="meta-row"><span>本期 03 篇</span><i></i><span>每周三 21:00</span><i></i><span>杭州 · 南山路</span></div>
+  </div>
+  <aside class="issue" aria-label="本期目录">
+    <div class="issue-top"><span>WINTER ISSUE</span><b>12</b></div>
+    <ul class="issue-list">
+      <li><b>01</b><span>慢，是一种抵抗</span><i>8 min</i></li>
+      <li><b>02</b><span>在山里读一封旧信</span><i>12 min</i></li>
+      <li><b>03</b><span>把书翻到折角那页</span><i>6 min</i></li>
+    </ul>
+    <div class="issue-foot">冬夜特辑 · 12 月 11 日 / 21:00</div>
+  </aside>
+</section>
+
+<section class="sec" id="read">
+  <div class="stick">
+    <div class="copy">
+      <p class="kicker">SCROLL / 12 · 本期发刊词</p>
+      <p class="body" id="body" aria-hidden="true">夜读不是把书读完。是留下一段话，让它在第二天早上还亮着。我们不追新书，只把值得重读的段落，一字一句地交给你。</p>
+      <p class="sr" id="bodySr">夜读不是把书读完。是留下一段话，让它在第二天早上还亮着。我们不追新书，只把值得重读的段落，一字一句地交给你。</p>
+      <div class="meta">
+        <p>只给「刚跨过边界」的那几个字改颜色，不逐帧遍历整段文字；往回滚时同样按索引撤销。</p>
+        <b id="pct">0%</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="picks" id="picks">
+  <article class="pick"><p class="no">01 / 慢</p><h3>慢，是一种抵抗</h3><p>「我们不是没有时间，而是把时间切得太碎。读书是少数几件不能加速的事。」</p><div class="by"><span>本期选段</span><span>P. 14</span></div></article>
+  <article class="pick"><p class="no">02 / 信</p><h3>在山里读一封旧信</h3><p>「信纸边上有雨痕。写信的人没有说想我，只说今年的栗子结得晚。」</p><div class="by"><span>本期选段</span><span>P. 22</span></div></article>
+  <article class="pick"><p class="no">03 / 折角</p><h3>把书翻到折角那页</h3><p>「重读不是为了记住，是为了看看三年前的自己，为什么在这一页停下来。」</p><div class="by"><span>本期选段</span><span>P. 31</span></div></article>
+</section>
+
+<section class="band" id="join">
+  <div class="inner-band">
+    <div>
+      <h2>下周三，读一封没有寄出的信。</h2>
+      <p>留下邮箱，我们会在周一晚上把本期文本和地址发给你。现场只有十二把椅子。</p>
+    </div>
+    <a class="cta" href="mailto:hello@margin.read">订阅夜读 →</a>
+  </div>
+</section>
+
+<footer>
+  <span>边注 · MARGIN NIGHT READING</span>
+  <span>杭州 · 南山路 214 号</span>
+  <span>每周三 21:00</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">往下滚，文字会从灰变红</p>
+<script>
+(function () {
+  var sec = document.getElementById('read'), body = document.getElementById('body');
+  var pct = document.getElementById('pct');
+  var text = body.textContent;
+  body.textContent = '';
+  var spans = [];
+  for (var i = 0; i < text.length; i++) {
+    var s = document.createElement('span');
+    s.textContent = text[i];
+    body.appendChild(s);
+    spans.push(s);
+  }
+
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    spans.forEach(function (s) { s.classList.add('on'); });
+    pct.textContent = '100%';
+    return;
+  }
+
+  var filled = 0, raf = null;
+  function render() {
+    raf = null;
+    var r = sec.getBoundingClientRect();
+    var total = sec.offsetHeight - innerHeight;
+    var p = Math.max(0, Math.min(1, -r.top / total));
+    var n = Math.round(p * spans.length);
+    if (n > filled) {
+      for (var i = filled; i < n; i++) spans[i].classList.add('on');
+    } else if (n < filled) {
+      for (var j = n; j < filled; j++) spans[j].classList.remove('on');
+    }
+    filled = n;
+    pct.textContent = Math.round(p * 100) + '%';
+  }
+  addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+  addEventListener('resize', render);
+  render();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

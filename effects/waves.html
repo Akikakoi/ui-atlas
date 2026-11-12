@@ -3,37 +3,370 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>等高线波浪 · UI Atlas 动效</title>
+<title>等高线波浪 · SWELL 海况预报</title>
 <style>
-:root{--bg:#080a0f;--ink:#eef1f7;--muted:rgba(238,241,247,.52);--accent:#7fa8ff}
+:root{--bg:#070a12;--bg2:#0a101d;--ink:#e9eefb;--muted:rgba(233,238,251,.56);--accent:#7fa8ff;
+  --line:rgba(127,168,255,.16);--glass:rgba(9,14,25,.52)}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;overflow:hidden}
-body{background:radial-gradient(720px 480px at 50% 24%,#101d35,#080a0f 72%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
-.stage{position:relative;z-index:2;min-height:100vh;display:grid;place-items:center;padding:34px 24px;text-align:center;pointer-events:none}
-.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(238,241,247,.42)}
-h1{margin:0;font-size:clamp(28px,6.8vw,50px);line-height:1.04;letter-spacing:-.04em;font-weight:600}
-h1 em{font-style:normal;color:var(--accent)}
-p.sub{max-width:25em;margin:16px auto 0;font-size:12px;line-height:1.8;color:var(--muted)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:rgba(238,241,247,.5);z-index:3;pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){canvas{opacity:1}}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(720px 480px at 50% 24%,#101d35,#080a0f 72%) fixed;color:var(--ink);
+  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block}
+.scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(7,10,18,.72),rgba(7,10,18,.18) 58%,transparent 78%),
+  linear-gradient(180deg,transparent 62%,rgba(7,10,18,.55))}
 
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.wrap{width:min(1200px,calc(100% - 48px));margin:0 auto}
+
+/* 顶栏 */
+.nav{position:sticky;top:0;z-index:6;background:rgba(7,10,18,.46);
+  backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);
+  border-bottom:1px solid rgba(127,168,255,.12)}
+.nav-in{width:min(1200px,calc(100% - 48px));margin:0 auto;height:64px;display:flex;align-items:center;gap:26px}
+.brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font:600 13px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em}
+.brand svg{width:22px;height:14px;display:block}
+.brand span{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:rgba(233,238,251,.4)}
+.nav nav{display:flex;gap:22px}
+.nav nav a{font-size:11.5px;letter-spacing:.05em;color:rgba(233,238,251,.58);text-decoration:none;transition:color .2s}
+.nav nav a:hover{color:var(--ink)}
+.hint{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 auto;padding:4px 9px;
+  font-size:11px;color:rgba(233,238,251,.6);white-space:nowrap;
+  background:rgba(128,128,128,.1);border:1px solid rgba(128,128,128,.18);border-radius:999px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:0 0 5px}
+.nav-cta{flex:0 0 auto;height:31px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;
+  border:1px solid rgba(127,168,255,.34);color:var(--accent);text-decoration:none;font-size:11.5px;
+  background:rgba(127,168,255,.08);transition:background .2s,color .2s}
+.nav-cta:hover{background:rgba(127,168,255,.18);color:#dbe7ff}
+
+/* 首屏 */
+.page{position:relative;z-index:2}
+.hero{width:min(1200px,calc(100% - 48px));margin:0 auto;min-height:calc(100vh - 65px);
+  padding:clamp(34px,8vh,88px) 0 22px;display:flex;flex-direction:column}
+.kicker{margin:0;font:600 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(233,238,251,.5)}
+h1{margin:16px 0 0;font-size:clamp(40px,6.6vw,74px);line-height:.99;letter-spacing:-.045em;font-weight:600;max-width:8.5em}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:20px 0 0;max-width:33em;font-size:13.5px;line-height:1.85;color:var(--muted)}
+.actions{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{height:44px;padding:0 20px;border-radius:999px;display:inline-flex;align-items:center;
+  font-size:12px;letter-spacing:.03em;text-decoration:none;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s}
+.btn.solid{background:var(--accent);border-color:var(--accent);color:#07101f}
+.btn.solid:hover{background:#a8c4ff;border-color:#a8c4ff}
+.btn.ghost{border-color:rgba(127,168,255,.32);color:var(--ink);background:rgba(9,14,25,.28);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+.hero-foot{margin-top:auto;padding-top:clamp(28px,7vh,66px)}
+.conditions{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:14px;
+  background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden}
+.cond{padding:14px 18px;border-left:1px solid rgba(127,168,255,.12)}
+.cond:first-child{border-left:0}
+.cond span{display:block;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:rgba(233,238,251,.42)}
+.cond b{display:flex;align-items:baseline;gap:5px;margin-top:4px;font:600 21px/1.2 ui-monospace,Consolas,monospace;letter-spacing:-.02em}
+.cond b small{font-size:10px;font-weight:500;letter-spacing:.02em;color:rgba(233,238,251,.5)}
+.cond p{margin:3px 0 0;font-size:9.5px;line-height:1.5;color:rgba(233,238,251,.4)}
+.cond p.up{color:#8fd6a8}
+
+/* 实底内容 */
+.solid{background:var(--bg);border-top:1px solid rgba(127,168,255,.1)}
+.forecast{padding:clamp(62px,10vh,106px) 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px}
+.eyebrow{margin:0;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:rgba(127,168,255,.62)}
+h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spacing:-.04em;font-weight:600}
+.sec-head>p{margin:0;max-width:30em;font-size:12.5px;line-height:1.85;color:var(--muted);justify-self:end;text-align:right}
+.spots{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.spot{border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;
+  background:linear-gradient(180deg,rgba(17,26,44,.66),rgba(8,12,21,.86));transition:transform .25s,border-color .25s}
+.spot:hover{transform:translateY(-3px);border-color:rgba(127,168,255,.34)}
+.spot-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.spot h3{margin:0;font-size:15.5px;letter-spacing:-.01em}
+.spot h3 small{display:block;margin-top:4px;font:400 9px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:rgba(233,238,251,.38)}
+.chip{padding:3px 8px;border-radius:999px;font:600 9px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.1em;white-space:nowrap}
+.chip.go{background:rgba(96,196,140,.12);color:#8fd6a8;border:1px solid rgba(96,196,140,.28)}
+.chip.care{background:rgba(240,190,100,.1);color:#f2c879;border:1px solid rgba(240,190,100,.28)}
+.chip.calm{background:rgba(127,168,255,.1);color:#a8c4ff;border:1px solid rgba(127,168,255,.28)}
+.spark{display:block;width:100%;height:58px;margin:14px 0 4px;overflow:visible}
+.spot-data{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-top:10px;border-top:1px dashed rgba(127,168,255,.16)}
+.spot-data span{font:600 8px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:rgba(233,238,251,.36)}
+.spot-data b{display:block;margin-top:3px;font:600 13px/1.2 ui-monospace,Consolas,monospace;letter-spacing:-.01em;color:rgba(233,238,251,.86)}
+.spot p{margin:12px 0 0;font-size:11.5px;line-height:1.8;color:rgba(233,238,251,.5)}
+
+/* 等深线 */
+.method{background:var(--bg2);border-top:1px solid rgba(127,168,255,.1);padding:clamp(58px,9vh,98px) 0}
+.method-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(30px,5vw,72px);align-items:start}
+.method-copy p{max-width:30em;margin:18px 0 0;font-size:12.5px;line-height:1.9;color:var(--muted)}
+.method-copy .aside{margin-top:26px;padding-left:16px;border-left:1px solid rgba(127,168,255,.28);
+  font:400 12.5px/1.8 Georgia,"Songti SC",serif;color:rgba(233,238,251,.66)}
+.method-copy .aside em{color:var(--accent)}
+.params{margin:0;border-top:1px solid rgba(127,168,255,.16)}
+.params div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:9px 0;
+  border-bottom:1px dashed rgba(127,168,255,.14);font:400 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em}
+.params dt{color:rgba(233,238,251,.42)}
+.params dd{margin:0;color:rgba(233,238,251,.82);text-align:right}
+.method .cap{margin:14px 0 0;font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(233,238,251,.32)}
+
+/* 引文 */
+.quote{background:var(--bg);border-top:1px solid rgba(127,168,255,.1);padding:clamp(62px,10vh,108px) 0}
+.quote blockquote{margin:0;max-width:20em;font:400 clamp(27px,3.7vw,46px)/1.26 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+.quote blockquote em{font-style:italic;color:var(--accent)}
+.quote .cite{margin:20px 0 0;font:400 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(233,238,251,.4)}
+
+/* 订阅 */
+.cta{padding:clamp(72px,12vh,132px) 0;border-top:1px solid rgba(127,168,255,.14);
+  background:linear-gradient(180deg,rgba(7,10,18,.66),rgba(7,10,18,.9))}
+.cta-in{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.cta .kicker{color:rgba(127,168,255,.7)}
+.cta h2{margin:12px 0 0;font-size:clamp(32px,5vw,58px);line-height:1.02}
+.cta .note{margin:16px 0 0;max-width:31em;font-size:12px;line-height:1.85;color:var(--muted)}
+.cta-actions{display:flex;gap:10px;flex-wrap:wrap}
+.foot{background:#05070d;border-top:1px solid rgba(127,168,255,.1);padding:22px 0 28px}
+.foot-in{display:flex;flex-wrap:wrap;gap:10px 22px;font:400 9.5px/1.8 ui-monospace,Consolas,monospace;
+  letter-spacing:.08em;color:rgba(233,238,251,.34)}
+.foot-in span:last-child{margin-left:auto}
+
+/* 平板 */
+@media (max-width:900px){
+  .nav nav{display:none}
+  .sec-head{grid-template-columns:1fr;gap:12px}
+  .sec-head>p{justify-self:start;text-align:left}
+  .spots{grid-template-columns:1fr;gap:14px}
+  .spark{height:48px}
+  .method-grid{grid-template-columns:1fr;gap:32px}
+}
+
+/* 手机 */
+@media (max-width:560px){
+  body{background:radial-gradient(420px 320px at 50% 18%,#101d35,#080a0f 76%) fixed}
+  .scrim{background:linear-gradient(180deg,rgba(7,10,18,.28),transparent 40%),linear-gradient(180deg,transparent 60%,rgba(7,10,18,.6))}
+  .nav-in{width:calc(100% - 32px);height:56px;gap:12px}
+  .brand span{display:none}
+  .hint{display:none}
+  .nav-cta{margin-left:auto;height:29px;padding:0 12px;font-size:11px}
+  .wrap,.hero{width:calc(100% - 32px)}
+  .hero{min-height:calc(100vh - 57px);padding:34px 0 20px}
+  h1{font-size:clamp(38px,11vw,48px);max-width:8em}
+  .lede{font-size:12.5px;margin-top:16px}
+  .actions{margin-top:20px}
+  .btn{height:42px;padding:0 17px}
+  .hero-foot{padding-top:24px}
+  .conditions{grid-template-columns:1fr 1fr}
+  .cond{padding:11px 13px;border-top:1px solid rgba(127,168,255,.12)}
+  .cond:nth-child(odd){border-left:0}
+  .cond:nth-child(-n+2){border-top:0}
+  .cond b{font-size:18px}
+  .forecast{padding-top:52px}
+  .spots{margin-top:30px}
+  .cta-in{align-items:flex-start}
+  .foot-in span:last-child{margin-left:0}
+}
+
+/* 画廊 600×450 紧凑首屏 */
+@media (max-height:560px) and (min-width:561px){
+  .nav-in{height:44px;gap:14px}
+  .brand span{display:none}
+  .nav nav{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .nav-cta{height:27px;padding:0 11px;font-size:10.5px}
+  .hero{min-height:calc(100vh - 45px);padding:12px 0 10px}
+  .kicker{font-size:9px}
+  h1{margin-top:7px;font-size:clamp(30px,4.9vw,40px);max-width:9em}
+  .lede{margin-top:8px;font-size:10.5px;line-height:1.6;max-width:44em}
+  .actions{margin-top:10px;gap:8px}
+  .btn{height:32px;padding:0 13px;font-size:11px}
+  .hero-foot{padding-top:10px}
+  .conditions{border-radius:11px}
+  .cond{padding:8px 12px}
+  .cond span{font-size:7.5px}
+  .cond b{font-size:15px;margin-top:2px}
+  .cond b small{font-size:8px}
+  .cond p{font-size:8px;margin-top:1px}
+}
+
+@media (hover:none){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  canvas{opacity:1}
+}
 </style>
 </head>
 <body>
 <canvas id="c" aria-hidden="true"></canvas>
-<main class="stage">
-  <div>
-    <p class="kicker">BACKGROUND / 04</p>
-    <h1>山脊线，<br><em>在水面下呼吸。</em></h1>
-    <p class="sub">18 条正弦线叠出等高线的错觉：频率只差一点，相位各错开 0.62，速度再慢一点，画面就不会像洗衣机。</p>
+<div class="scrim" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top" aria-label="SWELL 海况预报">
+      <svg viewBox="0 0 22 14" aria-hidden="true" fill="none" stroke="#7fa8ff" stroke-width="1.4" stroke-linecap="round">
+        <path d="M1 4.5c3.5-3 5.5 3 9 0s5.5 3 11 0"/>
+        <path d="M1 9.5c3.5-3 5.5 3 9 0s5.5 3 11 0" opacity=".5"/>
+      </svg>
+      SWELL<span>MARINE</span>
+    </a>
+    <nav aria-label="主导航">
+      <a href="#forecast">今晚海况</a>
+      <a href="#method">等深线</a>
+      <a href="#subscribe">订阅</a>
+    </nav>
+    <p class="hint">波纹在自己走，不用操作</p>
+    <a class="nav-cta" href="#forecast">看今晚</a>
   </div>
+</header>
+
+<main class="page" id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">MARINE FORECAST · 29°N 122°E · 东海</p>
+      <h1>海面之下，<br><em>山脊在走。</em></h1>
+      <p class="lede">十八层等深线叠在一起，浪高、周期、风向都写在线的疏密里。今晚下水之前，先看一眼海底的山脊怎么呼吸。</p>
+      <div class="actions">
+        <a class="btn solid" href="#forecast">查看今晚海况 →</a>
+        <a class="btn ghost" href="#method">等深线怎么算</a>
+      </div>
+    </div>
+
+    <div class="hero-foot">
+      <div class="conditions" aria-label="当前海况">
+        <div class="cond">
+          <span>浪高 / SWELL</span>
+          <b>1.4<small>m</small></b>
+          <p class="up">较昨日 +0.2</p>
+        </div>
+        <div class="cond">
+          <span>周期 / PERIOD</span>
+          <b>8.2<small>s</small></b>
+          <p>涌向 · 东南</p>
+        </div>
+        <div class="cond">
+          <span>风 / WIND</span>
+          <b>4<small>级 西南</small></b>
+          <p>阵风 5 级</p>
+        </div>
+        <div class="cond">
+          <span>水温 / SEA</span>
+          <b>19.4<small>°C</small></b>
+          <p>能见度 12 km</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="forecast solid" id="forecast">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">01 / 今晚海况</p>
+          <h2>三个出海口，三种浪。</h2>
+        </div>
+        <p>数据每小时更新一次。给出了下水建议，但最后下不下的决定，永远在你。</p>
+      </div>
+      <div class="spots">
+        <article class="spot">
+          <div class="spot-top">
+            <h3>花鸟岛<small>NORTHEAST REEF</small></h3>
+            <span class="chip go">适合出海</span>
+          </div>
+          <svg class="spark" viewBox="0 0 300 58" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 34 C24 22 38 44 62 36 S100 18 126 30 166 48 190 34 230 16 254 28 284 40 300 24" fill="none" stroke="#7fa8ff" stroke-width="1.4"/>
+            <path d="M0 42 C28 32 42 50 68 42 S108 28 134 38 172 54 198 42 238 26 262 36 290 46 300 34" fill="none" stroke="#7fa8ff" stroke-width="1" opacity=".32"/>
+          </svg>
+          <div class="spot-data">
+            <div><span>浪高</span><b>1.6 m</b></div>
+            <div><span>周期</span><b>9 s</b></div>
+            <div><span>风</span><b>西南 3</b></div>
+          </div>
+          <p>长板的好日子，涌很干净。十点以后风转西，记得趁早。</p>
+        </article>
+        <article class="spot">
+          <div class="spot-top">
+            <h3>东极 · 青浜<small>QINGBANG OFFSHORE</small></h3>
+            <span class="chip care">谨慎</span>
+          </div>
+          <svg class="spark" viewBox="0 0 300 58" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 30 C26 38 44 24 70 32 S110 44 138 34 176 22 202 32 240 44 268 32 292 26 300 30" fill="none" stroke="#f2c879" stroke-width="1.4"/>
+            <path d="M0 38 C30 46 48 34 74 40 S114 50 142 42 180 30 206 38 244 50 272 40 294 34 300 38" fill="none" stroke="#f2c879" stroke-width="1" opacity=".28"/>
+          </svg>
+          <div class="spot-data">
+            <div><span>浪高</span><b>1.2 m</b></div>
+            <div><span>周期</span><b>7 s</b></div>
+            <div><span>风</span><b>西南 4</b></div>
+          </div>
+          <p>小浪，新手也能下。下午三点涨潮，注意礁石边的回流。</p>
+        </article>
+        <article class="spot">
+          <div class="spot-top">
+            <h3>嵊泗 · 基湖<small>JIHU BEACH</small></h3>
+            <span class="chip calm">平静</span>
+          </div>
+          <svg class="spark" viewBox="0 0 300 58" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 32 C30 28 52 36 80 32 S126 26 154 32 202 38 230 32 276 28 300 32" fill="none" stroke="#a8c4ff" stroke-width="1.4"/>
+            <path d="M0 38 C34 34 56 42 84 38 S130 32 158 38 206 44 234 38 280 34 300 38" fill="none" stroke="#a8c4ff" stroke-width="1" opacity=".26"/>
+          </svg>
+          <div class="spot-data">
+            <div><span>浪高</span><b>0.8 m</b></div>
+            <div><span>周期</span><b>6 s</b></div>
+            <div><span>风</span><b>西南 2</b></div>
+          </div>
+          <p>几乎是湖，适合带家人。沙滩朝西，日落正对海面。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="method" id="method">
+    <div class="wrap method-grid">
+      <div class="method-copy">
+        <p class="eyebrow">02 / 等深线</p>
+        <h2>一条线，<br>叠出海底的山。</h2>
+        <p>每一条线都是一组正弦：频率只差一点，相位错开 0.62，再让速度慢下来。十八条叠在一起，近处的线密、远处的线疏，看上去就像海底的等高线在动。</p>
+        <p class="aside">“海图把海底画成线；<em>线动起来，才像海。</em>”<br><span style="font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(233,238,251,.36)">值班室墙上的便签 · 2018</span></p>
+      </div>
+      <div>
+        <dl class="params">
+          <div><dt>线条数</dt><dd>18</dd></div>
+          <div><dt>频率 / 条</dt><dd>.0042 + .0009 × (i % 4)</dd></div>
+          <div><dt>相位 / 条</dt><dd>i × 0.62</dd></div>
+          <div><dt>水平采样</dt><dd>8 px</dd></div>
+          <div><dt>主速度</dt><dd>0.00055 / 帧</dd></div>
+          <div><dt>次速度</dt><dd>0.00038 / 帧</dd></div>
+          <div><dt>透明度</dt><dd>.08 → .28</dd></div>
+          <div><dt>画布</dt><dd>DPR ≤ 2 · 暂停于后台标签</dd></div>
+        </dl>
+        <p class="cap">Canvas 2D 实时绘制，无外部依赖。降低动态偏好下只画一帧静态线。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="quote solid">
+    <div class="wrap">
+      <blockquote>潮水不赶时间，<br><em>所以它从不迟到。</em></blockquote>
+      <p class="cite">航海日志 · 第 118 天 · 花鸟岛</p>
+    </div>
+  </section>
+
+  <section class="cta" id="subscribe">
+    <div class="wrap cta-in">
+      <div>
+        <p class="kicker">NEXT TIDE · 03:12</p>
+        <h2>明早六点，<br>潮水会回来。</h2>
+        <p class="note">每天清晨一封海况邮件：浪高、周期、风向，和三处出海口的下水建议。随时退订。</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn solid" href="#subscribe">订阅海况</a>
+        <a class="btn ghost" href="#forecast">看完整海图</a>
+      </div>
+    </div>
+  </section>
 </main>
-<p class="hint">不用操作，看波纹自己走</p>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>SWELL MARINE · 舟山 · 每日 05:30 更新</span>
+    <span>等深线由 Canvas 2D 实时绘制</span>
+  </div>
+</footer>
+
 <script>
 (function () {
   var c = document.getElementById('c');
@@ -87,6 +420,61 @@ p.sub{max-width:25em;margin:16px auto 0;font-size:12px;line-height:1.8;color:var
 
   resize();
   if (!reduce) raf = requestAnimationFrame(loop);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

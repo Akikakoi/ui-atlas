@@ -3,54 +3,266 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>光斑跟随卡片 · UI Atlas 动效</title>
+<title>光斑跟随卡片 · LUMEN 可观测平台</title>
 <style>
-:root{--bg:#f4f3ef;--ink:#111216;--muted:#74777e;--accent:#2f5fd0;--line:#e3e0d7}
+:root{--bg:#f4f3ee;--panel:#fbfaf6;--ink:#12141a;--muted:#71747d;--accent:#2f5fd0;--line:#e0ddd3;--deep:#11151f}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;padding:38px 22px 70px;display:grid;place-items:center}
-.wrap{width:100%;max-width:660px}
-.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-h1{margin:0 0 22px;font-size:clamp(24px,5.6vw,38px);line-height:1.15;letter-spacing:-.03em;font-weight:650}
-h1 em{font-style:normal;color:var(--accent)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px}
-.card{position:relative;isolation:isolate;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 15px 15px;overflow:hidden;
-  transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
-.card:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(28,28,20,.09)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.nav{position:sticky;top:0;z-index:8;height:68px;display:flex;align-items:center;gap:30px;
+  padding:0 max(22px,calc((100vw - 1160px)/2));background:rgba(244,243,238,.88);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:9px;font-size:12px;font-weight:700;letter-spacing:.2em;text-decoration:none;white-space:nowrap}
+.brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.nav-links{display:flex;gap:24px;margin-left:8px}
+.nav-links a{font-size:12.5px;color:#55585f;text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.btn{margin-left:auto;height:38px;padding:0 17px;border-radius:999px;background:var(--ink);color:#fff;
+  font-size:12px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.btn:hover{background:#2a2d36}
+.hero{max-width:1160px;margin:0 auto;padding:clamp(44px,6.4vw,84px) 22px 58px;
+  display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:clamp(28px,4.6vw,56px);align-items:center;
+  min-height:calc(100vh - 68px)}
+.kicker{margin:0 0 18px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+h1{margin:0;font-size:clamp(42px,5.8vw,76px);line-height:.98;letter-spacing:-.055em;font-weight:650}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:24px 0 0;max-width:27em;font-size:13.5px;line-height:1.9;color:#55585f}
+.cta{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:28px}
+.cta .btn{margin-left:0;height:44px;padding:0 21px;font-size:13px}
+.cta small{font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.trust{display:flex;align-items:center;gap:10px;margin-top:34px;font:600 9.5px/1 ui-monospace,Consolas,monospace;
+  letter-spacing:.16em;color:#8d9098}
+.trust i{display:block;width:22px;height:1px;background:#c9c5ba}
+.board{position:relative;border-radius:16px;background:var(--deep);color:#eef1f8;padding:14px 14px 12px;
+  box-shadow:0 40px 90px -50px rgba(17,21,31,.65),inset 0 0 0 1px rgba(255,255,255,.05);overflow:hidden}
+.board::before{content:"";position:absolute;inset:-30% -20% auto;height:70%;
+  background:radial-gradient(60% 100% at 50% 100%,rgba(84,124,255,.22),transparent 70%);pointer-events:none}
+.bar{position:relative;display:flex;align-items:center;gap:8px;padding:2px 2px 12px}
+.bar i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.16)}
+.bar i:first-child{background:#ff7a6e}
+.bar span{margin-left:auto;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:rgba(238,241,248,.45)}
+.bar b{display:inline-flex;align-items:center;gap:5px;font-weight:600;color:#8ef0c8}
+.bar b::before{content:"";width:5px;height:5px;border-radius:50%;background:#8ef0c8;box-shadow:0 0 0 3px rgba(142,240,200,.12)}
+.grid{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.card{position:relative;isolation:isolate;overflow:hidden;border-radius:11px;padding:13px 13px 11px;
+  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.075);
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),background-color .3s}
+.card:hover{transform:translateY(-2px);background:rgba(255,255,255,.055)}
 .card::before{content:"";position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .3s;
-  background:radial-gradient(200px circle at var(--mx,50%) var(--my,50%),rgba(47,95,208,.13),transparent 66%)}
+  background:radial-gradient(200px circle at var(--mx,50%) var(--my,50%),rgba(120,160,255,.26),transparent 66%)}
 .card:hover::before{opacity:1}
 .card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;
-  padding:1px;background:radial-gradient(150px circle at var(--mx,50%) var(--my,50%),rgba(47,95,208,.7),transparent 70%);
+  padding:1px;background:radial-gradient(150px circle at var(--mx,50%) var(--my,50%),rgba(143,180,255,.8),transparent 70%);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
 .card:hover::after{opacity:1}
-.num{font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--accent)}
-.card h2{margin:10px 0 6px;font-size:14px;letter-spacing:-.01em}
-.card p{margin:0;font-size:12px;line-height:1.7;color:var(--muted)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+.card>*{position:relative;z-index:1}
+.num{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:#8fb4ff}
+.card h2{margin:8px 0 0;font-size:12px;font-weight:560;color:#d8ddea;letter-spacing:0}
+.fig{display:flex;align-items:baseline;gap:6px;margin-top:9px}
+.fig b{font:500 23px/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em;color:#f3f6ff}
+.fig span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:rgba(238,241,248,.42)}
+.spark{margin-top:8px;height:22px;display:block;width:100%;color:#8fb4ff;opacity:.8}
+.spark path{fill:none;stroke:currentColor;stroke-width:1.4}
+.spark .area{fill:rgba(143,180,255,.12);stroke:none}
+.board .foot{display:flex;justify-content:space-between;gap:12px;padding:11px 3px 2px;
+  font:600 8.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:rgba(238,241,248,.34)}
+.logos{max-width:1160px;margin:0 auto;padding:22px 22px 0;display:flex;align-items:center;gap:30px;flex-wrap:wrap;
+  border-top:1px solid var(--line);font:600 11px ui-monospace,Consolas,monospace;letter-spacing:.12em;color:#9a9ca3}
+.logos span:first-child{font-size:9px;letter-spacing:.2em;color:#8d9098}
+.features{max-width:1160px;margin:0 auto;padding:52px 22px 24px}
+h2.sec{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.12;letter-spacing:-.04em;font-weight:600}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.fgrid article{border:1px solid var(--line);border-radius:14px;padding:22px 20px;background:var(--panel)}
+.fgrid span{display:block;margin-bottom:14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent)}
+.fgrid h3{margin:0 0 8px;font-size:15px;letter-spacing:-.01em}
+.fgrid p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.quote{max-width:1160px;margin:0 auto;padding:28px 22px 64px}
+.quote blockquote{margin:0;border-top:1px solid var(--line);padding:30px 0 0;max-width:760px;
+  font-size:clamp(20px,2.6vw,28px);line-height:1.45;letter-spacing:-.025em;font-weight:520}
+.quote blockquote em{font-style:italic;font-family:Georgia,"Songti SC",serif;color:var(--accent)}
+.quote p{margin:14px 0 0;font:600 10px ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+footer{max-width:1160px;margin:0 auto;padding:0 22px 28px}
+.band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:28px 0;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.band h2{margin:0;font-size:clamp(20px,2.6vw,28px);letter-spacing:-.03em}
+.band p{margin:6px 0 0;font-size:12px;color:var(--muted)}
+.band .btn{margin-left:auto;height:42px;padding:0 20px}
+.foot{display:flex;gap:18px;flex-wrap:wrap;padding-top:18px;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.foot span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);
+  pointer-events:none;z-index:9;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:920px){
+  .hero{grid-template-columns:1fr;min-height:0}
+  .fgrid{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .nav{height:56px;padding:0 16px;gap:14px}
+  .nav-links{display:none}
+  .brand span{display:none}
+  .hero{padding:32px 16px 42px}
+  h1{font-size:clamp(38px,11.5vw,54px)}
+  .lede{font-size:12.5px}
+  .cta .btn{height:42px}
+  .trust{margin-top:24px}
+  .board{padding:11px 11px 9px}
+  .fig b{font-size:20px}
+  .card h2{font-size:11.5px}
+  .logos,.features,.quote,footer{padding-left:16px;padding-right:16px}
+  .band .btn{margin-left:0}
+  .foot span:last-child{margin-left:0}
+  .hint{left:12px;bottom:10px;font-size:10px}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:48px;padding:0 18px;gap:20px}
+  .nav-links{display:none}
+  .brand span{display:none}
+  .hero{min-height:calc(100vh - 48px);grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);
+    padding:14px 22px;gap:18px;align-items:center}
+  .kicker{display:none}
+  h1{font-size:clamp(27px,4.2vw,34px)}
+  .lede{margin-top:10px;font-size:10px;line-height:1.65;max-width:24em}
+  .cta{margin-top:12px;gap:10px}
+  .cta .btn{height:34px;padding:0 14px;font-size:11px}
+  .cta small{display:none}
+  .trust{display:none}
+  .board{padding:10px 10px 8px;border-radius:12px}
+  .bar{padding-bottom:8px}
+  .card{padding:9px 10px 8px;border-radius:9px}
+  .card h2{font-size:10.5px;margin-top:6px}
+  .num{font-size:8px}
+  .fig{margin-top:6px}
+  .fig b{font-size:18px}
+  .spark{height:16px;margin-top:5px}
+  .board .foot{display:none}
+  .logos,.features,.quote,.foot{display:none}
+  .band{padding:16px 0 13px;gap:12px}
+  .band h2{font-size:16px}
+  .band p{margin-top:4px;font-size:10px}
+  .band .btn{height:32px;padding:0 13px;font-size:10.5px}
+  .hint{left:auto;right:12px;bottom:10px;font-size:10px}
+}
+@media (hover:none),(max-width:560px){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">POINTER / 02</p>
-    <h1>卡片上有一盏<em>跟着你走的灯。</em></h1>
-    <div class="grid">
-      <article class="card"><div class="num">01 / SIGNAL</div><h2>实时指标</h2><p>每分钟刷新一次，异常自动标记。</p></article>
-      <article class="card"><div class="num">02 / ROUTE</div><h2>边缘节点</h2><p>37 个区域，请求就近落地。</p></article>
-      <article class="card"><div class="num">03 / TRACE</div><h2>链路追踪</h2><p>一次点击，串起 12 个服务。</p></article>
-      <article class="card"><div class="num">04 / GUARD</div><h2>权限守卫</h2><p>按角色下发，改一条即刻生效。</p></article>
+
+<header class="nav">
+  <a class="brand" href="#top">LUMEN<span>OBSERVABILITY</span></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#features">产品</a>
+    <a href="#features">方案</a>
+    <a href="#features">文档</a>
+    <a href="#start">定价</a>
+  </nav>
+  <a class="btn" href="#start">免费试用</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">OBSERVABILITY · REAL TIME</p>
+      <h1>每一次请求，<br><em>都有光。</em></h1>
+      <p class="lede">指标、日志和链路放进同一张图。异常发生时，先告诉你哪里变了，再告诉你为什么。</p>
+      <div class="cta">
+        <a class="btn" href="#start">开始 14 天试用 →</a>
+        <small>不需要信用卡</small>
+      </div>
+      <div class="trust"><i></i>2,400+ 团队在用</div>
     </div>
+
+    <div class="board" aria-label="LUMEN 实时监控面板">
+      <div class="bar">
+        <i></i><i></i><i></i>
+        <span>生产环境 · 最近 30 分钟</span>
+        <b>LIVE</b>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="num">01 / SIGNAL</div>
+          <h2>实时指标</h2>
+          <div class="fig"><b>124</b><span>MS · P95</span></div>
+          <svg class="spark" viewBox="0 0 120 22" preserveAspectRatio="none" aria-hidden="true">
+            <path class="area" d="M0 17 L12 15 L24 16 L36 11 L48 13 L60 8 L72 10 L84 6 L96 9 L108 4 L120 7 L120 22 L0 22 Z"/>
+            <path d="M0 17 L12 15 L24 16 L36 11 L48 13 L60 8 L72 10 L84 6 L96 9 L108 4 L120 7"/>
+          </svg>
+        </article>
+        <article class="card">
+          <div class="num">02 / ROUTE</div>
+          <h2>边缘节点</h2>
+          <div class="fig"><b>37</b><span>REGIONS</span></div>
+          <svg class="spark" viewBox="0 0 120 22" preserveAspectRatio="none" aria-hidden="true">
+            <path class="area" d="M0 13 L12 14 L24 10 L36 12 L48 9 L60 11 L72 7 L84 9 L96 6 L108 8 L120 5 L120 22 L0 22 Z"/>
+            <path d="M0 13 L12 14 L24 10 L36 12 L48 9 L60 11 L72 7 L84 9 L96 6 L108 8 L120 5"/>
+          </svg>
+        </article>
+        <article class="card">
+          <div class="num">03 / TRACE</div>
+          <h2>链路追踪</h2>
+          <div class="fig"><b>12</b><span>SERVICES</span></div>
+          <svg class="spark" viewBox="0 0 120 22" preserveAspectRatio="none" aria-hidden="true">
+            <path class="area" d="M0 8 L12 11 L24 9 L36 14 L48 10 L60 15 L72 12 L84 16 L96 12 L108 17 L120 13 L120 22 L0 22 Z"/>
+            <path d="M0 8 L12 11 L24 9 L36 14 L48 10 L60 15 L72 12 L84 16 L96 12 L108 17 L120 13"/>
+          </svg>
+        </article>
+        <article class="card">
+          <div class="num">04 / GUARD</div>
+          <h2>权限守卫</h2>
+          <div class="fig"><b>6</b><span>ROLES</span></div>
+          <svg class="spark" viewBox="0 0 120 22" preserveAspectRatio="none" aria-hidden="true">
+            <path class="area" d="M0 16 L12 16 L24 15 L36 15 L48 13 L60 14 L72 13 L84 12 L96 12 L108 11 L120 11 L120 22 L0 22 Z"/>
+            <path d="M0 16 L12 16 L24 15 L36 15 L48 13 L60 14 L72 13 L84 12 L96 12 L108 11 L120 11"/>
+          </svg>
+        </article>
+      </div>
+      <div class="foot"><span>误差 0.4% · 采样率 100%</span><span>更新于 3 秒前</span></div>
+    </div>
+  </section>
+
+  <div class="logos">
+    <span>TRUSTED BY</span>
+    <span>折线科技</span><span>青屿</span><span>白噪唱片</span><span>北岸书店</span><span>KITE</span>
   </div>
+
+  <section class="features" id="features">
+    <p class="kicker">WHY LUMEN</p>
+    <h2 class="sec">从告警到原因，少跳三个页面。</h2>
+    <div class="fgrid">
+      <article><span>01 / TRACE</span><h3>一条链路看到底</h3><p>慢请求不再是一个数字。展开就是完整调用树，哪一跳超时、谁在重试，一眼能看见。</p></article>
+      <article><span>02 / SIGNAL</span><h3>指标和日志对得上</h3><p>同一时间轴、同一套筛选。看到尖峰时，不用再切到另一个工具查日志。</p></article>
+      <article><span>03 / GUARD</span><h3>权限按角色下发</h3><p>谁能看生产、谁能改告警，一条规则立即生效，变更也留在审计记录里。</p></article>
+    </div>
+  </section>
+
+  <section class="quote">
+    <blockquote>“以前排查一次超时要开四个窗口，现在一条链路就够了。<em>平均恢复时间从 40 分钟降到 9 分钟。</em>”</blockquote>
+    <p>周予安 · 折线科技 SRE 负责人</p>
+  </section>
+
+  <footer id="start">
+    <div class="band">
+      <div>
+        <h2>先把灯打开，再谈优化。</h2>
+        <p>14 天完整试用，接入只需要一个 SDK key。</p>
+      </div>
+      <a class="btn" href="#">创建项目 →</a>
+    </div>
+    <div class="foot">
+      <span>LUMEN · 可观测性平台</span>
+      <span>上海 · 深圳</span>
+      <span>© 2026</span>
+    </div>
+  </footer>
 </main>
+
 <p class="hint">移动光标扫过卡片</p>
 <script>
 (function () {
@@ -64,6 +276,61 @@ h1 em{font-style:normal;color:var(--accent)}
       card.style.removeProperty('--mx');
       card.style.removeProperty('--my');
     });
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

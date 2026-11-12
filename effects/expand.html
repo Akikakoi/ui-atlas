@@ -3,139 +3,460 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>卡片展开 · UI Atlas 动效</title>
+<title>卡片展开 · WEED 城市野草标本室 · UI Atlas</title>
 <style>
-:root{--bg:#f4f2ec;--ink:#111216;--muted:#797c83;--line:#e2ded3;--accent:#2f5fd0}
+:root{--bg:#f2efe6;--paper:#fbf9f2;--ink:#15171a;--muted:#7c7f78;--line:#ded9c9;--moss:#3d6b4a;--rust:#a4572f}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:34px 22px 74px}
-.wrap{width:100%;max-width:460px}
-.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
-h1{margin:0 0 22px;font-size:clamp(26px,6.2vw,38px);line-height:1.08;letter-spacing:-.04em;font-weight:650}
-.card{position:relative;width:100%;max-width:380px;border:1px solid var(--line);border-radius:15px;background:#fff;
-  overflow:hidden;cursor:pointer;box-shadow:0 10px 24px rgba(30,30,20,.07);transform-origin:top left}
-.card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.cover{height:142px;background:
-  radial-gradient(circle at 28% 22%,#f3dcb9,transparent 55%),
-  linear-gradient(135deg,#c9a06a,#4f5f4a);position:relative}
-.cover span{position:absolute;left:12px;bottom:10px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(255,255,255,.78)}
-.body{padding:15px 16px 18px}
-.tag{margin:0 0 5px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
-.body h2{margin:0 0 4px;font-size:18px;letter-spacing:-.02em}
-.body .sub{margin:0;font-size:12px;color:var(--muted)}
-.more{display:none;margin:12px 0 0;font-size:12.5px;line-height:1.85;color:#4b4e55}
-.card.open{position:fixed;z-index:20;max-width:none;cursor:default;border-radius:18px;overflow:auto;
-  box-shadow:0 24px 60px rgba(20,20,15,.30);margin:0}
-.card.open .cover{height:44%}
-.card.open .body{padding-bottom:22px}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.shell{min-height:100svh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;flex:0 0 auto;height:56px;display:flex;align-items:center;gap:14px;padding:0 clamp(16px,3.4vw,38px);border-bottom:1px solid var(--line);background:rgba(251,249,242,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.logo{width:27px;height:27px;border-radius:50%;border:1px solid var(--moss);color:var(--moss);display:grid;place-items:center;font:700 10px/1 ui-monospace,Consolas,monospace}
+.brand b{font-size:12px;font-weight:750;letter-spacing:.2em}
+.crumb{display:flex;align-items:center;gap:8px;padding-left:12px;margin-left:2px;border-left:1px solid var(--line);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.crumb em{font-style:normal;color:var(--ink)}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;padding:4px 9px;border:1px solid rgba(128,128,128,.16);border-radius:999px;background:rgba(128,128,128,.10);font-size:10.5px;letter-spacing:.03em;color:var(--muted);white-space:nowrap;pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--moss)}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex:0 0 auto;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.top-right b{color:var(--ink);font-size:10px}
+.issue{border:1px solid var(--line);border-radius:999px;padding:5px 10px;background:var(--paper)}
+.workspace{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:clamp(22px,3.6vw,46px) clamp(16px,4vw,44px) 40px}
+.intro{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:clamp(16px,4vw,54px);align-items:end;padding-bottom:clamp(18px,3vw,30px);border-bottom:1px solid var(--line);margin-bottom:clamp(16px,2.6vw,26px)}
+.kicker{margin:0 0 8px;font:600 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted)}
+.intro h1{margin:0 0 12px;font-family:Georgia,"Songti SC",serif;font-weight:500;font-size:clamp(30px,4.4vw,52px);line-height:1.1;letter-spacing:-.03em}
+.intro h1 em{font-style:italic;color:var(--moss)}
+.lede{margin:0;font-size:13.5px;line-height:1.9;color:#4a4d48;max-width:36em}
+.factsline{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px 18px;font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.meta{justify-self:end;display:flex;flex-direction:column;gap:9px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(255,253,246,.72);min-width:200px}
+.meta div{display:flex;justify-content:space-between;gap:18px;font-size:11.5px}
+.meta span{color:var(--muted)}
+.meta b{font-weight:600;white-space:nowrap}
+.sheet-head{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:12px}
+.sheet-head p{margin:0;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+.sheet-head span{font-size:10.5px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{position:relative;display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:14px;background:var(--paper);overflow:hidden;box-shadow:0 12px 26px -22px rgba(30,30,20,.5);transform-origin:top left}
+.card.lift{position:relative;z-index:60}
+.cover{position:relative;flex:0 0 auto;height:108px;overflow:hidden;background:radial-gradient(circle at 24% 22%,var(--c1,transparent),transparent 60%),linear-gradient(135deg,var(--c2,#c9c2a8),var(--c3,#6d7358))}
+.cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(20,22,18,.14))}
+.cover em{position:absolute;left:11px;top:9px;z-index:1;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(20,24,20,.55);font-style:normal}
+.art{position:absolute;right:8px;bottom:-6px;width:76px;height:76px;color:rgba(255,255,255,.62);fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.body{padding:11px 13px 13px}
+.tag{margin:0 0 3px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--rust)}
+.body h2{margin:0 0 1px;font-family:Georgia,"Songti SC",serif;font-size:19px;font-weight:600;letter-spacing:-.01em}
+.latin{margin:0;font:italic 11px/1.4 Georgia,serif;color:var(--muted)}
+.more{display:none;margin:12px 0 0;font-size:12.5px;line-height:1.85;color:#474a45}
+.facts{display:none;margin:12px 0 0;padding-top:10px;border-top:1px dashed var(--line);grid-template-columns:1fr 1fr;gap:6px 14px;font-size:11px}
+.facts div{display:flex;justify-content:space-between;gap:10px;padding-bottom:4px;border-bottom:1px solid rgba(222,217,201,.5)}
+.facts span{color:var(--muted)}
+.facts b{font-weight:600}
+.hit{position:absolute;inset:0;z-index:1;border:0;padding:0;border-radius:inherit;background:transparent;cursor:pointer}
+.hit:focus-visible{outline:2px solid var(--moss);outline-offset:-3px}
+.x{display:none;position:absolute;right:9px;top:9px;z-index:3;width:28px;height:28px;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:rgba(20,24,20,.32);color:#fff;font:16px/1 system-ui;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.card.open{position:fixed;z-index:60;max-width:none;margin:0;overflow:auto;border-radius:16px;box-shadow:0 40px 90px -30px rgba(20,22,18,.45);cursor:default}
+.card.open .cover{height:132px}
+.card.open .body{padding:14px 16px 18px}
+.card.open .body h2{font-size:24px}
 .card.open .more{display:block}
-.x{display:none;position:absolute;right:10px;top:10px;z-index:2;width:28px;height:28px;border:1px solid rgba(255,255,255,.35);
-  border-radius:50%;background:rgba(15,16,20,.35);color:#fff;font:16px/1 system-ui;cursor:pointer;
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.card.open .facts{display:grid}
+.card.open .hit{display:none}
 .card.open .x{display:grid;place-items:center}
-.backdrop{position:fixed;inset:0;z-index:15;background:rgba(15,16,20,.36);opacity:0;pointer-events:none;transition:opacity .3s}
+.backdrop{position:fixed;inset:0;z-index:50;background:rgba(20,22,18,.38);opacity:0;pointer-events:none;transition:opacity .3s}
 .backdrop.on{opacity:1;pointer-events:auto}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:30}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.ghost{border:1px dashed #cfc9b8;border-radius:14px;background:rgba(255,255,255,.32)}
+.field{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2.4vw,28px);margin-top:clamp(26px,4vw,44px);padding-top:22px;border-top:1px solid var(--line)}
+.field p{margin:0;font-size:12px;line-height:1.85;color:#4a4d48}
+.field .kicker{margin-bottom:4px;color:var(--rust)}
+.foot{flex:0 0 auto;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding:13px clamp(16px,4vw,44px);font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:44px;padding:0 18px}
+  .brand b{font-size:11px}
+  .logo{width:24px;height:24px}
+  .crumb,.issue{display:none}
+  .workspace{max-width:760px;padding:12px 18px 14px}
+  .intro{grid-template-columns:1fr;gap:0;padding-bottom:10px;margin-bottom:10px}
+  .intro h1{font-size:23px;margin-bottom:0}
+  .lede,.meta,.factsline,.field,.foot{display:none}
+  .kicker{margin-bottom:4px;font-size:8.5px}
+  .sheet-head{margin-bottom:8px}
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .cover{height:54px}
+  .art{width:50px;height:50px;right:5px}
+  .body{padding:8px 11px 10px}
+  .body h2{font-size:16px}
+  .latin{font-size:10px}
+  .tag{font-size:8px}
+  .card.open .cover{height:104px}
+  .card.open .body{padding:11px 14px 14px}
+  .card.open .body h2{font-size:22px}
+  .backdrop{background:rgba(20,22,18,.34)}
+}
+@media (max-width:560px){
+  .topbar{height:52px;padding:0 14px;gap:10px}
+  .brand b{font-size:11px}
+  .crumb,.hint,.issue{display:none}
+  .workspace{padding:18px 14px 24px}
+  .intro{grid-template-columns:1fr;gap:14px;padding-bottom:16px;margin-bottom:14px}
+  .intro h1{font-size:30px;margin-bottom:10px}
+  .lede{font-size:12.5px}
+  .meta{justify-self:stretch;flex-direction:row;flex-wrap:wrap;gap:8px 18px;padding:10px 12px;min-width:0}
+  .meta div{font-size:10.5px;gap:8px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .cover{height:74px}
+  .art{width:56px;height:56px;right:4px}
+  .body{padding:9px 10px 11px}
+  .body h2{font-size:17px}
+  .more{font-size:12px}
+  .card.open .cover{height:120px}
+  .card.open .facts{grid-template-columns:1fr}
+  .field{grid-template-columns:1fr;gap:14px}
+  .field p{font-size:11.5px}
+  .foot{padding:12px 14px;font-size:8px}
+  .foot span:nth-child(2){display:none}
+}
 @media (prefers-reduced-motion:reduce){.backdrop{transition:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">TRANSITION / 04</p>
-    <h1>一张卡，<br>长成一张详情页。</h1>
-    <article class="card" id="card" tabindex="0" role="button" aria-expanded="false" aria-label="展开《苔原笔记》详情">
-      <button class="x" id="x" type="button" aria-label="关闭详情">×</button>
-      <div class="cover"><span>2026 · 春</span></div>
-      <div class="body">
-        <p class="tag">CASE 001</p>
-        <h2>苔原笔记</h2>
-        <p class="sub">布面精装 · 128 页</p>
-        <p class="more">先记住卡片在流里的 rect，再把同一张卡 fixed 到目标位置，用两次 rect 的差做反向 transform——这就是 FLIP。关闭时把顺序反过来，卡片自己缩回原位。</p>
+<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+<symbol id="sprig" viewBox="0 0 64 64">
+<path d="M32 60V10"/>
+<path d="M32 44c-8-1-14-6-16-14 8 0 14 5 16 14Z"/>
+<path d="M32 36c8-1 14-6 16-14-8 0-14 5-16 14Z"/>
+<path d="M32 26c-6-1-10-5-12-11 6 0 10 4 12 11Z"/>
+<path d="M32 20c6-1 10-5 12-11-6 0-10 4-12 11Z"/>
+</symbol>
+</defs></svg>
+
+<div class="shell">
+  <header class="topbar">
+    <span class="brand"><span class="logo">W</span><b>WEED</b></span>
+    <span class="crumb">城市野草标本室 <em>/ 第 03 辑</em></span>
+    <p class="hint">点一张标本卡，卡片会长成标本页</p>
+    <div class="top-right">
+      <span class="issue">压干 · 编号 · 归档</span>
+      <span><b>06</b> / 24 种</span>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="intro">
+      <div>
+        <p class="kicker">FIELD COLLECTION / 03</p>
+        <h1>六种在<em>水泥缝</em>里<br>活得很好的植物。</h1>
+        <p class="lede">它们不长在花园里。脚步、车辙、墙脚的积水，都是它们的土。这一辑把六份压干的标本摊开，编号、记录、归档。</p>
+        <p class="factsline"><span>六份标本</span><span>采集：林一 / 周玥</span><span>压干 48 小时</span></p>
       </div>
-    </article>
-  </div>
-</main>
-<div class="backdrop" id="backdrop"></div>
-<p class="hint">点卡片展开，点遮罩或按 Esc 关闭</p>
+      <aside class="meta" aria-label="本辑信息">
+        <div><span>采集地</span><b>朝内大街 · 灯市口</b></div>
+        <div><span>时间</span><b>2026.04 — 09</b></div>
+        <div><span>编号</span><b>W-031 — W-036</b></div>
+      </aside>
+    </section>
+
+    <div class="sheet-head">
+      <p>标本 / SHEETS</p>
+      <span>按采集时间排列</span>
+    </div>
+
+    <section class="grid" id="grid" aria-label="野草标本">
+      <article class="card">
+        <div class="cover" style="--c1:#dce7c8;--c2:#a9bf8e;--c3:#6d8a5c"><em>W-031</em><svg class="art" viewBox="0 0 64 64" aria-hidden="true"><use href="#sprig"/></svg></div>
+        <div class="body">
+          <p class="tag">SPECIMEN 01</p>
+          <h2 id="sp1">萹蓄</h2>
+          <p class="latin">Polygonum aviculare</p>
+          <p class="more">茎从中心散开，在砖缝里长成一张小小的网。被人踩过之后，第二天照样抬头。压干时叶子会卷起来，像收好的信。</p>
+          <div class="facts">
+            <div><span>生境</span><b>人行道砖缝</b></div>
+            <div><span>花期</span><b>6 — 9 月</b></div>
+            <div><span>高度</span><b>10 — 40cm</b></div>
+            <div><span>记录</span><b>04.18</b></div>
+          </div>
+        </div>
+        <button class="hit" type="button" aria-expanded="false" aria-label="展开萹蓄标本"></button>
+        <button class="x" type="button" aria-label="关闭标本">×</button>
+      </article>
+
+      <article class="card">
+        <div class="cover" style="--c1:#e8dfbf;--c2:#c3b07a;--c3:#7f7048"><em>W-032</em><svg class="art" viewBox="0 0 64 64" aria-hidden="true"><use href="#sprig"/></svg></div>
+        <div class="body">
+          <p class="tag">SPECIMEN 02</p>
+          <h2 id="sp2">车前</h2>
+          <p class="latin">Plantago asiatica</p>
+          <p class="more">叶子贴地摊开，从上方看是一圈规矩的莲座。车辙里被压过许多次，叶脉还是照原来的方向长。</p>
+          <div class="facts">
+            <div><span>生境</span><b>车辙 · 路沿</b></div>
+            <div><span>花期</span><b>5 — 8 月</b></div>
+            <div><span>高度</span><b>10 — 30cm</b></div>
+            <div><span>记录</span><b>05.02</b></div>
+          </div>
+        </div>
+        <button class="hit" type="button" aria-expanded="false" aria-label="展开车前标本"></button>
+        <button class="x" type="button" aria-label="关闭标本">×</button>
+      </article>
+
+      <article class="card">
+        <div class="cover" style="--c1:#f2e3ae;--c2:#d8b95e;--c3:#9a7d2f"><em>W-033</em><svg class="art" viewBox="0 0 64 64" aria-hidden="true"><use href="#sprig"/></svg></div>
+        <div class="body">
+          <p class="tag">SPECIMEN 03</p>
+          <h2 id="sp3">蒲公英</h2>
+          <p class="latin">Taraxacum mongolicum</p>
+          <p class="more">草地边缘最准时的一种。花先开，再收成一个绒球，风一来就散。标本里留下的是散完之后的花托。</p>
+          <div class="facts">
+            <div><span>生境</span><b>草坪边缘</b></div>
+            <div><span>花期</span><b>3 — 6 月</b></div>
+            <div><span>高度</span><b>10 — 25cm</b></div>
+            <div><span>记录</span><b>04.30</b></div>
+          </div>
+        </div>
+        <button class="hit" type="button" aria-expanded="false" aria-label="展开蒲公英标本"></button>
+        <button class="x" type="button" aria-label="关闭标本">×</button>
+      </article>
+
+      <article class="card">
+        <div class="cover" style="--c1:#e6d6c6;--c2:#bd8f76;--c3:#7c4f3c"><em>W-034</em><svg class="art" viewBox="0 0 64 64" aria-hidden="true"><use href="#sprig"/></svg></div>
+        <div class="body">
+          <p class="tag">SPECIMEN 04</p>
+          <h2 id="sp4">酢浆草</h2>
+          <p class="latin">Oxalis corniculata</p>
+          <p class="more">三片心形小叶，白天张开，傍晚合拢。花坛砖缝里一大片，凑近看每一株都长得不太一样。</p>
+          <div class="facts">
+            <div><span>生境</span><b>花坛砖缝</b></div>
+            <div><span>花期</span><b>4 — 9 月</b></div>
+            <div><span>高度</span><b>5 — 15cm</b></div>
+            <div><span>记录</span><b>06.11</b></div>
+          </div>
+        </div>
+        <button class="hit" type="button" aria-expanded="false" aria-label="展开酢浆草标本"></button>
+        <button class="x" type="button" aria-label="关闭标本">×</button>
+      </article>
+
+      <article class="card">
+        <div class="cover" style="--c1:#dfe1c9;--c2:#b3b98c;--c3:#777e55"><em>W-035</em><svg class="art" viewBox="0 0 64 64" aria-hidden="true"><use href="#sprig"/></svg></div>
+        <div class="body">
+          <p class="tag">SPECIMEN 05</p>
+          <h2 id="sp5">狗尾草</h2>
+          <p class="latin">Setaria viridis</p>
+          <p class="more">荒地里最先立起来的一种。穗子被风推着走，摸上去有点扎手。压干后仍保持一个微微的弧度。</p>
+          <div class="facts">
+            <div><span>生境</span><b>荒地 · 围挡</b></div>
+            <div><span>花期</span><b>6 — 9 月</b></div>
+            <div><span>高度</span><b>30 — 80cm</b></div>
+            <div><span>记录</span><b>07.24</b></div>
+          </div>
+        </div>
+        <button class="hit" type="button" aria-expanded="false" aria-label="展开狗尾草标本"></button>
+        <button class="x" type="button" aria-label="关闭标本">×</button>
+      </article>
+
+      <article class="card">
+        <div class="cover" style="--c1:#e9e2d2;--c2:#c9bfa5;--c3:#8b8268"><em>W-036</em><svg class="art" viewBox="0 0 64 64" aria-hidden="true"><use href="#sprig"/></svg></div>
+        <div class="body">
+          <p class="tag">SPECIMEN 06</p>
+          <h2 id="sp6">荠菜</h2>
+          <p class="latin">Capsella bursa-pastoris</p>
+          <p class="more">墙脚最早绿的之一。白色的碎花不起眼，结出的心形小果却很好认。这一份采自一间关掉的店铺门口。</p>
+          <div class="facts">
+            <div><span>生境</span><b>墙脚 · 台阶</b></div>
+            <div><span>花期</span><b>3 — 5 月</b></div>
+            <div><span>高度</span><b>10 — 35cm</b></div>
+            <div><span>记录</span><b>03.29</b></div>
+          </div>
+        </div>
+        <button class="hit" type="button" aria-expanded="false" aria-label="展开荠菜标本"></button>
+        <button class="x" type="button" aria-label="关闭标本">×</button>
+      </article>
+    </section>
+
+    <section class="field" aria-label="采集方法">
+      <div><p class="kicker">01 · 采集</p><p>选一株完整的，连根带一点土。阴干两天再上压板，颜色才留得住。</p></div>
+      <div><p class="kicker">02 · 记录</p><p>写下采集地点和当时的天气，比只写日期更有用。风大的时候，叶子的方向也会被记进去。</p></div>
+      <div><p class="kicker">03 · 归档</p><p>同一物种至少留三份，才能看出来它在这座城市里长出了哪些变形。</p></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>WEED · 城市野草标本室</span>
+    <span>第 03 辑 · 2026 夏</span>
+    <span>在缝里，也长得很好</span>
+  </footer>
+</div>
+
+<div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
 <script>
 (function () {
-  var card = document.getElementById('card'), backdrop = document.getElementById('backdrop');
-  var x = document.getElementById('x');
+  var grid = document.getElementById('grid');
+  var backdrop = document.getElementById('backdrop');
+  var hint = document.querySelector('.hint');
+  var cards = [].slice.call(grid.querySelectorAll('.card'));
+  var chrome = [document.querySelector('.topbar'), document.querySelector('.intro'), document.querySelector('.sheet-head'), document.querySelector('.field'), document.querySelector('.foot')];
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var openState = false, anim = null;
+  var openCard = null, ghost = null, anim = null, lastFocus = null;
 
-  function open() {
-    if (openState) return;
+  function open(card) {
+    if (openCard) return;
+    if (anim) { anim.cancel(); anim = null; }
+    card.classList.remove('lift');
+    lastFocus = card.querySelector('.hit');
     var first = card.getBoundingClientRect();
-    openState = true;
-    card.classList.add('open');
 
+    ghost = document.createElement('div');
+    ghost.className = 'ghost';
+    ghost.style.width = first.width + 'px';
+    ghost.style.height = first.height + 'px';
+    grid.insertBefore(ghost, card);
+
+    openCard = card;
+    card.classList.add('open');
     var w = Math.min(420, innerWidth - 32);
-    var h = Math.min(innerHeight - 56, 330);
+    var h = Math.min(innerHeight - 56, 400);
     card.style.width = w + 'px';
     card.style.height = h + 'px';
     card.style.left = (innerWidth - w) / 2 + 'px';
     card.style.top = (innerHeight - h) / 2 + 'px';
-    card.setAttribute('aria-expanded', 'true');
+    card.setAttribute('role', 'dialog');
+    card.setAttribute('aria-modal', 'true');
+    card.setAttribute('aria-labelledby', card.querySelector('h2').id);
+    card.querySelector('.hit').setAttribute('aria-expanded', 'true');
+    hint.textContent = '按 Esc 或点右上角关闭，卡片会缩回原位';
     backdrop.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    chrome.forEach(function (el) { if (el) el.inert = true; });
+    cards.forEach(function (c) { if (c !== card) c.inert = true; });
 
     var last = card.getBoundingClientRect();
     if (!reduce) {
-      if (anim) anim.cancel();
       anim = card.animate([
         {
           transformOrigin: 'top left',
           transform: 'translate(' + (first.left - last.left) + 'px,' + (first.top - last.top) + 'px) scale(' +
             (first.width / last.width).toFixed(4) + ',' + (first.height / last.height).toFixed(4) + ')',
-          borderRadius: '15px'
+          borderRadius: '14px'
         },
-        { transformOrigin: 'top left', transform: 'none', borderRadius: '18px' }
+        { transformOrigin: 'top left', transform: 'none', borderRadius: '16px' }
       ], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
     }
-    x.focus();
+    card.querySelector('.x').focus({ preventScroll: true });
   }
 
   function close() {
-    if (!openState) return;
+    if (!openCard) return;
+    var card = openCard;
+    if (anim) { anim.cancel(); anim = null; }
     var first = card.getBoundingClientRect();
-    openState = false;
     card.classList.remove('open');
     card.style.width = '';
     card.style.height = '';
     card.style.left = '';
     card.style.top = '';
-    card.setAttribute('aria-expanded', 'false');
+    card.removeAttribute('role');
+    card.removeAttribute('aria-modal');
+    card.removeAttribute('aria-labelledby');
+    card.querySelector('.hit').setAttribute('aria-expanded', 'false');
+    if (ghost) { ghost.parentNode.removeChild(ghost); ghost = null; }
+    openCard = null;
+    hint.textContent = '点一张标本卡，卡片会长成标本页';
     backdrop.classList.remove('on');
+    document.body.style.overflow = '';
+    chrome.forEach(function (el) { if (el) el.inert = false; });
+    cards.forEach(function (c) { c.inert = false; });
 
     var last = card.getBoundingClientRect();
+    card.classList.add('lift');
     if (!reduce) {
-      if (anim) anim.cancel();
       anim = card.animate([
         {
           transformOrigin: 'top left',
           transform: 'translate(' + (first.left - last.left) + 'px,' + (first.top - last.top) + 'px) scale(' +
-            (first.width / last.width).toFixed(4) + ',' + (first.height / last.height).toFixed(4) + ')'
+            (first.width / last.width).toFixed(4) + ',' + (first.height / last.height).toFixed(4) + ')',
+          borderRadius: '16px'
         },
-        { transformOrigin: 'top left', transform: 'none' }
+        { transformOrigin: 'top left', transform: 'none', borderRadius: '14px' }
       ], { duration: 360, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      anim.onfinish = function () { card.classList.remove('lift'); };
+    } else {
+      card.classList.remove('lift');
     }
-    card.focus();
+    (lastFocus || card.querySelector('.hit')).focus({ preventScroll: true });
   }
 
-  card.addEventListener('click', function () { if (!openState) open(); });
-  card.addEventListener('keydown', function (e) {
-    if ((e.key === 'Enter' || e.key === ' ') && !openState) { e.preventDefault(); open(); }
+  cards.forEach(function (card) {
+    card.querySelector('.hit').addEventListener('click', function () { open(card); });
+    card.querySelector('.x').addEventListener('click', function (e) { e.stopPropagation(); close(); });
   });
-  x.addEventListener('click', function (e) { e.stopPropagation(); close(); });
+
   backdrop.addEventListener('click', close);
-  addEventListener('keydown', function (e) { if (e.key === 'Escape' && openState) close(); });
+
+  document.addEventListener('keydown', function (e) {
+    if (!openCard) return;
+    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key === 'Tab') {
+      var f = [].filter.call(openCard.querySelectorAll('button,[href],[tabindex]:not([tabindex="-1"])'), function (n) { return n.offsetParent !== null; });
+      if (!f.length) return;
+      var a = f[0], b = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === a) { e.preventDefault(); b.focus(); }
+      else if (!e.shiftKey && document.activeElement === b) { e.preventDefault(); a.focus(); }
+    }
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

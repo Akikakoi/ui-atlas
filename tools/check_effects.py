@@ -10,9 +10,10 @@
     2. effects.json 与 effects/ 目录一一对应，demo 路径存在
     3. 每条文案完整：features >= 2、how / watch / tech / tags 非空
     4. 深度档案完整：anatomy >= 3、params >= 3、variants >= 2、cost 合法、avoid 非空
-    5. 样例自包含：无 <link>、无 <script src>、无外链 src/href、无 @import
-    6. 样例结构：doctype、lang、viewport、title、.hint 操作提示
-    7. 无障碍：必须处理 prefers-reduced-motion
+    5. 机制归档完整：family 合法；variant_of 指向同族的已有条目
+    6. 样例自包含：无 <link>、无 <script src>、无外链 src/href、无 @import
+    7. 样例结构：doctype、lang、viewport、title、.hint 操作提示
+    8. 无障碍：必须处理 prefers-reduced-motion
 最后打印每条效果的行数、体积、是否含 JS、是否声明 reduced-motion。
 
 退出码：0 通过；1 有错误（--strict 时含警告）。
@@ -31,6 +32,11 @@ DATA = ROOT / "effects.json"
 
 VALID_CATS = {"pointer", "scroll", "type", "layout", "feedback", "bg", "transition"}
 VALID_TRIGGERS = {"hover", "scroll", "click", "view", "load", "auto", "drag"}
+VALID_FAMILIES = {
+    "pointer-field", "cursor-chrome", "direct-drag", "scroll-progress",
+    "text-sequence", "layout-reflow", "entrance-stagger", "state-feedback",
+    "ambient-bg", "view-transition",
+}
 
 RE_LINK = re.compile(r"<link\b", re.I)
 RE_SCRIPT_SRC = re.compile(r"<script[^>]*\bsrc\s*=", re.I)
@@ -65,7 +71,16 @@ def main() -> int:
     if cat_ids != VALID_CATS:
         fail(errors, f"cats 与约定不一致：{sorted(cat_ids)}")
 
+    families = data.get("families", [])
+    family_ids = {f.get("id") for f in families}
+    if family_ids != VALID_FAMILIES:
+        fail(errors, f"families 与约定不一致：{sorted(family_ids)}")
+    for f in families:
+        if not str(f.get("name", "")).strip() or not str(f.get("note", "")).strip():
+            fail(errors, f"family {f.get('id')}: name / note 不能为空")
+
     seen: set[str] = set()
+    family_of: dict[str, str] = {}
     rows = []
     for e in effects:
         eid = e.get("id", "<无 id>")
@@ -81,6 +96,10 @@ def main() -> int:
             fail(errors, f"{eid}: trigger 非法（{e.get('trigger')}）")
         if e.get("level") not in (1, 2, 3):
             fail(errors, f"{eid}: level 只能是 1/2/3")
+        if e.get("family") not in VALID_FAMILIES:
+            fail(errors, f"{eid}: family 非法（{e.get('family')}）")
+        else:
+            family_of[eid] = e["family"]
 
         for key in ("name", "name_en", "how", "watch", "demo"):
             if not str(e.get(key, "")).strip():
@@ -150,6 +169,8 @@ def main() -> int:
 
         js = RE_SCRIPT.search(src)
         css = RE_STYLE.search(src)
+        if e.get("cat") == "bg" and "<canvas" in src and js and "requestAnimationFrame" in js.group(1) and "visibilitychange" not in js.group(1):
+            warns.append(f"{eid}: 背景 canvas 的 rAF 没有 visibilitychange 暂停")
         if not css:
             fail(errors, f"{eid}: 没有 <style>，样式应内联")
         if len(src.encode("utf-8")) > 40 * 1024:
@@ -166,6 +187,18 @@ def main() -> int:
                 "yes" if RE_REDUCE.search(src) else "NO",
             )
         )
+
+    for e in effects:
+        vo = e.get("variant_of")
+        if not vo:
+            continue
+        eid = e.get("id", "<无 id>")
+        if vo == eid:
+            fail(errors, f"{eid}: variant_of 不能指向自己")
+        elif vo not in family_of:
+            fail(errors, f"{eid}: variant_of 指向不存在的条目（{vo}）")
+        elif family_of[vo] != e.get("family"):
+            fail(errors, f"{eid}: variant_of 必须与目标同族（{family_of[vo]} ≠ {e.get('family')}）")
 
     # 目录里多出来的文件
     if FX_DIR.exists():

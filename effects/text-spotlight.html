@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文字探照灯 · BLACKBOX 黑匣子剧场</title>
+<style>
+:root{--bg:#12100d;--panel:#1a1612;--ink:#918879;--lit:#ffe1a8;--muted:#7d7568;--line:rgba(255,225,168,.13);
+  --accent:#ffcf6e;--cream:#f3e9d5;--dark:#0d0b09}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(90% 70% at 50% 0%,#221c14,#0d0b09 70%);color:var(--ink);
+  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip;min-height:100vh}
+a{color:inherit}
+button{font:inherit}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.nav{position:sticky;top:0;z-index:10;height:64px;display:flex;align-items:center;gap:30px;
+  padding:0 max(24px,calc((100vw - 1180px)/2));background:rgba(18,16,13,.84);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-size:14px;font-weight:700;letter-spacing:.03em;text-decoration:none;white-space:nowrap}
+.brand .mark{width:26px;height:26px;display:grid;place-items:center;border:1.5px solid var(--accent);border-radius:2px;
+  font:700 11px/1 Georgia,"Songti SC",serif;color:var(--accent)}
+.brand i{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:#a49a89;text-decoration:none}
+.nav-links a:hover{color:var(--lit)}
+.cta{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--accent);background:var(--accent);color:#1b150a;
+  border-radius:999px;padding:9px 17px;font-size:12px;font-weight:650;text-decoration:none;cursor:pointer;white-space:nowrap;
+  transition:background .2s,color .2s}
+.cta:hover{background:transparent;color:var(--accent)}
+.nav .cta{margin-left:auto;padding:7px 14px;font-size:11.5px}
+.hero{max-width:1180px;margin:0 auto;padding:clamp(36px,5vw,68px) 24px 34px;
+  display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:clamp(30px,5vw,64px);align-items:center}
+.kicker{margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{position:relative;margin:0;font-size:clamp(38px,5.4vw,64px);line-height:1.16;letter-spacing:-.045em;font-weight:620;cursor:default}
+h1 .line{display:block}
+h1 .glow{position:absolute;inset:0;color:var(--lit);opacity:0;transition:opacity .2s;pointer-events:none;
+  -webkit-mask-image:radial-gradient(circle 110px at var(--x,-200px) var(--y,-200px),#000 0 52%,transparent 100%);
+  mask-image:radial-gradient(circle 110px at var(--x,-200px) var(--y,-200px),#000 0 52%,transparent 100%)}
+h1.on .glow{opacity:1}
+.lede{margin:22px 0 0;max-width:31em;font-size:13.5px;line-height:1.95;color:#a49a89}
+.actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:26px}
+.link{font-size:12.5px;text-decoration:none;border-bottom:1px solid rgba(255,225,168,.3);padding-bottom:2px;transition:color .2s,border-color .2s}
+.link:hover{border-color:var(--lit);color:var(--lit)}
+.meta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:24px;
+  font:600 9.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.meta-row i{width:1px;height:10px;background:var(--line)}
+.seat-card{position:relative;overflow:hidden;background:linear-gradient(170deg,rgba(255,225,168,.06),rgba(255,225,168,.015) 60%),var(--panel);
+  border:1px solid var(--line);border-radius:16px;padding:16px 20px 14px;box-shadow:0 40px 90px -50px rgba(0,0,0,.95)}
+.seat-top{display:flex;justify-content:space-between;gap:12px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.seat-top b{color:var(--accent);font-weight:600}
+.stage-plan{margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:rgba(255,225,168,.03)}
+.stage{height:26px;border-radius:4px;border:1px solid rgba(255,225,168,.28);
+  background:radial-gradient(60% 120% at 50% 0%,rgba(255,225,168,.35),rgba(255,225,168,.06) 70%);
+  display:grid;place-items:center;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:#3a2f1c}
+.seats{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin-top:12px}
+.seats i{display:block;aspect-ratio:1;border-radius:50%;background:rgba(255,225,168,.14)}
+.seats i.lit{background:rgba(255,225,168,.5)}
+.seats i.you{background:var(--accent);box-shadow:0 0 6px rgba(255,207,110,.6)}
+.seat-foot{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);
+  font:600 8.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.seat-foot b{color:var(--cream);font-weight:650}
+.seat-foot span:last-child{margin-left:auto}
+.figures{max-width:1180px;margin:0 auto;padding:6px 24px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.figure{border:1px solid var(--line);border-radius:12px;padding:15px 18px;background:rgba(26,22,18,.6);display:flex;align-items:baseline;gap:10px}
+.figure span{font-size:10px;color:var(--muted);letter-spacing:.03em}
+.figure b{margin-left:auto;font:600 clamp(17px,2vw,24px)/1 ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.03em;color:var(--cream)}
+.figure b small{font-size:9px;color:var(--muted);font-weight:500;margin-left:2px;letter-spacing:0}
+.sec{max-width:1180px;margin:0 auto;padding:clamp(44px,6.4vw,78px) 24px 0}
+.sec-head{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:22px;margin-bottom:20px}
+.sec-head .kicker{margin:0 0 8px}
+h2{margin:0;font:600 clamp(23px,2.8vw,34px)/1.18 Georgia,"Songti SC","SimSun",serif;letter-spacing:-.02em;color:var(--cream)}
+.sec-head p{margin:0 0 3px auto;max-width:27em;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.plays{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.play{display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:14px;
+  background:linear-gradient(170deg,rgba(255,225,168,.045),rgba(255,225,168,.01));padding:18px 20px 16px;
+  transition:border-color .2s,transform .2s}
+.play:hover{border-color:rgba(255,225,168,.34);transform:translateY(-2px)}
+.play-top{display:flex;justify-content:space-between;gap:10px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.play-top b{color:var(--accent);font-weight:600}
+.play h3{margin:14px 0 0;font:600 clamp(24px,2.4vw,30px)/1.2 Georgia,"Songti SC","SimSun",serif;letter-spacing:.04em;color:var(--cream)}
+.play .en{margin:4px 0 0;font:600 8.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted)}
+.play p{margin:12px 0 0;font-size:10.5px;line-height:1.85;color:#a49a89;flex:1}
+.play-meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:10px;border-top:1px solid var(--line);
+  font:600 8.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.play-foot{display:flex;align-items:baseline;gap:8px;margin-top:10px;font-size:10.5px;color:var(--muted)}
+.play-foot b{margin-left:auto;font:600 17px/1 ui-monospace,Consolas,monospace;color:var(--cream);letter-spacing:-.03em}
+.play-foot b small{font-size:9px;font-weight:500;color:var(--muted)}
+.house-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(24px,4vw,54px);align-items:start}
+.house-copy p{margin:0;font-size:12.5px;line-height:2;color:#a49a89;max-width:34em}
+.house-copy p + p{margin-top:14px}
+.house-specs{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);margin-top:22px}
+.house-specs div{padding:14px 16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.house-specs span{display:block;font:600 8px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.house-specs b{display:block;margin-top:6px;font-size:13px;font-weight:650;color:var(--cream)}
+.tix{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ticket{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;padding:18px 20px 16px;
+  background:rgba(26,22,18,.55);min-width:0}
+.ticket.hot{border-color:rgba(255,207,110,.42);background:linear-gradient(150deg,rgba(255,207,110,.08),transparent 62%),rgba(26,22,18,.85)}
+.tname{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.price{margin-top:12px;font:600 clamp(24px,2.6vw,30px)/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em;color:var(--cream)}
+.price small{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:0}
+.ticket ul{list-style:none;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line);font-size:10.5px;line-height:2;color:#a49a89}
+.ticket li::before{content:"—";margin-right:7px;color:var(--accent)}
+.ticket .link{margin-top:14px;align-self:flex-start;font-size:11.5px}
+.band{max-width:1180px;margin:clamp(44px,6.4vw,78px) auto 0;padding:0 24px}
+.band-inner{display:flex;align-items:center;gap:28px;flex-wrap:wrap;border-radius:18px;padding:clamp(24px,3.6vw,36px);
+  background:linear-gradient(115deg,rgba(255,207,110,.16),transparent 58%),#17130e;border:1px solid var(--line)}
+.band h2{font-size:clamp(22px,2.7vw,32px)}
+.band p{margin:8px 0 0;font-size:11.5px;line-height:1.8;color:var(--muted);max-width:34em}
+.band .cta{margin-left:auto}
+footer{max-width:1180px;margin:48px auto 0;padding:20px 24px 30px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
+  font:600 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;
+  font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}
+  .brand .mark{width:20px;height:20px;font-size:9px}
+  .brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .hero{grid-template-columns:minmax(0,1fr) 236px;gap:22px;padding:12px 20px 6px;align-items:start}
+  .kicker{margin-bottom:6px;font-size:8.5px}
+  h1{font-size:31px;line-height:1.14}
+  .lede{margin-top:8px;font-size:10px;line-height:1.65;max-width:36em}
+  .actions{margin-top:9px;gap:12px}
+  .cta{padding:7px 13px;font-size:10.5px}
+  .link{font-size:10.5px}
+  .meta-row{display:none}
+  .seat-card{padding:10px 12px 8px;border-radius:12px;box-shadow:none}
+  .seat-top{font-size:6.5px}
+  .stage-plan{margin-top:8px;padding:7px 9px}
+  .stage{height:18px;font-size:6px}
+  .seats{gap:3px;margin-top:7px}
+  .seat-foot{margin-top:7px;padding-top:5px;font-size:6px;gap:8px}
+  .figures{display:none}
+  .sec,.band,footer{display:none}
+  .sec.plays-sec{display:block;padding:10px 20px 0}
+  .plays-sec .sec-head{display:none}
+  .plays{grid-template-columns:repeat(3,1fr);gap:8px}
+  .play{padding:9px 11px 8px;border-radius:10px}
+  .play-top{font-size:6px}
+  .play h3{font-size:15px;margin-top:6px}
+  .play .en{font-size:6px;margin-top:1px}
+  .play p{font-size:6.5px;line-height:1.55;margin-top:5px}
+  .play-meta{margin-top:7px;padding-top:5px;font-size:6px;gap:6px}
+  .play-foot{margin-top:5px;font-size:6.5px}
+  .play-foot b{font-size:10px}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#c9c0af;
+    background:rgba(20,17,13,.85);border:1px solid rgba(255,225,168,.16);
+    box-shadow:0 1px 6px rgba(0,0,0,.4)}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav-links{display:none}
+  .nav .cta{margin-left:auto;padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}
+  .brand i{display:none}
+  .hero{grid-template-columns:1fr;gap:22px;padding:28px 16px 18px}
+  h1{font-size:clamp(34px,10.2vw,44px);line-height:1.18}
+  .lede{font-size:12px;line-height:1.9;margin-top:16px}
+  .actions{margin-top:18px}
+  .meta-row{margin-top:18px;font-size:8.5px;gap:10px}
+  .seat-card{padding:15px 16px 13px;border-radius:16px}
+  .figures{grid-template-columns:repeat(2,1fr);gap:8px;padding:4px 16px 0}
+  .figure{padding:11px 13px}
+  .figure b{font-size:18px}
+  .sec{padding-left:16px;padding-right:16px}
+  .sec-head{padding-top:18px;margin-bottom:16px}
+  .sec-head p{display:none}
+  .plays{grid-template-columns:1fr;gap:10px}
+  .house-grid{grid-template-columns:1fr;gap:24px}
+  .tix{grid-template-columns:1fr;gap:10px}
+  .band{padding:0 16px;margin-top:38px}
+  .band-inner{padding:22px 20px;gap:16px}
+  .band .cta{margin-left:0}
+  footer{padding-left:16px;padding-right:16px;font-size:8.5px;margin-top:34px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  h1 .glow{display:none}
+  .cta,.link,.play{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark" aria-hidden="true">B</span>BLACKBOX 黑匣子剧场<i>SEASON 2026</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#plays">演出季</a>
+    <a href="#house">剧场</a>
+    <a href="#tickets">票务</a>
+  </nav>
+  <a class="cta" href="#tickets">选座购票</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">SEASON 2026 / 只演 36 场</p>
+      <h1 id="spot" aria-label="灯光亮起之前，先听见呼吸。"><span class="line">灯光亮起之前，</span><span class="line">先听见呼吸。</span><span class="glow" aria-hidden="true"><span class="line">灯光亮起之前，</span><span class="line">先听见呼吸。</span></span></h1>
+      <p class="lede">一百二十个座位，六米见方的黑匣子，四面黑幕围住。灯亮之前，先把光标在标题上慢慢移一遍。</p>
+      <div class="actions">
+        <a class="cta" href="#tickets">购买季票</a>
+        <a class="link" href="#plays">查看演出季</a>
+      </div>
+      <p class="meta-row"><span>120 座</span><i></i><span>6 × 6 m</span><i></i><span>360° 黑幕</span><i></i><span>4.1 声道</span></p>
+    </div>
+    <aside class="seat-card" aria-label="剧场座位示意">
+      <div class="seat-top"><span>HOUSE PLAN / 2026</span><b>3 部作品</b></div>
+      <div class="stage-plan" aria-hidden="true">
+        <div class="stage">STAGE</div>
+        <div class="seats">
+          <i class="lit"></i><i></i><i></i><i class="lit"></i><i></i><i></i><i class="lit"></i><i></i><i></i><i></i>
+          <i></i><i class="lit"></i><i></i><i></i><i class="lit"></i><i></i><i></i><i></i><i class="lit"></i><i></i>
+          <i></i><i></i><i class="lit"></i><i></i><i></i><i class="you"></i><i></i><i class="lit"></i><i></i><i></i>
+          <i></i><i></i><i></i><i class="lit"></i><i></i><i></i><i></i><i></i><i></i><i class="lit"></i>
+        </div>
+      </div>
+      <div class="seat-foot"><span>120 座 <b>· 无固定台口</b></span><span>第 3 排 12 号</span></div>
+    </aside>
+  </section>
+
+  <section class="figures" aria-label="剧场数据">
+    <div class="figure"><span>座席</span><b>120<small>座</small></b></div>
+    <div class="figure"><span>舞台</span><b>6×6<small>m</small></b></div>
+    <div class="figure"><span>黑幕</span><b>360<small>°</small></b></div>
+    <div class="figure"><span>本季场次</span><b>36<small>场</small></b></div>
+  </section>
+
+  <section class="sec plays-sec" id="plays">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">SEASON 2026 / THREE PLAYS</p>
+        <h2>本季三部</h2>
+      </div>
+      <p>每部只演 12 场，演完不返场。季票可以自由换场。</p>
+    </div>
+    <div class="plays">
+      <article class="play">
+        <div class="play-top"><span>03.14 — 03.29</span><b>话剧</b></div>
+        <h3>夜航</h3>
+        <p class="en">NIGHT FLIGHT</p>
+        <p>一架永远落不了地的飞机，四个乘客轮流讲述自己为什么离开。灯只亮一束，其余全黑。</p>
+        <div class="play-meta"><span>110 分钟</span><span>无中场</span><span>12 场</span></div>
+        <div class="play-foot"><span>票价</span><b>¥180<small> 起</small></b></div>
+      </article>
+      <article class="play">
+        <div class="play-top"><span>05.09 — 05.24</span><b>肢体剧场</b></div>
+        <h3>潮汐</h3>
+        <p class="en">TIDE</p>
+        <p>两位舞者用身体丈量一间会涨潮的房间。水从黑幕后面渗出来，观众席第一排会湿鞋。</p>
+        <div class="play-meta"><span>85 分钟</span><span>无对白</span><span>12 场</span></div>
+        <div class="play-foot"><span>票价</span><b>¥160<small> 起</small></b></div>
+      </article>
+      <article class="play">
+        <div class="play-top"><span>11.07 — 11.22</span><b>独角戏</b></div>
+        <h3>静默</h3>
+        <p class="en">SILENCE</p>
+        <p>一位配音演员失去声音后的第 47 天。全场只靠字幕、呼吸和一只会响的椅子完成叙事。</p>
+        <div class="play-meta"><span>70 分钟</span><span>无中场</span><span>12 场</span></div>
+        <div class="play-foot"><span>票价</span><b>¥140<small> 起</small></b></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" id="house">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">THE HOUSE / 六米见方</p>
+        <h2>黑匣子</h2>
+      </div>
+      <p>没有固定台口，没有幕布，也没有“最好的座位”。</p>
+    </div>
+    <div class="house-grid">
+      <div class="house-copy">
+        <p>我们把一个旧仓库的夹层改成了黑匣子：四面黑幕，六米见方，座椅可以全部拆掉。演员从任何一角进场，灯从任何一角亮起。</p>
+        <p>每场只卖 120 张票。第一排的观众离演员最近时不到两米，最后一排也不超过十二米——在这个距离里，呼吸是听得见的。</p>
+        <div class="house-specs">
+          <div><span>座席</span><b>120 座 · 可拆</b></div>
+          <div><span>舞台面积</span><b>6 × 6 m</b></div>
+          <div><span>声场</span><b>4.1 声道</b></div>
+          <div><span>黑幕</span><b>360° 环幕</b></div>
+        </div>
+      </div>
+      <div class="house-copy">
+        <p>灯位只有 18 个，全部藏在黑幕后面。开演之后，观众席不设地灯，手机需要关机——不是静音，是关机。</p>
+        <p>我们相信黑不是空的。黑是把所有不必要的东西拿掉之后，剩下的那一点点光。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="tickets">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">TICKETS / 演完不返场</p>
+        <h2>票务</h2>
+      </div>
+      <p>季票可以换场，也可以转让给朋友。开演前 48 小时可退。</p>
+    </div>
+    <div class="tix">
+      <article class="ticket">
+        <span class="tname">平日场</span>
+        <b class="price">¥120</b>
+        <ul><li>周二至周四</li><li>自由选座</li><li>含演后谈</li></ul>
+        <a class="link" href="#top">购票</a>
+      </article>
+      <article class="ticket hot">
+        <span class="tname">周末场</span>
+        <b class="price">¥180</b>
+        <ul><li>周五至周日</li><li>自由选座</li><li>含一杯热茶</li></ul>
+        <a class="link" href="#top">购票</a>
+      </article>
+      <article class="ticket">
+        <span class="tname">本季季票</span>
+        <b class="price">¥420</b>
+        <ul><li>三部作品各一场</li><li>可换场一次</li><li>提前 10 分钟入场</li></ul>
+        <a class="link" href="#top">购买季票</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="band-inner">
+      <div>
+        <h2>灯亮之前，位置先留好。</h2>
+        <p>本季只演 36 场，每场 120 座。选一个晚上，把手机关掉两小时。</p>
+      </div>
+      <a class="cta" href="#tickets">选座购票</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>BLACKBOX · 黑匣子剧场 · 上海静安</span>
+  <span>120 座 / 6 × 6 m / 360° 黑幕</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">把光标在标题上慢慢移动，灯跟着亮</p>
+
+<script>
+(function () {
+  var spot = document.getElementById('spot');
+  if (!spot || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  function move(e) {
+    var r = spot.getBoundingClientRect();
+    spot.style.setProperty('--x', (e.clientX - r.left).toFixed(1) + 'px');
+    spot.style.setProperty('--y', (e.clientY - r.top).toFixed(1) + 'px');
+    spot.classList.add('on');
+  }
+  function leave() {
+    spot.classList.remove('on');
+    spot.style.setProperty('--x', '-200px');
+    spot.style.setProperty('--y', '-200px');
+  }
+  spot.addEventListener('pointermove', move);
+  spot.addEventListener('pointerleave', leave);
+  spot.addEventListener('pointercancel', leave);
+
+  if (matchMedia('(hover:none)').matches || innerWidth <= 560) {
+    var raf = null, timer = null, hold = null;
+    function sweep() {
+      var r = spot.getBoundingClientRect();
+      if (!r.width) return;
+      var start = performance.now(), dur = 1700;
+      spot.classList.add('on');
+      function tick(now) {
+        var p = Math.min(1, (now - start) / dur);
+        var x = -30 + (r.width + 60) * p;
+        spot.style.setProperty('--x', x.toFixed(1) + 'px');
+        spot.style.setProperty('--y', (r.height * .38).toFixed(1) + 'px');
+        if (p < 1) { raf = requestAnimationFrame(tick); }
+        else { spot.classList.remove('on'); raf = null; }
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    function start() { if (!timer) timer = setInterval(sweep, 3800); }
+    function stop() {
+      clearInterval(timer); timer = null;
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+      spot.classList.remove('on');
+    }
+    spot.addEventListener('pointerup', function () {
+      clearTimeout(hold);
+      hold = setTimeout(leave, 1200);
+    });
+    setTimeout(sweep, 1000);
+    start();
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop(); else start();
+    });
+  }
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

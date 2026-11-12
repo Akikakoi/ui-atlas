@@ -3,110 +3,468 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>共享元素转场 · UI Atlas 动效</title>
+<title>共享元素转场 · LITTORAL 海岸影像展 · UI Atlas</title>
 <style>
-:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0}
+:root{--bg:#edefe9;--paper:#fbfcf8;--ink:#151a16;--muted:#717a71;--line:#d6dbd0;--accent:#236b57;--warm:#bd6b45}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:26px 18px 56px}
-.app{width:100%;max-width:520px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:360px;position:relative}
-.bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
-.bar b{color:var(--ink);font-size:13px;letter-spacing:-.01em}
-.bar .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
-.view{padding:18px 16px 22px}
-.view[hidden]{display:none}
-.kicker{margin:0 0 10px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
-h1{margin:0 0 16px;font-size:clamp(20px,4.6vw,27px);line-height:1.16;letter-spacing:-.03em;font-weight:640}
-.case{display:flex;gap:12px;align-items:center;width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;
-  background:#fbfaf6;text-align:left;font:inherit;cursor:pointer;transition:border-color .2s,transform .2s}
-.case:hover{border-color:#c9c5b9;transform:translateY(-1px)}
-.thumb{width:78px;height:64px;border-radius:8px;flex:0 0 78px;background:
-  radial-gradient(circle at 30% 25%,#f0d7b4,transparent 55%),linear-gradient(135deg,#c9a06a,#5d6b52);
-  view-transition-name:hero}
-.case .who b{display:block;font-size:13.5px;letter-spacing:-.01em}
-.case .who span{font-size:11.5px;color:var(--muted)}
-.case .go{margin-left:auto;color:var(--accent);font-size:12px}
-.hero{height:150px;border-radius:11px;margin-bottom:14px;background:
-  radial-gradient(circle at 30% 25%,#f0d7b4,transparent 55%),linear-gradient(135deg,#c9a06a,#5d6b52)}
-.detail h1{margin-bottom:8px}
-.detail p{margin:0 0 10px;font-size:12.5px;line-height:1.85;color:#4b4e55;max-width:34em}
-.back{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 11px;font:inherit;font-size:11.5px;cursor:pointer;margin-bottom:12px}
-.back:hover{border-color:var(--accent);color:var(--accent)}
-.tagrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
-.tagrow span{font-size:10.5px;color:var(--muted);background:#f3f1ea;border-radius:999px;padding:2px 9px}
-::view-transition-group(hero){animation-duration:.58s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
-::view-transition-old(hero),::view-transition-new(hero){animation-duration:.58s}
-::view-transition-old(root),::view-transition-new(root){animation-duration:.3s}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.shell{min-height:100svh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;flex:0 0 auto;height:54px;display:flex;align-items:center;gap:14px;padding:0 clamp(16px,3vw,36px);border-bottom:1px solid var(--line);background:rgba(251,252,248,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.logo{width:26px;height:26px;border-radius:8px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:700 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em}
+.brand b{font-size:12px;font-weight:750;letter-spacing:.18em}
+.brand span{font-size:9px;letter-spacing:.1em;color:var(--muted)}
+.crumb{display:flex;align-items:center;gap:8px;padding-left:13px;border-left:1px solid var(--line);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.crumb em{font-style:normal;color:var(--ink)}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:4px 9px;white-space:nowrap}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (max-height:560px){
-  .stage{padding:18px 18px 46px}
-  .app{min-height:0}
-  .hero{height:104px;margin-bottom:10px}
-  .tagrow{display:none}
-  .view{padding:14px 16px 16px}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex:0 0 auto}
+.dates{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
+.live{display:flex;align-items:center;gap:5px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);border:1px solid #c7d6ca;border-radius:999px;padding:5px 9px;white-space:nowrap}
+.live::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.view{flex:1;display:flex;flex-direction:column;min-height:0}
+.exhibit{flex:1;width:100%;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:minmax(250px,.72fr) minmax(0,1.5fr);gap:clamp(26px,4.5vw,64px);padding:clamp(26px,4vw,54px) clamp(18px,4vw,44px) 38px;align-items:start}
+.intro{position:sticky;top:84px}
+.kicker{margin:0 0 14px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+.intro h1{margin:0 0 18px;font-size:clamp(30px,3.9vw,48px);line-height:1.06;letter-spacing:-.044em;font-weight:640}
+.intro h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--warm)}
+.lede{margin:0 0 22px;font-size:13.5px;line-height:1.9;color:#4a514a;max-width:26em}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--line);gap:1px;margin:0 0 20px}
+.facts div{background:var(--paper);padding:9px 11px}
+.facts span{display:block;font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);margin-bottom:5px}
+.facts b{font-size:12.5px;font-weight:650;letter-spacing:-.01em}
+.venue{margin:0;padding-top:16px;border-top:1px solid var(--line);font:500 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.venue b{display:block;color:var(--ink);font-size:10.5px;letter-spacing:.04em;margin-bottom:2px}
+.works{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2vw,22px)}
+.work{position:relative;display:flex;flex-direction:column;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:8px 8px 12px;cursor:pointer;transition:transform .26s cubic-bezier(.2,.8,.2,1),border-color .22s,box-shadow .26s}
+.work:hover{transform:translateY(-3px);border-color:#b9c2b6;box-shadow:0 26px 44px -34px rgba(18,30,24,.45)}
+.work:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.cover{position:relative;display:block;aspect-ratio:4/3;border-radius:9px;overflow:hidden;background:
+  radial-gradient(ellipse 92% 74% at 72% 20%,var(--c) 0%,transparent 58%),
+  radial-gradient(ellipse 120% 86% at 16% 94%,var(--d) 0%,transparent 62%),
+  linear-gradient(166deg,var(--a),var(--b));
+  isolation:isolate}
+.cover::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 7px);mix-blend-mode:soft-light;opacity:.7}
+.cover::after{content:"";position:absolute;left:0;right:0;top:61%;height:1px;background:rgba(255,255,255,.4);box-shadow:0 6px 20px rgba(255,255,255,.12)}
+.cover .no{position:absolute;left:10px;top:8px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(255,255,255,.78);font-style:normal}
+.cover .ring{position:absolute;right:12%;bottom:14%;width:34%;aspect-ratio:1;border:1px solid rgba(255,255,255,.34);border-radius:50%;box-shadow:0 0 0 9px rgba(255,255,255,.06),0 0 0 20px rgba(255,255,255,.04)}
+.wmeta{display:flex;flex-direction:column;gap:2px;padding:11px 5px 0;min-width:0}
+.wno{font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.wtitle{font-size:16px;font-weight:660;letter-spacing:-.015em;margin-top:1px}
+.wsub{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.go{position:absolute;right:12px;top:12px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:rgba(251,252,248,.82);color:var(--ink);font-size:12px;opacity:0;transform:translateY(3px);transition:opacity .22s,transform .22s}
+.work:hover .go,.work:focus-visible .go{opacity:1;transform:none}
+.foot{flex:0 0 auto;border-top:1px solid var(--line);padding:13px clamp(18px,4vw,44px);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);background:rgba(251,252,248,.5)}
+.detail-view{background:var(--bg)}
+.dwrap{flex:1;width:100%;max-width:1240px;margin:0 auto;padding:18px clamp(18px,4vw,44px) 40px}
+.dbar{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.back{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 14px;font-size:11.5px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s}
+.back:hover{border-color:var(--accent);color:var(--accent)}
+.back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dno-tag{margin-left:auto;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.dgrid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.78fr);gap:clamp(24px,4vw,56px);align-items:start}
+.dart{position:relative;height:clamp(300px,56vh,560px);border-radius:18px;overflow:hidden;view-transition-name:vt-hero;background:
+  radial-gradient(ellipse 92% 74% at 72% 20%,var(--c) 0%,transparent 58%),
+  radial-gradient(ellipse 120% 86% at 16% 94%,var(--d) 0%,transparent 62%),
+  linear-gradient(166deg,var(--a),var(--b));
+  box-shadow:0 40px 80px -60px rgba(18,30,24,.6)}
+.dart::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 9px);mix-blend-mode:soft-light;opacity:.7}
+.dart::after{content:"";position:absolute;left:0;right:0;top:61%;height:1px;background:rgba(255,255,255,.4)}
+.dart .big{position:absolute;left:clamp(16px,3vw,30px);top:clamp(12px,2vw,24px);font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(255,255,255,.8)}
+.dart .dring{position:absolute;right:10%;bottom:12%;width:30%;aspect-ratio:1;border:1px solid rgba(255,255,255,.32);border-radius:50%;box-shadow:0 0 0 12px rgba(255,255,255,.055),0 0 0 28px rgba(255,255,255,.035)}
+.dinfo{padding-top:4px}
+.dinfo .kicker{margin-bottom:12px}
+.dinfo h1{margin:0 0 6px;font-size:clamp(32px,4vw,50px);line-height:1.04;letter-spacing:-.045em;font-weight:650;view-transition-name:vt-title;outline:none}
+.dsub{margin:0 0 20px;font:500 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.dlead{margin:0 0 14px;font-size:14.5px;line-height:1.95;letter-spacing:-.005em}
+.dbody{margin:0 0 22px;font-size:12.5px;line-height:1.95;color:#565d55;max-width:34em}
+.dstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:11px;overflow:hidden;margin:0 0 22px}
+.dstats div{background:var(--paper);padding:9px 12px}
+.dstats dt{font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);margin-bottom:5px}
+.dstats dd{margin:0;font-size:12px;font-weight:600}
+.dnote{margin:0 0 24px;padding:14px 16px;border-left:2px solid var(--warm);background:#f4f2e9;border-radius:0 10px 10px 0;font:italic 15px/1.7 Georgia,"Songti SC",serif;color:#3d423c}
+.dnote small{display:block;margin-top:6px;font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);font-style:normal}
+.back2{border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 16px;font-size:11.5px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s}
+.back2:hover{border-color:var(--accent);color:var(--accent)}
+.dfoot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:20px;padding-top:14px;border-top:1px solid var(--line);font:500 8.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+::view-transition-group(vt-hero),::view-transition-group(vt-title){animation-duration:.58s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+::view-transition-old(vt-hero),::view-transition-new(vt-hero),
+::view-transition-old(vt-title),::view-transition-new(vt-title){animation-duration:.58s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.3s}
+@media (max-width:900px){
+  .exhibit{grid-template-columns:1fr;gap:24px}
+  .intro{position:static;display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:8px 28px;align-items:start}
+  .intro .kicker,.intro h1,.intro .lede{grid-column:1}
+  .intro .facts,.intro .venue{grid-column:2}
+  .intro .facts{align-self:end;margin-bottom:10px}
+  .intro .venue{border-top:0;padding-top:0}
+  .dgrid{grid-template-columns:1fr}
+  .dart{height:clamp(220px,42vh,380px)}
 }
-@media (prefers-reduced-motion:reduce){::view-transition-group(hero){animation-duration:.01s}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:42px;padding:0 16px;gap:10px}
+  .brand span,.crumb,.dates,.live{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .exhibit{grid-template-columns:214px minmax(0,1fr);gap:18px;padding:12px 18px 10px}
+  .intro{position:static;display:block}
+  .kicker{margin-bottom:7px;font-size:7.5px}
+  .intro h1{font-size:23px;line-height:1.12;margin-bottom:8px}
+  .lede{font-size:10.5px;line-height:1.65;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .facts{margin-bottom:8px}
+  .facts div{padding:6px 8px}
+  .facts span{font-size:6.5px;margin-bottom:3px}
+  .facts b{font-size:10.5px}
+  .venue{padding-top:8px;font-size:7.5px;line-height:1.7}
+  .venue b{font-size:8.5px}
+  .works{gap:8px}
+  .work{padding:5px 5px 8px;border-radius:10px}
+  .cover{aspect-ratio:16/7;border-radius:7px}
+  .cover .ring{display:none}
+  .wmeta{padding:6px 4px 0}
+  .wno{font-size:6.5px}
+  .wtitle{font-size:12.5px}
+  .wsub{font-size:8px}
+  .go{display:none}
+  .foot{display:none}
+  .dwrap{padding:9px 16px 12px}
+  .dbar{margin-bottom:8px}
+  .back{padding:5px 10px;font-size:10px}
+  .dno-tag{font-size:7.5px}
+  .dgrid{grid-template-columns:minmax(0,1.22fr) minmax(0,1fr);gap:18px}
+  .dart{height:calc(100svh - 106px);min-height:280px;border-radius:13px}
+  .dinfo .kicker{font-size:7.5px;margin-bottom:7px}
+  .dinfo h1{font-size:24px;margin-bottom:3px}
+  .dsub{font-size:8px;margin-bottom:9px}
+  .dlead{font-size:11px;line-height:1.7;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .dbody,.dnote,.dfoot{display:none}
+  .dstats{margin-bottom:9px}
+  .dstats div{padding:6px 8px}
+  .dstats dt{font-size:6.5px;margin-bottom:3px}
+  .dstats dd{font-size:10px}
+  .back2{padding:5px 11px;font-size:9.5px}
+}
+@media (max-width:560px){
+  .topbar{height:48px;padding:0 13px;gap:9px}
+  .brand span,.crumb,.dates,.live,.hint{display:none}
+  .exhibit{grid-template-columns:1fr;gap:18px;padding:18px 16px 26px}
+  .intro{display:block}
+  .intro h1{font-size:31px}
+  .lede{font-size:12.5px;line-height:1.85}
+  .facts{margin-bottom:14px}
+  .venue{padding-top:12px}
+  .works{grid-template-columns:1fr;gap:10px}
+  .cover{aspect-ratio:16/9}
+  .wtitle{font-size:15px}
+  .wsub{font-size:10.5px}
+  .go{display:none}
+  .foot{padding:11px 14px;font-size:7.5px}
+  .foot span:nth-child(3){display:none}
+  .dwrap{padding:12px 16px 30px}
+  .dbar{margin-bottom:11px}
+  .dgrid{grid-template-columns:1fr;gap:18px}
+  .dart{height:220px;border-radius:13px}
+  .dinfo h1{font-size:32px}
+  .dlead{font-size:13px;line-height:1.85}
+  .dbody{font-size:12px}
+  .dstats{margin-bottom:16px}
+  .dnote{font-size:14px}
+  .dfoot{font-size:7.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  .work,.go,.back{transition:none}
+  ::view-transition-group(vt-hero),::view-transition-group(vt-title),
+  ::view-transition-old(vt-hero),::view-transition-new(vt-hero),
+  ::view-transition-old(vt-title),::view-transition-new(vt-title){animation-duration:.01s}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="app">
-    <div class="bar"><span class="dot"></span><b>档案</b><span>· 2026</span></div>
-    <section class="view" id="listView">
-      <p class="kicker">VIEW TRANSITIONS</p>
-      <h1>点开一个案例，<br>缩略图会自己长大。</h1>
-      <button class="case" id="openBtn" type="button">
-        <span class="thumb" id="thumb"></span>
-        <span class="who"><b>星野计划</b><span>品牌识别 · 2026</span></span>
-        <span class="go">→</span>
-      </button>
-    </section>
-    <section class="view detail" id="detailView" hidden>
-      <button class="back" id="backBtn" type="button">← 返回列表</button>
-      <div class="hero" id="hero"></div>
-      <p class="kicker">CASE 001</p>
-      <h1>星野计划</h1>
-      <p>缩略图与详情大图共用一个 <code>view-transition-name: hero</code>，浏览器自己补出中间的位移与缩放，不需要手写 FLIP。</p>
-      <div class="tagrow"><span>品牌识别</span><span>包装</span><span>2026</span></div>
-    </section>
-  </div>
-</main>
-<p class="hint">点卡片进入，返回时图形会缩回去</p>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand"><span class="logo" aria-hidden="true">LT</span><b>LITTORAL</b><span>海岸影像</span></div>
+    <span class="crumb">展览 <em>/ 海退之后</em></span>
+    <p class="hint">点一张作品，封面与标题会一起长成大图</p>
+    <div class="top-right">
+      <span class="dates">09.18 — 11.30</span>
+      <span class="live">正在展出</span>
+    </div>
+  </header>
+
+  <main class="view" id="listView">
+    <div class="exhibit">
+      <aside class="intro">
+        <p class="kicker">CURRENT EXHIBITION · 2026</p>
+        <h1>海退之后，<br>礁石留下了<em>光。</em></h1>
+        <p class="lede">四位摄影师在同一段海岸线上等待退潮。水退下去以后，礁石、盐霜与搁浅的船呈现出另一种秩序，像一组被海水冲洗过的静物。</p>
+        <div class="facts">
+          <div><span>作品</span><b>12 幅</b></div>
+          <div><span>媒材</span><b>银盐 / 蓝晒</b></div>
+          <div><span>门票</span><b>免费</b></div>
+        </div>
+        <p class="venue"><b>LITTORAL 画廊 · 三层</b>上海市杨浦区滨江路 218 号<br>周三至周日 10:00 — 18:00</p>
+      </aside>
+
+      <section class="works" aria-label="展出作品">
+        <button class="work" type="button" data-id="tide" style="--a:#2a4b45;--b:#7f9b8f;--c:#dcc9a2;--d:#132725">
+          <span class="cover" aria-hidden="true"><i class="no">01</i><i class="ring"></i></span>
+          <span class="wmeta"><span class="wno">WORK 01 · SILVER GELATIN</span><b class="wtitle">退潮线</b><span class="wsub">2026 · 60 × 80 cm · 3 + 1AP</span></span>
+          <span class="go" aria-hidden="true">↗</span>
+        </button>
+        <button class="work" type="button" data-id="haze" style="--a:#6d4a35;--b:#c99f74;--c:#f1dcc0;--d:#3e2a1e">
+          <span class="cover" aria-hidden="true"><i class="no">02</i><i class="ring"></i></span>
+          <span class="wmeta"><span class="wno">WORK 02 · PIGMENT PRINT</span><b class="wtitle">盐雾</b><span class="wsub">2025 · 90 × 60 cm · 5 + 2AP</span></span>
+          <span class="go" aria-hidden="true">↗</span>
+        </button>
+        <button class="work" type="button" data-id="reef" style="--a:#1f3550;--b:#5d7f9d;--c:#cfd9df;--d:#101b29">
+          <span class="cover" aria-hidden="true"><i class="no">03</i><i class="ring"></i></span>
+          <span class="wmeta"><span class="wno">WORK 03 · CYANOTYPE</span><b class="wtitle">礁石记</b><span class="wsub">2024 · 50 × 70 cm · 8 版</span></span>
+          <span class="go" aria-hidden="true">↗</span>
+        </button>
+        <button class="work" type="button" data-id="night" style="--a:#243329;--b:#5f7562;--c:#c9b98f;--d:#111a13">
+          <span class="cover" aria-hidden="true"><i class="no">04</i><i class="ring"></i></span>
+          <span class="wmeta"><span class="wno">WORK 04 · SILVER GELATIN</span><b class="wtitle">夜航</b><span class="wsub">2026 · 70 × 100 cm · 3 + 1AP</span></span>
+          <span class="go" aria-hidden="true">↗</span>
+        </button>
+      </section>
+    </div>
+    <footer class="foot">
+      <span>LITTORAL · 海岸影像计划</span>
+      <span>策展：周玥 / 林一</span>
+      <span>共 12 幅 · 本页展出 4 幅</span>
+    </footer>
+  </main>
+
+  <main class="view detail-view" id="detailView" hidden>
+    <div class="dwrap">
+      <div class="dbar">
+        <button class="back" id="backBtn" type="button">← 返回展览</button>
+        <span class="dno-tag" id="dnoTag">WORK 01 / 04</span>
+      </div>
+      <div class="dgrid">
+        <div class="dart" id="detailArt" aria-hidden="true"><span class="big" id="dnoBig">01</span><span class="dring"></span></div>
+        <div class="dinfo">
+          <p class="kicker" id="dkicker">SILVER GELATIN · 2026</p>
+          <h1 id="dtitle" tabindex="-1">退潮线</h1>
+          <p class="dsub" id="dsub">2026 · 60 × 80 cm · 3 + 1AP</p>
+          <p class="dlead" id="dlead">退潮后的第三十分钟，礁石上的水痕形成一条几乎笔直的线。</p>
+          <p class="dbody" id="dbody">摄影师在同一个位置等了六个下午，只为等海水退到那条线。画面里没有人物，只有盐霜、被磨圆的石头和一层很薄的反光。</p>
+          <dl class="dstats">
+            <div><dt>年份</dt><dd id="dyear">2026</dd></div>
+            <div><dt>媒材</dt><dd id="dmedium">银盐照片</dd></div>
+            <div><dt>尺寸</dt><dd id="dsize">60 × 80 cm</dd></div>
+            <div><dt>版数</dt><dd id="dedition">3 + 1AP</dd></div>
+          </dl>
+          <blockquote class="dnote" id="dnote">“海水退下去以后，礁石才开始说话。”<small>展览前言 · 第 01 页</small></blockquote>
+          <button class="back2" id="backBtn2" type="button">← 回到展览</button>
+          <div class="dfoot"><span>导览 · 每周六 14:00</span><span>LITTORAL / 展厅三层</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
 <script>
 (function () {
-  var list = document.getElementById('listView'), detail = document.getElementById('detailView');
-  var thumb = document.getElementById('thumb'), hero = document.getElementById('hero');
-  var openBtn = document.getElementById('openBtn'), backBtn = document.getElementById('backBtn');
-  var busy = false;
-
-  function swap(toDetail) {
-    list.hidden = toDetail;
-    detail.hidden = !toDetail;
-    if (toDetail) {
-      thumb.style.viewTransitionName = 'none';
-      hero.style.viewTransitionName = 'hero';
-      backBtn.focus();
-    } else {
-      hero.style.viewTransitionName = 'none';
-      thumb.style.viewTransitionName = 'hero';
-      openBtn.focus();
+  var WORKS = {
+    tide: {
+      title: '退潮线', no: '01', kicker: 'SILVER GELATIN · 2026',
+      sub: '2026 · 60 × 80 cm · 3 + 1AP',
+      lead: '退潮后的第三十分钟，礁石上的水痕形成一条几乎笔直的线。',
+      body: '摄影师在同一个位置等了六个下午，只为等海水退到那条线。画面里没有人物，只有盐霜、被磨圆的石头和一层很薄的反光。',
+      note: '“海水退下去以后，礁石才开始说话。”',
+      year: '2026', medium: '银盐照片', size: '60 × 80 cm', edition: '3 + 1AP',
+      colors: ['#2a4b45', '#7f9b8f', '#dcc9a2', '#132725']
+    },
+    haze: {
+      title: '盐雾', no: '02', kicker: 'PIGMENT PRINT · 2025',
+      sub: '2025 · 90 × 60 cm · 5 + 2AP',
+      lead: '清晨的盐雾把远处的防波堤擦成一块柔软的灰色。',
+      body: '这张照片用了很长的曝光。海浪在画面里变成雾，只有栏杆还保留着硬边。拍摄结束后，镜头上的盐粒花了半小时才擦干净。',
+      note: '“看不清的地方，反而更接近记忆。”',
+      year: '2025', medium: '艺术微喷', size: '90 × 60 cm', edition: '5 + 2AP',
+      colors: ['#6d4a35', '#c99f74', '#f1dcc0', '#3e2a1e']
+    },
+    reef: {
+      title: '礁石记', no: '03', kicker: 'CYANOTYPE · 2024',
+      sub: '2024 · 50 × 70 cm · 8 版',
+      lead: '蓝晒把礁石的阴影压成了一整片深海的颜色。',
+      body: '这组作品在退潮后的浅水区完成曝光。阳光、海水和涂过感光液的纸共同决定了最后的蓝，每一张都不可能完全重复。',
+      note: '“海水的蓝有重量，落在纸上就变成山。”',
+      year: '2024', medium: '蓝晒（氰版）', size: '50 × 70 cm', edition: '8 版',
+      colors: ['#1f3550', '#5d7f9d', '#cfd9df', '#101b29']
+    },
+    night: {
+      title: '夜航', no: '04', kicker: 'SILVER GELATIN · 2026',
+      sub: '2026 · 70 × 100 cm · 3 + 1AP',
+      lead: '最后一班渡轮经过时，海面只剩下一道很慢的白色尾迹。',
+      body: '曝光时间被拉长到四分钟。船身消失了，灯留在原地，像一排没有落点的星。摄影师说，这是他第一次觉得“离开”也可以被拍下来。',
+      note: '“船走了，光还在原地等了一会儿。”',
+      year: '2026', medium: '银盐照片', size: '70 × 100 cm', edition: '3 + 1AP',
+      colors: ['#243329', '#5f7562', '#c9b98f', '#111a13']
     }
+  };
+
+  var listView = document.getElementById('listView');
+  var detailView = document.getElementById('detailView');
+  var backBtn = document.getElementById('backBtn'), backBtn2 = document.getElementById('backBtn2');
+  var art = document.getElementById('detailArt');
+  var dTitle = document.getElementById('dtitle'), dKicker = document.getElementById('dkicker');
+  var dSub = document.getElementById('dsub'), dLead = document.getElementById('dlead'), dBody = document.getElementById('dbody');
+  var dYear = document.getElementById('dyear'), dMedium = document.getElementById('dmedium');
+  var dSize = document.getElementById('dsize'), dEdition = document.getElementById('dedition');
+  var dNote = document.getElementById('dnote'), dNoTag = document.getElementById('dnoTag'), dNoBig = document.getElementById('dnoBig');
+  var works = [].slice.call(document.querySelectorAll('.work'));
+  var hint = document.querySelector('.hint');
+  var opener = null, busy = false, listScroll = 0;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasVT = typeof document.startViewTransition === 'function';
+
+  function namesOn(card, on) {
+    var cover = card.querySelector('.cover'), title = card.querySelector('.wtitle');
+    cover.style.viewTransitionName = on ? 'vt-hero' : '';
+    title.style.viewTransitionName = on ? 'vt-title' : '';
   }
-  function go(toDetail) {
+
+  function fill(id) {
+    var w = WORKS[id];
+    dTitle.textContent = w.title;
+    dKicker.textContent = w.kicker;
+    dSub.textContent = w.sub;
+    dLead.textContent = w.lead;
+    dBody.textContent = w.body;
+    dYear.textContent = w.year;
+    dMedium.textContent = w.medium;
+    dSize.textContent = w.size;
+    dEdition.textContent = w.edition;
+    dNote.innerHTML = w.note + '<small>展览前言 · 第 ' + w.no + ' 页</small>';
+    dNoTag.textContent = 'WORK ' + w.no + ' / 04';
+    dNoBig.textContent = w.no;
+    art.style.setProperty('--a', w.colors[0]);
+    art.style.setProperty('--b', w.colors[1]);
+    art.style.setProperty('--c', w.colors[2]);
+    art.style.setProperty('--d', w.colors[3]);
+  }
+
+  function open(card) {
     if (busy) return;
-    if (!document.startViewTransition) { swap(toDetail); return; }
+    opener = card;
+    listScroll = window.scrollY;
+    fill(card.dataset.id);
+
+    function swap() {
+      listView.hidden = true;
+      detailView.hidden = false;
+      namesOn(card, false);
+      hint.textContent = '按 Esc 或「返回展览」，封面会缩回原位';
+      window.scrollTo(0, 0);
+    }
+    if (!hasVT || reduce) {
+      swap();
+      backBtn.focus({ preventScroll: true });
+      return;
+    }
     busy = true;
-    var t = document.startViewTransition(function () { swap(toDetail); });
-    t.finished.finally(function () { busy = false; });
+    namesOn(card, true);
+    var t = document.startViewTransition(swap);
+    t.finished.finally(function () {
+      busy = false;
+      backBtn.focus({ preventScroll: true });
+      window.scrollTo(0, 0);
+    });
   }
-  openBtn.addEventListener('click', function () { go(true); });
-  backBtn.addEventListener('click', function () { go(false); });
+
+  function close() {
+    if (busy || detailView.hidden) return;
+    function swap() {
+      detailView.hidden = true;
+      listView.hidden = false;
+      namesOn(opener, true);
+      hint.textContent = '点一张作品，封面与标题会一起长成大图';
+      window.scrollTo(0, listScroll);
+    }
+    if (!hasVT || reduce) {
+      swap();
+      namesOn(opener, false);
+      opener.focus({ preventScroll: true });
+      window.scrollTo(0, listScroll);
+      return;
+    }
+    busy = true;
+    var t = document.startViewTransition(swap);
+    t.finished.finally(function () {
+      busy = false;
+      namesOn(opener, false);
+      opener.focus({ preventScroll: true });
+      window.scrollTo(0, listScroll);
+    });
+  }
+
+  works.forEach(function (card) {
+    card.addEventListener('click', function () { open(card); });
+  });
+  backBtn.addEventListener('click', close);
+  backBtn2.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

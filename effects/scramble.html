@@ -3,80 +3,357 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>乱码解码 · UI Atlas 动效</title>
+<title>乱码解码 · UPLINK 边缘部署</title>
 <style>
-:root{--bg:#0d0f12;--ink:#e9ebef;--muted:#7c818c;--accent:#7ee0a8}
+:root{--bg:#05080b;--panel:#0b1116;--panel2:#0e151b;--ink:#e9f0ea;--muted:#89968f;--accent:#7ef0a8;--line:rgba(222,240,230,.12);--mono:ui-monospace,"Cascadia Code",Consolas,monospace}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:radial-gradient(500px 260px at 50% 0%,rgba(60,120,90,.16),transparent 70%),var(--bg);color:var(--ink);
-  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:38px 20px 74px;text-align:center}
-.kicker{margin:0 0 18px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
-.code{margin:0;font:600 clamp(19px,4.6vw,34px)/1.5 ui-monospace,"Cascadia Code",Consolas,monospace;
-  letter-spacing:.06em;white-space:nowrap;color:var(--accent);text-shadow:0 0 22px rgba(126,224,168,.25)}
-.code .dim{color:#3d4a44}
-.sub{margin:16px 0 0;font-size:12px;line-height:1.85;color:var(--muted);max-width:30em}
-.sub code{color:#b9c4be;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;font-size:11.5px}
-.again{margin-top:24px;border:1px solid rgba(255,255,255,.18);background:transparent;color:var(--ink);
-  border-radius:999px;padding:7px 16px;font:inherit;font-size:12px;cursor:pointer}
-.again:hover{border-color:var(--accent);color:var(--accent)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (max-width:420px){.code{font-size:16px;letter-spacing:.02em}}
-@media (prefers-reduced-motion:reduce){.code{color:var(--ink)}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.head{position:relative;z-index:5;display:flex;align-items:center;gap:26px;padding:16px clamp(20px,4vw,44px);border-bottom:1px solid var(--line);
+  background:rgba(5,8,11,.74);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:10px;font:700 13px/1 var(--mono);letter-spacing:.2em;text-decoration:none;white-space:nowrap}
+.brand .mark{width:23px;height:23px;display:grid;place-items:center;border-radius:5px;background:var(--accent);color:#06120b;font-size:12px;letter-spacing:0}
+.brand i{font:400 9px var(--mono);letter-spacing:.12em;color:var(--muted);font-style:normal}
+.head nav{display:flex;gap:22px;margin-left:10px}
+.head nav a{font-size:12px;color:var(--muted);text-decoration:none}
+.head nav a:hover{color:var(--ink)}
+.head .hint{margin-left:auto;margin-right:2px}
+.status{display:flex;align-items:center;gap:7px;font:600 8.5px/1 var(--mono);letter-spacing:.14em;color:var(--muted);white-space:nowrap}
+.status i{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--accent);background:var(--accent);color:#06120b;border-radius:7px;
+  padding:10px 17px;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap}
+.btn:hover{filter:brightness(1.06)}
+.ghost{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:7px;padding:10px 15px;font-size:12.5px;text-decoration:none;color:var(--ink)}
+.ghost:hover{border-color:rgba(222,240,230,.3)}
+.head .btn{padding:7px 13px;font-size:11px}
+.hero{position:relative;max-width:1180px;margin:0 auto;padding:clamp(40px,5.6vw,72px) clamp(20px,4vw,44px) 34px;
+  display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:clamp(28px,4.6vw,58px);align-items:center}
+.hero::before{content:"";position:absolute;inset:-80px 0 0;background:
+  radial-gradient(58% 44% at 22% 18%,rgba(126,240,168,.13),transparent 66%),
+  linear-gradient(rgba(222,240,230,.03) 1px,transparent 1px) 0 0/100% 38px,
+  linear-gradient(90deg,rgba(222,240,230,.03) 1px,transparent 1px) 0 0/38px 100%;
+  -webkit-mask-image:radial-gradient(80% 80% at 40% 30%,#000 30%,transparent 75%);
+  mask-image:radial-gradient(80% 80% at 40% 30%,#000 30%,transparent 75%);pointer-events:none}
+.copy{position:relative;z-index:1}
+.kicker{margin:0 0 16px;font:600 9.5px/1 var(--mono);letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;font-family:var(--mono);font-size:clamp(38px,4.2vw,62px);line-height:1.05;letter-spacing:-.035em;font-weight:700;white-space:nowrap}
+h1 .code{display:block;min-height:1.05em}
+h1 .ac{color:var(--accent);text-shadow:0 0 32px rgba(126,240,168,.28)}
+.lede{margin:22px 0 0;max-width:30em;font-size:13px;line-height:1.95;color:#9aa79f}
+.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.note{margin:12px 0 0;font:500 9px/1.6 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.term{position:relative;z-index:1;background:linear-gradient(180deg,#0d141a,#090f14);border:1px solid rgba(126,240,168,.2);border-radius:12px;
+  box-shadow:0 44px 90px -46px rgba(0,0,0,.9),0 0 0 1px rgba(0,0,0,.4);overflow:hidden}
+.term-top{display:flex;align-items:center;gap:10px;padding:10px 13px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--line);
+  font:600 8.5px/1 var(--mono);letter-spacing:.1em;color:var(--muted)}
+.dots{display:flex;gap:5px;margin-right:2px}
+.dots i{width:7px;height:7px;border-radius:50%;background:#2a353d}
+.dots i:first-child{background:#3d4a52}
+.term-top .tt{color:#b9c6be}
+.term-top .live{margin-left:auto;display:flex;align-items:center;gap:5px;color:var(--accent)}
+.term-top .live::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.term-body{padding:12px 14px 14px;font:500 10.5px/2 var(--mono);letter-spacing:.01em}
+.ln{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#b7c4bc}
+.ln .dim{color:#4d5a54;margin-right:7px}
+.ln .ok{color:var(--accent);margin-right:7px}
+.ln .val{color:#e9f0ea}
+.ln .code{display:inline-block;color:var(--accent);min-width:15ch}
+.ln.big{margin-top:5px;padding-top:6px;border-top:1px dashed rgba(222,240,230,.12);color:#7d8b84}
+.term-foot{display:flex;justify-content:space-between;gap:8px;padding:9px 14px;border-top:1px solid var(--line);background:rgba(255,255,255,.02);
+  font:600 8px/1 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.term-foot span:first-child{color:var(--accent)}
+.stats{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,44px);display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+.stat{padding:20px 12px;border-left:1px solid var(--line)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{display:block;font:500 24px/1 var(--mono);letter-spacing:-.04em;color:var(--accent)}
+.stat span{display:block;margin-top:6px;font-size:10px;color:var(--muted);letter-spacing:.03em}
+.marks{max-width:1180px;margin:0 auto;padding:30px clamp(20px,4vw,44px) 0;display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  font:600 9px/1 var(--mono);letter-spacing:.16em;color:#5a6862}
+.marks span:first-child{color:#43504a;letter-spacing:.1em}
+.features{max-width:1180px;margin:0 auto;padding:38px clamp(20px,4vw,44px) 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.feature{border:1px solid var(--line);border-radius:10px;padding:20px 18px;background:rgba(255,255,255,.018)}
+.feature:hover{border-color:rgba(126,240,168,.3);background:rgba(126,240,168,.035)}
+.feature span{font:600 8.5px/1 var(--mono);letter-spacing:.14em;color:var(--accent)}
+.feature h3{margin:10px 0 8px;font-size:15px;letter-spacing:-.01em}
+.feature p{margin:0 0 14px;font-size:11.5px;line-height:1.75;color:var(--muted)}
+.feature code{display:inline-block;font:500 9.5px/1 var(--mono);color:#b7c4bc;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:4px;padding:5px 7px}
+.band{max-width:1180px;margin:0 auto 46px;padding:0 clamp(20px,4vw,44px)}
+.band-inner{border:1px solid rgba(126,240,168,.24);border-radius:12px;padding:26px 26px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  background:radial-gradient(60% 100% at 15% 0%,rgba(126,240,168,.1),transparent 62%)}
+.band h2{margin:0 0 7px;font-size:clamp(20px,2.5vw,28px);letter-spacing:-.035em;line-height:1.15}
+.band p{margin:0;font-size:11.5px;color:var(--muted)}
+.cmd{display:flex;align-items:center;gap:10px;font:500 10.5px/1 var(--mono);color:#b7c4bc;background:#08100c;border:1px solid var(--line);border-radius:7px;padding:11px 14px;white-space:nowrap}
+.cmd b{color:var(--accent);font-weight:500}
+.band .btn{margin-left:auto}
+footer{max-width:1180px;margin:0 auto;padding:16px clamp(20px,4vw,44px) 28px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
+  font:500 9px/1.7 var(--mono);letter-spacing:.08em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.04em;color:var(--muted);pointer-events:none;white-space:nowrap;
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px) and (min-width:561px){
+  .head{padding:10px 20px;gap:16px}
+  .head nav,.status,.brand i{display:none}
+  .head .hint{font-size:9.5px;padding:3px 8px;margin-left:auto}
+  .head .btn{padding:5px 11px;font-size:10px}
+  .hero{grid-template-columns:minmax(0,1fr) 236px;gap:22px;padding:15px 22px 8px}
+  .kicker{margin-bottom:6px;font-size:8px}
+  h1{font-size:29px}
+  .lede{margin-top:10px;font-size:10px;line-height:1.7;max-width:34em}
+  .actions{margin-top:11px;gap:7px}
+  .btn,.ghost{padding:6px 10px;font-size:9.5px;border-radius:6px}
+  .note{display:none}
+  .term{border-radius:9px}
+  .term-top{padding:7px 9px;font-size:7px}
+  .dots i{width:5px;height:5px}
+  .term-body{padding:8px 10px 9px;font-size:8px;line-height:1.95}
+  .term-foot{padding:6px 10px;font-size:6.5px}
+  .stats{padding:0 22px;border-top:0}
+  .stat{padding:8px 10px 10px;border-left:0}
+  .stat b{font-size:14px}
+  .stat span{font-size:7.5px;margin-top:3px}
+  .features{display:grid;grid-template-columns:repeat(3,1fr);padding:8px 22px 0;gap:8px}
+  .feature{padding:9px 10px;border-radius:7px}
+  .feature span{font-size:6.5px}
+  .feature h3{font-size:11px;margin:4px 0 3px}
+  .feature p{font-size:8px;line-height:1.55;margin:0}
+  .feature code{display:none}
+  .marks,.band,footer{display:none}
+}
+@media (max-width:560px){
+  .head{padding:12px 16px;gap:12px}
+  .head nav,.status,.brand i{display:none}
+  .head .btn{margin-left:auto;padding:5px 10px;font-size:9.5px}
+  .hero{grid-template-columns:1fr;gap:24px;padding:28px 16px 22px}
+  h1{font-size:clamp(34px,10.6vw,46px);white-space:normal}
+  .lede{font-size:12px;line-height:1.85;margin-top:16px}
+  .actions{margin-top:16px}
+  .term-body{font-size:9.5px;line-height:2.05}
+  .ln{white-space:normal}
+  .stats{padding:0 16px;grid-template-columns:repeat(2,1fr)}
+  .stat{padding:14px 8px}
+  .stat:nth-child(3){border-left:0;padding-left:0}
+  .marks{padding:22px 16px 0;gap:14px;font-size:8px}
+  .features{grid-template-columns:1fr;padding:26px 16px 20px}
+  .band{padding:0 16px;margin-bottom:32px}
+  .band-inner{padding:20px;gap:14px}
+  .band .btn{margin-left:0}
+  .cmd{width:100%;justify-content:space-between;font-size:9px}
+  footer{padding-left:16px;padding-right:16px;font-size:8px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .status i{animation:none}
+  .feature,.ghost{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div>
-    <p class="kicker">TYPE / 02</p>
-    <p class="code" id="code" aria-label="DECODING INTERFACE">DECODING INTERFACE</p>
-    <p class="sub">每个字符有自己的 <code>end</code> 帧。随机字形先占位，从左往右逐个锁定真相，右边还在噪声里。</p>
-    <button class="again" id="again" type="button">重新解码</button>
+
+<header class="head">
+  <a class="brand" href="#top"><span class="mark">U</span>UPLINK<i>EDGE DEPLOY</i></a>
+  <nav aria-label="主导航">
+    <a href="#top">产品</a>
+    <a href="#top">文档</a>
+    <a href="#top">定价</a>
+    <a href="#top">状态</a>
+  </nav>
+  <span class="status"><i></i>ALL SYSTEMS NORMAL</span>
+  <p class="hint">终端状态每 4 秒重新解码</p>
+  <a class="btn" href="#start">开始部署</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="copy">
+      <p class="kicker">EDGE DEPLOYMENT · 42 REGIONS</p>
+      <h1 aria-label="SHIP WITHOUT DOUBT">
+        <span class="code" id="code1" data-text="SHIP WITHOUT" aria-hidden="true">SHIP WITHOUT</span>
+        <span class="code ac" id="code2" data-text="DOUBT." aria-hidden="true">DOUBT.</span>
+      </h1>
+      <p class="lede">把每次发布拆成一次原子操作：构建、灰度、回滚，都在同一条命令里。上线不再靠祈祷。</p>
+      <div class="actions">
+        <a class="btn" href="#start">开始部署 →</a>
+        <a class="ghost" href="#start">看文档</a>
+      </div>
+      <p class="note">60 秒接上第一个项目 · 无需信用卡</p>
+    </div>
+
+    <aside class="term" aria-label="实时部署日志：42 个区域已同步，P95 延迟 38 毫秒">
+      <div class="term-top">
+        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="tt">uplink — prod · deploy</span>
+        <span class="live">LIVE</span>
+      </div>
+      <div class="term-body" aria-hidden="true">
+        <p class="ln"><span class="dim">$</span> uplink deploy --prod</p>
+        <p class="ln"><span class="ok">✓</span> build <span class="val">3.2s</span></p>
+        <p class="ln"><span class="ok">✓</span> bundle <span class="val">812 KB</span></p>
+        <p class="ln"><span class="ok">✓</span> upload <span class="code" data-text="42 / 42 REGIONS">42 / 42 REGIONS</span></p>
+        <p class="ln"><span class="ok">✓</span> health <span class="code" data-text="ALL GREEN">ALL GREEN</span></p>
+        <p class="ln"><span class="ok">✓</span> traffic <span class="code" data-text="ZERO DOWNTIME">ZERO DOWNTIME</span></p>
+        <p class="ln big"><span class="dim">›</span> rollback <span class="code" data-text="READY IN 9S">READY IN 9S</span></p>
+      </div>
+      <div class="term-foot"><span>P95 38MS</span><span>42 REGIONS</span><span>REV 8F2C1A</span></div>
+    </aside>
+  </section>
+
+  <div class="stats" aria-label="平台数据">
+    <div class="stat"><b>42</b><span>边缘节点</span></div>
+    <div class="stat"><b>38 ms</b><span>p95 延迟</span></div>
+    <div class="stat"><b>99.99%</b><span>月度可用性</span></div>
+    <div class="stat"><b>1.2 M</b><span>本月部署</span></div>
   </div>
+
+  <div class="marks" aria-label="客户">
+    <span>SHIPPING EVERY DAY /</span>
+    <span>NOVA</span><span>FIELD</span><span>72</span><span>LATTICE</span><span>海雾</span><span>ORBIT</span>
+  </div>
+
+  <section class="features" aria-label="核心能力">
+    <article class="feature">
+      <span>01 / ATOMIC</span>
+      <h3>原子发布</h3>
+      <p>每次部署是一个不可变快照，构建与流量切换分开做，回滚不用重新构建。</p>
+      <code>uplink deploy --prod</code>
+    </article>
+    <article class="feature">
+      <span>02 / ROLLBACK</span>
+      <h3>9 秒回滚</h3>
+      <p>上一版一直留着。出错时一条命令回去，DNS 与缓存同步失效。</p>
+      <code>uplink rollback</code>
+    </article>
+    <article class="feature">
+      <span>03 / EDGE</span>
+      <h3>就近执行</h3>
+      <p>静态资源与函数落在离用户最近的节点，冷启动压到 12ms 以内。</p>
+      <code>uplink regions</code>
+    </article>
+  </section>
+
+  <section class="band" id="start">
+    <div class="band-inner">
+      <div>
+        <h2>从 0 到上线，只需要一条命令。</h2>
+        <p>装好 CLI，登录，然后 deploy。剩下的交给 42 个节点。</p>
+      </div>
+      <span class="cmd"><b>$</b> npm i -g uplink</span>
+      <a class="btn" href="#start">开始部署 →</a>
+    </div>
+  </section>
 </main>
-<p class="hint">每 4 秒自动解一次，也可点按钮</p>
+
+<footer>
+  <span>UPLINK · 上海 / 新加坡</span>
+  <span>STATUS · DOCS · CHANGELOG</span>
+  <span>© 2026</span>
+</footer>
+
 <script>
 (function () {
-  var el = document.getElementById('code');
-  var text = el.textContent.trim();
-  var pool = '!<>-_\\/[]{}=+*^?#%&@01ABCDEF';
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var timer = null;
+  var pool = '!<>-_\\/[]{}=+*^?#%&@01ABCDEF';
 
-  function decode() {
+  function decode(el, delay) {
+    var text = el.getAttribute('data-text');
+    if (!text) return;
     cancelAnimationFrame(el._raf);
     var q = Array.from(text).map(function (ch, i) {
       return { ch: ch, end: 12 + i * 1.6 + Math.random() * 14 };
     });
-    var frame = 0, max = 0;
+    var frame = -Math.round((delay || 0) / 16.7);
+    var max = 0;
     q.forEach(function (o) { max = Math.max(max, o.end); });
     el.setAttribute('aria-live', 'off');
     function step() {
-      var out = '';
-      q.forEach(function (o) {
-        if (frame >= o.end) out += o.ch;
-        else if (o.ch === ' ') out += ' ';
-        else out += pool[Math.floor(Math.random() * pool.length)];
-      });
-      el.textContent = out;
+      if (frame >= 0) {
+        var out = '';
+        q.forEach(function (o) {
+          if (frame >= o.end) out += o.ch;
+          else if (o.ch === ' ') out += ' ';
+          else out += pool[Math.floor(Math.random() * pool.length)];
+        });
+        el.textContent = out;
+      }
       frame++;
       if (frame <= max) el._raf = requestAnimationFrame(step);
       else { el.textContent = text; el._raf = null; }
     }
     step();
   }
+
+  var hero = [document.getElementById('code1'), document.getElementById('code2')];
+  decode(hero[0], 0);
+  decode(hero[1], 220);
+
+  var tokens = [].slice.call(document.querySelectorAll('.term .code'));
   function loop() {
-    decode();
-    clearTimeout(timer);
-    timer = setTimeout(loop, 4000);
+    tokens.forEach(function (el) { decode(el, Math.random() * 120); });
   }
   loop();
-  document.getElementById('again').addEventListener('click', loop);
+  setInterval(loop, 4000);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) loop();
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

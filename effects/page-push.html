@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>页面推入 · FIELDLOG 田野档案 · UI Atlas</title>
+<style>
+:root{--bg:#ece8dd;--paper:#fbfaf6;--ink:#171916;--muted:#767a70;--line:#d9d3c4;--accent:#3f6b4f}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
+button{font:inherit;color:inherit}
+.app{height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.topbar{flex:0 0 auto;height:52px;display:flex;align-items:center;gap:18px;padding:0 20px;border-bottom:1px solid var(--line);background:rgba(251,250,246,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:5}
+.brand{display:flex;align-items:baseline;gap:9px;font-weight:750;font-size:13px;letter-spacing:.14em}
+.brand span{font-size:9.5px;letter-spacing:.08em;color:var(--muted);font-weight:500}
+.crumb{font-size:11px;color:var(--muted);padding-left:18px;border-left:1px solid var(--line)}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+.sync{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#f7f4ec;display:grid;place-items:center;font:600 10px/1 ui-monospace,Consolas,monospace}
+.shell{flex:1;display:flex;min-height:0}
+.rail{flex:0 0 78px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 0;border-right:1px solid var(--line);background:#f2eee5}
+.rlogo{width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:700 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;margin-bottom:14px}
+.rlink{width:54px;padding:8px 0;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;letter-spacing:.08em;color:var(--muted)}
+.rlink .ri{width:16px;height:16px;border:1.4px solid currentColor;border-radius:5px;opacity:.65}
+.rlink.on{background:#e4dfd2;color:var(--ink)}
+.push{position:relative;flex:1;min-width:0;overflow:hidden;background:var(--paper)}
+.pane{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--paper);will-change:transform;transition:transform .44s cubic-bezier(.22,.8,.2,1),opacity .3s ease}
+.pane.list{transform:none}
+.pane.detail{transform:translateX(100%);background:#f7f4ec;box-shadow:-18px 0 40px -30px rgba(0,0,0,.35)}
+.push.open .pane.list{transform:translateX(-26%);opacity:.45}
+.push.open .pane.detail{transform:none}
+.list-inner{height:100%;overflow:auto;display:grid;grid-template-columns:minmax(0,1fr) 300px;width:100%;max-width:1240px;margin:0 auto}
+.list-main{display:flex;flex-direction:column;min-height:100%;padding:clamp(24px,4vw,44px) clamp(20px,3.4vw,44px) 20px}
+.list-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:clamp(18px,3vw,30px)}
+.eyebrow{margin:0 0 10px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+.list-head h1{margin:0;font-size:clamp(30px,4vw,46px);line-height:1.02;letter-spacing:-.045em;font-weight:640}
+.count{font:600 60px/.8 "Songti SC",Georgia,serif;color:#ddd6c7}
+.items{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.item{display:flex;align-items:center;gap:16px;width:100%;border:1px solid transparent;border-radius:14px;background:transparent;text-align:left;cursor:pointer;padding:12px;transition:background .18s,border-color .18s}
+.item:hover{background:#f1ede4;border-color:var(--line)}
+.item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.thumb{flex:0 0 96px;height:66px;border-radius:10px;background:radial-gradient(80% 100% at 30% 20%,rgba(255,255,255,.35),transparent 60%),linear-gradient(135deg,var(--c1),var(--c2))}
+.itxt{min-width:0}
+.ino{display:block;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);margin-bottom:5px}
+.item b{display:block;font-size:15px;font-weight:650;letter-spacing:-.01em}
+.item small{display:block;font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.itag{margin-left:auto;flex:0 0 auto;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);border:1px solid #c9d3c7;border-radius:999px;padding:4px 8px}
+.item i{font-style:normal;color:#a9a292;font-size:16px;margin-left:4px}
+.season{display:none;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.season span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 9px}
+.list-foot{margin-top:auto;display:flex;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid var(--line);font:500 9.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.side{border-left:1px solid var(--line);padding:clamp(24px,4vw,44px) 24px;display:flex;flex-direction:column;background:#f5f1e8}
+.side .stat{display:flex;align-items:baseline;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}
+.side .stat b{font:600 30px/1 "Songti SC",Georgia,serif;letter-spacing:-.03em}
+.side .stat span{font-size:10px;color:var(--muted)}
+.mini{margin-top:22px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbf8f1}
+.mini span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.mini svg{display:block;width:100%;height:auto;margin-top:10px;color:var(--accent)}
+.mini .dash{stroke-dasharray:3 5}
+.side-note{margin:22px 0 0;font-family:"Songti SC",Georgia,serif;font-style:italic;font-size:13px;line-height:1.8;color:#5f6359}
+.dbar{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:13px 22px;border-bottom:1px solid var(--line);background:rgba(251,248,241,.9)}
+.back{width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:#fff;cursor:pointer;color:var(--ink);font:600 14px/1 ui-monospace,Consolas,monospace;display:grid;place-items:center}
+.back:hover{border-color:var(--accent);color:var(--accent)}
+.back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dback{font-size:12px;font-weight:600}
+.dmeta{margin-left:auto;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.detail-scroll{flex:1;overflow:auto}
+.detail-inner{max-width:780px;margin:0 auto;padding:clamp(26px,4vw,44px) clamp(22px,4vw,48px) 56px}
+.detail-inner h2{margin:0 0 8px;font-size:clamp(34px,4.4vw,52px);line-height:1.03;letter-spacing:-.045em;font-weight:650;outline:none}
+.route{margin:0 0 22px;font:500 10.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.fig{height:clamp(150px,26vh,240px);border-radius:14px;border:1px solid var(--line);margin-bottom:24px;background:radial-gradient(75% 100% at 28% 18%,rgba(255,255,255,.32),transparent 58%),linear-gradient(135deg,var(--c1,#4c5e6e),var(--c2,#9caeaa))}
+.dlead{margin:0 0 14px;font-size:15px;line-height:1.95;letter-spacing:-.005em}
+.dbody{margin:0 0 26px;font-size:13px;line-height:1.95;color:#5c6058;max-width:36em}
+.dstats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding-top:18px;border-top:1px solid var(--line);margin-bottom:30px}
+.dstats span{display:block;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);margin-bottom:7px}
+.dstats b{font-size:12.5px;font-weight:600}
+.back2{border:1px solid var(--line);background:transparent;border-radius:999px;padding:9px 16px;font-size:11.5px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s}
+.back2:hover{border-color:var(--accent);color:var(--accent)}
+.hint{position:fixed;right:16px;left:auto;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:6;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:900px){
+  .list-inner{grid-template-columns:1fr}
+  .side{display:none}
+  .season{display:flex}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:42px;padding:0 16px;gap:12px}
+  .brand span{display:none}
+  .crumb{padding-left:12px;font-size:10px}
+  .sync{display:none}
+  .rail{display:none}
+  .list-inner{grid-template-columns:1fr;max-width:none}
+  .list-main{padding:16px 20px 12px}
+  .eyebrow{margin-bottom:6px;font-size:8px}
+  .list-head{margin-bottom:12px;align-items:flex-start}
+  .list-head h1{font-size:24px}
+  .count{display:none}
+  .items{gap:5px;margin-bottom:8px}
+  .item{padding:8px;gap:12px;border-radius:10px}
+  .thumb{flex-basis:64px;height:48px;border-radius:8px}
+  .ino{display:none}
+  .item b{font-size:13px}
+  .item small{font-size:9.5px}
+  .itag{display:none}
+  .item i{font-size:13px}
+  .list-foot{font-size:8.5px}
+  .dbar{padding:8px 16px}
+  .detail-inner{padding:18px 24px 24px}
+  .detail-inner h2{font-size:26px}
+  .route{margin-bottom:12px;font-size:9.5px}
+  .fig{height:96px;margin-bottom:14px}
+  .dlead{font-size:12.5px;line-height:1.8;margin-bottom:0}
+  .dbody,.dstats,.back2{display:none}
+  .hint{display:none}
+}
+@media (max-width:560px){
+  .topbar{height:48px;padding:0 14px;gap:12px}
+  .crumb,.sync,.rail{display:none}
+  .brand span{display:none}
+  .list-main{padding:20px 16px 14px}
+  .list-head h1{font-size:32px}
+  .count{display:none}
+  .thumb{flex-basis:72px;height:54px}
+  .itag{display:none}
+  .item small{font-size:10px}
+  .list-foot{font-size:8.5px}
+  .detail-inner{padding:24px 18px 48px}
+  .detail-inner h2{font-size:36px}
+  .fig{height:150px}
+  .dstats{gap:10px}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .pane{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">FIELDLOG<span>田野档案</span></div>
+    <span class="crumb">档案 / 2026 秋</span>
+    <div class="top-actions">
+      <span class="sync">已同步 · 12:40</span>
+      <span class="avatar" aria-hidden="true">Y</span>
+    </div>
+  </header>
+  <div class="shell">
+    <aside class="rail" aria-label="应用导航">
+      <span class="rlogo">FL</span>
+      <span class="rlink on" aria-current="page"><span class="ri"></span>档案</span>
+      <span class="rlink"><span class="ri"></span>地图</span>
+      <span class="rlink"><span class="ri"></span>相机</span>
+      <span class="rlink"><span class="ri"></span>笔记</span>
+    </aside>
+    <main class="push" id="push">
+      <section class="pane list" id="listPane" aria-label="档案列表">
+        <div class="list-inner">
+          <div class="list-main">
+            <div class="list-head">
+              <div>
+                <p class="eyebrow">2026 AUTUMN · 3 ENTRIES</p>
+                <h1>三次出行，<br>三卷底片。</h1>
+              </div>
+              <span class="count" aria-hidden="true">03</span>
+            </div>
+            <div class="items">
+              <button class="item" type="button"
+                data-title="峡湾北岸" data-tag="ENTRY 01" data-eyebrow="FIELD ENTRY · 01"
+                data-route="斯塔尔海姆 · 9.28–10.02 · 240 km"
+                data-desc="雨从第一晚开始下，渡轮晚了四十分钟。走到防波堤尽头，风把雨衣吹成一面旗。"
+                data-desc2="第二天雾散了一半，峡湾像被人从中间抽走。相机一直没开机；回到木屋才发现，最想留下的那张，是车窗外一块被雨刷擦干净的风景。"
+                data-weather="连续四天小雨" data-traffic="渡轮 + 徒步" data-film="34 张"
+                data-c1="#31445c" data-c2="#8fa6b8"
+                style="--c1:#31445c;--c2:#8fa6b8">
+                <span class="thumb" aria-hidden="true"></span>
+                <span class="itxt"><span class="ino">ENTRY 01</span><b>峡湾北岸</b><small>斯塔尔海姆 · 9.28–10.02 · 240 km</small></span>
+                <span class="itag">雨</span><i aria-hidden="true">→</i>
+              </button>
+              <button class="item" type="button"
+                data-title="火山腹地" data-tag="ENTRY 02" data-eyebrow="FIELD ENTRY · 02"
+                data-route="兰德曼纳劳卡 · 10.06–10.09 · 128 km"
+                data-desc="车开到最后一段碎石路就停了。地面还在冒白汽，鞋底踩下去像踩在结块的盐上。"
+                data-desc2="晚上住在没有电视的木屋。十点以后风小了，把三脚架立在门口，拍了四十分钟星空，最后只留下两张。"
+                data-weather="晴转大风" data-traffic="四驱车" data-film="28 张"
+                data-c1="#6b4636" data-c2="#c8a27e"
+                style="--c1:#6b4636;--c2:#c8a27e">
+                <span class="thumb" aria-hidden="true"></span>
+                <span class="itxt"><span class="ino">ENTRY 02</span><b>火山腹地</b><small>兰德曼纳劳卡 · 10.06–10.09 · 128 km</small></span>
+                <span class="itag">晴</span><i aria-hidden="true">→</i>
+              </button>
+              <button class="item" type="button"
+                data-title="东岸灯塔" data-tag="ENTRY 03" data-eyebrow="FIELD ENTRY · 03"
+                data-route="斯托克内斯 · 10.14–10.18 · 310 km"
+                data-desc="沿着东岸一路向北，左手是海，右手是只剩苔藓的熔岩。"
+                data-desc2="最后一天没有安排。在小镇停了四十分钟，喝完一杯很烫的咖啡，看云从灯塔后面慢慢翻过来。"
+                data-weather="多云" data-traffic="自驾" data-film="34 张"
+                data-c1="#2f4a42" data-c2="#7f9b8e"
+                style="--c1:#2f4a42;--c2:#7f9b8e">
+                <span class="thumb" aria-hidden="true"></span>
+                <span class="itxt"><span class="ino">ENTRY 03</span><b>东岸灯塔</b><small>斯托克内斯 · 10.14–10.18 · 310 km</small></span>
+                <span class="itag">云</span><i aria-hidden="true">→</i>
+              </button>
+            </div>
+            <div class="season" aria-label="本季统计">
+              <span>本季 678 公里</span><span>96 张底片</span><span>07 个营地</span>
+            </div>
+            <div class="list-foot"><span>同步自 FIELDLOG iOS</span><span>最后更新 12:40</span></div>
+          </div>
+          <aside class="side" aria-label="本季统计">
+            <p class="eyebrow">THIS SEASON</p>
+            <div class="stat"><b>678</b><span>公里</span></div>
+            <div class="stat"><b>96</b><span>张底片</span></div>
+            <div class="stat"><b>07</b><span>个营地</span></div>
+            <div class="mini"><span>路线轨迹</span>
+              <svg viewBox="0 0 220 110" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+                <path d="M10 86c30-52 62 18 92-20s56-44 108-32" class="dash"/>
+                <circle cx="10" cy="86" r="3"/><circle cx="102" cy="66" r="3"/><circle cx="210" cy="34" r="3"/>
+                <path d="M30 20h14M30 26h22" opacity=".3"/>
+              </svg>
+            </div>
+            <p class="side-note">“把每天的最后一张底片，留给自己。”</p>
+          </aside>
+        </div>
+      </section>
+      <section class="pane detail" id="detailPane" aria-label="档案详情" inert>
+        <div class="dbar">
+          <button class="back" id="back" type="button" aria-label="返回档案">←</button>
+          <span class="dback">返回档案</span>
+          <span class="dmeta" id="dmeta">ENTRY 01</span>
+        </div>
+        <div class="detail-scroll" id="dscroll">
+          <div class="detail-inner">
+            <p class="eyebrow" id="deyebrow">FIELD ENTRY · 01</p>
+            <h2 id="dt" tabindex="-1">峡湾北岸</h2>
+            <p class="route" id="droute">斯塔尔海姆 · 9.28–10.02 · 240 km</p>
+            <div class="fig" id="dfig" aria-hidden="true"></div>
+            <p class="dlead" id="dd">雨从第一晚开始下，渡轮晚了四十分钟。走到防波堤尽头，风把雨衣吹成一面旗。</p>
+            <p class="dbody" id="dd2"></p>
+            <div class="dstats">
+              <div><span>天气</span><b id="dw">连续四天小雨</b></div>
+              <div><span>交通</span><b id="dtra">渡轮 + 徒步</b></div>
+              <div><span>底片</span><b id="df">34 张</b></div>
+            </div>
+            <button class="back2" id="back2" type="button">← 回到档案</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<p class="hint">点一条记录推入详情；Esc 或左上角返回</p>
+<script>
+(function () {
+  var push = document.getElementById('push'), listPane = document.getElementById('listPane');
+  var detailPane = document.getElementById('detailPane'), back = document.getElementById('back');
+  var back2 = document.getElementById('back2'), dscroll = document.getElementById('dscroll');
+  var dt = document.getElementById('dt'), dd = document.getElementById('dd'), dd2 = document.getElementById('dd2');
+  var droute = document.getElementById('droute'), deyebrow = document.getElementById('deyebrow');
+  var dmeta = document.getElementById('dmeta'), dfig = document.getElementById('dfig');
+  var dw = document.getElementById('dw'), dtra = document.getElementById('dtra'), df = document.getElementById('df');
+  var items = [].slice.call(document.querySelectorAll('.item'));
+  var opener = null, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function open(item) {
+    opener = item;
+    dt.textContent = item.dataset.title;
+    dd.textContent = item.dataset.desc;
+    dd2.textContent = item.dataset.desc2;
+    droute.textContent = item.dataset.route;
+    deyebrow.textContent = item.dataset.eyebrow;
+    dmeta.textContent = item.dataset.tag;
+    dw.textContent = item.dataset.weather;
+    dtra.textContent = item.dataset.traffic;
+    df.textContent = item.dataset.film;
+    dfig.style.setProperty('--c1', item.dataset.c1);
+    dfig.style.setProperty('--c2', item.dataset.c2);
+    dscroll.scrollTop = 0;
+    listPane.inert = true;
+    detailPane.inert = false;
+    push.classList.add('open');
+    setTimeout(function () { dt.focus(); }, reduce ? 0 : 380);
+  }
+
+  function close() {
+    if (!push.classList.contains('open')) return;
+    push.classList.remove('open');
+    detailPane.inert = true;
+    listPane.inert = false;
+    setTimeout(function () { if (opener) opener.focus(); }, reduce ? 0 : 400);
+  }
+
+  items.forEach(function (item) {
+    item.addEventListener('click', function () { open(item); });
+  });
+  back.addEventListener('click', close);
+  back2.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

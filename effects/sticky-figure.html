@@ -3,72 +3,304 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>图文随行 · UI Atlas 动效</title>
+<title>图文随行 · TERRA 山脊橄榄园</title>
 <style>
-:root{--bg:#f6f4ee;--ink:#121317;--muted:#7a7d84;--line:#e4e0d5;--accent:#2f5fd0}
+:root{--paper:#f5f2e9;--ink:#23261d;--muted:#77796c;--line:#ddd9c9;--accent:#7c5a2e;--olive:#68704e}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{max-width:720px;margin:0 auto;padding:28px 20px 80px}
-.grid{display:grid;grid-template-columns:150px minmax(0,1fr);gap:22px;align-items:start}
-.figure{position:sticky;top:22px}
-.art{height:196px;border-radius:14px;border:1px solid var(--line);overflow:hidden;position:relative;
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+.nav{position:fixed;inset:0 0 auto;z-index:9;height:68px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1120px)/2));background:rgba(245,242,233,.93);border-bottom:1px solid var(--line);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:baseline;gap:10px;font:600 15px/1.1 Georgia,"Songti SC",serif;letter-spacing:.04em;white-space:nowrap}
+.brand .mark{width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:var(--olive);color:#f8f4e8;
+  font:600 11px/1 ui-monospace,Consolas,monospace}
+.brand i{font:400 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:#5f6156}
+.nav-links a:hover{color:var(--accent)}
+.cta{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ink);background:var(--ink);color:#f8f4e8;
+  border-radius:999px;padding:9px 17px;font-size:12px;font-weight:600;white-space:nowrap}
+.cta:hover{background:var(--accent);border-color:var(--accent)}
+.nav .cta{margin-left:auto;padding:7px 14px;font-size:11.5px}
+.hero{max-width:1120px;margin:0 auto;padding:138px 22px 46px}
+.kicker{margin:0 0 16px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;font-size:clamp(40px,5.8vw,72px);line-height:1.03;letter-spacing:-.05em;font-weight:620}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:22px 0 0;max-width:34em;font-size:13.5px;line-height:1.95;color:#5c5e52}
+.meta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:24px;
+  font:600 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.meta-row i{width:1px;height:10px;background:var(--line)}
+.note{max-width:1120px;margin:0 auto;padding:0 22px 34px}
+.grid{max-width:1120px;margin:0 auto;padding:0 22px 64px;display:grid;grid-template-columns:280px minmax(0,1fr);
+  gap:clamp(30px,6vw,76px);align-items:start}
+.figure{position:sticky;top:92px;margin:0}
+.art{height:300px;border-radius:14px;border:1px solid var(--line);overflow:hidden;position:relative;
   background:radial-gradient(circle at 30% 25%,#f3dcb9,transparent 55%),linear-gradient(135deg,#c9a06a,#4f5f4a);
   transition:background .5s ease}
-.art::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(120deg,rgba(255,255,255,.10) 0 5px,transparent 5px 15px)}
+.art::before{content:"";position:absolute;inset:38% -10% -6%;background:linear-gradient(180deg,#6b7350,#39402f);
+  clip-path:polygon(0 54%,16% 34%,32% 52%,50% 24%,66% 48%,84% 30%,100% 46%,100% 100%,0 100%)}
+.art::after{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(120deg,rgba(255,255,255,.10) 0 5px,transparent 5px 15px)}
 .figure[data-p="1"] .art{background:radial-gradient(circle at 70% 25%,#dce6f5,transparent 55%),linear-gradient(135deg,#7d94bd,#3f4d66)}
+.figure[data-p="1"] .art::before{background:linear-gradient(180deg,#566b6e,#26343a)}
 .figure[data-p="2"] .art{background:radial-gradient(circle at 35% 70%,#e4edd8,transparent 55%),linear-gradient(135deg,#93a67f,#4a5c3e)}
+.figure[data-p="2"] .art::before{background:linear-gradient(180deg,#77875d,#39452c)}
 .figure[data-p="3"] .art{background:radial-gradient(circle at 72% 68%,#f4ddd0,transparent 55%),linear-gradient(135deg,#c9906f,#5c4034)}
-.cap{margin:10px 0 0;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
-.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
-h1{margin:0 0 24px;font-size:clamp(24px,5.6vw,36px);line-height:1.1;letter-spacing:-.04em;font-weight:650}
-.text section{min-height:230px;padding:24px 0 10px;border-top:1px solid var(--line)}
+.figure[data-p="3"] .art::before{background:linear-gradient(180deg,#8b5e45,#412b22)}
+.art span{position:absolute;left:24%;top:30%;width:10px;height:10px;border-radius:50%;background:rgba(255,246,220,.85);
+  box-shadow:34px 18px 0 -2px rgba(255,246,220,.6),-18px 34px 0 -3px rgba(255,246,220,.5),58px 52px 0 -4px rgba(255,246,220,.4)}
+.cap{margin:12px 0 0;font:600 9.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);
+  display:flex;justify-content:space-between;gap:12px}
+.cap b{font-weight:600;color:var(--accent)}
+.text{border-left:1px solid var(--line);padding-left:clamp(22px,4vw,46px)}
+.text section{min-height:260px;padding:8px 0 34px;border-top:1px solid var(--line)}
 .text section:first-of-type{border-top:0;padding-top:0}
-.text h2{margin:0 0 8px;font-size:15px;letter-spacing:-.01em}
-.text p{margin:0;font-size:12.5px;line-height:1.85;color:var(--muted);max-width:32em}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.sec-no{margin:0 0 10px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+.text h2{margin:0 0 12px;font-size:clamp(24px,3.2vw,34px);line-height:1.1;letter-spacing:-.04em;font-weight:620}
+.text p{margin:0;font-size:13px;line-height:1.95;color:#5c5e52;max-width:33em}
+.text .detail{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px;font:600 8.5px/1.7 ui-monospace,Consolas,monospace;
+  letter-spacing:.08em;color:#8a897a}
+.text .detail b{color:var(--ink);font-weight:600}
+.facts{max-width:1120px;margin:0 auto;padding:0 22px 52px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.fact{border-top:1px solid var(--line);padding-top:18px}
+.fact dt{font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);margin-bottom:8px}
+.fact dd{margin:0;font-size:clamp(26px,3.4vw,38px);line-height:1;letter-spacing:-.04em;font-weight:620}
+.fact dd small{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);margin-left:4px}
+.fact p{margin:9px 0 0;font-size:11.5px;line-height:1.75;color:#6b6d5f}
+.band{max-width:1120px;margin:0 auto;padding:0 22px 52px}
+.inner-band{border:1px solid rgba(124,90,46,.28);border-radius:16px;padding:30px 28px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(104,112,78,.10),rgba(104,112,78,.02) 62%)}
+.inner-band h2{margin:0 0 6px;font-size:clamp(22px,2.8vw,30px);letter-spacing:-.03em}
+.inner-band p{margin:0;font-size:12px;color:#616356;line-height:1.8}
+.inner-band .cta{margin-left:auto;background:var(--accent);border-color:var(--accent)}
+footer{max-width:1120px;margin:0 auto;padding:0 22px 28px;display:flex;gap:18px;flex-wrap:wrap;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;pointer-events:none;
+  font-size:11px;letter-spacing:.04em;color:#4e5044;background:rgba(250,247,238,.85);border:1px solid rgba(35,38,29,.12);
+  border-radius:999px;padding:4px 9px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (max-width:420px){.grid{grid-template-columns:118px minmax(0,1fr);gap:16px}.art{height:168px}}
-@media (prefers-reduced-motion:reduce){.art{transition:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-width:860px){
+  .nav{gap:16px}.nav-links{display:none}
+  .hero{padding-top:118px}
+  .grid{grid-template-columns:220px minmax(0,1fr);gap:30px}
+  .art{height:240px}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}.brand i{display:none}
+  .hero{padding:84px 16px 22px}
+  h1{font-size:clamp(36px,11.6vw,50px);line-height:1.06}
+  .lede{font-size:12px;line-height:1.9;margin-top:16px}
+  .meta-row{margin-top:16px;font-size:8px;gap:10px}
+  .note{padding:0 16px 20px}
+  .grid{grid-template-columns:100px minmax(0,1fr);gap:14px;padding:0 16px 44px}
+  .figure{top:70px}
+  .art{height:132px;border-radius:10px}
+  .cap{display:block;font-size:7px;letter-spacing:.1em;margin-top:8px}
+  .cap b{display:block;margin-top:3px}
+  .text{padding-left:12px}
+  .text section{min-height:170px;padding-bottom:24px}
+  .sec-no{font-size:7.5px;margin-bottom:7px}
+  .text h2{font-size:18px;margin-bottom:8px}
+  .text p{font-size:11.5px;line-height:1.85}
+  .text .detail{display:none}
+  .facts{grid-template-columns:1fr;padding:0 16px 34px;gap:20px}
+  .band{padding:0 16px 38px}
+  .inner-band{padding:22px 18px}
+  .inner-band .cta{margin-left:0}
+  footer{padding:0 16px 24px;font-size:8.5px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}.brand .mark{width:20px;height:20px;font-size:10px}.brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .hero{padding:64px 20px 8px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end}
+  .kicker{grid-column:1/-1;margin-bottom:7px;font-size:8px}
+  h1{font-size:26px;line-height:1.08}
+  .lede{margin-top:7px;font-size:10.5px;line-height:1.6;max-width:40em;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .meta-row{display:none}
+  .note{padding:0 20px 6px;display:none}
+  .grid{grid-template-columns:150px minmax(0,1fr);gap:20px;padding:4px 20px 0}
+  .figure{top:58px}
+  .art{height:122px;border-radius:9px}
+  .cap{font-size:7px;margin-top:6px;display:block}
+  .cap b{display:inline;margin-left:4px}
+  .text{padding-left:16px}
+  .text section{min-height:116px;padding:0 0 14px}
+  .text section:first-of-type{padding-top:0}
+  .sec-no{font-size:7px;margin-bottom:5px}
+  .text h2{font-size:15px;margin-bottom:5px}
+  .text p{font-size:10.5px;line-height:1.6;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .text .detail{display:none}
+  .facts,.band,footer{display:none}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c4048;
+    background:rgba(255,255,255,.82);border:1px solid rgba(22,21,15,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (prefers-reduced-motion:reduce){
+  .art{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="grid">
-    <aside class="figure" id="figure" data-p="0">
-      <div class="art" aria-hidden="true"></div>
-      <p class="cap" id="cap">01 · 材料</p>
-    </aside>
-    <div class="text">
-      <p class="kicker">SCROLL / 10</p>
-      <h1>图停住，<br>文字继续走。</h1>
-      <section data-p="0"><h2>先让图站住</h2><p>左栏只做一件事：position: sticky。它不跟着正文滚，读者看到第三段时，图还在原位，图和字的对应关系就不会断。</p></section>
-      <section data-p="1"><h2>颜色跟着章节换</h2><p>IntersectionObserver 观察右侧每一节，谁进入视口中线就把索引写到 figure 的 data-p 上；图不重排，只换一层渐变。</p></section>
-      <section data-p="2"><h2>窄屏就并排变小</h2><p>不改结构，只把左栏从 150px 收到 118px；文字仍然是正文宽度，不因为图而缩成一条缝。</p></section>
-      <section data-p="3"><h2>停下来的时机</h2><p>图比正文短，sticky 会在它的容器底部自然结束；不要给容器写死高度，否则最后一段会提前失去图。</p></section>
-    </div>
+
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark">T</span>山脊<i>TERRA OLIVE GROVE</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#notes">采收笔记</a>
+    <a href="#facts">年份</a>
+    <a href="#order">订油</a>
+  </nav>
+  <a class="cta" href="#order">订本年新油</a>
+</header>
+
+<section class="hero" id="top">
+  <p class="kicker">HARVEST NOTES · 2026 / 海拔 620 M</p>
+  <h1>这片坡，<br>先由<em>风</em>来管。</h1>
+  <p class="lede">TERRA 的橄榄园在一条朝南的长坡上。我们不浇水，也不催熟；风从谷口进来，穿过每一棵树，决定这一年油的味道。</p>
+  <div class="meta-row"><span>1,200 棵</span><i></i><span>单一园</span><i></i><span>手工采收</span><i></i><span>冷压</span></div>
+</section>
+
+<section class="grid" id="notes">
+  <figure class="figure" id="figure" data-p="0">
+    <div class="art" aria-hidden="true"><span></span></div>
+    <figcaption class="cap"><span id="cap">01 · 坡向</span><b>SOUTH SLOPE</b></figcaption>
+  </figure>
+  <div class="text">
+    <section data-p="0">
+      <p class="sec-no">01 / 04 · 坡向</p>
+      <h2>先看风怎么走。</h2>
+      <p>南坡每天多晒四十分钟。风从谷口上来，先把湿气带走，再穿过树冠。我们留出三排不修剪的老树，让风有地方转弯。</p>
+      <div class="detail"><span>坡向 <b>南偏东 12°</b></span><span>密度 <b>7 × 8 m</b></span><span>树龄 <b>60–90 年</b></span></div>
+    </section>
+    <section data-p="1">
+      <p class="sec-no">02 / 04 · 采收</p>
+      <h2>在变紫之前摘完。</h2>
+      <p>橄榄从青转紫只需要一周。我们在青转黄的那三天动手，全部手摘，不带落果。1,200 棵树，六个人，摘十二天。</p>
+      <div class="detail"><span>采收 <b>10 月下旬</b></span><span>方式 <b>手摘</b></span><span>日产 <b>约 90 kg</b></span></div>
+    </section>
+    <section data-p="2">
+      <p class="sec-no">03 / 04 · 压榨</p>
+      <h2>六小时之内进石磨。</h2>
+      <p>摘下来的果子不能等。当天送到山下的磨坊，六小时内低温压榨，油温不超过 27°C。过夜再压，味道就会重一层。</p>
+      <div class="detail"><span>等待 <b>&lt; 6 h</b></span><span>温度 <b>&lt; 27°C</b></span><span>出油率 <b>13.6%</b></span></div>
+    </section>
+    <section data-p="3">
+      <p class="sec-no">04 / 04 · 装瓶</p>
+      <h2>把这一年封进深色瓶。</h2>
+      <p>油装进深色玻璃瓶，充氮，避光。每瓶都写上年份和压榨日；开瓶后三个月内用完，风味最好。我们不混年份。</p>
+      <div class="detail"><span>容量 <b>500 ml</b></span><span>瓶数 <b>4,800</b></span><span>赏味 <b>18 个月</b></span></div>
+    </section>
   </div>
-</main>
-<p class="hint">往下滚，左边图片会停住</p>
+</section>
+
+<section class="facts" id="facts">
+  <div class="fact"><dt>海拔</dt><dd>620<small>m</small></dd><p>南坡中段，早晚温差 11°C，油更清亮。</p></div>
+  <div class="fact"><dt>单一园</dt><dd>1,200<small>棵</small></dd><p>不混其他产区，也不买外来果。</p></div>
+  <div class="fact"><dt>本年产量</dt><dd>4,800<small>瓶</small></dd><p>每瓶 500 ml，写有压榨日期与地块编号。</p></div>
+</section>
+
+<section class="band" id="order">
+  <div class="inner-band">
+    <div>
+      <h2>2026 年份新油已装瓶。</h2>
+      <p>青草、杏仁和一点番茄叶。第一批 1,200 瓶，按压榨日发货。</p>
+    </div>
+    <a class="cta" href="mailto:order@terra.grove">订本年新油 →</a>
+  </div>
+</section>
+
+<footer>
+  <span>山脊 · TERRA OLIVE GROVE</span>
+  <span>浙江 · 海拔 620 m 南坡</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">往下滚，左边这幅画会停住并换景</p>
 <script>
 (function () {
   var figure = document.getElementById('figure'), cap = document.getElementById('cap');
   var secs = [].slice.call(document.querySelectorAll('.text section'));
-  var labels = ['01 · 材料', '02 · 颜色', '03 · 窄屏', '04 · 收尾'];
+  var labels = ['01 · 坡向', '02 · 采收', '03 · 压榨', '04 · 装瓶'];
   if (!('IntersectionObserver' in window)) return;
+  var ratios = new Array(secs.length);
+  for (var k = 0; k < ratios.length; k++) ratios[k] = 0;
   var io = new IntersectionObserver(function (es) {
     es.forEach(function (en) {
-      if (!en.isIntersecting) return;
-      var i = secs.indexOf(en.target);
-      figure.dataset.p = String(i);
-      cap.textContent = labels[i] || labels[0];
+      ratios[secs.indexOf(en.target)] = en.isIntersecting ? en.intersectionRatio : 0;
     });
-  }, { threshold: .55 });
+    var best = -1, bestRatio = .25;
+    ratios.forEach(function (r, j) { if (r >= bestRatio) { best = j; bestRatio = r; } });
+    if (best < 0) return;
+    figure.dataset.p = String(best);
+    cap.textContent = labels[best] || labels[0];
+  }, { threshold: [0, .25, .55, .75, 1], rootMargin: '-32% 0px -32% 0px' });
   secs.forEach(function (s) { io.observe(s); });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D 翻卡 · PRESSED 植物标本室 · UI Atlas</title>
+<style>
+:root{--bg:#f1ecdf;--paper:#fcf9f0;--ink:#20231d;--muted:#7c786a;--line:#ddd5c1;--accent:#3d6b4c;--clay:#a2603e;--back:#21362b;--backInk:#efe9d8}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+button{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:30;height:54px;display:flex;align-items:center;gap:18px;padding:0 clamp(16px,3.4vw,38px);border-bottom:1px solid var(--line);background:rgba(252,249,240,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.logo{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#f7f3e6;display:grid;place-items:center;font:600 12px/1 Georgia,serif}
+.brand b{font-size:12px;font-weight:750;letter-spacing:.2em}
+.brand span{font-size:9.5px;color:var(--muted);letter-spacing:.06em}
+.crumb{padding-left:14px;border-left:1px solid var(--line);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.crumb em{font-style:normal;color:var(--ink)}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:4px 9px;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.top-right{margin-left:auto;flex:0 0 auto}
+.chip{display:inline-flex;align-items:baseline;gap:6px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:rgba(252,249,240,.6)}
+.chip b{font-size:11px;color:var(--accent)}
+.page{width:100%;max-width:1160px;margin:0 auto;padding:clamp(22px,4.4vw,58px) clamp(18px,4vw,44px) 0}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,400px);gap:clamp(30px,5.6vw,84px);align-items:center;min-height:min(650px,calc(100svh - 54px));padding-bottom:clamp(28px,4.6vw,58px)}
+.copy{min-width:0}
+.kicker{margin:0 0 14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+.copy h1{margin:0 0 18px;font-size:clamp(34px,4.6vw,56px);line-height:1.06;letter-spacing:-.045em;font-weight:640}
+.copy h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:0;font-size:13.5px;line-height:1.95;color:#5b594d;max-width:27em}
+.specs{margin:26px 0 0;border-top:1px solid var(--line);max-width:360px}
+.specs div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid var(--line)}
+.specs dt{font:500 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.specs dd{margin:0;font-size:11.5px;font-weight:600;text-align:right}
+.copy-note{margin:14px 0 0;font:500 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.card-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+.card{display:block;position:relative;width:min(400px,100%);padding:0;border:0;background:none;cursor:pointer;perspective:1000px;text-align:left;outline:none;-webkit-tap-highlight-color:transparent;--art:#46613f;--petal:#b98a4e}
+.card::before{content:"";display:block;padding-top:133.33%}
+.card:focus-visible .inner{box-shadow:0 0 0 3px rgba(61,107,76,.42)}
+.inner{position:absolute;inset:0;display:block;transform-style:preserve-3d;transition:transform .68s cubic-bezier(.22,.8,.2,1)}
+.card[aria-pressed="true"] .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;display:flex;flex-direction:column;gap:9px;padding:20px;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.front{background:linear-gradient(158deg,#fdfaf2,#f5eedc);color:var(--ink);border:1px solid #d8d0ba;box-shadow:0 32px 60px -46px rgba(40,36,24,.6)}
+.back{background:radial-gradient(130% 92% at 22% 0,#2c4434,#1d2f26);color:var(--backInk);border:1px solid #15241c;transform:rotateY(180deg);box-shadow:0 32px 60px -44px rgba(20,30,22,.8)}
+.face-top{display:flex;align-items:center;justify-content:space-between;gap:10px;font:600 8px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.back .face-top{color:rgba(239,233,216,.55)}
+.pill{font-size:7.5px;letter-spacing:.08em;color:var(--accent);border:1px solid #c8c0aa;border-radius:999px;padding:3px 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plate{position:relative;flex:1;min-height:0;border:1px solid rgba(120,110,88,.3);border-radius:5px;display:grid;place-items:center;background:repeating-linear-gradient(0deg,transparent 0 23px,rgba(120,110,88,.055) 23px 24px),#fbf7ec;overflow:hidden}
+.plate::before{content:"";position:absolute;inset:7px;border:1px dashed rgba(120,110,88,.28);pointer-events:none}
+.art{display:none;width:80%;height:88%;color:var(--art)}
+.art.on{display:block}
+.plate-label{position:absolute;left:11px;bottom:8px;font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);background:rgba(251,247,236,.85);padding:2px 4px}
+.name{display:block;padding-top:1px}
+.name b{display:block;font-family:"Songti SC",Georgia,serif;font-size:clamp(22px,2.5vw,28px);line-height:1.15;letter-spacing:.02em;font-weight:600}
+.name i{display:block;margin-top:3px;font:italic 400 11px/1.4 Georgia,serif;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.face-foot{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font:600 7.8px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.flip-cue{color:var(--accent)}
+.memo{display:block;font-family:"Songti SC",Georgia,serif;font-size:15px;line-height:1.72;color:#f2ecdc;padding:2px 0 4px}
+.notes{display:block;flex:1;min-height:0;overflow:hidden;border-top:1px solid rgba(239,233,216,.14)}
+.notes span{position:relative;display:block;padding:7px 0 7px 13px;border-bottom:1px solid rgba(239,233,216,.12);font-size:10.5px;line-height:1.75;color:rgba(239,233,216,.74)}
+.notes span::before{content:"";position:absolute;left:1px;top:14px;width:3px;height:3px;border-radius:50%;background:var(--clay)}
+.back .face-foot{padding-top:8px;border-top:1px solid rgba(239,233,216,.14);color:rgba(239,233,216,.55)}
+.stamp-mark{position:absolute;right:14px;bottom:46px;width:136px;height:136px;border:1px dashed rgba(239,233,216,.2);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transform:rotate(-11deg);pointer-events:none}
+.stamp-mark i{font:italic 400 8px/1 Georgia,serif;letter-spacing:.08em;color:rgba(239,233,216,.3)}
+.stamp-mark b{font:600 7px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(239,233,216,.34)}
+.card-meta{display:flex;gap:14px;font:600 7.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted)}
+.batch{border-top:1px solid var(--line);padding:clamp(20px,3vw,28px) 0 clamp(24px,4vw,38px)}
+.batch-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:13px}
+.batch-head h2{margin:0;font-size:15px;letter-spacing:-.01em}
+.batch-head span{font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.batch-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.row{display:flex;align-items:center;gap:12px;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper);cursor:pointer;text-align:left;transition:border-color .2s,background .2s}
+.row:hover{border-color:#c5bda6}
+.row[aria-current="true"]{border-color:var(--accent);background:#f6f1e3;box-shadow:inset 0 0 0 1px var(--accent)}
+.row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rno{flex:0 0 auto;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:5px 6px;background:rgba(255,255,255,.4)}
+.rname{flex:1;min-width:0}
+.rname b{display:block;font-size:12.5px;letter-spacing:-.01em}
+.rname i{display:block;font:italic 400 9px/1.5 Georgia,serif;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rside{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.rmeta{font:500 7.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted)}
+.rstate{font:600 7.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.row[aria-current="true"] .rstate{color:var(--accent)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:12px 0 16px;font:600 7.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;min-height:0;gap:26px}
+  .card{width:min(360px,100%)}
+  .specs{max-width:none}
+  .batch-grid{grid-template-columns:1fr}
+}
+@media (max-height:560px) and (min-width:561px){
+  .top{height:42px;padding:0 16px;gap:10px}
+  .brand span,.crumb{display:none}
+  .hint{font-size:9px;padding:3px 8px}
+  .page{padding:10px 18px 0}
+  .hero{grid-template-columns:minmax(0,1fr) 224px;gap:22px;align-items:start;min-height:0;padding-bottom:8px}
+  .kicker{font-size:7.5px;margin-bottom:6px}
+  .copy h1{font-size:26px;margin-bottom:8px}
+  .lede{font-size:9.8px;line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .specs,.copy-note,.batch,.foot{display:none}
+  .card{width:224px}
+  .card-meta{gap:9px;font-size:6.2px}
+  .face{padding:12px;gap:6px;border-radius:13px}
+  .face-top{font-size:6.5px}
+  .pill{font-size:6px;padding:2px 5px}
+  .name b{font-size:18px}
+  .name i{font-size:8.5px}
+  .face-foot{font-size:6.2px}
+  .memo{font-size:10px;line-height:1.55;padding:0}
+  .notes span{font-size:8px;line-height:1.5;padding:4px 0 4px 10px}
+  .notes span::before{top:9px}
+  .back .face-foot{padding-top:5px}
+  .stamp-mark{display:none}
+}
+@media (max-width:560px){
+  .top{height:48px;padding:0 13px;gap:9px}
+  .brand span,.crumb,.hint{display:none}
+  .page{padding:16px 16px 0}
+  .hero{grid-template-columns:1fr;gap:20px;padding-bottom:22px}
+  .copy h1{font-size:34px}
+  .lede{font-size:12.5px}
+  .specs{margin-top:18px}
+  .card{width:min(330px,100%)}
+  .face{padding:16px;gap:8px}
+  .batch-grid{grid-template-columns:1fr}
+  .foot{font-size:6.8px;padding-bottom:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  .inner{transition:none}
+  .row{transition:none}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo" aria-hidden="true">P</span><b>PRESSED</b><span>植物标本室</span></div>
+  <span class="crumb">标本册 <em>/ 高山系列</em></span>
+  <p class="hint">点标本卡翻面；下面一行能换标本</p>
+  <div class="top-right"><span class="chip">本册 <b>03</b> 件</span></div>
+</header>
+
+<main class="page">
+  <section class="hero">
+    <div class="copy">
+      <p class="kicker">HERBARIUM / 09 · 标本卡</p>
+      <h1>翻过来，<br><em>看它长在哪里。</em></h1>
+      <p class="lede">每一件标本都压在同一张纸上：正面是植株，背面是采集当天的记录。卡还是那张卡，转 180° 之后，看到的是另一半。</p>
+      <dl class="specs">
+        <div><dt>采集地</dt><dd id="sWhere">云南 · 苍山西坡</dd></div>
+        <div><dt>海拔</dt><dd id="sAlt">2,410 m</dd></div>
+        <div><dt>压制日期</dt><dd id="sDate">2019.08.14</dd></div>
+        <div><dt>标本编号</dt><dd id="sNo">NO. 026</dd></div>
+      </dl>
+      <p class="copy-note">两面同尺寸，翻到一半不会跳；Enter / 空格也能翻。</p>
+    </div>
+
+    <div class="card-wrap">
+      <button class="card" id="card" type="button" aria-pressed="false" aria-label="翻转银粉背蕨标本卡，查看采集记录">
+        <span class="inner">
+          <span class="face front">
+            <span class="face-top"><span id="fNo">NO. 026</span><span class="pill" id="fTag">蕨类 · 石灰岩缝</span></span>
+            <span class="plate">
+              <svg class="art on" data-art="fern" viewBox="0 0 200 240" aria-hidden="true" focusable="false">
+                <defs>
+                  <path id="pinL" d="M0 0 C-12 -8 -30 -9 -42 -2 C-30 6 -12 7 0 0 Z"/>
+                  <path id="pinR" d="M0 0 C12 -8 30 -9 42 -2 C30 6 12 7 0 0 Z"/>
+                </defs>
+                <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                  <path d="M100 224 C97 196 103 140 99 58"/>
+                  <path d="M99 58 C95 44 88 34 78 30 C86 40 90 50 91 60"/>
+                </g>
+                <g fill="currentColor" opacity=".88">
+                  <use href="#pinL" transform="translate(99 202) rotate(26)"/>
+                  <use href="#pinR" transform="translate(101 202) rotate(-26)"/>
+                  <use href="#pinL" transform="translate(99 182) rotate(23) scale(.94)"/>
+                  <use href="#pinR" transform="translate(101 182) rotate(-23) scale(.94)"/>
+                  <use href="#pinL" transform="translate(100 163) rotate(21) scale(.88)"/>
+                  <use href="#pinR" transform="translate(102 163) rotate(-21) scale(.88)"/>
+                  <use href="#pinL" transform="translate(100 145) rotate(19) scale(.8)"/>
+                  <use href="#pinR" transform="translate(102 145) rotate(-19) scale(.8)"/>
+                  <use href="#pinL" transform="translate(100 128) rotate(17) scale(.72)"/>
+                  <use href="#pinR" transform="translate(102 128) rotate(-17) scale(.72)"/>
+                  <use href="#pinL" transform="translate(100 113) rotate(15) scale(.63)"/>
+                  <use href="#pinR" transform="translate(101 113) rotate(-15) scale(.63)"/>
+                  <use href="#pinL" transform="translate(99 100) rotate(13) scale(.54)"/>
+                  <use href="#pinR" transform="translate(101 100) rotate(-13) scale(.54)"/>
+                  <use href="#pinL" transform="translate(99 89) rotate(11) scale(.45)"/>
+                  <use href="#pinR" transform="translate(101 89) rotate(-11) scale(.45)"/>
+                  <use href="#pinL" transform="translate(99 80) rotate(9) scale(.36)"/>
+                  <use href="#pinR" transform="translate(101 80) rotate(-9) scale(.36)"/>
+                </g>
+              </svg>
+              <svg class="art" data-art="gentian" viewBox="0 0 200 240" aria-hidden="true" focusable="false">
+                <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                  <path d="M100 226 C98 186 102 142 99 100"/>
+                  <path d="M99 188 C85 184 69 186 57 194 C72 200 87 198 99 190 Z" fill="currentColor" fill-opacity=".14"/>
+                  <path d="M101 188 C115 184 131 186 143 194 C128 200 113 198 101 190 Z" fill="currentColor" fill-opacity=".14"/>
+                  <path d="M100 160 C89 157 77 159 68 165 C80 170 92 168 100 162 Z" fill="currentColor" fill-opacity=".14"/>
+                  <path d="M100 160 C111 157 123 159 132 165 C120 170 108 168 100 162 Z" fill="currentColor" fill-opacity=".14"/>
+                  <path d="M100 136 C92 133 83 135 76 140 C85 144 94 142 100 137 Z" fill="currentColor" fill-opacity=".14"/>
+                  <path d="M100 136 C108 133 117 135 124 140 C115 144 106 142 100 137 Z" fill="currentColor" fill-opacity=".14"/>
+                </g>
+                <g>
+                  <path d="M99 106 C89 92 88 70 99 52 C110 70 109 92 100 106 Z" fill="var(--petal)" fill-opacity=".5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M99 97 C96 83 96 69 99 59" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/>
+                  <path d="M88 74 L99 64 M110 74 L99 64" fill="none" stroke="currentColor" stroke-width="1" opacity=".5"/>
+                  <path d="M118 140 C112 129 112 113 119 101 C126 113 126 129 120 140 Z" fill="var(--petal)" fill-opacity=".42" stroke="currentColor" stroke-width="1.4" transform="rotate(12 119 120)"/>
+                  <path d="M119 132 C117 123 117 114 119 107" fill="none" stroke="currentColor" stroke-width="1" opacity=".5"/>
+                </g>
+              </svg>
+              <svg class="art" data-art="rose" viewBox="0 0 200 240" aria-hidden="true" focusable="false">
+                <defs>
+                  <path id="leafS" d="M0 0 C-8 -6 -20 -7 -28 -1 C-20 5 -8 5 0 0 Z"/>
+                  <path id="leafSR" d="M0 0 C8 -6 20 -7 28 -1 C20 5 8 5 0 0 Z"/>
+                  <path id="petal" d="M0 0 C-10 -14 -8 -32 0 -40 C8 -32 10 -14 0 0 Z"/>
+                </defs>
+                <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                  <path d="M100 228 C104 192 96 152 101 112"/>
+                  <path d="M101 200 L91 194 M99 170 L109 164 M102 142 L93 137"/>
+                </g>
+                <g fill="currentColor" opacity=".72">
+                  <use href="#leafS" transform="translate(99 208) rotate(22)"/>
+                  <use href="#leafSR" transform="translate(101 208) rotate(-22)"/>
+                  <use href="#leafS" transform="translate(99 184) rotate(24)"/>
+                  <use href="#leafSR" transform="translate(101 184) rotate(-24)"/>
+                  <use href="#leafS" transform="translate(99 158) rotate(26)"/>
+                  <use href="#leafSR" transform="translate(101 158) rotate(-26)"/>
+                </g>
+                <g transform="translate(101 88)">
+                  <use href="#petal" fill="var(--petal)" fill-opacity=".5" stroke="currentColor" stroke-width="1.4" transform="rotate(0) scale(.9)"/>
+                  <use href="#petal" fill="var(--petal)" fill-opacity=".5" stroke="currentColor" stroke-width="1.4" transform="rotate(72) scale(.9)"/>
+                  <use href="#petal" fill="var(--petal)" fill-opacity=".5" stroke="currentColor" stroke-width="1.4" transform="rotate(144) scale(.9)"/>
+                  <use href="#petal" fill="var(--petal)" fill-opacity=".5" stroke="currentColor" stroke-width="1.4" transform="rotate(216) scale(.9)"/>
+                  <use href="#petal" fill="var(--petal)" fill-opacity=".5" stroke="currentColor" stroke-width="1.4" transform="rotate(288) scale(.9)"/>
+                  <circle cx="0" cy="0" r="4" fill="currentColor" opacity=".7"/>
+                </g>
+                <g>
+                  <path d="M118 132 C124 122 124 110 119 100" fill="none" stroke="currentColor" stroke-width="1.2"/>
+                  <ellipse cx="118" cy="97" rx="6" ry="9" fill="var(--petal)" fill-opacity=".45" stroke="currentColor" stroke-width="1.2" transform="rotate(12 118 97)"/>
+                </g>
+              </svg>
+              <span class="plate-label" id="fPlate">苍山 · 2019</span>
+            </span>
+            <span class="name"><b id="fName">银粉背蕨</b><i id="fLatin">Aleuritopteris argentea</i></span>
+            <span class="face-foot"><span id="fWhere">云南 · 苍山西坡</span><span class="flip-cue">点击翻面</span></span>
+          </span>
+          <span class="face back">
+            <span class="face-top"><span>FIELD NOTES</span><span id="bNo">NO. 026</span></span>
+            <span class="memo" id="bMemo">叶背那层银白是蜡质，不是霉。它替植株挡掉高山过强的紫外线，压制后也几乎不褪。</span>
+            <span class="notes" id="bNotes"><span>二回羽状复叶，末回小羽片贴得很密。</span><span>根茎横走，扎在石灰岩薄土与苔藓之间。</span><span>压后银粉完整，是这批里状态最好的一件。</span></span>
+            <span class="stamp-mark" aria-hidden="true"><i>PRESSED HERBARIUM</i><b id="bMark">NO. 026</b></span>
+            <span class="face-foot"><span id="bStamp">2019.08.14 · 2,410 m</span><span>再点一次翻回</span></span>
+          </span>
+        </span>
+      </button>
+      <span class="card-meta"><span>680MS</span><span>PERSPECTIVE 1000PX</span><span>2 FACES</span></span>
+    </div>
+  </section>
+
+  <section class="batch" aria-label="同批标本">
+    <header class="batch-head"><h2>同批标本</h2><span>SPRING 2026 · 共 03 件</span></header>
+    <div class="batch-grid">
+      <button class="row" type="button" data-id="fern" aria-current="true">
+        <span class="rno">026</span>
+        <span class="rname"><b>银粉背蕨</b><i>Aleuritopteris argentea</i></span>
+        <span class="rside"><span class="rmeta">云南 · 2,410 m</span><span class="rstate">正在查看</span></span>
+      </button>
+      <button class="row" type="button" data-id="gentian" aria-current="false">
+        <span class="rno">041</span>
+        <span class="rname"><b>高山龙胆</b><i>Gentiana algida</i></span>
+        <span class="rside"><span class="rmeta">四川 · 3,600 m</span><span class="rstate">翻看</span></span>
+      </button>
+      <button class="row" type="button" data-id="rose" aria-current="false">
+        <span class="rno">058</span>
+        <span class="rname"><b>绢毛蔷薇</b><i>Rosa sericea</i></span>
+        <span class="rside"><span class="rmeta">西藏 · 3,050 m</span><span class="rstate">翻看</span></span>
+      </button>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>PRESSED HERBARIUM · 昆明</span>
+    <span>每件标本只压一次</span>
+    <span>编号 2019 – 2022</span>
+  </footer>
+</main>
+<p class="sr" id="live" role="status" aria-live="polite"></p>
+
+<script>
+(function () {
+  var SPECIMENS = [
+    {
+      id: 'fern', no: '026', name: '银粉背蕨', latin: 'Aleuritopteris argentea', art: 'fern',
+      tag: '蕨类 · 石灰岩缝', plate: '苍山 · 2019', where: '云南 · 苍山西坡',
+      alt: '2,410 m', date: '2019.08.14', artColor: '#46613f', petal: '#b98a4e',
+      memo: '叶背那层银白是蜡质，不是霉。它替植株挡掉高山过强的紫外线，压制后也几乎不褪。',
+      notes: ['二回羽状复叶，末回小羽片贴得很密。', '根茎横走，扎在石灰岩薄土与苔藓之间。', '压后银粉完整，是这批里状态最好的一件。']
+    },
+    {
+      id: 'gentian', no: '041', name: '高山龙胆', latin: 'Gentiana algida', art: 'gentian',
+      tag: '龙胆科 · 流石滩', plate: '贡嘎 · 2021', where: '四川 · 贡嘎南坡',
+      alt: '3,600 m', date: '2021.09.02', artColor: '#4a5675', petal: '#8b9ccb',
+      memo: '花在霜降前后才开，钟形花冠合得很紧，风灌不进去。压的时候要先把花冠轻轻撑开，否则干后缩成一团。',
+      notes: ['植株矮，花几乎贴地生长。', '花色从深蓝褪到灰紫，是正常的干燥结果。', '与流石滩上的地衣混生。']
+    },
+    {
+      id: 'rose', no: '058', name: '绢毛蔷薇', latin: 'Rosa sericea', art: 'rose',
+      tag: '蔷薇科 · 灌丛', plate: '林芝 · 2020', where: '西藏 · 林芝',
+      alt: '3,050 m', date: '2020.06.21', artColor: '#5f4b36', petal: '#c08a86',
+      memo: '四瓣，白得发亮，叶子背面有一层绢毛。压过之后花瓣薄得能透光，放在窗边像一张纸。',
+      notes: ['羽状复叶，小叶五到七枚。', '枝上有刺，压制前先用软纸包住。', '标本册里唯一一件蔷薇科。']
+    }
+  ];
+
+  var card = document.getElementById('card');
+  var arts = card.querySelectorAll('.art');
+  var rows = document.querySelectorAll('.row');
+  var live = document.getElementById('live');
+  var els = {
+    fNo: document.getElementById('fNo'), fTag: document.getElementById('fTag'),
+    fPlate: document.getElementById('fPlate'), fName: document.getElementById('fName'),
+    fLatin: document.getElementById('fLatin'), fWhere: document.getElementById('fWhere'),
+    bNo: document.getElementById('bNo'), bMemo: document.getElementById('bMemo'),
+    bNotes: document.getElementById('bNotes'), bStamp: document.getElementById('bStamp'),
+    bMark: document.getElementById('bMark'),
+    sWhere: document.getElementById('sWhere'), sAlt: document.getElementById('sAlt'),
+    sDate: document.getElementById('sDate'), sNo: document.getElementById('sNo')
+  };
+  var current = SPECIMENS[0];
+
+  function setPressed(on) {
+    card.setAttribute('aria-pressed', on ? 'true' : 'false');
+    card.setAttribute('aria-label', on
+      ? '翻回正面，收起' + current.name + '的采集记录'
+      : '翻转' + current.name + '标本卡，查看采集记录');
+  }
+
+  function render(s, announce) {
+    current = s;
+    card.style.setProperty('--art', s.artColor);
+    card.style.setProperty('--petal', s.petal);
+    els.fNo.textContent = 'NO. ' + s.no;
+    els.bNo.textContent = 'NO. ' + s.no;
+    els.fTag.textContent = s.tag;
+    els.fPlate.textContent = s.plate;
+    els.fName.textContent = s.name;
+    els.fLatin.textContent = s.latin;
+    els.fWhere.textContent = s.where;
+    els.bMemo.textContent = s.memo;
+    els.bStamp.textContent = s.date + ' · ' + s.alt;
+    els.bMark.textContent = 'NO. ' + s.no;
+    els.sWhere.textContent = s.where;
+    els.sAlt.textContent = s.alt;
+    els.sDate.textContent = s.date;
+    els.sNo.textContent = 'NO. ' + s.no;
+
+    els.bNotes.textContent = '';
+    s.notes.forEach(function (n) {
+      var line = document.createElement('span');
+      line.textContent = n;
+      els.bNotes.appendChild(line);
+    });
+
+    arts.forEach(function (a) { a.classList.toggle('on', a.dataset.art === s.art); });
+    rows.forEach(function (r) {
+      var on = r.dataset.id === s.id;
+      r.setAttribute('aria-current', on ? 'true' : 'false');
+      r.querySelector('.rstate').textContent = on ? '正在查看' : '翻看';
+    });
+
+    setPressed(false);
+    if (announce) live.textContent = '已换到 ' + s.name + '，正面';
+  }
+
+  card.addEventListener('click', function () {
+    var on = card.getAttribute('aria-pressed') !== 'true';
+    setPressed(on);
+    live.textContent = current.name + (on ? ' · 已翻到背面，采集记录' : ' · 已翻回正面');
+  });
+
+  rows.forEach(function (r) {
+    r.addEventListener('click', function () {
+      if (r.dataset.id === current.id) return;
+      render(SPECIMENS.filter(function (s) { return s.id === r.dataset.id; })[0], true);
+    });
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

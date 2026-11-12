@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>延迟提示气泡 · MANUSCRIPT 编辑台 · UI Atlas</title>
+<style>
+:root{--bg:#eeece4;--paper:#fbfaf6;--ink:#121317;--muted:#7b7e85;--line:#ddd8ca;--accent:#2f5fd0;--warm:#a8643c}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.app{min-height:100svh;display:flex;flex-direction:column}
+.topbar{flex:0 0 auto;height:54px;display:flex;align-items:center;gap:22px;padding:0 clamp(16px,3vw,34px);border-bottom:1px solid var(--line);background:rgba(251,250,246,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.logo{width:26px;height:26px;border-radius:7px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:700 12px/1 Georgia,serif}
+.brand b{font-size:11.5px;font-weight:750;letter-spacing:.16em}
+.brand .sub{font-size:10px;color:var(--muted);letter-spacing:.08em}
+.nav{display:flex;align-items:center;gap:2px}
+.nav a{padding:6px 10px;border-radius:7px;font-size:11.5px;color:var(--muted);transition:background .18s,color .18s}
+.nav a:hover{background:#f3f0e8;color:var(--ink)}
+.nav a.on{background:#fff;color:var(--ink);box-shadow:0 8px 18px -16px rgba(20,22,30,.5)}
+.right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.sync{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.sync::before{content:"";width:5px;height:5px;border-radius:50%;background:#3f8f74}
+.avatar{width:27px;height:27px;border-radius:50%;background:linear-gradient(145deg,#9c7b5f,#5e4632);color:#fff6ec;display:grid;place-items:center;font:700 10px/1 ui-monospace,Consolas,monospace}
+.shell{flex:1;width:100%;max-width:1380px;margin:0 auto;display:grid;grid-template-columns:196px minmax(0,1fr) 244px;gap:clamp(18px,2.6vw,32px);padding:clamp(16px,2.4vw,28px) clamp(16px,3vw,38px) 32px;align-items:start}
+.side-k{margin:0 0 10px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.17em;color:var(--muted)}
+.docs{position:sticky;top:78px;display:flex;flex-direction:column;gap:2px;padding-top:4px}
+.doc{display:block;padding:9px 10px;border-radius:9px;transition:background .18s}
+.doc:hover{background:rgba(255,255,255,.55)}
+.doc.on{background:#fff;box-shadow:0 10px 22px -20px rgba(20,22,30,.5)}
+.doc b{display:block;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc small{display:block;margin-top:3px;font:500 8.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.03em;color:var(--muted)}
+.docs-goal{margin-top:22px;padding:12px 10px 0;border-top:1px solid var(--line)}
+.docs-goal span{font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.docs-goal b{display:block;font-size:18px;letter-spacing:-.03em;margin-top:2px}
+.docs-goal i{display:block;height:3px;border-radius:2px;background:#ddd8ca;margin-top:8px;position:relative;overflow:hidden}
+.docs-goal i::after{content:"";position:absolute;inset:0;width:64%;background:var(--warm);border-radius:2px}
+.editor{min-width:0;display:flex;flex-direction:column;min-height:calc(100svh - 54px - 60px);background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:0 40px 80px -74px rgba(20,22,30,.55);position:relative}
+.edbar{flex:0 0 auto;height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid #ebe6da;background:rgba(255,255,255,.42);border-radius:14px 14px 0 0}
+.ed-title{display:flex;align-items:baseline;gap:9px;min-width:0}
+.ed-title b{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ed-title span{font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.state{margin-left:auto;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+.hint{margin:0 auto;display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.02em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.toolbar{position:relative;z-index:12;display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:5px 14px;border-bottom:1px solid #ebe6da;background:rgba(255,255,255,.55)}
+.toolbar button{width:40px;height:38px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--ink);font:600 14px/1 ui-monospace,Consolas,monospace;cursor:pointer;display:grid;place-items:center;transition:background .18s,border-color .18s,color .18s}
+.toolbar button:hover{background:#f2efe7;border-color:var(--line)}
+.toolbar button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.toolbar button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.toolbar .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
+.tip{position:absolute;left:0;top:0;z-index:40;padding:6px 10px;border-radius:8px;background:var(--ink);color:#fff;font:500 11.5px/1.4 -apple-system,"Segoe UI","PingFang SC",sans-serif;white-space:nowrap;pointer-events:none;opacity:0;visibility:hidden;transform:translate(-50%,-100%) translateY(-7px);transition:opacity .16s ease,transform .22s cubic-bezier(.2,.8,.2,1),visibility .16s}
+.tip.on{opacity:1;visibility:visible;transform:translate(-50%,-100%) translateY(-11px)}
+.tip::after{content:"";position:absolute;left:50%;bottom:-4px;width:8px;height:8px;background:var(--ink);transform:translateX(-50%) rotate(45deg);border-radius:1px}
+.canvas{flex:1;padding:clamp(22px,3.2vw,40px) clamp(20px,4vw,52px) 30px}
+.canvas article{max-width:648px;margin:0 auto;outline:none}
+.canvas .kicker{margin:0 0 12px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+.canvas h1{margin:0 0 8px;font-size:clamp(30px,3.4vw,42px);line-height:1.12;letter-spacing:-.04em;font-weight:640}
+.canvas .byline{margin:0 0 22px;padding-bottom:16px;border-bottom:1px solid #eae5d9;font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.07em;color:var(--muted)}
+.canvas p{font-size:14.5px;line-height:2;color:#3e4046;margin:0 0 18px}
+.canvas mark{background:#f2e3c7;color:inherit;padding:0 2px;border-radius:2px}
+.canvas blockquote{margin:24px 0;padding:14px 18px;border-left:2px solid var(--warm);background:#f5f1e6;border-radius:0 9px 9px 0;font:italic 16px/1.75 Georgia,"Songti SC",serif;color:#33353a}
+.canvas blockquote footer{margin-top:7px;font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);font-style:normal}
+.status{flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:7px 16px;border-top:1px solid #ebe6da;font:500 8px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.07em;color:var(--muted);background:rgba(255,255,255,.35);border-radius:0 0 14px 14px}
+.status .stat-r{margin-left:auto}
+.notes{position:sticky;top:78px;display:flex;flex-direction:column;gap:9px;padding-top:4px}
+.note{padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.5)}
+.note header{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.note header span{font-size:10.5px;font-weight:600}
+.note header small{font:500 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted)}
+.note p{margin:5px 0 0;font-size:10.5px;line-height:1.7;color:#55575d}
+.ver{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(221,216,202,.65);font-size:10.5px;color:var(--muted)}
+.ver.on{color:var(--ink)}
+.ver small{font:500 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.03em;color:var(--muted)}
+.notes .side-k:not(:first-child){margin-top:14px}
+.foot{flex:0 0 auto;border-top:1px solid var(--line);padding:12px clamp(16px,3vw,38px);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+@media (max-width:1180px){
+  .shell{grid-template-columns:180px minmax(0,1fr)}
+  .notes{display:none}
+}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;padding:14px}
+  .docs{display:none}
+  .editor{min-height:calc(100svh - 54px - 28px)}
+}
+@media (max-width:780px){
+  .nav{display:none}
+  .state{display:none}
+}
+@media (max-width:560px){
+  .topbar{height:50px;gap:10px;padding:0 14px}
+  .sync,.avatar{display:none}
+  .hint{display:none}
+  .shell{padding:10px}
+  .editor{min-height:calc(100svh - 70px);border-radius:12px}
+  .edbar{height:40px;padding:0 13px;border-radius:12px 12px 0 0}
+  .ed-title span{display:none}
+  .toolbar{padding:4px 8px}
+  .toolbar button{width:38px;height:36px}
+  .canvas{padding:20px 16px 26px}
+  .canvas h1{font-size:29px}
+  .canvas p{font-size:13.5px;line-height:1.95}
+  .status{gap:10px;padding:7px 12px;border-radius:0 0 12px 12px}
+  .status .stat-r,.status span:nth-child(3){display:none}
+  .foot{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:40px;padding:0 16px;gap:14px}
+  .nav,.sync,.avatar{display:none}
+  .shell{grid-template-columns:1fr;max-width:760px;padding:10px 16px 12px}
+  .docs,.notes{display:none}
+  .editor{min-height:calc(100svh - 62px);border-radius:12px}
+  .edbar{height:36px;padding:0 13px;border-radius:12px 12px 0 0}
+  .ed-title span,.state{display:none}
+  .hint{font-size:9px;padding:2px 7px}
+  .toolbar{padding:3px 10px}
+  .toolbar button{height:34px}
+  .canvas{padding:14px 24px 16px}
+  .canvas h1{font-size:26px;margin-bottom:6px}
+  .canvas .byline{margin-bottom:10px;padding-bottom:8px}
+  .canvas p{font-size:13px;line-height:1.85;margin-bottom:10px}
+  .canvas blockquote,.canvas .deep{display:none}
+  .status{padding:5px 14px}
+  .foot{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .toolbar button,.tip,.nav a,.doc{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="#doc" aria-label="MANUSCRIPT 编辑台"><span class="logo">M</span><b>MANUSCRIPT</b><span class="sub">手稿</span></a>
+    <nav class="nav" aria-label="编辑台导航">
+      <a class="on" href="#doc">稿件</a>
+      <a href="#notes">版本</a>
+      <a href="#notes">协作</a>
+    </nav>
+    <div class="right">
+      <span class="sync">已保存 · 09:41</span>
+      <span class="avatar" aria-hidden="true">林</span>
+    </div>
+  </header>
+
+  <main class="shell">
+    <aside class="docs" aria-label="稿件列表">
+      <p class="side-k">稿件 / DRAFTS</p>
+      <a class="doc on" href="#doc"><b>雾从海上过来</b><small>第 3 稿 · 8 分钟前</small></a>
+      <a class="doc" href="#doc"><b>一把旧钥匙</b><small>第 2 稿 · 昨天</small></a>
+      <a class="doc" href="#doc"><b>山中的雨</b><small>第 1 稿 · 11 月 8 日</small></a>
+      <a class="doc" href="#doc"><b>星期天的面馆</b><small>草稿 · 11 月 3 日</small></a>
+      <div class="docs-goal"><span>本周写了</span><b>3,240 字</b><i aria-hidden="true"></i></div>
+    </aside>
+
+    <section class="editor" aria-label="正文编辑器">
+      <div class="edbar">
+        <div class="ed-title"><b>雾从海上过来</b><span>散文 · 第 3 稿</span></div>
+        <p class="hint">悬停格式按钮，等 300ms 看提示</p>
+        <span class="state">1,284 字 · 已保存</span>
+      </div>
+      <div class="toolbar" id="toolbar" role="toolbar" aria-label="文本格式">
+        <button type="button" data-tip="加粗 ⌘B" aria-label="加粗" aria-pressed="false" data-cmd="bold">B</button>
+        <button type="button" data-tip="斜体 ⌘I" aria-label="斜体" aria-pressed="false" data-cmd="italic">I</button>
+        <button type="button" data-tip="行内代码 ⌘E" aria-label="行内代码" aria-pressed="false">&lt;/&gt;</button>
+        <span class="sep" aria-hidden="true"></span>
+        <button type="button" data-tip="插入链接 ⌘K" aria-label="插入链接" aria-pressed="false" data-cmd="createLink">↗</button>
+        <button type="button" data-tip="更多格式" aria-label="更多格式" aria-pressed="false">⋯</button>
+        <span class="tip" id="tip" role="tooltip"></span>
+      </div>
+      <div class="canvas">
+        <article id="doc" contenteditable="true" spellcheck="false" aria-label="正文">
+          <p class="kicker">ESSAY / 2026 · 秋</p>
+          <h1>雾从海上过来</h1>
+          <p class="byline">林一 · 写于苍南 · 2026.10.28</p>
+          <p>清晨五点四十，窗外的声音先醒。不是鸟，也不是车，是雾从海上过来，把整条街的轮廓都磨钝了。</p>
+          <p>我坐在桌前改第三稿。<mark>有些句子还是太用力，像把海风写成了台风。</mark>删掉两个形容词之后，窗台上的水汽反而更清楚了。</p>
+          <p>写作这件事，大概就是等雾自己散。你能做的，只是把纸铺好，把笔盖打开，然后坐得久一点。</p>
+          <blockquote>“不要急着把话说满。留一点雾，读者才走得进来。”<footer>—— 编辑批注 · 第 2 段</footer></blockquote>
+          <p class="deep">十点以后，雾散了。楼下早餐铺的蒸汽升上来，和刚才的雾接在一起。我保存了文档，决定下午再改结尾。</p>
+        </article>
+      </div>
+      <div class="status">
+        <span>正文</span><span>1,284 字</span><span>中文（简体）</span><span class="stat-r">⌘S 保存于 09:41</span>
+      </div>
+    </section>
+
+    <aside class="notes" id="notes" aria-label="批注与版本">
+      <p class="side-k">批注 · 2</p>
+      <div class="note">
+        <header><span>陈默</span><small>2 分钟前</small></header>
+        <p>第二段的“薄”很好，别改。</p>
+      </div>
+      <div class="note">
+        <header><span>周玥</span><small>11 分钟前</small></header>
+        <p>结尾可以再收一点，现在正好。</p>
+      </div>
+      <p class="side-k">版本</p>
+      <a class="ver on" href="#doc">第 3 稿 <small>刚刚</small></a>
+      <a class="ver" href="#doc">第 2 稿 <small>昨天 18:20</small></a>
+      <a class="ver" href="#doc">第 1 稿 <small>11 月 8 日</small></a>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    <span>MANUSCRIPT · 写作台</span>
+    <span>自动保存已开启 · 仅自己可见</span>
+    <span>第 3 稿 / 共 4 篇</span>
+  </footer>
+</div>
+<script>
+(function () {
+  var toolbar = document.getElementById('toolbar'), tip = document.getElementById('tip');
+  var doc = document.getElementById('doc');
+  var btns = [].slice.call(toolbar.querySelectorAll('button'));
+  var timer = null, cur = null;
+
+  function show(btn) {
+    cur = btn;
+    tip.textContent = btn.dataset.tip;
+    tip.style.left = (btn.offsetLeft + btn.offsetWidth / 2) + 'px';
+    tip.style.top = btn.offsetTop + 'px';
+    tip.classList.add('on');
+    btn.setAttribute('aria-describedby', 'tip');
+  }
+  function hide() {
+    clearTimeout(timer);
+    tip.classList.remove('on');
+    if (cur) cur.removeAttribute('aria-describedby');
+    cur = null;
+  }
+
+  btns.forEach(function (b) {
+    b.addEventListener('pointerenter', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () { show(b); }, 300);
+    });
+    b.addEventListener('pointerleave', hide);
+    b.addEventListener('focus', function () { clearTimeout(timer); show(b); });
+    b.addEventListener('blur', hide);
+    if (b.dataset.cmd) {
+      b.addEventListener('pointerdown', function (e) { e.preventDefault(); });
+    }
+    b.addEventListener('click', function () {
+      var on = b.getAttribute('aria-pressed') !== 'true';
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      hide();
+      if (!b.dataset.cmd) return;
+      try {
+        doc.focus();
+        document.execCommand(b.dataset.cmd, false, b.dataset.cmd === 'createLink' ? '#doc' : null);
+      } catch (err) {}
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && tip.classList.contains('on')) hide();
+  });
+  addEventListener('resize', hide);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

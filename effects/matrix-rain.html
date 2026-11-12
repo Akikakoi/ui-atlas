@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>字符雨 · SENTINEL 安全运营</title>
+<style>
+:root{--bg:#050806;--bg2:#070b08;--ink:#e8fff1;--muted:rgba(232,255,241,.52);--accent:#6dffa8;
+  --line:rgba(109,255,168,.14)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:#050806;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block}
+.shade{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,8,6,.84),transparent 42%),
+  linear-gradient(90deg,rgba(5,8,6,.68),rgba(5,8,6,.15) 56%,transparent 76%),
+  radial-gradient(120% 80% at 20% 10%,transparent 40%,rgba(5,8,6,.55) 100%)}
+.wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+
+/* 顶栏 */
+.nav{position:sticky;top:0;z-index:6;background:rgba(5,8,6,.5);
+  backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);
+  border-bottom:1px solid rgba(109,255,168,.12)}
+.nav-in{width:min(1180px,calc(100% - 48px));margin:0 auto;height:64px;display:flex;align-items:center;gap:26px}
+.brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+  font:600 13px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em}
+.brand svg{width:17px;height:18px;display:block}
+.brand span{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:rgba(232,255,241,.4)}
+.nav nav{display:flex;gap:22px}
+.nav nav a{font-size:11.5px;letter-spacing:.05em;color:rgba(232,255,241,.58);text-decoration:none;transition:color .2s}
+.nav nav a:hover{color:var(--ink)}
+.hint{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 auto;padding:4px 9px;
+  font-size:11px;color:rgba(232,255,241,.6);white-space:nowrap;
+  background:rgba(128,128,128,.1);border:1px solid rgba(128,128,128,.18);border-radius:999px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:0 0 5px}
+.nav-cta{flex:0 0 auto;height:31px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;
+  border:1px solid rgba(109,255,168,.36);color:var(--accent);text-decoration:none;font-size:11.5px;
+  background:rgba(109,255,168,.07);transition:background .2s}
+.nav-cta:hover{background:rgba(109,255,168,.16)}
+
+/* 首屏 */
+.page{position:relative;z-index:2}
+.hero{width:min(1180px,calc(100% - 48px));margin:0 auto;min-height:calc(100vh - 65px);
+  padding:clamp(34px,8vh,84px) 0 24px;display:flex;flex-direction:column}
+.kicker{margin:0;font:600 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(109,255,168,.7)}
+h1{margin:16px 0 0;font-size:clamp(40px,6.4vw,72px);line-height:.99;letter-spacing:-.045em;font-weight:600;max-width:9em;text-shadow:0 2px 32px rgba(0,0,0,.7)}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:20px 0 0;max-width:30em;font-size:13.5px;line-height:1.85;color:rgba(232,255,241,.66)}
+.actions{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{height:44px;padding:0 20px;border-radius:999px;display:inline-flex;align-items:center;
+  font-size:12px;letter-spacing:.03em;text-decoration:none;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s}
+.btn.solid{background:var(--accent);border-color:var(--accent);color:#04130a}
+.btn.solid:hover{background:#9bffc3;border-color:#9bffc3}
+.btn.ghost{border-color:rgba(232,255,241,.24);color:var(--ink);background:rgba(5,10,6,.32);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.hero-foot{margin-top:auto;padding-top:clamp(30px,8vh,70px)}
+.pulse{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:14px;
+  background:rgba(6,11,8,.6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden}
+.stat{padding:14px 18px;border-left:1px solid rgba(109,255,168,.1)}
+.stat:first-child{border-left:0}
+.stat span{display:block;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:rgba(232,255,241,.4)}
+.stat b{display:flex;align-items:baseline;gap:5px;margin-top:4px;font:600 21px/1.2 ui-monospace,Consolas,monospace;letter-spacing:-.02em}
+.stat b small{font-size:10px;font-weight:500;color:rgba(232,255,241,.48)}
+.stat p{margin:3px 0 0;font-size:9.5px;line-height:1.5;color:rgba(232,255,241,.38)}
+.stat p.hot{color:var(--accent)}
+.term{margin:12px 0 0;font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:rgba(232,255,241,.34)}
+
+/* 实底内容 */
+.solid{background:var(--bg);border-top:1px solid rgba(109,255,168,.1)}
+.feed{padding:clamp(62px,10vh,106px) 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px}
+.eyebrow{margin:0;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:rgba(109,255,168,.62)}
+h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spacing:-.04em;font-weight:600}
+.sec-head>p{margin:0;max-width:30em;font-size:12.5px;line-height:1.85;color:var(--muted);justify-self:end;text-align:right}
+.feed-grid{margin-top:42px;display:grid;grid-template-columns:1fr 1.08fr;gap:clamp(30px,4vw,56px);align-items:center}
+.feed-copy p{margin:16px 0 0;max-width:30em;font-size:12.5px;line-height:1.9;color:var(--muted)}
+.feed-stats{margin-top:26px;display:flex;gap:30px;flex-wrap:wrap}
+.feed-stats span{display:block;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(232,255,241,.36)}
+.feed-stats b{display:block;margin-top:3px;font:600 18px/1.3 ui-monospace,Consolas,monospace;letter-spacing:-.02em;color:rgba(232,255,241,.9)}
+.feed-copy .btn{margin-top:24px}
+.console{border:1px solid rgba(109,255,168,.18);border-radius:14px;overflow:hidden;
+  background:rgba(6,10,7,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 30px 70px -40px rgba(0,0,0,.9)}
+.console-head{display:flex;align-items:center;gap:8px;padding:10px 14px;
+  border-bottom:1px solid rgba(109,255,168,.12);font:500 9px/1.6 ui-monospace,Consolas,monospace;
+  letter-spacing:.12em;color:rgba(232,255,241,.42)}
+.dots{display:inline-flex;gap:4px}
+.dots i{width:6px;height:6px;border-radius:50%;background:rgba(109,255,168,.22)}
+.console-head b{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--accent)}
+.console-head b::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(109,255,168,.9)}
+.console-body{padding:10px 0 12px;font:400 10px/1.9 ui-monospace,Consolas,monospace}
+.line{display:grid;grid-template-columns:62px 48px minmax(0,1fr) auto;gap:10px;padding:4px 16px;white-space:nowrap}
+.line:hover{background:rgba(109,255,168,.05)}
+.line .t{color:rgba(232,255,241,.3)}
+.line .lv{font-weight:600;letter-spacing:.06em}
+.lv.warn{color:#f2c879}
+.lv.block{color:#ff8a9b}
+.lv.info{color:rgba(109,255,168,.7)}
+.line .msg{overflow:hidden;text-overflow:ellipsis;color:rgba(232,255,241,.72)}
+.line .src{color:rgba(232,255,241,.28)}
+.console-foot{padding:8px 16px;border-top:1px solid rgba(109,255,168,.1);
+  font:400 8.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(232,255,241,.3)}
+
+/* 能力 */
+.cap{background:var(--bg2);border-top:1px solid rgba(109,255,168,.1);padding:clamp(58px,9vh,98px) 0}
+.cap-grid{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{border:1px solid var(--line);border-radius:14px;padding:20px;
+  background:linear-gradient(180deg,rgba(12,20,14,.6),rgba(6,10,7,.86));transition:transform .25s,border-color .25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(109,255,168,.32)}
+.card b{font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--accent)}
+.card h3{margin:10px 0 0;font-size:16px;letter-spacing:-.01em}
+.card p{margin:8px 0 0;font-size:11.5px;line-height:1.85;color:rgba(232,255,241,.52)}
+.card .meta{margin-top:16px;padding-top:10px;border-top:1px dashed rgba(109,255,168,.16);
+  font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(232,255,241,.34)}
+
+/* 引文 */
+.quote{background:var(--bg);border-top:1px solid rgba(109,255,168,.1);padding:clamp(62px,10vh,108px) 0}
+.quote blockquote{margin:0;max-width:21em;font:400 clamp(27px,3.7vw,46px)/1.26 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+.quote blockquote em{font-style:italic;color:var(--accent)}
+.quote .cite{margin:20px 0 0;font:400 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(232,255,241,.4)}
+
+/* 演示 */
+.cta{padding:clamp(72px,12vh,132px) 0;border-top:1px solid rgba(109,255,168,.14);
+  background:linear-gradient(180deg,rgba(5,8,6,.6),rgba(5,8,6,.9))}
+.cta-in{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.cta .kicker{color:rgba(109,255,168,.66)}
+.cta h2{margin:12px 0 0;font-size:clamp(32px,5vw,58px);line-height:1.02}
+.cta .note{margin:16px 0 0;max-width:31em;font-size:12px;line-height:1.85;color:var(--muted)}
+.cta-actions{display:flex;gap:10px;flex-wrap:wrap}
+.foot{background:#040605;border-top:1px solid rgba(109,255,168,.1);padding:22px 0 28px}
+.foot-in{display:flex;flex-wrap:wrap;gap:10px 22px;font:400 9.5px/1.8 ui-monospace,Consolas,monospace;
+  letter-spacing:.08em;color:rgba(232,255,241,.34)}
+.foot-in span:last-child{margin-left:auto}
+
+/* 平板 */
+@media (max-width:900px){
+  .nav nav{display:none}
+  .sec-head{grid-template-columns:1fr;gap:12px}
+  .sec-head>p{justify-self:start;text-align:left}
+  .feed-grid{grid-template-columns:1fr;gap:30px}
+  .cap-grid{grid-template-columns:1fr;gap:14px}
+}
+
+/* 手机 */
+@media (max-width:560px){
+  .nav-in{width:calc(100% - 32px);height:56px;gap:12px}
+  .brand span{display:none}
+  .hint{display:none}
+  .nav-cta{margin-left:auto;height:29px;padding:0 12px;font-size:11px}
+  .wrap,.hero{width:calc(100% - 32px)}
+  .hero{min-height:calc(100vh - 57px);padding:34px 0 20px}
+  h1{font-size:clamp(38px,11vw,48px);max-width:8em}
+  .lede{font-size:12.5px;margin-top:16px}
+  .actions{margin-top:20px}
+  .btn{height:42px;padding:0 17px}
+  .hero-foot{padding-top:24px}
+  .pulse{grid-template-columns:1fr 1fr}
+  .stat{padding:11px 13px;border-top:1px solid rgba(109,255,168,.1)}
+  .stat:nth-child(odd){border-left:0}
+  .stat:nth-child(-n+2){border-top:0}
+  .stat b{font-size:18px}
+  .term{font-size:8px}
+  .feed{padding-top:52px}
+  .feed-grid{margin-top:30px}
+  .line{grid-template-columns:52px 44px minmax(0,1fr);padding:4px 12px;font-size:9px}
+  .line .src{display:none}
+  .console-body{font-size:9px}
+  .cta-in{align-items:flex-start}
+  .foot-in span:last-child{margin-left:0}
+}
+
+/* 画廊 600×450 紧凑首屏 */
+@media (max-height:560px) and (min-width:561px){
+  .nav-in{height:44px;gap:14px}
+  .brand span{display:none}
+  .nav nav{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .nav-cta{height:27px;padding:0 11px;font-size:10.5px}
+  .hero{min-height:calc(100vh - 45px);padding:10px 0}
+  .kicker{font-size:9px}
+  h1{margin-top:7px;font-size:clamp(28px,4.7vw,38px);max-width:9em}
+  .lede{margin-top:8px;font-size:10.5px;line-height:1.6;max-width:36em}
+  .actions{margin-top:10px;gap:8px}
+  .btn{height:32px;padding:0 13px;font-size:11px}
+  .hero-foot{padding-top:10px}
+  .pulse{border-radius:11px}
+  .stat{padding:8px 12px}
+  .stat span{font-size:7.5px}
+  .stat b{font-size:15px;margin-top:2px}
+  .stat b small{font-size:8px}
+  .stat p{font-size:8px;margin-top:1px}
+  .term{display:none}
+}
+
+@media (hover:none){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  canvas{opacity:.55}
+}
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<div class="shade" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top" aria-label="SENTINEL 安全运营">
+      <svg viewBox="0 0 17 18" aria-hidden="true" fill="none" stroke="#6dffa8" stroke-width="1.3">
+        <path d="M8.5 1.2 15.2 4v5.2c0 4-2.8 6.6-6.7 7.6-3.9-1-6.7-3.6-6.7-7.6V4z" opacity=".75"/>
+        <path d="M5.4 8.6l2.1 2.2 4.2-4.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      SENTINEL<span>SOC</span>
+    </a>
+    <nav aria-label="主导航">
+      <a href="#feed">实时事件</a>
+      <a href="#capabilities">能力</a>
+      <a href="#demo">演示</a>
+    </nav>
+    <p class="hint">字符雨在后台跑，不用操作</p>
+    <a class="nav-cta" href="#demo">预约演示</a>
+  </div>
+</header>
+
+<main class="page" id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">SENTINEL · 安全运营平台 · 7×24 值守</p>
+      <h1>坏事发生前，<br><em>先看见它。</em></h1>
+      <p class="lede">每秒 2.4 亿条日志穿过管线，行为基线在暗处校准。异常出现的那一秒，值班的人已经知道了。</p>
+      <div class="actions">
+        <a class="btn solid" href="#demo">预约演示 →</a>
+        <a class="btn ghost" href="#feed">看实时事件</a>
+      </div>
+    </div>
+    <div class="hero-foot">
+      <div class="pulse" aria-label="平台实时指标">
+        <div class="stat">
+          <span>事件 / EVENTS</span>
+          <b>2.4<small>亿 / 秒</small></b>
+          <p>全球管线吞吐</p>
+        </div>
+        <div class="stat">
+          <span>节点 / NODES</span>
+          <b>412<small>个</small></b>
+          <p>受保护边缘节点</p>
+        </div>
+        <div class="stat">
+          <span>响应 / RESPONSE</span>
+          <b>0.8<small>s</small></b>
+          <p class="hot">从命中到隔离</p>
+        </div>
+        <div class="stat">
+          <span>今日阻止 / BLOCKED</span>
+          <b>1,284<small>次</small></b>
+          <p>自动处置 98.2%</p>
+        </div>
+      </div>
+      <p class="term">tail -f /var/log/world · 16px 字符列 · 8% 拖尾 · 2.5% 重生率 · Canvas 2D</p>
+    </div>
+  </section>
+
+  <section class="feed solid" id="feed">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">01 / 实时事件</p>
+          <h2>每一条日志，<br>都有人看着。</h2>
+        </div>
+        <p>从登录失败到异常出站，所有动作都进同一条时间线。规则命中的瞬间自动隔离，证据包同时归档。</p>
+      </div>
+      <div class="feed-grid">
+        <div class="feed-copy">
+          <p>凌晨四点，值班工程师只需要看一列红色的 BLOCK。其余的交给基线、规则和 412 个节点的互相印证。早上复盘时，每一步都有原文可查。</p>
+          <div class="feed-stats">
+            <div><span>今日事件</span><b>8,412,096</b></div>
+            <div><span>自动处置</span><b>98.2%</b></div>
+            <div><span>人工复核</span><b>43 条</b></div>
+          </div>
+          <a class="btn ghost" href="#capabilities">看 24 小时事件流 →</a>
+        </div>
+        <div class="console" aria-label="实时事件示例">
+          <div class="console-head">
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            tail -f /var/log/edge
+            <b>LIVE</b>
+          </div>
+          <div class="console-body">
+            <div class="line"><span class="t">04:12:08</span><span class="lv warn">WARN</span><span class="msg">45.12.8.9 连续 37 次登录失败</span><span class="src">sin-03</span></div>
+            <div class="line"><span class="t">04:12:09</span><span class="lv block">BLOCK</span><span class="msg">已隔离来源 IP · 规则 R-0142</span><span class="src">auto</span></div>
+            <div class="line"><span class="t">04:12:19</span><span class="lv info">INFO</span><span class="msg">欧洲节点升级行为基线 v2026.11.12</span><span class="src">control</span></div>
+            <div class="line"><span class="t">04:13:02</span><span class="lv warn">WARN</span><span class="msg">异常出站流量 1.2 GB / 5 min</span><span class="src">fra-07</span></div>
+            <div class="line"><span class="t">04:13:05</span><span class="lv block">BLOCK</span><span class="msg">连接已切断 · 证据包归档</span><span class="src">auto</span></div>
+            <div class="line"><span class="t">04:13:40</span><span class="lv info">INFO</span><span class="msg">值班工程师确认处置 · 工单 #8841</span><span class="src">on-call</span></div>
+          </div>
+          <div class="console-foot">区域 sin / fra · 采样 100% · 保留 180 天</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cap" id="capabilities">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">02 / 能力</p>
+          <h2>看见，看懂，<br>然后按住它。</h2>
+        </div>
+        <p>不追求更多告警。把真正需要人看的那 43 条，放在最前面。</p>
+      </div>
+      <div class="cap-grid">
+        <article class="card">
+          <b>BASELINE / 01</b>
+          <h3>行为基线</h3>
+          <p>每个账号、每台机器都有自己的一条曲线。偏离三倍标准差才叫异常，不为人家的加班报警。</p>
+          <div class="meta">按小时重建 · 保留 90 天</div>
+        </article>
+        <article class="card">
+          <b>LATERAL / 02</b>
+          <h3>横向移动检测</h3>
+          <p>从一台机器到另一台机器的每一步都留痕。九分钟内画出完整的横向路径。</p>
+          <div class="meta">平均 9 min 还原路径</div>
+        </article>
+        <article class="card">
+          <b>CONTAIN / 03</b>
+          <h3>自动隔离</h3>
+          <p>确认威胁后 0.8 秒切断连接，同时保留内存镜像。误隔离可以一键回滚。</p>
+          <div class="meta">0.8 s · 一键回滚</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="quote solid">
+    <div class="wrap">
+      <blockquote>真正的安全感，<br><em>是半夜没有电话。</em></blockquote>
+      <p class="cite">值班工程师 · 第 214 个夜班 · 04:13</p>
+    </div>
+  </section>
+
+  <section class="cta" id="demo">
+    <div class="wrap cta-in">
+      <div>
+        <p class="kicker">30-DAY TRIAL · NO CARD</p>
+        <h2>把下一次入侵，<br>变成一次演练。</h2>
+        <p class="note">30 天试用，不需要信用卡。接入 20 个节点以内免费，数据随时可导出。</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn solid" href="#demo">预约演示</a>
+        <a class="btn ghost" href="#capabilities">看接入文档</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>SENTINEL SOC · 杭州 · 7×24 值守</span>
+    <span>背景字符雨由 Canvas 2D 绘制</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var canvas = document.getElementById('rain'), ctx = canvas.getContext('2d');
+  var chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン';
+  var fs = 16, dpr = Math.min(devicePixelRatio || 1, 2), drops = [], cols = 0;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var raf = null, running = true;
+
+  function drawStatic() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    ctx.font = fs + 'px ui-monospace,Consolas,monospace';
+    for (var c = 0; c < cols; c++) {
+      for (var r = 0; r < innerHeight / fs; r += 2) {
+        if (Math.random() > .35) continue;
+        ctx.fillStyle = 'rgba(109,255,168,' + (.08 + Math.random() * .3).toFixed(2) + ')';
+        ctx.fillText(chars[Math.floor(Math.random() * chars.length)], c * fs, r * fs);
+      }
+    }
+  }
+
+  function size() {
+    canvas.width = innerWidth * dpr;
+    canvas.height = innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(innerWidth / fs);
+    drops = [];
+    for (var i = 0; i < cols; i++) drops.push(Math.random() * -60);
+    if (reduce) drawStatic();
+  }
+
+  function frame() {
+    raf = null;
+    if (!running) return;
+    ctx.fillStyle = 'rgba(5,8,6,.08)';
+    ctx.fillRect(0, 0, innerWidth, innerHeight);
+    ctx.font = fs + 'px ui-monospace,Consolas,monospace';
+    for (var i = 0; i < cols; i++) {
+      var ch = chars[Math.floor(Math.random() * chars.length)];
+      var y = drops[i] * fs;
+      if (y > innerHeight && Math.random() > .975) drops[i] = Math.random() * -20;
+      ctx.fillStyle = Math.random() < .05 ? '#d9ffe9' : (i % 7 === 0 ? '#6dffa8' : '#2fae6c');
+      ctx.fillText(ch, i * fs, y);
+      drops[i]++;
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  size();
+  addEventListener('resize', size);
+  document.addEventListener('visibilitychange', function () {
+    running = !document.hidden;
+    if (running && !reduce && !raf) raf = requestAnimationFrame(frame);
+  });
+  if (!reduce) raf = requestAnimationFrame(frame);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

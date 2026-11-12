@@ -3,41 +3,172 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>文字波浪 · UI Atlas 动效</title>
+<title>文字波浪 · 冒泡 BUBBLY 气泡水</title>
 <style>
-:root{--bg:#0c0d11;--ink:#f5f2e9;--muted:rgba(245,242,233,.5);--accent:#f0a35e}
+:root{--bg:#0c0d11;--ink:#f5f2e9;--muted:rgba(245,242,233,.5);--line:rgba(245,242,233,.14);--accent:#f0a35e;--lime:#c6ef7a}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{background:radial-gradient(680px 420px at 50% 12%,#1a1c25,#0c0d11 72%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden}
-.stage{min-height:100vh;display:grid;place-items:center;padding:38px 22px 84px;text-align:center}
-.wrap{width:100%;max-width:620px}
-.kicker{margin:0 0 18px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
-.line{margin:0;font-size:clamp(30px,7.4vw,50px);line-height:1.18;letter-spacing:-.04em;font-weight:640}
+body{background:radial-gradient(760px 480px at 50% 6%,#1d1610,#0c0d11 70%) fixed;color:var(--ink);font:14px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.head{max-width:1180px;margin:0 auto;height:70px;padding:0 40px;display:flex;align-items:center;gap:34px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:.04em}
+.brand .bub{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#fff,#f0a35e 58%,#b45f2a);box-shadow:0 0 12px rgba(240,163,94,.5);display:inline-block}
+.brand i{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted);font-style:normal}
+.nav{display:flex;gap:26px;font-size:12.5px;color:var(--muted)}
+.nav a:hover{color:var(--ink)}
+.hint{margin:0 0 0 auto;display:inline-flex;align-items:center;gap:7px;font:400 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);background:rgba(245,242,233,.05);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.cta{background:var(--accent);color:#241508;border-radius:999px;padding:9px 16px;font-size:12px;font-weight:700}
+.cta:hover{filter:brightness(1.07)}
+.hero{max-width:900px;margin:0 auto;padding:48px 24px 20px;text-align:center}
+.kicker{margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.28em;color:var(--muted)}
+.line{margin:0;font-size:clamp(38px,6.1vw,72px);line-height:1.16;letter-spacing:-.04em;font-weight:650}
 .line + .line{margin-top:2px}
 .ch{display:inline-block;will-change:transform}
 .line .accent{color:var(--accent)}
-.sub{margin:26px 0 0;font-size:12.5px;line-height:1.85;color:var(--muted)}
-.readout{margin:14px 0 0;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(240,163,94,.8)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.ch{will-change:auto}}
+.sub{margin:18px auto 0;max-width:32em;font-size:12.5px;line-height:1.85;color:var(--muted)}
+.readout{margin:14px 0 0;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(240,163,94,.85)}
+.cans{display:flex;align-items:flex-end;justify-content:center;gap:30px;padding:8px 20px 34px}
+.can{width:112px;height:190px;border-radius:13px 13px 15px 15px;background:linear-gradient(158deg,var(--c1),var(--c2) 58%,var(--c3));position:relative;box-shadow:0 30px 46px -26px rgba(0,0,0,.9);flex:0 0 auto}
+.can::before{content:"";position:absolute;top:-6px;left:7px;right:7px;height:12px;border-radius:50%;background:linear-gradient(#e6e0d2,#a9a293);box-shadow:inset 0 -2px 3px rgba(0,0,0,.25)}
+.can::after{content:"";position:absolute;top:2px;left:22px;right:22px;height:4px;border-radius:50%;border:1px solid rgba(0,0,0,.22)}
+.can .label{position:absolute;inset:24px 11px 14px;border-radius:7px;background:rgba(12,13,17,.86);border:1px solid rgba(245,242,233,.12);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:11px 6px 9px;text-align:center}
+.can .label b{font-size:12.5px;letter-spacing:.14em;font-weight:700}
+.can .label i{font:600 7px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(245,242,233,.62);font-style:normal}
+.can .label u{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);text-decoration:none;border-top:1px solid rgba(245,242,233,.16);padding-top:7px;width:100%}
+.c1{--c1:#e3ffb0;--c2:#9ccf52;--c3:#5c842c}
+.c2{--c1:#ffd9a0;--c2:#f5a24a;--c3:#b45f24}
+.c3{--c1:#ffb59a;--c2:#ec7550;--c3:#a33d21}
+.facts{max-width:1040px;margin:0 auto 64px;padding:34px 40px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.fact b{display:block;font:600 20px/1.2 ui-monospace,Consolas,monospace;letter-spacing:-.02em;color:var(--accent);margin-bottom:7px}
+.fact b small{font-size:10px;color:var(--muted);margin-left:3px}
+.fact h3{margin:0 0 6px;font-size:13.5px;letter-spacing:.01em}
+.fact p{margin:0;font-size:11px;line-height:1.75;color:var(--muted)}
+.band{max-width:1040px;margin:0 auto 72px;padding:34px 40px;border:1px solid rgba(240,163,94,.22);border-radius:14px;background:radial-gradient(520px 240px at 14% 0%,rgba(240,163,94,.12),transparent 70%);display:flex;align-items:center;justify-content:space-between;gap:28px}
+.band h2{margin:0;font-size:clamp(21px,2.2vw,27px);line-height:1.4;font-weight:600;letter-spacing:-.01em}
+.band h2 em{font-style:normal;color:var(--accent)}
+.band p{margin:6px 0 0;font-size:10.5px;color:var(--muted)}
+.buy{display:flex;align-items:center;gap:16px}
+.buy .price{font:600 18px/1 ui-monospace,Consolas,monospace}
+.buy .price small{display:block;font-size:8px;letter-spacing:.12em;color:var(--muted);margin-top:4px}
+footer{max-width:1180px;margin:0 auto;padding:20px 40px 26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-height:560px) and (min-width:561px){
+  .head{height:44px;padding:0 18px;gap:14px}
+  .brand{font-size:13px;gap:7px}
+  .brand .bub{width:12px;height:12px}
+  .brand i{display:none}
+  .nav{display:none}
+  .hint{margin-left:auto;font-size:8px;padding:5px 8px;gap:5px}
+  .hint::before{width:4px;height:4px}
+  .cta{font-size:9.5px;padding:6px 11px}
+  .hero{padding:14px 20px 10px}
+  .kicker{font-size:7.5px;margin-bottom:8px;letter-spacing:.22em}
+  .line{font-size:37px;line-height:1.12}
+  .sub{font-size:9px;line-height:1.65;margin-top:9px;max-width:36em}
+  .readout{font-size:7px;margin-top:7px}
+  .cans{gap:22px;padding:4px 18px 8px}
+  .can{width:78px;height:132px;border-radius:9px 9px 11px 11px}
+  .can::before{top:-4px;left:5px;right:5px;height:9px}
+  .can::after{top:1px;left:16px;right:16px;height:3px}
+  .can .label{inset:16px 7px 9px;border-radius:5px;padding:7px 4px 6px}
+  .can .label b{font-size:9px;letter-spacing:.08em}
+  .can .label i{font-size:5px;letter-spacing:.1em}
+  .can .label u{font-size:6px;padding-top:4px}
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:0;padding:9px 18px 11px}
+  .fact b{font-size:12px;margin-bottom:2px}
+  .fact b small{font-size:7px}
+  .fact h3{font-size:9px;margin-bottom:2px}
+  .fact p{font-size:7.5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  .band,footer{display:none}
+}
+@media (max-width:560px){
+  .head{height:56px;padding:0 16px;gap:10px}
+  .brand{font-size:13.5px;gap:8px}
+  .brand .bub{width:13px;height:13px}
+  .brand i{display:none}
+  .nav{display:none}
+  .hint{display:none}
+  .cta{margin-left:auto;font-size:10.5px;padding:7px 12px}
+  .hero{padding:30px 16px 14px}
+  .kicker{font-size:8px;margin-bottom:12px}
+  .line{font-size:clamp(33px,10.4vw,44px)}
+  .sub{font-size:11px;line-height:1.8;margin-top:12px}
+  .readout{font-size:8px;margin-top:10px}
+  .cans{gap:12px;padding:6px 12px 28px}
+  .can{width:96px;height:164px;border-radius:11px 11px 13px 13px}
+  .can::before{left:6px;right:6px}
+  .can .label{inset:20px 9px 12px;padding:9px 4px 7px}
+  .can .label b{font-size:10.5px;letter-spacing:.1em}
+  .can .label i{font-size:6px}
+  .can .label u{font-size:7px;padding-top:5px}
+  .facts{grid-template-columns:1fr;gap:0;padding:0 16px 30px;border-top:none}
+  .fact{padding:16px 0;border-top:1px solid var(--line)}
+  .fact b{font-size:17px}
+  .fact h3{font-size:12.5px}
+  .fact p{font-size:10.5px}
+  .band{flex-direction:column;align-items:flex-start;gap:16px;margin:0 16px 44px;padding:24px 22px}
+  .band h2{font-size:20px}
+  footer{flex-wrap:wrap;padding:16px 16px 22px;font-size:8px}
+  footer span:last-child{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .ch{will-change:auto}
+  .cta{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">TYPE / 09</p>
-    <h1 class="line" id="l1" aria-label="动起来的时候，">动起来的时候，</h1>
-    <h1 class="line" id="l2" aria-label="字也有呼吸。">字也有呼吸。</h1>
-    <p class="sub">每个字一个 span，共用一条时间线；相位按字符序号错开 0.36，幅度由光标横向位置决定。只改 transform，字体渲染不重排。</p>
-    <p class="readout" id="readout">AMPLITUDE · 9px</p>
-  </div>
+
+<header class="head">
+  <a class="brand" href="#top"><span class="bub"></span>冒泡<i>BUBBLY</i></a>
+  <nav class="nav" aria-label="主导航">
+    <a href="#flavors">口味</a>
+    <a href="#facts">配方</a>
+    <a href="#buy">购买</a>
+  </nav>
+  <p class="hint">左右移动光标，改变气泡强度</p>
+  <a class="cta" href="#buy">买一箱</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <p class="kicker">SPARKLING WATER / NO.04</p>
+    <h1 class="line" id="l1" aria-label="开罐之前，">开罐之前，</h1>
+    <h1 class="line" id="l2" aria-label="先摇一摇。">先摇<span class="accent">一摇</span>。</h1>
+    <p class="sub">零糖，4.2 倍气泡，冰到 4°C。气够足的时候，字会自己跳起来——不顺眼的话，把光标往左挪。</p>
+    <p class="readout" id="readout">BUBBLE FORCE · 9px</p>
+  </section>
+
+  <section class="cans" id="flavors" aria-label="三种口味">
+    <div class="can c1"><div class="label"><b>青柠</b><i>LIME · 0 SUGAR</i><u>4.2 GV</u></div></div>
+    <div class="can c2"><div class="label"><b>柚子</b><i>YUZU · 0 SUGAR</i><u>4.2 GV</u></div></div>
+    <div class="can c3"><div class="label"><b>血橙</b><i>BLOOD ORANGE</i><u>4.2 GV</u></div></div>
+  </section>
+
+  <section class="facts" id="facts" aria-label="配方">
+    <div class="fact"><b>0<small>g</small></b><h3>糖，一点都没有</h3><p>只用赤藓糖醇收一点尾，喝完不粘牙。</p></div>
+    <div class="fact"><b>4.2<small>GV</small></b><h3>气，多一点</h3><p>比常规气泡水多 40%，倒进杯子还能听见。</p></div>
+    <div class="fact"><b>4<small>°C</small></b><h3>冰，刚好</h3><p>冷藏四小时再开。常温喝，气会散得太快。</p></div>
+  </section>
+
+  <section class="band" id="buy">
+    <div>
+      <h2>一箱 12 罐，<em>冰好再送</em>。</h2>
+      <p>青柠 / 柚子 / 血橙 各 4 罐 · 顺丰冷链 · 上海次日达</p>
+    </div>
+    <div class="buy">
+      <p class="price">¥128<small>12 CANS</small></p>
+      <a class="btn cta" href="#top">加入购物车</a>
+    </div>
+  </section>
 </main>
-<p class="hint">移动光标左右，改变波幅</p>
+
+<footer>
+  <span>© 2026 冒泡 BUBBLY · 上海</span>
+  <span>配方 · 配送 · 联系</span>
+</footer>
+
 <script>
 (function () {
   var lines = [document.getElementById('l1'), document.getElementById('l2')];
@@ -57,12 +188,17 @@ body{background:radial-gradient(680px 420px at 50% 12%,#1a1c25,#0c0d11 72%);colo
       chars.push(span);
     });
   });
+  /* 第二行第 3、4 个字用强调色（原文为 <span class="accent">一摇</span>） */
+  var l2 = lines[1];
+  [].slice.call(l2.querySelectorAll('.ch')).forEach(function (ch, i) {
+    if (i === 2 || i === 3) ch.classList.add('accent');
+  });
 
   var amp = 9, targetAmp = 9;
 
   function setAmp(v) {
     targetAmp = v;
-    readout.textContent = 'AMPLITUDE · ' + Math.round(v) + 'px';
+    readout.textContent = 'BUBBLE FORCE · ' + Math.round(v) + 'px';
   }
 
   if (reduce) {
@@ -95,6 +231,61 @@ body{background:radial-gradient(680px 420px at 50% 12%,#1a1c25,#0c0d11 72%);colo
   });
 
   raf = requestAnimationFrame(loop);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

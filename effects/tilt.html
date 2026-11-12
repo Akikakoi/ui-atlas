@@ -3,66 +3,271 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>3D 倾斜卡片 · UI Atlas 动效</title>
+<title>3D 倾斜卡片 · AURUM 金属卡</title>
 <style>
-:root{--bg:#0e1117;--ink:#f2f4f8;--muted:#8b93a7;--accent:#8fb4ff}
+:root{--bg:#0b0e15;--ink:#f2f4f8;--muted:#8b93a7;--accent:#8fb4ff;--line:rgba(242,244,248,.12)}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
+html,body{margin:0}
 body{background:
-  radial-gradient(600px 300px at 50% -10%,rgba(80,120,220,.28),transparent 70%),
-  radial-gradient(400px 240px at 100% 100%,rgba(160,90,220,.18),transparent 70%),var(--bg);
-  color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden}
-.stage{min-height:100vh;display:grid;place-items:center;padding:36px 22px 70px}
-.scene{perspective:900px;width:min(340px,86vw)}
-.card{position:relative;aspect-ratio:1.62;border-radius:18px;padding:20px;color:#0c1220;
-  background:linear-gradient(135deg,#e9eeff 0%,#c9d8ff 46%,#a7bdff 100%);
-  box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.9);
+  radial-gradient(640px 340px at 52% -8%,rgba(80,120,220,.26),transparent 70%),
+  radial-gradient(460px 280px at 104% 92%,rgba(150,90,220,.16),transparent 70%),
+  var(--bg);
+  color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.nav{position:sticky;top:0;z-index:8;height:68px;display:flex;align-items:center;gap:30px;
+  padding:0 max(22px,calc((100vw - 1160px)/2));background:rgba(11,14,21,.78);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(242,244,248,.07)}
+.brand{display:flex;align-items:baseline;gap:9px;font-size:12px;font-weight:700;letter-spacing:.26em;text-decoration:none;white-space:nowrap}
+.brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.nav-links{display:flex;gap:24px;margin-left:8px}
+.nav-links a{font-size:12.5px;color:rgba(242,244,248,.62);text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.btn{margin-left:auto;height:38px;padding:0 18px;border-radius:999px;border:1px solid rgba(242,244,248,.22);
+  color:var(--ink);font-size:12px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.solid{background:#e8eefc;border-color:#e8eefc;color:#0b0e15}
+.btn.solid:hover{background:#fff;color:#0b0e15}
+.hero{max-width:1160px;margin:0 auto;padding:clamp(44px,6vw,86px) 22px 58px;
+  display:grid;grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr);gap:clamp(28px,4.4vw,56px);align-items:center;
+  min-height:calc(100vh - 68px)}
+.kicker{margin:0 0 18px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+h1{margin:0;font-size:clamp(44px,6vw,80px);line-height:.98;letter-spacing:-.055em;font-weight:620}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:#b9cdfb}
+.lede{margin:24px 0 0;max-width:27em;font-size:13.5px;line-height:1.9;color:rgba(242,244,248,.58)}
+.cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:30px}
+.cta .btn{margin-left:0;height:44px;padding:0 21px;font-size:13px}
+.cta .btn.solid{border-color:#e8eefc}
+.meta{display:flex;align-items:center;gap:14px;margin-top:30px;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;
+  letter-spacing:.14em;color:rgba(242,244,248,.4)}
+.meta b{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--accent)}
+.meta b::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.scene{perspective:1100px;width:min(400px,100%)}
+.card{position:relative;aspect-ratio:1.62;border-radius:20px;padding:22px;color:#0c1220;
+  background:
+    radial-gradient(120% 120% at 20% 10%,rgba(255,255,255,.9),transparent 42%),
+    linear-gradient(135deg,#eef2ff 0%,#ccd9fa 44%,#9fb6f1 100%);
+  box-shadow:0 34px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.95);
   transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.8,.2,1);
   will-change:transform;cursor:grab;overflow:hidden}
 .card.on{transition:transform .1s linear}
+.card::before{content:"";position:absolute;left:-30%;top:-60%;width:90%;height:220%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.5) 45%,transparent 62%);
+  transform:rotate(14deg);opacity:.34;pointer-events:none}
 .card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:radial-gradient(280px circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.85),transparent 60%);
+  background:radial-gradient(280px circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.9),transparent 60%);
   mix-blend-mode:screen;opacity:.7}
 .card>*{position:relative;z-index:1;transform:translateZ(26px)}
-.top{display:flex;justify-content:space-between;align-items:flex-start;font:600 10px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.16em}
-.brand{font:700 12px/1 -apple-system,"Segoe UI",sans-serif;letter-spacing:.02em}
-.chip{width:34px;height:24px;border-radius:5px;background:linear-gradient(135deg,#f7d774,#c99b28);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
-.mid{margin-top:22px}
-.mid b{display:block;font-size:clamp(17px,4.4vw,22px);letter-spacing:-.02em}
-.mid span{display:block;margin-top:3px;font:600 10.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.1em;opacity:.6}
-.bot{position:absolute;left:20px;right:20px;bottom:18px;display:flex;justify-content:space-between;align-items:flex-end;
-  font:600 10.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.08em;transform:translateZ(38px)}
-.bot em{font-style:normal;font-size:15px;letter-spacing:.06em}
-.floor{width:min(340px,86vw);height:26px;margin:20px auto 0;border-radius:50%;background:rgba(0,0,0,.55);filter:blur(18px)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+.top{display:flex;justify-content:space-between;align-items:flex-start}
+.top .brand{font-size:11px;letter-spacing:.24em;color:#1d2b4a}
+.top .brand span{color:#64749a}
+.chip{width:36px;height:25px;border-radius:5px;background:linear-gradient(135deg,#f7d774,#c99b28);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.chip::before{content:"";display:block;width:100%;height:100%;
+  background:repeating-linear-gradient(90deg,transparent 0 7px,rgba(0,0,0,.1) 7px 8px);border-radius:inherit}
+.mid{margin-top:20px}
+.mid b{display:block;font-size:clamp(20px,3vw,26px);letter-spacing:-.03em;font-weight:560}
+.mid span{display:block;margin-top:3px;font:600 10px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.14em;opacity:.55}
+.bot{position:absolute;left:22px;right:22px;bottom:18px;display:flex;justify-content:space-between;align-items:flex-end;
+  font:600 10px/1.45 ui-monospace,Consolas,monospace;letter-spacing:.1em;transform:translateZ(38px)}
+.bot em{font-style:normal;font-size:17px;letter-spacing:.08em}
+.ring{position:absolute;right:16%;top:24%;width:72px;height:72px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 0 26px rgba(255,255,255,.35);opacity:.7}
+.floor{width:min(400px,100%);height:28px;margin:20px auto 0;border-radius:50%;background:rgba(0,0,0,.6);filter:blur(20px)}
+.cap{margin:16px 0 0;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:rgba(242,244,248,.36);text-align:center}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);max-width:1160px;margin:0 auto;padding:0 22px;border-top:1px solid var(--line)}
+.stat{padding:26px 10px;border-left:1px solid var(--line)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{display:block;font:500 26px/1 ui-monospace,Consolas,monospace;letter-spacing:-.04em;color:#cddcff}
+.stat span{display:block;margin-top:7px;font-size:10.5px;color:var(--muted)}
+.sec{max-width:1160px;margin:0 auto;padding:62px 22px 24px}
+h2{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
+.benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.benefits article{border:1px solid var(--line);border-radius:14px;padding:22px 20px;background:rgba(255,255,255,.03)}
+.benefits span{display:block;margin-bottom:14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent)}
+.benefits h3{margin:0 0 8px;font-size:15px;letter-spacing:-.01em}
+.benefits p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.spec{max-width:1160px;margin:0 auto;padding:26px 22px 62px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:42px;align-items:center}
+.spec .art{height:260px;border-radius:14px;border:1px solid var(--line);position:relative;overflow:hidden;
+  background:linear-gradient(150deg,#1b2338,#0c1019 65%)}
+.spec .art::before{content:"";position:absolute;left:18%;right:18%;top:50%;height:118px;border-radius:12px;
+  transform:translateY(-50%) rotate(-6deg);
+  background:linear-gradient(135deg,#eef2ff,#b7c8f2 55%,#8ba6e6);box-shadow:0 24px 50px rgba(0,0,0,.5)}
+.spec .art::after{content:"";position:absolute;left:26%;right:26%;top:50%;height:2px;transform:translateY(-50%) rotate(-6deg);
+  background:rgba(20,30,55,.35)}
+.spec dl{margin:0;display:grid;grid-template-columns:1fr 1fr;gap:18px 26px}
+.spec dt{font:600 9.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.spec dd{margin:5px 0 0;font-size:14px;letter-spacing:-.01em}
+.band{max-width:1160px;margin:0 auto;padding:0 22px 30px}
+.inner{border:1px solid rgba(143,180,255,.28);border-radius:16px;padding:28px 26px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(143,180,255,.1),rgba(143,180,255,.015) 60%)}
+.inner h2{margin:0 0 6px;font-size:clamp(21px,2.8vw,30px)}
+.inner p{margin:0;font-size:12px;color:var(--muted)}
+.inner .btn{margin-left:auto;height:42px;padding:0 20px}
+.foot{max-width:1160px;margin:0 auto;padding:0 22px 28px;display:flex;gap:18px;flex-wrap:wrap;
+  border-top:1px solid var(--line);padding-top:18px;font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.foot span:last-child{margin-left:auto}
+.hint{position:fixed;left:auto;right:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);
+  pointer-events:none;z-index:9;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;min-height:0}
+  .stage{order:-1}
+  .scene{width:min(340px,82vw)}
+  .floor{width:min(340px,82vw)}
+  .benefits{grid-template-columns:1fr}
+  .spec{grid-template-columns:1fr;gap:26px}
+}
+@media (max-width:560px){
+  .nav{height:56px;padding:0 16px;gap:14px}
+  .nav-links{display:none}
+  .brand span{display:none}
+  .hero{padding:32px 16px 44px}
+  .scene{width:min(310px,88vw)}
+  .floor{width:min(310px,88vw);margin-top:14px}
+  h1{font-size:clamp(38px,11.5vw,54px)}
+  .lede{font-size:12.5px}
+  .cta .btn{height:42px}
+  .meta{flex-wrap:wrap;gap:8px 14px}
+  .stats{grid-template-columns:1fr;padding:0 16px}
+  .stat{border-left:0;padding:18px 0;border-top:1px solid var(--line)}
+  .stat:first-child{border-top:0}
+  .sec,.spec,.band,.foot{padding-left:16px;padding-right:16px}
+  .inner .btn{margin-left:0}
+  .foot{padding-top:16px}
+  .foot span:last-child{margin-left:0}
+  .hint{left:auto;right:12px;bottom:10px;font-size:10px}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:48px;padding:0 18px;gap:20px}
+  .nav-links{display:none}
+  .brand span{display:none}
+  .hero{min-height:calc(100vh - 48px);grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);
+    padding:12px 22px;gap:18px;align-items:center}
+  .kicker{display:none}
+  h1{font-size:clamp(27px,4.4vw,36px)}
+  .lede{margin-top:10px;font-size:10px;line-height:1.7;max-width:25em}
+  .cta{margin-top:12px;gap:8px}
+  .cta .btn{height:34px;padding:0 14px;font-size:11px}
+  .meta{display:none}
+  .scene{width:238px}
+  .floor{width:238px;margin-top:12px}
+  .card{padding:15px;border-radius:14px}
+  .top .brand{font-size:9px}
+  .chip{width:28px;height:19px}
+  .mid{margin-top:12px}
+  .mid b{font-size:18px}
+  .mid span{font-size:8px}
+  .bot{left:15px;right:15px;bottom:12px;font-size:8px}
+  .bot em{font-size:13px}
+  .ring{width:48px;height:48px;right:14%}
+  .cap{display:none}
+  .stats,.sec,.spec,.band,.foot{display:none}
+  .hint{left:auto;right:12px;bottom:10px;font-size:10px}
+}
+@media (hover:none),(max-width:560px){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .card{transform:none!important}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div>
-    <div class="scene">
-      <div class="card" id="card">
-        <div class="top"><span class="brand">UI ATLAS</span><span class="chip"></span></div>
-        <div class="mid"><b>林柯</b><span>MEMBER · 0042</span></div>
-        <div class="bot"><span>VALID<br>12 / 2029</span><em>◆</em></div>
+
+<header class="nav">
+  <a class="brand" href="#top">AURUM<span>METAL CARD</span></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#benefits">权益</a>
+    <a href="#detail">卡片</a>
+    <a href="#apply">费率</a>
+  </nav>
+  <a class="btn" href="#apply">申请邀请</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">METAL CHARGE CARD · INVITE ONLY</p>
+      <h1>把分量，<br><em>握在手里。</em></h1>
+      <p class="lede">0.8 毫米不锈钢，细拉丝表面，卡号只印在背面。不拍照，不镀金，只在结账时安静地重一点。</p>
+      <div class="cta">
+        <a class="btn solid" href="#apply">申请邀请 →</a>
+        <a class="btn" href="#benefits">查看权益</a>
       </div>
+      <div class="meta"><b>INVITE ONLY</b><span>2026 年度 · 剩 420 个名额</span></div>
     </div>
-    <div class="floor"></div>
+    <div class="stage">
+      <div class="scene">
+        <div class="card" id="card">
+          <div class="top"><span class="brand">AURUM<span> · 金属卡</span></span><span class="chip"></span></div>
+          <div class="ring" aria-hidden="true"></div>
+          <div class="mid"><b>林柯</b><span>MEMBER · 0042</span></div>
+          <div class="bot"><span>VALID<br>12 / 2029</span><em>◆</em></div>
+        </div>
+      </div>
+      <div class="floor" aria-hidden="true"></div>
+      <p class="cap">在卡片上移动光标 · 16° / 18°</p>
+    </div>
+  </section>
+
+  <div class="stats" aria-label="卡片参数">
+    <div class="stat"><b>0.8 mm</b><span>304 不锈钢</span></div>
+    <div class="stat"><b>2.4%</b><span>全网消费返现</span></div>
+    <div class="stat"><b>无限</b><span>机场贵宾厅</span></div>
+  </div>
+
+  <section class="sec" id="benefits">
+    <p class="kicker">BENEFITS</p>
+    <h2>三件不用额外申请的事。</h2>
+    <div class="benefits">
+      <article><span>01 / TRAVEL</span><h3>晚到也有房间</h3><p>航班延误四小时以上，合作酒店保留房间到第二天中午，不用打电话解释。</p></article>
+      <article><span>02 / TABLE</span><h3>两个人的位置</h3><p>合作餐厅当天留位，提前两小时说一声即可；取消不收费，也不追问理由。</p></article>
+      <article><span>03 / DESK</span><h3>一个记得你的号码</h3><p>同一组人接电话，知道你的座位偏好和过敏史。不需要每次从头讲。</p></article>
+    </div>
+  </section>
+
+  <section class="spec" id="detail">
+    <div class="art" role="img" aria-label="金属卡侧面拉丝质感"></div>
+    <div>
+      <p class="kicker">THE CARD ITSELF</p>
+      <h2>重 18 克，<br>边角是 C 形。</h2>
+      <dl>
+        <div><dt>材质</dt><dd>304 不锈钢 · 细拉丝</dd></div>
+        <div><dt>重量</dt><dd>18 g</dd></div>
+        <div><dt>厚度</dt><dd>0.8 mm</dd></div>
+        <div><dt>支付</dt><dd>NFC · 磁条 · 芯片</dd></div>
+        <div><dt>卡号</dt><dd>仅背面 · 激光蚀刻</dd></div>
+        <div><dt>挂失</dt><dd>一通电话 · 48 小时补卡</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="band" id="apply">
+    <div class="inner">
+      <div>
+        <h2>今年只发 1,000 张。</h2>
+        <p>留下邮箱，我们把邀请和费率一起寄给你。</p>
+      </div>
+      <a class="btn solid" href="mailto:invite@aurum.card">申请邀请 →</a>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>AURUM · 金属信用卡</span>
+    <span>上海 · 香港</span>
+    <span>© 2026</span>
   </div>
 </main>
+
 <p class="hint">在卡片上移动光标，注意高光与层深</p>
 <script>
 (function () {
   var card = document.getElementById('card');
   if (!card || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var on = false;
-  card.addEventListener('pointerenter', function () { on = true; card.classList.add('on'); });
+  card.addEventListener('pointerenter', function () { card.classList.add('on'); });
   card.addEventListener('pointermove', function (e) {
     var r = card.getBoundingClientRect();
     var px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
@@ -71,7 +276,62 @@ body{background:
     card.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
   });
   card.addEventListener('pointerleave', function () {
-    on = false; card.classList.remove('on'); card.style.transform = '';
+    card.classList.remove('on'); card.style.transform = '';
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>旋钮拖拽 · AURORA 母带工程</title>
+<style>
+:root{--bg:#0b0d11;--panel:#12161d;--panel2:#171c25;--ink:#f2f3ee;--muted:#8b8f9b;--line:rgba(255,255,255,.10);--accent:#8ef0c8;--gold:#ffcf6e}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+button{font:inherit}
+a{color:inherit}
+.app{min-height:100vh;display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+.topbar{display:flex;align-items:center;gap:20px;height:52px;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(11,13,17,.94)}
+.brand{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:650;letter-spacing:.16em;text-decoration:none;white-space:nowrap}
+.brand i{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--accent),#2c8d6c 70%);box-shadow:0 0 12px rgba(142,240,200,.45)}
+.proj{display:flex;flex-direction:column;line-height:1.25;padding-left:18px;border-left:1px solid var(--line);min-width:0}
+.proj b{font-size:12.5px;white-space:nowrap}
+.proj span{font:10.5px/1.4 ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.04em}
+.tabs{display:flex;gap:18px;margin-left:4px}
+.tabs a{font-size:12px;color:var(--muted);text-decoration:none;padding:7px 0;border-bottom:1px solid transparent}
+.tabs a:hover{color:var(--ink)}
+.tabs a.on{color:var(--ink);border-color:var(--accent)}
+.grow{flex:1}
+.top-actions{display:flex;align-items:center;gap:12px}
+.save{display:flex;align-items:center;gap:6px;font:10px ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.04em}
+.save i{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 7px var(--accent)}
+.avatar{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(150deg,#ffcf6e,#c98f3a);color:#171207;font-size:10px;font-weight:700}
+.export{border:0;border-radius:7px;background:var(--accent);color:#07110d;font-size:11.5px;font-weight:650;padding:7px 12px;cursor:pointer}
+.export:hover{filter:brightness(1.06)}
+.shell{display:grid;grid-template-columns:216px minmax(0,1fr);min-height:0}
+.sidebar{border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:20px;background:rgba(18,22,29,.55);overflow:auto}
+.side-k{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted);padding:0 8px;margin:0 0 8px}
+.track{display:flex;align-items:baseline;gap:8px;padding:7px 8px;border-radius:6px;font-size:12px;color:#c9cdd6}
+.track span{margin-left:auto;font:10px ui-monospace,Consolas,monospace;color:var(--muted)}
+.track.on{background:rgba(142,240,200,.08);color:var(--ink)}
+.chain{display:grid;gap:2px}
+.step{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;font-size:11.5px;color:var(--muted)}
+.step i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.18);flex:0 0 5px}
+.step em{margin-left:auto;font:9px ui-monospace,Consolas,monospace;font-style:normal;color:var(--muted)}
+.step.on{color:var(--ink);background:rgba(255,255,255,.05)}
+.step.on i{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.side-foot{margin-top:auto;font-size:10px;line-height:1.7;color:var(--muted);padding:0 8px;border-top:1px solid var(--line);padding-top:12px}
+.side-foot b{display:block;color:#c9cdd6;font-weight:500;font-size:10.5px}
+.main{min-width:0;padding:20px 24px;overflow:auto}
+.workhead{display:flex;align-items:flex-end;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.crumb{font:10px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);margin:0 0 3px}
+h1{margin:0;font-size:22px;letter-spacing:-.02em;font-weight:620}
+.workhead .meta{margin-left:auto;display:flex;gap:8px;align-items:center}
+.pill{border:1px solid var(--line);border-radius:999px;padding:4px 9px;font:10px ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted);background:transparent;cursor:default}
+button.pill{cursor:pointer}
+button.pill:hover{color:var(--ink);border-color:rgba(255,255,255,.24)}
+button.pill[aria-pressed="true"]{color:var(--gold);border-color:rgba(255,207,110,.35);background:rgba(255,207,110,.07)}
+.console{background:linear-gradient(180deg,#151a23,#10141b);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;grid-template-columns:minmax(190px,1fr) minmax(190px,.9fr);gap:22px;box-shadow:0 18px 44px -26px rgba(0,0,0,.8)}
+.knob-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-width:0}
+.kicker{margin:0;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+.knob-wrap{position:relative;width:var(--knob,226px);height:var(--knob,226px);margin:2px auto 0;touch-action:none}
+.ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(0deg)}
+.ring circle{fill:none;stroke-width:5;stroke-linecap:round}
+.ring .track{stroke:rgba(255,255,255,.09);stroke-dasharray:386 515;transform:rotate(135deg);transform-origin:100px 100px}
+.ring .value{stroke:var(--accent);stroke-dasharray:386 515;stroke-dashoffset:232;transform:rotate(135deg);transform-origin:100px 100px;
+  transition:stroke-dashoffset .2s ease;filter:drop-shadow(0 0 6px rgba(142,240,200,.45))}
+.knob{position:absolute;left:50%;top:50%;width:65%;height:65%;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 50% 32%,#252b38,#141922 62%,#0f1319);border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 18px 34px -20px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.09);cursor:grab;outline:none;
+  display:grid;place-items:center}
+.knob:active{cursor:grabbing}
+.knob:focus-visible{box-shadow:0 0 0 3px rgba(142,240,200,.4),0 18px 34px -20px rgba(0,0,0,.9)}
+.needle{position:absolute;left:50%;bottom:50%;width:2px;height:39%;border-radius:2px;
+  background:linear-gradient(to top,rgba(142,240,200,.18),var(--accent) 55%,#eafff7);
+  transform-origin:50% 100%;transform:translateX(-50%) rotate(0deg);transition:transform .12s linear;
+  filter:drop-shadow(0 0 5px rgba(142,240,200,.55))}
+.wrap.dragging .needle,.wrap.dragging .ring .value{transition:none}
+.num{font:600 34px/1 "SF Mono",ui-monospace,Consolas,monospace;letter-spacing:-.05em}
+.num small{font-size:.34em;color:var(--muted);margin-left:2px;letter-spacing:0}
+.ticks{position:absolute;inset:0;pointer-events:none}
+.ticks i{position:absolute;left:50%;top:50%;width:1px;height:7px;background:rgba(255,255,255,.22);transform-origin:50% 0}
+.ticks i.on{background:var(--accent)}
+.knob-foot{display:flex;align-items:baseline;gap:8px;font:10px ui-monospace,Consolas,monospace;color:var(--muted)}
+.knob-foot b{color:var(--gold);font-weight:500}
+.params{display:flex;flex-direction:column;border-left:1px solid var(--line);padding-left:18px;min-width:0}
+.param{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:11.5px}
+.param:last-child{border-bottom:0}
+.param span{color:var(--muted)}
+.param b{font:12px ui-monospace,Consolas,monospace;font-weight:500;color:#dfe5f0;white-space:nowrap}
+.gr{margin-top:auto;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:rgba(0,0,0,.18)}
+.gr-top{display:flex;justify-content:space-between;font:9.5px ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.1em;margin-bottom:7px}
+.gr-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.gr-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--accent));border-radius:inherit;transition:width .12s linear}
+.bypassed .knob,.bypassed .ring,.bypassed .ticks{opacity:.32}
+.bypassed .knob{cursor:not-allowed}
+.history{margin-top:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:rgba(18,22,29,.6)}
+.history h2{margin:0;padding:11px 14px;font-size:12px;font-weight:600;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.history h2 span{font:9.5px ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.08em;font-weight:400}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);text-align:left;padding:9px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--line)}
+td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.05);color:#c9cdd6}
+tr:last-child td{border-bottom:0}
+td.ok{color:var(--accent)}
+.statusbar{display:flex;align-items:center;gap:18px;height:28px;padding:0 18px;border-top:1px solid var(--line);font:10px ui-monospace,Consolas,monospace;color:var(--muted);background:#0a0c10;letter-spacing:.04em;white-space:nowrap;overflow:hidden}
+.statusbar .grow{flex:1}
+.hint{position:fixed;left:16px;bottom:36px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:3}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .tabs{display:none}
+}
+@media (max-width:560px){
+  .console{grid-template-columns:1fr;gap:14px}
+  .params{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:6px}
+  .workhead .meta{margin-left:0}
+  .top-actions .save{display:none}
+  .proj span{display:none}
+  .statusbar span.optional{display:none}
+  .num{font-size:28px}
+}
+@media (max-height:560px){
+  .topbar{height:42px;gap:12px;padding:0 12px}
+  .brand{font-size:10px}
+  .proj{padding-left:12px}
+  .proj span{display:none}
+  .tabs{display:none}
+  .main{padding:12px 14px;display:flex;flex-direction:column}
+  .workhead{margin-bottom:8px;align-items:center}
+  .crumb{display:none}
+  h1{font-size:17px}
+  .workhead .meta .pill:not(button){display:none}
+  .console{flex:1;align-content:center;padding:12px 18px;gap:14px;grid-template-columns:minmax(160px,1fr) minmax(180px,.92fr);border-radius:11px}
+  .knob-wrap{--knob:190px}
+  .kicker{display:none}
+  .num{font-size:26px}
+  .param{padding:5px 0}
+  .gr{margin-top:6px;padding:7px 10px}
+  .history{display:none}
+  .statusbar{height:24px;font-size:9px;gap:12px;padding:0 12px}
+  .hint{left:12px;bottom:32px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .needle,.ring .value,.gr-bar i{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="#"><i></i>AURORA</a>
+    <div class="proj"><b>夜航 · EP</b><span>MASTER 02 · 96 kHz</span></div>
+    <nav class="tabs" aria-label="工程视图">
+      <a class="on" href="#">工程</a>
+      <a href="#">母带链</a>
+      <a href="#">导出历史</a>
+    </nav>
+    <span class="grow"></span>
+    <div class="top-actions">
+      <span class="save"><i></i>已保存 14:02</span>
+      <span class="avatar" aria-label="账户：林一">林</span>
+      <button class="export" type="button">导出母带</button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar" aria-label="工程侧栏">
+      <div>
+        <p class="side-k">曲目</p>
+        <div class="track on"><span>01</span>夜航<span>03:42</span></div>
+        <div class="track"><span>02</span>灯塔<span>04:18</span></div>
+        <div class="track"><span>03</span>潮汐<span>03:07</span></div>
+      </div>
+      <div>
+        <p class="side-k">母带链</p>
+        <div class="chain">
+          <div class="step"><i></i>Tone EQ<em>ON</em></div>
+          <div class="step on"><i></i>Compressor<em>01</em></div>
+          <div class="step"><i></i>Limiter<em>ON</em></div>
+          <div class="step"><i></i>Dither<em>24</em></div>
+        </div>
+      </div>
+      <div class="side-foot">
+        <b>工程备注</b>
+        人声在 2.8 kHz 略抢，压缩后补一点空气感。母带上限 -1.0 dBTP。
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="workhead">
+        <div>
+          <p class="crumb">MASTERING CHAIN / COMPRESSOR</p>
+          <h1>压缩器 · BUS 01</h1>
+        </div>
+        <div class="meta">
+          <span class="pill">96 kHz · 24-bit</span>
+          <button class="pill" id="bypass" type="button" aria-pressed="false">旁路 B</button>
+        </div>
+      </div>
+
+      <section class="console" id="console" aria-label="压缩器参数">
+        <div class="knob-side">
+          <p class="kicker">OUTPUT GAIN</p>
+          <div class="knob-wrap" id="wrap">
+            <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+              <circle class="track" cx="100" cy="100" r="82"/>
+              <circle class="value" id="arc" cx="100" cy="100" r="82"/>
+            </svg>
+            <div class="ticks" id="ticks" aria-hidden="true"></div>
+            <div class="knob" id="knob" role="slider" tabindex="0" aria-label="输出增益" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40">
+              <span class="needle" id="needle"></span>
+              <span class="num"><b id="num">40</b><small>%</small></span>
+            </div>
+          </div>
+          <div class="knob-foot">增益缩减 <b id="gr-read">-2.1 dB</b><span>·</span><span>峰值 -1.0 dBTP</span></div>
+        </div>
+
+        <div class="params" role="group" aria-label="压缩器固定参数">
+          <div class="param"><span>Threshold</span><b>-18.2 dB</b></div>
+          <div class="param"><span>Ratio</span><b>2.4 : 1</b></div>
+          <div class="param"><span>Attack</span><b>12 ms</b></div>
+          <div class="param"><span>Release</span><b>180 ms</b></div>
+          <div class="param"><span>Makeup</span><b>+1.8 dB</b></div>
+          <div class="gr">
+            <div class="gr-top"><span>GAIN REDUCTION</span><b id="gr-num">-2.1 dB</b></div>
+            <div class="gr-bar"><i id="gr-fill" style="width:27%"></i></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="history">
+        <h2>导出历史<span>最近 3 次</span></h2>
+        <table>
+          <thead><tr><th>时间</th><th>格式</th><th>响度</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>今天 14:02</td><td>WAV · 24-bit</td><td>-9.4 LUFS</td><td class="ok">已完成</td></tr>
+            <tr><td>今天 11:36</td><td>MP3 · 320 kbps</td><td>-9.6 LUFS</td><td class="ok">已完成</td></tr>
+            <tr><td>昨天 21:18</td><td>WAV · 24-bit</td><td>-9.4 LUFS</td><td>已归档</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <div class="statusbar">
+    <span>96 kHz / 24-bit</span>
+    <span class="optional">BUFFER 0.8 ms</span>
+    <span class="grow"></span>
+    <span class="optional">CPU 12%</span>
+    <span>自动保存 14:02</span>
+  </div>
+</div>
+
+<p class="hint">按住旋钮转一圈；方向键也能调</p>
+<script>
+(function () {
+  var wrap = document.getElementById('wrap'), knob = document.getElementById('knob');
+  var needle = document.getElementById('needle'), arc = document.getElementById('arc');
+  var num = document.getElementById('num'), ticks = document.getElementById('ticks');
+  var consoleEl = document.getElementById('console');
+  var bypass = document.getElementById('bypass');
+  var grFill = document.getElementById('gr-fill'), grNum = document.getElementById('gr-num'), grRead = document.getElementById('gr-read');
+  var C = 2 * Math.PI * 82, SWEEP = C * .75;
+  var val = 40, dragging = false;
+
+  for (var i = 0; i <= 10; i++) {
+    var t = document.createElement('i');
+    t.style.transform = 'rotate(' + (-135 + i * 27) + 'deg) translateY(calc(var(--knob, 226px) * -.426))';
+    ticks.appendChild(t);
+  }
+  var marks = [].slice.call(ticks.children);
+
+  function paint(v) {
+    val = Math.max(0, Math.min(100, v));
+    var a = -135 + val * 2.7;
+    needle.style.transform = 'translateX(-50%) rotate(' + a.toFixed(2) + 'deg)';
+    arc.style.strokeDashoffset = (SWEEP * (1 - val / 100)).toFixed(1);
+    num.textContent = Math.round(val);
+    knob.setAttribute('aria-valuenow', String(Math.round(val)));
+    marks.forEach(function (m, i) { m.classList.toggle('on', i * 10 <= val + .5); });
+    var gr = (val * .032 + .8).toFixed(1);
+    grFill.style.width = Math.max(6, val * .68).toFixed(0) + '%';
+    grNum.textContent = '-' + gr + ' dB';
+    grRead.textContent = '-' + gr + ' dB';
+  }
+
+  function fromPoint(x, y) {
+    if (knob.getAttribute('aria-disabled') === 'true') return;
+    var r = knob.getBoundingClientRect();
+    var deg = Math.atan2(y - (r.top + r.height / 2), x - (r.left + r.width / 2)) * 180 / Math.PI + 90;
+    if (deg > 180) deg -= 360;
+    if (deg < -180) deg += 360;
+    paint((Math.max(-135, Math.min(135, deg)) + 135) / 2.7);
+  }
+
+  knob.addEventListener('pointerdown', function (e) {
+    if (knob.getAttribute('aria-disabled') === 'true') return;
+    dragging = true;
+    wrap.classList.add('dragging');
+    knob.setPointerCapture(e.pointerId);
+    knob.focus();
+    fromPoint(e.clientX, e.clientY);
+  });
+  knob.addEventListener('pointermove', function (e) { if (dragging) fromPoint(e.clientX, e.clientY); });
+  function end() {
+    if (!dragging) return;
+    dragging = false;
+    wrap.classList.remove('dragging');
+    var snap = Math.round(val / 10) * 10;
+    if (Math.abs(snap - val) < 3.2) paint(snap);
+  }
+  knob.addEventListener('pointerup', end);
+  knob.addEventListener('pointercancel', end);
+
+  knob.addEventListener('keydown', function (e) {
+    if (knob.getAttribute('aria-disabled') === 'true') return;
+    var step = e.shiftKey ? 10 : 5, hit = true;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') paint(val + step);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') paint(val - step);
+    else if (e.key === 'Home') paint(0);
+    else if (e.key === 'End') paint(100);
+    else hit = false;
+    if (hit) e.preventDefault();
+  });
+
+  bypass.addEventListener('click', function () {
+    var on = bypass.getAttribute('aria-pressed') !== 'true';
+    bypass.setAttribute('aria-pressed', on ? 'true' : 'false');
+    consoleEl.classList.toggle('bypassed', on);
+    knob.setAttribute('aria-disabled', on ? 'true' : 'false');
+    knob.tabIndex = on ? -1 : 0;
+    if (on) {
+      dragging = false;
+      wrap.classList.remove('dragging');
+    }
+  });
+
+  paint(val);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

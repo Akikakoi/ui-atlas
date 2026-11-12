@@ -3,52 +3,304 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>双行跑马灯 · UI Atlas 动效</title>
+<title>双行跑马灯 · NO SIGNAL 无信号音乐节</title>
 <style>
-:root{--bg:#0e1013;--ink:#f2f0e9;--dim:#2a2e35;--accent:#e2683c}
+:root{--bg:#0a0a09;--ink:#f2eee3;--muted:#8d8a80;--acid:#d9ff4b;--line:rgba(242,238,227,.15);--serif:Georgia,"Songti SC","Noto Serif SC",serif}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
-.stage{min-height:100vh;display:grid;align-content:center;gap:0;padding:40px 0}
-.top{margin:0 0 22px;padding:0 22px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:#7b7f88}
-.band{display:flex;overflow:hidden;padding:10px 0;border-top:1px solid rgba(255,255,255,.09);border-bottom:1px solid rgba(255,255,255,.09)}
+html,body{margin:0}
+body{background:radial-gradient(62% 44% at 82% 0%,rgba(255,92,42,.13),transparent 62%),var(--bg);color:var(--ink);
+  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.head{display:flex;align-items:center;gap:28px;padding:15px clamp(20px,4vw,44px);border-bottom:1px solid var(--line);
+  background:rgba(10,10,9,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);position:relative;z-index:5}
+.brand{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:.14em;text-decoration:none;white-space:nowrap}
+.brand .mark{width:24px;height:24px;display:grid;place-items:center;border-radius:2px;background:var(--acid);color:#131408;
+  font:800 10px/1 ui-monospace,Consolas,monospace}
+.brand i{font:500 9px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);font-style:normal}
+.head nav{display:flex;gap:24px;margin-left:8px}
+.head nav a{font-size:12px;color:var(--muted);text-decoration:none}
+.head nav a:hover{color:var(--ink)}
+.head .hint{margin-left:auto}
+.buy{display:inline-flex;align-items:center;gap:8px;background:var(--acid);color:#131408;border:1px solid var(--acid);border-radius:999px;
+  padding:9px 17px;font-size:12px;font-weight:800;text-decoration:none;white-space:nowrap}
+.buy:hover{filter:brightness(1.05)}
+.head .buy{padding:7px 13px;font-size:10.5px}
+.hero{max-width:1240px;margin:0 auto;padding:clamp(26px,3.6vw,46px) 0 0}
+.hero-top{display:grid;grid-template-columns:minmax(0,1.16fr) minmax(0,.84fr);gap:clamp(24px,4vw,54px);align-items:end;
+  padding:0 clamp(20px,4vw,40px) clamp(20px,2.8vw,32px)}
+.kicker{margin:0 0 12px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;font-size:clamp(44px,5.8vw,82px);line-height:.98;letter-spacing:-.05em;font-weight:800}
+h1 em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.03em;color:var(--acid)}
+.ht-right{justify-self:end;text-align:right}
+.ht-right p{margin:0 0 5px;font:600 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.ht-right .date{font-size:11.5px;letter-spacing:.14em;color:var(--ink)}
+.ht-right b{color:var(--acid);font-weight:700}
+.ht-right .buy{margin-top:14px}
+.bands{display:block;overflow:hidden}
+.band{display:flex;overflow:hidden;padding:clamp(8px,1.2vw,15px) 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .band + .band{border-top:0}
 .track{display:flex;flex:0 0 auto;min-width:max-content;animation:slide 26s linear infinite;will-change:transform}
 .band.rev .track{animation-direction:reverse;animation-duration:34s}
 .band:hover .track{animation-play-state:paused}
-.track span{display:inline-flex;align-items:center;gap:26px;padding-right:26px;white-space:nowrap;
-  font-size:clamp(28px,7.6vw,58px);line-height:1.1;letter-spacing:-.03em;font-weight:600}
-.track span::after{content:"◆";font-size:.32em;color:var(--accent);transform:translateY(-.1em)}
-.band.rev .track span{font-weight:400;color:transparent;-webkit-text-stroke:1px rgba(242,240,233,.55);font-style:italic;font-family:Georgia,serif}
-.band.rev .track span::after{-webkit-text-stroke:0;color:var(--accent)}
+.track span{display:inline-flex;align-items:center;gap:30px;padding-right:30px;white-space:nowrap;
+  font-size:clamp(40px,6.4vw,82px);line-height:1.06;letter-spacing:-.04em;font-weight:800}
+.track span::after{content:"✳";font-size:.3em;color:var(--acid);transform:translateY(-.08em)}
+.band.rev .track span{font-family:var(--serif);font-style:italic;font-weight:400;color:transparent;
+  -webkit-text-stroke:1px rgba(242,238,227,.62);letter-spacing:-.02em;font-size:clamp(36px,5.4vw,70px)}
+.band.rev .track span::after{-webkit-text-stroke:0;color:var(--acid)}
 @keyframes slide{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
-.foot{margin:26px 0 0;padding:0 22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
-  font:600 10px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#7b7f88}
-.foot b{color:var(--accent);font-weight:600}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:#7b7f88;pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.track{animation:none;transform:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+.lineup{max-width:1240px;margin:0 auto;padding:clamp(30px,4.4vw,52px) clamp(20px,4vw,40px) 0}
+.sec-head{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.sec-head .kicker{margin:0 0 7px}
+h2{margin:0;font-size:clamp(24px,3vw,36px);line-height:1.05;letter-spacing:-.04em;font-weight:800}
+.sec-head .note{margin:0 0 4px auto;font:500 9.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.acts{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.act{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:18px 16px 17px;min-height:118px;display:flex;flex-direction:column}
+.act:nth-child(4n){border-right:0}
+.act span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--acid)}
+.act h3{margin:auto 0 0;font-size:19px;letter-spacing:-.02em;font-weight:750}
+.act i{font:400 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);font-style:normal;margin-top:2px}
+.act p{margin:6px 0 0;font-size:10.5px;color:var(--muted)}
+.sched{max-width:1240px;margin:0 auto;padding:clamp(26px,3.6vw,42px) clamp(20px,4vw,40px) 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.day{border:1px solid var(--line);border-radius:8px;padding:16px 17px}
+.day b{display:block;font-size:18px;letter-spacing:-.02em}
+.day span{display:block;margin-top:3px;font:600 8.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--acid)}
+.day p{margin:10px 0 0;font-size:10.5px;line-height:1.8;color:var(--muted)}
+.tickets{max-width:1240px;margin:clamp(26px,3.6vw,42px) auto 46px;padding:0 clamp(20px,4vw,40px)}
+.tk-inner{border:1px solid var(--line);border-radius:10px;padding:24px 26px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  background:linear-gradient(115deg,rgba(217,255,75,.08),transparent 58%)}
+.tk-inner .kicker{margin:0 0 6px}
+.tk-inner h2{font-size:clamp(22px,2.6vw,30px)}
+.prices{display:flex;gap:22px;flex-wrap:wrap;margin-left:auto}
+.price{border-left:1px solid var(--line);padding-left:22px}
+.price small{display:block;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.price b{display:block;margin-top:5px;font-size:22px;letter-spacing:-.03em}
+.price.off small,.price.off b{color:#5f5d55;text-decoration:line-through}
+footer{max-width:1240px;margin:0 auto;padding:16px clamp(20px,4vw,40px) 28px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
+  font:500 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.04em;color:var(--muted);pointer-events:none;white-space:nowrap;
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--acid)}
+@media (max-height:560px) and (min-width:561px){
+  .head{padding:9px 20px;gap:16px}
+  .head nav,.brand i{display:none}
+  .head .hint{font-size:9.5px;padding:3px 8px;margin-left:auto}
+  .head .buy{padding:5px 11px;font-size:9.5px}
+  .hero{padding:10px 0 0}
+  .hero-top{padding:0 22px 8px;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center}
+  .kicker{margin-bottom:4px;font-size:7.5px}
+  h1{font-size:24px;line-height:1.1;letter-spacing:-.04em}
+  h1 br{display:none}
+  .ht-right p{margin-bottom:2px;font-size:7px}
+  .ht-right .date{font-size:8px}
+  .ht-right .buy{margin-top:5px;padding:4px 9px;font-size:8.5px}
+  .band{padding:5px 0}
+  .track span{font-size:36px;gap:18px;padding-right:18px}
+  .band.rev .track span{font-size:31px}
+  .lineup{padding:12px 22px 0}
+  .sec-head{padding-bottom:7px;gap:10px}
+  .sec-head .kicker{margin-bottom:3px;font-size:7px}
+  h2{font-size:16px}
+  .sec-head .note{font-size:7px}
+  .act{min-height:52px;padding:6px 9px}
+  .act span{font-size:6.5px}
+  .act h3{font-size:11px;margin-top:auto}
+  .act i{font-size:6px;margin-top:0}
+  .act p{display:none}
+  .sched{grid-template-columns:repeat(3,1fr);padding:9px 22px 0;gap:7px}
+  .day{padding:7px 9px}
+  .day b{font-size:11px}
+  .day span{font-size:6px;margin-top:1px}
+  .day p{display:none}
+  .tickets{display:none}
+  footer{display:none}
+}
+@media (max-width:560px){
+  .head{padding:12px 16px;gap:12px}
+  .head nav,.brand i{display:none}
+  .head .buy{margin-left:auto;padding:5px 11px;font-size:9.5px}
+  .hero{padding:22px 0 0}
+  .hero-top{grid-template-columns:1fr;gap:16px;padding:0 16px 18px}
+  h1{font-size:clamp(38px,11.4vw,52px)}
+  .ht-right{justify-self:start;text-align:left}
+  .ht-right .buy{margin-top:8px}
+  .track span{font-size:30px;gap:18px;padding-right:18px}
+  .band.rev .track span{font-size:27px}
+  .lineup{padding:24px 16px 0}
+  .sec-head .note{margin-left:0}
+  .acts{grid-template-columns:1fr 1fr}
+  .act{border-right:1px solid var(--line);padding:13px 12px;min-height:104px}
+  .act:nth-child(2n){border-right:0}
+  .act h3{font-size:16px}
+  .sched{grid-template-columns:1fr;padding:20px 16px 0}
+  .tickets{padding:0 16px;margin:22px auto 32px}
+  .tk-inner{padding:20px;gap:14px}
+  .prices{margin-left:0;gap:16px}
+  .price{padding-left:14px}
+  .price b{font-size:18px}
+  footer{padding-left:16px;padding-right:16px;font-size:8px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .track{animation:none;transform:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <p class="top">TYPE / 04 · 悬停暂停</p>
-  <div class="band" aria-hidden="true">
-    <div class="track">
-      <span>MOTION</span><span>RHYTHM</span><span>REPEAT</span><span>MOTION</span><span>RHYTHM</span><span>REPEAT</span>
+
+<header class="head">
+  <a class="brand" href="#top"><span class="mark">NS</span>NO SIGNAL<i>无信号音乐节</i></a>
+  <nav aria-label="主导航">
+    <a href="#lineup">阵容</a>
+    <a href="#sched">日程</a>
+    <a href="#tickets">票务</a>
+  </nav>
+  <p class="hint">悬停任意一条跑马灯会暂停</p>
+  <a class="buy" href="#tickets">购票 ¥480</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-top">
+      <div>
+        <p class="kicker">NO SIGNAL FEST · 2026—2027 · XIAMEN</p>
+        <h1>跨年，<br><em>来岛上听真的。</em></h1>
+      </div>
+      <div class="ht-right">
+        <p class="date">2026.12.31 — 2027.01.02</p>
+        <p>厦门 · 环岛草地 · 跨年特别场</p>
+        <p><b>24</b> 组音乐人 · <b>3</b> 天 · <b>2</b> 舞台</p>
+        <a class="buy" href="#tickets">购票 ¥480 →</a>
+      </div>
     </div>
-    <div class="track"><span>MOTION</span><span>RHYTHM</span><span>REPEAT</span><span>MOTION</span><span>RHYTHM</span><span>REPEAT</span></div>
-  </div>
-  <div class="band rev" aria-hidden="true">
-    <div class="track"><span>Nothing stands still</span><span>Nothing stands still</span></div>
-    <div class="track"><span>Nothing stands still</span><span>Nothing stands still</span></div>
-  </div>
-  <p class="foot"><span>两条内容相同、方向相反 · 26s / 34s</span><span>悬停 <b>PAUSE</b></span></p>
+    <div class="bands" aria-hidden="true">
+      <div class="band">
+        <div class="track">
+          <span>NO SIGNAL</span><span>无信号</span><span>12.31 — 01.02</span>
+          <span>NO SIGNAL</span><span>无信号</span><span>12.31 — 01.02</span>
+        </div>
+        <div class="track">
+          <span>NO SIGNAL</span><span>无信号</span><span>12.31 — 01.02</span>
+          <span>NO SIGNAL</span><span>无信号</span><span>12.31 — 01.02</span>
+        </div>
+      </div>
+      <div class="band rev">
+        <div class="track">
+          <span>Nothing stands still</span><span>Nothing stands still</span>
+          <span>Nothing stands still</span><span>Nothing stands still</span>
+        </div>
+        <div class="track">
+          <span>Nothing stands still</span><span>Nothing stands still</span>
+          <span>Nothing stands still</span><span>Nothing stands still</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lineup" id="lineup">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">LINEUP / PHASE 01</p>
+        <h2>首批阵容</h2>
+      </div>
+      <p class="note">更多阵容 11 月 20 日公布</p>
+    </div>
+    <div class="acts">
+      <article class="act"><span>01</span><h3>橘子海岸</h3><i>ORANGE COAST</i><p>独立摇滚 · 厦门</p></article>
+      <article class="act"><span>02</span><h3>白噪</h3><i>WHITE NOISE</i><p>电子 · 上海</p></article>
+      <article class="act"><span>03</span><h3>山雀</h3><i>TIT</i><p>民谣 · 成都</p></article>
+      <article class="act"><span>04</span><h3>低空飞行</h3><i>LOW PASS</i><p>后摇 · 北京</p></article>
+      <article class="act"><span>05</span><h3>海雾</h3><i>SEA FOG</i><p>Ambient · 台北</p></article>
+      <article class="act"><span>06</span><h3>三号公路</h3><i>ROUTE 3</i><p>朋克 · 广州</p></article>
+      <article class="act"><span>07</span><h3>夜航</h3><i>NIGHTFALL</i><p>Dream Pop · 杭州</p></article>
+      <article class="act"><span>08</span><h3>无名氏</h3><i>NOBODY</i><p>实验 · 武汉</p></article>
+    </div>
+  </section>
+
+  <section class="sched" id="sched" aria-label="三天日程">
+    <div class="day"><b>12.31</b><span>DAY 01 · 跨年夜</span><p>主舞台 19:00—01:00<br>副舞台 17:00—23:00</p></div>
+    <div class="day"><b>01.01</b><span>DAY 02 · 新年场</span><p>主舞台 15:00—23:00<br>副舞台 13:00—22:00</p></div>
+    <div class="day"><b>01.02</b><span>DAY 03 · 收尾</span><p>主舞台 14:00—22:00<br>副舞台 12:00—21:00</p></div>
+  </section>
+
+  <section class="tickets" id="tickets">
+    <div class="tk-inner">
+      <div>
+        <p class="kicker">TICKETS / 限量</p>
+        <h2>三天通票，售完即止。</h2>
+      </div>
+      <div class="prices">
+        <div class="price off"><small>早鸟 · 已售罄</small><b>¥380</b></div>
+        <div class="price"><small>预售 · 三日</small><b>¥480</b></div>
+        <div class="price"><small>现场 · 三日</small><b>¥580</b></div>
+      </div>
+      <a class="buy" href="#tickets">立即购票 →</a>
+    </div>
+  </section>
 </main>
-<p class="hint">悬停任意一条会暂停</p>
+
+<footer>
+  <span>NO SIGNAL FEST · 厦门 · 环岛草地</span>
+  <span>THREE DAYS / TWO STAGES / NO SIGNAL</span>
+  <span>© 2026—2027</span>
+</footer>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
 </body>
 </html>

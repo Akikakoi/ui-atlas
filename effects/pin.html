@@ -3,50 +3,221 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>滚动钉住 · UI Atlas 动效</title>
+<title>滚动钉住 · OFFSET 建筑事务所 · UI Atlas</title>
 <style>
-:root{--ink:#f5f3ec;--muted:rgba(245,243,236,.55);--accent:#f0a35e}
+:root{--ink:#f4f1e8;--muted:rgba(244,241,232,.58);--dim:rgba(244,241,232,.36);--accent:#e9a05f;--line:rgba(244,241,232,.14)}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:#0c0d10;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.pin{height:320vh}
+body{background:#0b0c0f;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.pin{height:180vh}
 .stick{position:sticky;top:0;height:100vh;overflow:hidden}
+.nav{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;align-items:center;gap:28px;padding:20px clamp(20px,4vw,52px)}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand b{font:700 13px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em}
+.brand span{font-size:10.5px;color:var(--muted);letter-spacing:.08em}
+.navlinks{display:flex;gap:22px;margin-left:auto;font-size:11.5px;color:var(--muted)}
+.navlinks a:hover{color:var(--ink)}
+.navtag{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--dim)}
 .track{display:flex;width:100%;height:100%;will-change:transform}
-.panel{width:100%;height:100%;flex:0 0 100%;position:relative;display:grid;place-items:center;padding:28px}
-.panel::before{content:"";position:absolute;inset:0;opacity:.9}
-.p1::before{background:radial-gradient(120% 90% at 20% 10%,#1d2a4a,#0c0d10 70%)}
-.p2::before{background:radial-gradient(120% 90% at 80% 20%,#4a2230,#0c0d10 70%)}
-.p3::before{background:radial-gradient(120% 90% at 40% 90%,#24402f,#0c0d10 70%)}
-.inner{position:relative;z-index:1;max-width:420px;text-align:left}
+.panel{width:100%;height:100%;flex:0 0 100%;position:relative;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);align-items:center;gap:clamp(24px,4vw,64px);padding:112px clamp(28px,6vw,96px) 72px;overflow:hidden}
+.panel::before{content:"";position:absolute;inset:0;opacity:.92}
+.p1::before{background:radial-gradient(110% 90% at 78% 12%,#1c2b45,#0b0c0f 68%)}
+.p2::before{background:radial-gradient(110% 90% at 22% 78%,#43242c,#0b0c0f 68%)}
+.p3::before{background:radial-gradient(110% 90% at 78% 70%,#203b2c,#0b0c0f 68%)}
+.panel::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:72px 72px;-webkit-mask-image:radial-gradient(65% 65% at 62% 50%,#000,transparent);mask-image:radial-gradient(65% 65% at 62% 50%,#000,transparent);pointer-events:none}
+.inner{position:relative;z-index:1;max-width:520px}
 .no{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--accent)}
-.inner h2{margin:12px 0 8px;font-size:clamp(26px,6.4vw,44px);line-height:1.02;letter-spacing:-.04em;font-weight:600}
-.inner p{margin:0;font-size:12.5px;line-height:1.8;color:var(--muted);max-width:28em}
-.inner .fig{display:block;margin-top:20px;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:rgba(245,243,236,.4)}
-.hud{position:absolute;left:20px;right:20px;bottom:18px;z-index:2;display:flex;align-items:center;gap:14px}
-.hud .line{flex:1;height:2px;background:rgba(255,255,255,.16);position:relative;overflow:hidden}
+.inner h2{margin:16px 0 18px;font-size:clamp(44px,5.8vw,78px);line-height:.98;letter-spacing:-.05em;font-weight:600}
+.inner p{margin:0;max-width:30em;font-size:13.5px;line-height:1.9;color:var(--muted)}
+.meta{display:flex;gap:36px;margin:28px 0 0;padding-top:18px;border-top:1px solid var(--line)}
+.meta dt{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--dim);margin-bottom:6px}
+.meta dd{margin:0;font-size:12.5px}
+.fig{display:block;margin-top:26px;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--dim)}
+.art{position:relative;z-index:1;width:100%;max-width:470px;justify-self:center;color:var(--accent);opacity:.72}
+.art svg{display:block;width:100%;height:auto}
+.art .fill{fill:rgba(233,160,95,.08)}
+.art .dash{stroke-dasharray:3 5}
+.hud{position:absolute;left:0;right:0;bottom:18px;z-index:2;display:flex;align-items:center;gap:16px;padding:0 clamp(20px,4vw,52px)}
+.hud span{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);min-width:34px}
+.hud .line{flex:1;height:2px;background:rgba(255,255,255,.14);position:relative;overflow:hidden}
 .hud .line i{position:absolute;inset:0;background:var(--accent);transform-origin:left;transform:scaleX(0)}
-.hud span{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
-.hint{position:fixed;left:16px;bottom:40px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);z-index:3;pointer-events:none}
+.hud-r{text-align:right;color:var(--dim)!important}
+.index{background:#101217;padding:clamp(56px,8vw,104px) clamp(24px,6vw,96px)}
+.index-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;max-width:1180px;margin:0 auto 34px}
+.index-head h3{margin:0;font-size:clamp(26px,3.4vw,40px);letter-spacing:-.04em;font-weight:600}
+.index-head span{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--dim)}
+.works{max-width:1180px;margin:0 auto}
+.work{display:grid;grid-template-columns:44px 1.4fr 1fr .6fr 24px;align-items:center;gap:18px;padding:22px 4px;border-top:1px solid var(--line);transition:background .2s}
+.work:last-child{border-bottom:1px solid var(--line)}
+.work:hover{background:rgba(255,255,255,.03)}
+.work .wn{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent)}
+.work b{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.work small{font-size:12px;color:var(--muted)}
+.work .wy{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--dim)}
+.work i{font-style:normal;color:var(--dim);font-size:16px}
+.foot{background:#0b0c0f;padding:28px clamp(24px,6vw,96px);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;font-size:11px;color:var(--dim)}
+.foot b{font:700 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:40px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);z-index:4;pointer-events:none;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.track{transform:none!important}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-height:560px) and (min-width:561px){
+  .nav{padding:12px 20px;gap:16px}
+  .brand span,.navtag{display:none}
+  .navlinks{font-size:10px;gap:14px}
+  .panel{padding:58px 26px 40px;gap:18px}
+  .no{font-size:9px}
+  .inner h2{font-size:34px;margin:10px 0}
+  .inner p{font-size:11.5px;line-height:1.7}
+  .meta,.fig{display:none}
+  .art{max-width:210px;opacity:.62}
+  .hud{bottom:10px;padding:0 20px}
+  .hud-r{display:none}
+  .hint{bottom:30px;font-size:10px}
+}
+@media (max-width:560px){
+  .navlinks,.navtag{display:none}
+  .brand{margin:0 auto}
+  .panel{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:84px 22px 64px;gap:0}
+  .inner h2{font-size:clamp(40px,12vw,54px);margin:12px 0 16px}
+  .inner p{font-size:12.5px;line-height:1.85}
+  .meta{gap:24px;margin-top:22px;padding-top:14px}
+  .fig{display:none}
+  .art{position:absolute;right:-36px;bottom:64px;width:250px;max-width:none;opacity:.2;z-index:0}
+  .hint{display:none}
+  .index-head{flex-direction:column;gap:8px}
+  .work{grid-template-columns:30px 1fr auto;gap:12px;padding:16px 2px}
+  .work small,.work i{display:none}
+  .foot{flex-direction:column;align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){
+  .pin{height:auto}
+  .stick{position:static;height:auto;overflow:visible}
+  .track{display:block;transform:none!important}
+  .panel{min-height:100vh}
+  .hud{display:none}
+}
 </style>
 </head>
 <body>
 <div class="pin" id="pin">
   <div class="stick">
+    <header class="nav">
+      <div class="brand"><b>OFFSET</b><span>建筑事务所</span></div>
+      <nav class="navlinks" aria-label="主导航">
+        <a href="#index">项目索引</a><span>事务所</span><span>联系</span>
+      </nav>
+      <span class="navtag">上海 · 2026</span>
+    </header>
     <div class="track" id="track">
-      <section class="panel p1"><div class="inner"><span class="no">SCROLL / 03 · A</span><h2>竖向滚动<br>推着横向走。</h2><p>外层 320vh 只负责提供「时间」；内层 sticky 固定在视口，横向轨道按进度位移 200%。</p><span class="fig">translateX = -progress × 200%</span></div></section>
-      <section class="panel p2"><div class="inner"><span class="no">SCROLL / 03 · B</span><h2>三屏内容<br>只占一屏高。</h2><p>滚动条长度是可预期的，用户不会滚不到底；移动端建议改成原生横向滑动，别硬抢滚轮。</p><span class="fig">p 0.33 → 0.66</span></div></section>
-      <section class="panel p3"><div class="inner"><span class="no">SCROLL / 03 · C</span><h2>进度条<br>同步 HUD。</h2><p>同一个 progress 变量喂给轨道和底部细线，两者不会走散。</p><span class="fig">p 1.00 / end</span></div></section>
+      <section class="panel p1" aria-label="剖面">
+        <div class="inner">
+          <span class="no">01 / SECTION · 剖面</span>
+          <h2>先把光<br>切进来。</h2>
+          <p>屋顶压低 40 厘米，北向长窗切进一条稳定的天光。白天不开灯，晚上只留两盏壁灯。</p>
+          <dl class="meta">
+            <div><dt>项目</dt><dd>青浦宅</dd></div>
+            <div><dt>面积</dt><dd>210 m²</dd></div>
+            <div><dt>完成</dt><dd>2025</dd></div>
+          </dl>
+          <span class="fig">FIG. 01 — 南北剖面 · 1:100</span>
+        </div>
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 380 300" fill="none" stroke="currentColor" stroke-width="1.1">
+            <path d="M18 250h344" opacity=".5"/>
+            <path d="M60 250V132l64-38 64 38v118"/>
+            <path d="M60 132h128"/>
+            <path d="M110 250v-64h34v64" opacity=".75"/>
+            <path d="M188 250V94h96v156" opacity=".8"/>
+            <path d="M254 94V58h62v36" opacity=".8"/>
+            <path d="M206 126h60M206 158h60M206 190h60" opacity=".35"/>
+            <path d="M320 250v-46" opacity=".35"/>
+            <circle cx="304" cy="52" r="24" class="dash" opacity=".65"/>
+            <path d="M304 28v-10M304 86v-10M280 52h-10M338 52h-10" opacity=".45"/>
+            <path d="M342 250v-152" class="dash" opacity=".3"/>
+            <path d="M60 264h128M188 264h96" opacity=".4"/>
+            <path d="M60 258v12M188 258v12M284 258v12" opacity=".4"/>
+          </svg>
+        </div>
+      </section>
+      <section class="panel p2" aria-label="平面">
+        <div class="inner">
+          <span class="no">02 / PLAN · 平面</span>
+          <h2>再让路<br>绕着走。</h2>
+          <p>入口不设玄关，一条折线把厨房、院子和书房串起来。每天回家都先经过一株石榴。</p>
+          <dl class="meta">
+            <div><dt>项目</dt><dd>松江工作室</dd></div>
+            <div><dt>面积</dt><dd>146 m²</dd></div>
+            <div><dt>完成</dt><dd>2024</dd></div>
+          </dl>
+          <span class="fig">FIG. 02 — 首层平面 · 1:100</span>
+        </div>
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 380 300" fill="none" stroke="currentColor" stroke-width="1.1">
+            <rect x="48" y="52" width="284" height="196" rx="2"/>
+            <rect x="76" y="80" width="108" height="76"/>
+            <rect x="76" y="180" width="108" height="40" opacity=".7"/>
+            <rect x="208" y="80" width="96" height="140" opacity=".7"/>
+            <path d="M184 80v140M208 150h96" opacity=".35"/>
+            <path d="M92 96h76v44H92z" class="fill"/>
+            <path d="M232 96h48v38h-48z" class="fill"/>
+            <path d="M48 132h28M208 220h96" opacity=".4"/>
+            <circle cx="214" cy="238" r="5" opacity=".6"/>
+            <path d="M60 262c46-18 96 12 142-2s80 6 124-14" class="dash" opacity=".35"/>
+            <path d="M118 52V38M262 52V38M118 248v14M262 248v14" opacity=".3"/>
+          </svg>
+        </div>
+      </section>
+      <section class="panel p3" aria-label="节点">
+        <div class="inner">
+          <span class="no">03 / DETAIL · 节点</span>
+          <h2>最后把缝<br>收干净。</h2>
+          <p>钢柱与木梁的接头不外露，误差留在看不到的一侧。收口做完了，房子才开始安静。</p>
+          <dl class="meta">
+            <div><dt>项目</dt><dd>西岸书店</dd></div>
+            <div><dt>面积</dt><dd>380 m²</dd></div>
+            <div><dt>完成</dt><dd>2023</dd></div>
+          </dl>
+          <span class="fig">FIG. 03 — 柱梁节点 · 1:5</span>
+        </div>
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 380 300" fill="none" stroke="currentColor" stroke-width="1.1">
+            <circle cx="190" cy="150" r="96"/>
+            <circle cx="190" cy="150" r="64" opacity=".55"/>
+            <circle cx="190" cy="150" r="30" class="fill"/>
+            <path d="M190 54v192M94 150h192" opacity=".25"/>
+            <path d="M156 116l68 68M224 116l-68 68" opacity=".25"/>
+            <circle cx="190" cy="86" r="4"/><circle cx="254" cy="150" r="4"/><circle cx="190" cy="214" r="4"/><circle cx="126" cy="150" r="4"/>
+            <path d="M120 54h140M120 48v12M260 48v12" opacity=".35"/>
+            <path d="M190 270v-24M184 270h12" opacity=".35"/>
+            <path d="M28 270h72M282 270h72" class="dash" opacity=".25"/>
+          </svg>
+        </div>
+      </section>
     </div>
-    <div class="hud"><span id="pct">00%</span><div class="line"><i id="bar"></i></div><span>03</span></div>
+    <div class="hud" aria-hidden="true">
+      <span id="pct">00%</span>
+      <div class="line"><i id="bar"></i></div>
+      <span class="hud-r">OFFSET · 2026</span>
+    </div>
   </div>
 </div>
-<p class="hint">继续往下滚，画面会横向推进</p>
+<section class="index" id="index">
+  <div class="index-head">
+    <h3>项目索引</h3>
+    <span>SELECTED WORKS / 2023—2026</span>
+  </div>
+  <div class="works">
+    <div class="work"><span class="wn">01</span><b>青浦宅</b><small>独立住宅 · 青浦</small><span class="wy">2025</span><i>↗</i></div>
+    <div class="work"><span class="wn">02</span><b>松江工作室</b><small>改造 · 松江</small><span class="wy">2024</span><i>↗</i></div>
+    <div class="work"><span class="wn">03</span><b>西岸书店</b><small>商业空间 · 徐汇</small><span class="wy">2023</span><i>↗</i></div>
+  </div>
+</section>
+<footer class="foot">
+  <b>OFFSET ARCHITECTS</b>
+  <span>上海 · 徐汇区龙腾大道 2555 号</span>
+  <span>studio@offset.archi</span>
+</footer>
+<p class="hint">继续往下滚，三张图会横向推进</p>
 <script>
 (function () {
   var pin = document.getElementById('pin'), track = document.getElementById('track');
@@ -65,6 +236,61 @@ body{background:#0c0d10;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI",
   addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
   addEventListener('resize', render);
   render();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

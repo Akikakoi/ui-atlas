@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>侧栏收轨 · HARBOR 团队工作台</title>
+<style>
+:root{--bg:#efeee9;--ink:#14171b;--muted:#767b82;--line:#e2dfd6;--panel:#fff;--accent:#2f63e9;--side:#13181e;--side-ink:#eef1f2}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
+a{color:inherit}
+
+.app{--sidew:236px;display:grid;grid-template-columns:var(--sidew) minmax(0,1fr);height:100vh;height:100dvh;overflow:hidden;
+  background:var(--bg);transition:grid-template-columns .46s cubic-bezier(.22,.8,.2,1)}
+.app.rail{--sidew:68px}
+
+/* 侧栏 */
+.side{background:var(--side);color:var(--side-ink);padding:16px 11px 12px;display:flex;flex-direction:column;gap:6px;
+  min-width:0;overflow:hidden}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 4px 15px;margin-bottom:4px;border-bottom:1px solid rgba(255,255,255,.09)}
+.brand i{flex:0 0 30px;width:30px;height:30px;border-radius:9px;background:linear-gradient(145deg,#4c7bff,#2f63e9);
+  display:grid;place-items:center;font:700 12px/1 ui-monospace,Consolas,monospace;font-style:normal;letter-spacing:.02em;color:#fff}
+.brand b{display:flex;flex-direction:column;gap:2px;max-width:150px;overflow:hidden;white-space:nowrap;
+  font-size:12px;letter-spacing:.16em;font-weight:650;
+  transition:max-width .3s cubic-bezier(.22,.8,.2,1),opacity .2s,transform .3s}
+.brand em{font:400 9px/1.2 ui-monospace,Consolas,monospace;font-style:normal;letter-spacing:.1em;color:rgba(238,241,242,.44)}
+.nav{display:grid;gap:2px;min-height:0;overflow-y:auto;overflow-x:hidden;margin-top:2px}
+.nav a{display:flex;align-items:center;justify-content:flex-start;gap:0;min-height:38px;padding:8px 9px;border-radius:9px;
+  color:rgba(238,241,242,.62);text-decoration:none;white-space:nowrap;overflow:hidden;
+  transition:background .18s,color .18s,padding .3s}
+.nav a:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav a[aria-current="page"]{background:rgba(47,99,233,.22);color:#fff;box-shadow:inset 0 0 0 1px rgba(90,134,255,.28)}
+.nav a:focus-visible{outline:2px solid #6f9bff;outline-offset:-2px}
+.nav svg{flex:0 0 18px;width:18px;height:18px}
+.nav .txt{max-width:140px;margin-left:11px;overflow:hidden;font-size:12.5px;
+  transition:max-width .3s cubic-bezier(.22,.8,.2,1),margin .3s,opacity .2s,transform .3s}
+.divider{height:1px;background:rgba(255,255,255,.09);margin:8px 4px}
+.side-foot{margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,255,255,.09);display:grid;gap:8px}
+.me{display:flex;align-items:center;gap:9px;padding:4px 5px;overflow:hidden;white-space:nowrap;transition:gap .3s,padding .3s}
+.ava{position:relative;flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:#2f63e9;color:#fff;
+  display:grid;place-items:center;font:600 11px/1 -apple-system,"Segoe UI",sans-serif;font-style:normal}
+.ava::after{content:"";position:absolute;right:-1px;bottom:-1px;width:8px;height:8px;border-radius:50%;background:#3ecf8e;border:2px solid var(--side)}
+.me span{display:flex;flex-direction:column;gap:1px;max-width:130px;overflow:hidden;
+  transition:max-width .3s cubic-bezier(.22,.8,.2,1),opacity .2s,transform .3s}
+.me b{font-size:11.5px;font-weight:600;white-space:nowrap}
+.me em{font:400 9px/1.3 ui-monospace,Consolas,monospace;font-style:normal;letter-spacing:.04em;color:rgba(238,241,242,.45);white-space:nowrap}
+.toggle{display:flex;align-items:center;justify-content:flex-start;gap:0;border:1px solid rgba(255,255,255,.13);
+  background:transparent;color:rgba(238,241,242,.76);border-radius:9px;padding:8px 9px;font:inherit;font-size:11.5px;
+  cursor:pointer;overflow:hidden;white-space:nowrap;transition:background .18s,color .18s,padding .3s}
+.toggle:hover{background:rgba(255,255,255,.07);color:#fff}
+.toggle:focus-visible{outline:2px solid #6f9bff;outline-offset:2px}
+.toggle svg{flex:0 0 18px;width:18px;height:18px;transition:transform .4s cubic-bezier(.22,.8,.2,1)}
+.toggle span{max-width:120px;margin-left:11px;overflow:hidden;
+  transition:max-width .3s cubic-bezier(.22,.8,.2,1),margin .3s,opacity .2s,transform .3s}
+
+/* 收起状态：宽度、标签、图标一起收 */
+.app.rail .brand{justify-content:center;gap:0;padding-left:0;padding-right:0}
+.app.rail .brand i{flex-basis:32px;width:32px;height:32px}
+.app.rail .brand b{max-width:0;opacity:0;transform:translateX(-5px);pointer-events:none}
+.app.rail .nav a{justify-content:center;padding:8px 0}
+.app.rail .nav .txt{max-width:0;margin-left:0;opacity:0;transform:translateX(-5px);pointer-events:none}
+.app.rail .divider{margin:8px 10px}
+.app.rail .me{justify-content:center;gap:0;padding:4px 0}
+.app.rail .me span{max-width:0;opacity:0;transform:translateX(-5px);pointer-events:none}
+.app.rail .toggle{justify-content:center;padding:8px 0}
+.app.rail .toggle span{max-width:0;margin-left:0;opacity:0;transform:translateX(-5px);pointer-events:none}
+.app.rail .toggle svg{transform:rotate(180deg)}
+
+/* 主区 */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg);overflow:hidden}
+.topbar{flex:0 0 auto;height:62px;display:flex;align-items:center;gap:16px;padding:0 24px;
+  border-bottom:1px solid var(--line);background:rgba(239,238,233,.92);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.crumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
+.crumb b{font-weight:400;color:#bcb7aa}
+.crumb strong{color:var(--ink);font-weight:600}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:9px}
+.search{display:flex;align-items:center;gap:8px;width:212px;border:1px solid var(--line);background:var(--panel);
+  border-radius:9px;padding:7px 10px;color:var(--muted);font:inherit;font-size:11.5px;cursor:pointer;text-align:left;
+  transition:border-color .18s}
+.search:hover{border-color:#cfcabe}
+.search:focus-visible{outline:2px solid rgba(47,99,233,.5);outline-offset:1px}
+.search svg{flex:0 0 15px;width:15px;height:15px}
+.search kbd{margin-left:auto;font:600 9px/1.4 ui-monospace,Consolas,monospace;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:#9a958a}
+.icon-btn{position:relative;width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--panel);
+  display:grid;place-items:center;cursor:pointer;color:#4d5158;transition:border-color .18s}
+.icon-btn:hover{border-color:#cfcabe}
+.icon-btn:focus-visible{outline:2px solid rgba(47,99,233,.5);outline-offset:1px}
+.icon-btn .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#e0663c;border:1.5px solid var(--panel)}
+.avatars{display:flex;padding-left:7px}
+.avatars span{width:26px;height:26px;border-radius:50%;border:2px solid var(--bg);margin-left:-7px;display:grid;place-items:center;
+  font:600 9px/1 -apple-system,"Segoe UI",sans-serif;color:#fff;background:#2f63e9}
+.avatars span:first-child{margin-left:0}
+.avatars .more{background:#dcd8cc;color:#5c584d}
+
+.content{flex:1 1 auto;min-height:0;overflow-y:auto;padding:26px 24px 22px}
+.greet{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.date{margin:0 0 8px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted)}
+.greet h1{margin:0;font-size:clamp(22px,2.6vw,30px);line-height:1.15;letter-spacing:-.035em;font-weight:650}
+.greet .sub{margin:7px 0 0;font-size:12px;line-height:1.7;color:var(--muted)}
+.greet-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:9px 14px;
+  font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;transition:background .18s,border-color .18s,color .18s}
+.btn:hover{border-color:#c9c3b5}
+.btn:focus-visible{outline:2px solid rgba(47,99,233,.5);outline-offset:2px}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:20px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 13px;min-width:0}
+.stat .lbl{display:block;margin-bottom:10px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.13em;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat b{display:block;font-size:23px;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.stat em{display:block;margin-top:7px;font-style:normal;font-size:9.5px;color:#2f7d5c;white-space:nowrap}
+.stat em.muted{color:var(--muted)}
+
+.cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,.85fr);gap:14px;margin-top:14px;align-items:start}
+.side-col{display:grid;gap:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px 8px;min-width:0}
+.panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px}
+.panel-head h2{margin:0;font-size:13px;font-weight:650;letter-spacing:-.01em}
+.panel-head a,.panel-head span{font-size:10px;color:var(--muted);text-decoration:none;white-space:nowrap}
+.panel-head a:hover{color:var(--accent)}
+.projects{list-style:none;margin:0;padding:0}
+.projects li{display:grid;grid-template-columns:32px minmax(0,1fr) 78px 34px 64px;gap:11px;align-items:center;
+  padding:11px 0;border-top:1px solid #f1efe8}
+.projects li:first-child{border-top:0}
+.thumb{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:650;
+  background:linear-gradient(150deg,var(--a),var(--b))}
+.pinfo{min-width:0}
+.pinfo b{display:block;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pinfo span{display:block;margin-top:2px;font-size:9.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:5px;border-radius:3px;background:#eeebe2;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--accent)}
+.projects li:nth-child(2) .bar i{background:#c08a2e}
+.projects li:nth-child(3) .bar i{background:#2f7d5c}
+.pct{font:500 9.5px/1.4 ui-monospace,Consolas,monospace;color:var(--muted);text-align:right}
+.chip{justify-self:start;display:inline-flex;align-items:center;gap:5px;font-size:9px;line-height:1.4;padding:3px 7px;
+  border-radius:999px;background:#eef2ff;color:#2f55b8;white-space:nowrap}
+.chip::before{content:"";width:4px;height:4px;border-radius:50%;background:currentColor}
+.chip.amber{background:#fbf3e2;color:#8a6416}
+.chip.green{background:#e9f5ee;color:#2f7d5c}
+
+.agenda{list-style:none;margin:6px 0 0;padding:0}
+.agenda li{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid #f1efe8}
+.agenda li:first-child{border-top:0}
+.agenda time{flex:0 0 38px;padding-top:1px;font:500 9.5px/1.6 ui-monospace,Consolas,monospace;color:var(--muted)}
+.agenda b{display:block;font-size:11.5px;font-weight:600;line-height:1.4}
+.agenda span{display:block;margin-top:2px;font-size:9.5px;color:var(--muted)}
+.agenda li.now b,.agenda li.now time{color:var(--accent)}
+.agenda .badge{margin-left:auto;font-size:8.5px;color:var(--accent);border:1px solid rgba(47,99,233,.3);
+  border-radius:999px;padding:2px 6px;white-space:nowrap}
+.brief dl{margin:8px 0 6px;display:grid;gap:0}
+.brief dl div{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid #f1efe8}
+.brief dl div:first-child{border-top:0;padding-top:2px}
+.brief dt{font-size:10px;color:var(--muted)}
+.brief dd{margin:0;font-size:12px;font-weight:600;letter-spacing:-.02em}
+.brief dd span{font-size:9px;font-weight:400;color:var(--muted)}
+.content-foot{margin:18px 2px 0;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  font:500 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:#a09b8e}
+
+.scrim{display:none}
+.hint{position:fixed;right:16px;bottom:14px;margin:0;z-index:40;display:flex;align-items:center;gap:6px;
+  font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+
+@media (max-width:900px){
+  .cols{grid-template-columns:1fr}
+  .side-col{grid-template-columns:1fr 1fr;align-items:start}
+  .search{width:170px}
+}
+@media (max-width:560px){
+  .app,.app.rail{grid-template-columns:64px minmax(0,1fr);transition:none}
+  .side{padding:12px 10px 10px}
+  .app:not(.rail) .side{position:fixed;left:0;top:0;bottom:0;width:236px;z-index:30;box-shadow:0 0 50px rgba(0,0,0,.42)}
+  .app:not(.rail) .scrim{display:block}
+  .scrim{position:fixed;inset:0;z-index:25;background:rgba(10,14,18,.44)}
+  .topbar{height:52px;padding:0 14px}
+  .crumb span,.crumb b{display:none}
+  .search{display:none}
+  .avatars{display:none}
+  .content{padding:18px 14px 24px}
+  .greet{align-items:flex-start;flex-direction:column;gap:12px}
+  .greet h1{font-size:24px}
+  .greet .sub{font-size:11.5px}
+  .stats{grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+  .cols{margin-top:12px}
+  .side-col{grid-template-columns:1fr}
+  .projects li{grid-template-columns:30px minmax(0,1fr) 54px;gap:9px;padding:10px 0}
+  .bar,.pct{display:none}
+  .panel{padding:14px 13px 6px}
+  .content-foot{font-size:8.5px}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .app{--sidew:200px}
+  .app.rail{--sidew:64px}
+  .side{padding-top:12px;padding-bottom:10px}
+  .brand{padding-bottom:11px}
+  .nav a{min-height:34px;padding-top:6px;padding-bottom:6px}
+  .topbar{height:48px;padding:0 14px}
+  .content{padding:16px 16px 16px}
+  .greet{align-items:flex-start;flex-direction:column;gap:10px}
+  .date{margin-bottom:6px}
+  .greet h1{font-size:22px}
+  .greet .sub{display:none}
+  .greet-actions .btn{padding:7px 12px;font-size:10.5px}
+  .greet-actions .btn:not(.primary){display:none}
+  .stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:14px}
+  .stat{padding:9px 10px}
+  .stat .lbl{font-size:8px;letter-spacing:.08em;margin-bottom:7px}
+  .stat b{font-size:17px}
+  .stat em{font-size:8.5px;margin-top:5px}
+  .cols{grid-template-columns:1fr;margin-top:12px}
+  .side-col{display:none}
+  .panel{padding:12px 13px 5px}
+  .panel-head h2{font-size:12px}
+  .projects li{grid-template-columns:28px minmax(0,1fr) 34px 58px;gap:9px;padding:8px 0}
+  .bar{display:none}
+  .thumb{width:28px;height:28px;border-radius:8px;font-size:10px}
+  .content-foot{display:none}
+  .search{width:150px}
+  .search span{display:none}
+  .hint{right:12px;bottom:10px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .app,.brand b,.nav .txt,.nav a,.me,.me span,.toggle,.toggle span,.toggle svg,.btn,.search,.icon-btn{transition:none}
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <aside class="side" id="side">
+    <div class="brand"><i>H</i><b>HARBOR<em>团队工作台</em></b></div>
+    <nav class="nav" aria-label="主导航">
+      <a href="#" aria-current="page" title="概览">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>
+        <span class="txt">概览</span>
+      </a>
+      <a href="#" title="项目">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5h6l2 2h9v9a1.5 1.5 0 0 1-1.5 1.5h-14A1.5 1.5 0 0 1 3.5 18.5z"/></svg>
+        <span class="txt">项目</span>
+      </a>
+      <a href="#" title="日程">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="3.8" y="5" width="16.4" height="15" rx="2.5"/><path d="M8 3.5v3M16 3.5v3M3.8 10h16.4"/></svg>
+        <span class="txt">日程</span>
+      </a>
+      <a href="#" title="文件">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12h6M9 15.5h6"/></svg>
+        <span class="txt">文件</span>
+      </a>
+      <a href="#" title="成员">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="9.5" cy="9" r="3"/><path d="M4 19c0-2.6 2.4-4.5 5.5-4.5S15 16.4 15 19"/><path d="M16 7.2a2.8 2.8 0 0 1 0 5.4M17.5 14.8c1.9.6 3 2 3 4.2"/></svg>
+        <span class="txt">成员</span>
+      </a>
+      <div class="divider" role="presentation"></div>
+      <a href="#" title="设置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M18 6l-1.4 1.4M7.4 16.6 6 18"/></svg>
+        <span class="txt">设置</span>
+      </a>
+    </nav>
+    <div class="side-foot">
+      <div class="me"><i class="ava" aria-hidden="true">林</i><span><b>林岸</b><em>产品设计师</em></span></div>
+      <button class="toggle" id="toggle" type="button" aria-expanded="true" aria-controls="side" aria-label="收起侧栏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 7-5 5 5 5"/></svg>
+        <span>收起侧栏</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="crumb"><span>团队空间</span><b>/</b><strong>概览</strong></div>
+      <div class="top-actions">
+        <button class="search" type="button" aria-label="搜索项目、成员">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.4 15.4 4.1 4.1"/></svg>
+          <span>搜索项目、成员</span><kbd>⌘K</kbd>
+        </button>
+        <button class="icon-btn" type="button" aria-label="通知，2 条未读">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 5 2 6 2 6h-15s2-1 2-6z"/><path d="M10 19a2.2 2.2 0 0 0 4 0"/></svg>
+          <i class="dot" aria-hidden="true"></i>
+        </button>
+        <div class="avatars" aria-label="在线成员 4 人">
+          <span style="background:#2f63e9">陈</span>
+          <span style="background:#8a5a2b">周</span>
+          <span style="background:#2f7d5c">许</span>
+          <span class="more">+9</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <header class="greet">
+        <div>
+          <p class="date">2026 / 11 / 12 · 周三</p>
+          <h1>早上好，林岸。</h1>
+          <p class="sub">本周有 3 个项目在推进，2 份方案等你确认。</p>
+        </div>
+        <div class="greet-actions">
+          <button class="btn" type="button">本周报告</button>
+          <button class="btn primary" type="button">+ 新建项目</button>
+        </div>
+      </header>
+
+      <section class="stats" aria-label="本周数据">
+        <div class="stat"><span class="lbl">进行中项目</span><b>6</b><em>较上周 +1</em></div>
+        <div class="stat"><span class="lbl">本周完成</span><b>24</b><em>完成率 82%</em></div>
+        <div class="stat"><span class="lbl">待评审</span><b>3</b><em class="muted">2 份方案</em></div>
+        <div class="stat"><span class="lbl">团队在线</span><b>12</b><em class="muted">共 18 人</em></div>
+      </section>
+
+      <div class="cols">
+        <section class="panel projects-panel" aria-label="进行中的项目">
+          <div class="panel-head"><h2>进行中的项目</h2><a href="#">全部 6 个 →</a></div>
+          <ul class="projects">
+            <li>
+              <span class="thumb" style="--a:#3c5bb8;--b:#7f9ee8">岚</span>
+              <div class="pinfo"><b>岚野民宿</b><span>品牌与导视 · 岚野文旅</span></div>
+              <div class="bar" role="progressbar" aria-label="岚野民宿进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="68"><i style="width:68%"></i></div>
+              <span class="pct">68%</span>
+              <span class="chip">进行中</span>
+            </li>
+            <li>
+              <span class="thumb" style="--a:#8a6a2f;--b:#d0a75c">拾</span>
+              <div class="pinfo"><b>拾光书店</b><span>空间改造 · 拾光文化</span></div>
+              <div class="bar" role="progressbar" aria-label="拾光书店进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42"><i style="width:42%"></i></div>
+              <span class="pct">42%</span>
+              <span class="chip amber">评审中</span>
+            </li>
+            <li>
+              <span class="thumb" style="--a:#2f6d5a;--b:#7fb39c">北</span>
+              <div class="pinfo"><b>北岸咖啡</b><span>包装系统 · 北岸餐饮</span></div>
+              <div class="bar" role="progressbar" aria-label="北岸咖啡进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="86"><i style="width:86%"></i></div>
+              <span class="pct">86%</span>
+              <span class="chip green">待交付</span>
+            </li>
+          </ul>
+        </section>
+
+        <div class="side-col">
+          <section class="panel" aria-label="今日安排">
+            <div class="panel-head"><h2>今天</h2><span>3 件事</span></div>
+            <ul class="agenda">
+              <li><time>10:00</time><div><b>设计评审 · 拾光书店</b><span>会议室 B · 6 人</span></div></li>
+              <li class="now"><time>14:30</time><div><b>与供应商对样</b><span>线上 · 陈默</span></div><i class="badge">进行中</i></li>
+              <li><time>17:00</time><div><b>提交本周周报</b><span>提醒 · 还差 2 项</span></div></li>
+            </ul>
+          </section>
+          <section class="panel brief" aria-label="本周快览">
+            <div class="panel-head"><h2>快览</h2><span>本周</span></div>
+            <dl>
+              <div><dt>团队在线</dt><dd>12<span> / 18</span></dd></div>
+              <div><dt>本周会议</dt><dd>9</dd></div>
+              <div><dt>平均响应</dt><dd>1.2<span> h</span></dd></div>
+            </dl>
+          </section>
+        </div>
+      </div>
+
+      <p class="content-foot"><span>HARBOR · 设计组</span><span>最后同步于 2 分钟前 · 数据仅自己可见</span></p>
+    </div>
+  </main>
+</div>
+
+<p class="hint">点侧栏底部的按钮，收起 / 展开侧栏</p>
+<script>
+(function () {
+  var app = document.getElementById('app');
+  var btn = document.getElementById('toggle');
+  var label = btn.querySelector('span');
+  var scrim = document.getElementById('scrim');
+  var mq = matchMedia('(max-width:560px)');
+
+  function setRail(rail) {
+    app.classList.toggle('rail', rail);
+    btn.setAttribute('aria-expanded', rail ? 'false' : 'true');
+    btn.setAttribute('aria-label', rail ? '展开侧栏' : '收起侧栏');
+    label.textContent = rail ? '展开侧栏' : '收起侧栏';
+  }
+
+  btn.addEventListener('click', function () {
+    setRail(!app.classList.contains('rail'));
+  });
+
+  scrim.addEventListener('click', function () {
+    setRail(true);
+    btn.focus();
+  });
+
+  addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && mq.matches && !app.classList.contains('rail')) {
+      setRail(true);
+      btn.focus();
+    }
+  });
+
+  mq.addEventListener('change', function () {
+    if (mq.matches) setRail(true);
+  });
+
+  if (mq.matches) setRail(true);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

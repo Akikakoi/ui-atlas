@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dock 邻近放大 · MESA 工作台 · UI Atlas</title>
+<style>
+:root{--bg:#e9e6dd;--paper:#fbfaf6;--ink:#121317;--muted:#7b7e85;--line:#dad5c8;--accent:#2f5fd0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(80% 60% at 50% 0%,#f2efe7,#e4e0d6 72%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+a{color:inherit;text-decoration:none}
+.desk{min-height:100svh;display:flex;flex-direction:column}
+.menubar{flex:0 0 auto;height:44px;display:flex;align-items:center;gap:16px;padding:0 clamp(14px,2.4vw,28px);border-bottom:1px solid var(--line);background:rgba(251,250,246,.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:relative;z-index:4}
+.mb-left{display:flex;align-items:center;gap:14px}
+.logo{width:22px;height:22px;border-radius:6px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:700 11px/1 ui-monospace,Consolas,monospace}
+.mb-left b{font-size:12px;font-weight:750;letter-spacing:.14em}
+.menu{font-size:11.5px;color:var(--muted);cursor:default}
+.date{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
+.mb-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.sync{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);display:flex;align-items:center;gap:5px}
+.sync::before{content:"";width:5px;height:5px;border-radius:50%;background:#3f8f74}
+.avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(150deg,#4f5f53,#26302a);color:#f4f0e6;display:grid;place-items:center;font:700 10px/1 ui-monospace,Consolas,monospace}
+.hint{margin:0;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:4px 9px;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.workspace{flex:1;width:100%;max-width:1500px;margin:0 auto;display:grid;grid-template-columns:172px minmax(0,1fr);gap:clamp(16px,2.6vw,30px);padding:clamp(14px,2.4vw,26px) clamp(16px,3vw,42px) 0;min-height:0}
+.rail{display:flex;flex-direction:column;gap:3px;padding-top:4px}
+.rail-k{margin:0 0 10px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted)}
+.rail-i{display:flex;align-items:center;justify-content:space-between;gap:8px;border-radius:8px;padding:7px 9px;font-size:11.5px;color:var(--muted)}
+.rail-i span{font:600 8.5px/1 ui-monospace,Consolas,monospace;color:#a3a6ac}
+.rail-i.on{background:rgba(255,255,255,.62);color:var(--ink);box-shadow:0 8px 16px -14px rgba(20,22,30,.5)}
+.rail-i.on span{color:var(--ink)}
+.rail-i:hover:not(.on){background:rgba(255,255,255,.34);color:var(--ink)}
+.rail-foot{margin-top:auto;padding-top:16px;display:flex;align-items:center;gap:7px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.rail-foot i{flex:1;height:3px;border-radius:2px;background:#d6d1c4;position:relative;overflow:hidden}
+.rail-foot i::after{content:"";position:absolute;inset:0;width:68%;background:#3f8f74;border-radius:2px}
+.scene{position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;padding-bottom:8px}
+.window{width:min(100%,900px);height:min(58vh,540px);min-height:300px;border:1px solid var(--line);border-radius:16px;background:var(--paper);box-shadow:0 40px 80px -60px rgba(20,22,30,.7);display:flex;flex-direction:column;overflow:hidden}
+.winbar{flex:0 0 auto;height:38px;display:flex;align-items:center;gap:12px;padding:0 12px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.5)}
+.dots{display:flex;gap:5px}
+.dots i{width:8px;height:8px;border-radius:50%;background:#d3cec1}
+.dots i:first-child{background:#c98a7c}
+.dots i:nth-child(2){background:#d2b06a}
+.dots i:last-child{background:#8fa06a}
+.winbar b{font-size:10.5px;font-weight:600;letter-spacing:.01em}
+.saved{margin-left:auto;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.winbody{flex:1;min-height:0;display:grid;grid-template-columns:1.24fr .76fr}
+.cover{position:relative;overflow:hidden;padding:clamp(16px,2.6vw,28px);display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(155deg,#31463c,#1d2a25 58%,#273b34);color:#f4f0e6;border-right:1px solid var(--line)}
+.cover::after{content:"";position:absolute;right:-70px;bottom:-90px;width:260px;height:260px;border:1px solid rgba(244,240,230,.16);border-radius:50%}
+.cv-k{position:relative;z-index:1;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(244,240,230,.55)}
+.cv-type{position:relative;z-index:1}
+.cv-type strong{display:block;font:700 clamp(56px,6.8vw,86px)/.86 ui-monospace,Consolas,monospace;letter-spacing:-.06em}
+.cv-type span{display:block;margin-top:9px;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:rgba(244,240,230,.62)}
+.cv-line{position:relative;z-index:1;display:flex;align-items:flex-end;gap:8px}
+.cv-line i{display:block;width:3px;height:var(--h);border-radius:2px;background:#c9a96a}
+.files{padding:clamp(14px,2.2vw,22px);display:flex;flex-direction:column;min-height:0;background:rgba(255,255,255,.36)}
+.files-k{margin:0 0 10px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.file{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);min-width:0}
+.file .fic{flex:0 0 24px;width:24px;height:28px;border-radius:5px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;font:700 6.5px/1 ui-monospace,Consolas,monospace;color:var(--muted)}
+.file div{min-width:0}
+.file b{display:block;font-size:10.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file small{display:block;margin-top:2px;font:500 8px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.03em;color:var(--muted)}
+.file em{margin-left:auto;font-style:normal;color:var(--muted);letter-spacing:.1em;font-size:10px}
+.files-foot{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.dock-wrap{flex:0 0 auto;display:flex;justify-content:center;padding:8px 20px 30px;position:relative;z-index:3}
+.dock{display:flex;align-items:flex-end;justify-content:center;gap:9px;padding:11px 12px 10px;border:1px solid rgba(255,255,255,.65);border-radius:20px;background:rgba(255,255,255,.58);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 24px 50px -34px rgba(20,22,30,.55);width:max-content;max-width:100%}
+.app{position:relative;width:54px;height:54px;border:0;border-radius:15px;cursor:pointer;color:#fff;display:grid;place-items:center;font:600 15px/1 ui-monospace,Consolas,monospace;background:linear-gradient(150deg,var(--c1),var(--c2));transform-origin:50% 100%;transition:transform .16s ease-out,box-shadow .2s;box-shadow:0 10px 18px -12px rgba(0,0,0,.5);outline:none}
+.app:hover,.app:focus-visible{box-shadow:0 18px 28px -14px rgba(0,0,0,.55)}
+.app:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.app span{position:absolute;left:50%;bottom:-24px;transform:translateX(-50%);font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);opacity:0;transition:opacity .18s;white-space:nowrap}
+.dock:hover .app span{opacity:.75}
+@media (max-height:560px) and (min-width:561px){
+  .menubar{height:40px;padding:0 16px}
+  .menu,.date,.sync{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .workspace{grid-template-columns:1fr;padding:12px 18px 0}
+  .rail{display:none}
+  .window{height:calc(100svh - 196px);min-height:0;border-radius:12px}
+  .winbar{height:32px}
+  .winbody{grid-template-columns:1.18fr .82fr}
+  .cover{padding:14px}
+  .cv-type strong{font-size:54px}
+  .cv-type span{margin-top:5px;font-size:7px}
+  .cv-k{font-size:7px}
+  .cv-line{gap:5px}
+  .cv-line i{width:2px}
+  .files{padding:11px}
+  .files-k{font-size:7.5px;margin-bottom:6px}
+  .file{padding:6px 0;gap:8px}
+  .file:nth-of-type(4){display:none}
+  .file .fic{flex-basis:20px;width:20px;height:24px}
+  .file b{font-size:9.5px}
+  .file small{font-size:7px}
+  .files-foot{font-size:7px;padding-top:7px}
+  .dock-wrap{padding:5px 14px 22px}
+  .dock{gap:5px;padding:7px 9px;border-radius:15px}
+  .app{width:44px;height:44px;border-radius:12px;font-size:13px}
+  .app span{bottom:-20px;font-size:8px}
+}
+@media (max-width:560px){
+  .menubar{height:44px;padding:0 14px}
+  .menu,.date,.sync,.hint{display:none}
+  .workspace{grid-template-columns:1fr;padding:12px 12px 0}
+  .rail{display:none}
+  .scene{padding-bottom:0}
+  .window{height:calc(100svh - 208px);min-height:300px;width:100%;border-radius:14px}
+  .winbar{height:34px}
+  .winbar b{font-size:9.5px}
+  .winbody{grid-template-columns:1fr}
+  .cover{padding:20px;border-right:0}
+  .cv-type strong{font-size:74px}
+  .cv-line i:nth-child(n+8){display:none}
+  .files{display:none}
+  .dock-wrap{padding:7px 14px 24px}
+  .dock{gap:5px;padding:7px 9px;border-radius:15px;max-width:calc(100vw - 24px)}
+  .app{width:44px;height:44px;border-radius:12px;font-size:13px}
+  .app span{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .app{transition:none}
+  .app span{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="desk" id="top">
+  <header class="menubar">
+    <div class="mb-left">
+      <span class="logo">M</span><b>MESA</b>
+      <span class="menu">文件</span><span class="menu">编辑</span><span class="menu">视图</span>
+    </div>
+    <span class="date">11 月 12 日 · 周四</span>
+    <div class="mb-right">
+      <p class="hint">把光标沿着图标滑过去</p>
+      <span class="sync">已同步</span>
+      <span class="avatar">Y</span>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="rail" aria-label="工作区导航">
+      <p class="rail-k">工作区</p>
+      <a class="rail-i on" href="#top">今日工作台 <span>05</span></a>
+      <a class="rail-i" href="#top">项目文件 <span>12</span></a>
+      <a class="rail-i" href="#top">素材库 <span>48</span></a>
+      <a class="rail-i" href="#top">归档 <span>—</span></a>
+      <a class="rail-i" href="#top">回收站 <span>02</span></a>
+      <div class="rail-foot"><span>存储</span><i></i><span>68%</span></div>
+    </aside>
+
+    <section class="scene" aria-label="工作台">
+      <div class="window">
+        <div class="winbar">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <b>Q3 品牌手册 — v4</b>
+          <span class="saved">已保存</span>
+        </div>
+        <div class="winbody">
+          <div class="cover">
+            <span class="cv-k">Q3 / BRAND BOOK</span>
+            <div class="cv-type"><strong>MESA</strong><span>设计系统与语气 · 2026</span></div>
+            <div class="cv-line" aria-hidden="true"><i style="--h:18px"></i><i style="--h:32px"></i><i style="--h:24px"></i><i style="--h:44px"></i><i style="--h:30px"></i><i style="--h:52px"></i><i style="--h:38px"></i><i style="--h:22px"></i><i style="--h:46px"></i><i style="--h:28px"></i><i style="--h:36px"></i><i style="--h:16px"></i></div>
+          </div>
+          <div class="files">
+            <p class="files-k">最近修改</p>
+            <div class="file"><span class="fic">PDF</span><div><b>动效规范.pdf</b><small>今天 09:42 · 4.2 MB</small></div><em>···</em></div>
+            <div class="file"><span class="fic">FIG</span><div><b>组件清单.fig</b><small>昨天 18:10 · 12.6 MB</small></div><em>···</em></div>
+            <div class="file"><span class="fic">MD</span><div><b>语气样本.md</b><small>11.10 · 8 KB</small></div><em>···</em></div>
+            <div class="files-foot"><span>4 个文件</span><span>共享给 2 人</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="dock-wrap">
+    <div class="dock" id="dock" role="toolbar" aria-label="应用 Dock">
+      <button class="app" type="button" aria-label="邮件" style="--c1:#7d94bd;--c2:#3f4d66"><span>邮件</span>M</button>
+      <button class="app" type="button" aria-label="日历" style="--c1:#d2a06a;--c2:#7a5333"><span>日历</span>12</button>
+      <button class="app" type="button" aria-label="笔记" style="--c1:#8fa06a;--c2:#4a5c3e"><span>笔记</span>N</button>
+      <button class="app" type="button" aria-label="照片" style="--c1:#c98a9c;--c2:#7d4659"><span>照片</span>◒</button>
+      <button class="app" type="button" aria-label="终端" style="--c1:#5c6b78;--c2:#242b33"><span>终端</span>&gt;_</button>
+      <button class="app" type="button" aria-label="设置" style="--c1:#9b96b8;--c2:#4c4763"><span>设置</span>◆</button>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var dock = document.getElementById('dock');
+  var apps = [].slice.call(dock.querySelectorAll('.app'));
+  var rects = [];
+
+  function measure() {
+    rects = apps.map(function (a) {
+      var r = a.getBoundingClientRect();
+      return { cx: r.left + r.width / 2 };
+    });
+  }
+  measure();
+  addEventListener('resize', measure);
+
+  dock.addEventListener('pointermove', function (e) {
+    apps.forEach(function (a, i) {
+      var d = Math.abs(e.clientX - rects[i].cx);
+      var f = Math.max(0, 1 - d / 120);
+      a.style.transform = 'translateY(' + (-f * 9).toFixed(2) + 'px) scale(' + (1 + f * .45).toFixed(3) + ')';
+    });
+  });
+  dock.addEventListener('pointerleave', function () {
+    apps.forEach(function (a) { a.style.transform = ''; });
+  });
+  apps.forEach(function (a) {
+    a.addEventListener('focus', function () { a.style.transform = 'translateY(-9px) scale(1.35)'; });
+    a.addEventListener('blur', function () { a.style.transform = ''; });
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

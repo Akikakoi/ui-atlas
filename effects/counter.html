@@ -3,48 +3,307 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>数字滚动 · UI Atlas 动效</title>
+<title>数字滚动 · NIMBUS CLOUD 2025 年度报告</title>
 <style>
-:root{--bg:#0f1116;--ink:#f4f5f8;--muted:#8b90a0;--line:rgba(255,255,255,.12);--accent:#9db8ff}
+:root{--bg:#0b0d12;--panel:#11141c;--ink:#f2f4f9;--muted:#8b91a2;--line:rgba(242,244,249,.12);--accent:#9db8ff;--accent-2:#6f8fe0;--warm:#f0c58a}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:38px 22px 70px}
-.wrap{width:100%;max-width:520px}
-.kicker{margin:0 0 14px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-h1{margin:0 0 30px;font-size:clamp(22px,5.4vw,32px);line-height:1.18;letter-spacing:-.03em;font-weight:600}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+#numbers,#curve,#regions,#report{scroll-margin-top:74px}
+.nav{position:sticky;top:0;z-index:10;height:58px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1080px)/2));background:rgba(11,13,18,.8);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:9px;text-decoration:none;white-space:nowrap}
+.brand b{font:600 14px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em}
+.brand span{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.nav nav{display:flex;gap:22px;margin-left:auto}
+.nav nav a{font-size:12px;color:var(--muted);text-decoration:none}
+.nav nav a:hover{color:var(--ink)}
+.nav .pdf{height:32px;padding:0 13px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;
+  font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;text-decoration:none;color:var(--ink)}
+.nav .pdf:hover{border-color:var(--accent);color:var(--accent)}
+.hero{max-width:1080px;margin:0 auto;padding:clamp(34px,5.5vw,64px) 22px 0;position:relative}
+.hero::before{content:"";position:absolute;inset:-60px 0 auto 0;height:520px;pointer-events:none;
+  background:radial-gradient(58% 70% at 76% 0%,rgba(157,184,255,.16),transparent 70%),
+  radial-gradient(42% 60% at 24% 10%,rgba(240,197,138,.07),transparent 70%);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.kicker{margin:0 0 14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--accent);position:relative}
+h1{margin:0;font-size:clamp(34px,5.6vw,64px);line-height:1.02;letter-spacing:-.045em;font-weight:640;position:relative}
 h1 em{font-style:normal;color:var(--accent)}
-.stats{display:grid;gap:0}
-.stat{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:10px;padding:17px 0;border-top:1px solid var(--line)}
-.stat .k{font-size:12.5px;color:var(--muted);letter-spacing:.02em}
-.stat .v{font-size:clamp(28px,7vw,42px);line-height:1;letter-spacing:-.04em;font-weight:600;font-variant-numeric:tabular-nums}
-.stat .v small{font-size:.42em;letter-spacing:0;color:var(--muted);margin-left:2px;font-weight:500}
-.stat .sub{grid-column:1/-1;margin:0;font-size:11.5px;color:#6d7280}
-.stat .track{grid-column:1/-1;height:2px;margin-top:8px;background:rgba(255,255,255,.08)}
-.stat .track i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--accent),#6f8fe0);transform-origin:left;transform:scaleX(0);transition:transform 1.1s cubic-bezier(.16,.84,.3,1)}
+.lede{margin:20px 0 0;max-width:34em;font-size:14px;line-height:1.9;color:#a7adbd;position:relative}
+.byline{margin:18px 0 0;display:flex;gap:20px;flex-wrap:wrap;font:600 9px/1.6 ui-monospace,Consolas,monospace;
+  letter-spacing:.1em;color:var(--muted);position:relative}
+.byline b{color:var(--ink);font-weight:600}
+.sec{max-width:1080px;margin:0 auto;padding:0 22px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:clamp(26px,4vw,44px) 0 0}
+.stat{position:relative;min-width:0;padding:20px 18px 18px;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(157,184,255,.055),rgba(157,184,255,0) 60%),var(--panel)}
+.stat .k{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);letter-spacing:.02em}
+.delta{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:#9fe0b4;background:rgba(120,220,160,.1);
+  border:1px solid rgba(120,220,160,.22);border-radius:999px;padding:4px 6px;white-space:nowrap}
+.stat .v{display:block;margin:12px 0 0;font-size:clamp(30px,4.2vw,46px);line-height:1;letter-spacing:-.045em;
+  font-weight:640;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:.4em;letter-spacing:0;color:var(--muted);margin-left:3px;font-weight:500}
+.stat .sub{margin:10px 0 0;font-size:11.5px;line-height:1.6;color:#848b9d}
+.track{display:block;height:3px;margin-top:14px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.track i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  transform-origin:left;transform:scaleX(0);transition:transform 1.1s cubic-bezier(.16,.84,.3,1)}
 .stats.in .track i{transform:scaleX(1)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+.note{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:12px 0 0;
+  font:600 8.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.note span:last-child{text-align:right}
+.curve{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,.8fr);gap:16px;margin:clamp(44px,7vw,84px) 0 0;align-items:start}
+.panel{border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:22px}
+.panel h2{margin:0;font-size:15px;letter-spacing:-.01em;font-weight:620}
+.panel h3{margin:0;font-size:15px;letter-spacing:-.01em;font-weight:620}
+.cap{margin:6px 0 0;font-size:11.5px;line-height:1.7;color:var(--muted)}
+.chart{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;align-items:end;height:170px;
+  margin:22px 0 0;padding-bottom:1px;border-bottom:1px solid var(--line)}
+.chart .b{height:var(--h);min-width:0;border-radius:4px 4px 0 0;
+  background:linear-gradient(180deg,rgba(157,184,255,.75),rgba(157,184,255,.16))}
+.chart .b.hi{background:linear-gradient(180deg,var(--warm),rgba(240,197,138,.16))}
+.months{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;margin-top:8px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted);text-align:center}
+.fact-list{margin:14px 0 0}
+.fact-list div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.fact-list dt{font-size:11.5px;color:var(--muted)}
+.fact-list dd{margin:0;font:600 17px/1 ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}
+.notes{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:44px;margin:clamp(44px,7vw,84px) 0 0}
+.notes figure{margin:0}
+blockquote{margin:0;font:400 clamp(22px,2.6vw,32px)/1.42 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+blockquote span{color:var(--accent);font-style:italic}
+.notes figcaption{margin:14px 0 0;font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.notes p{margin:0 0 12px;font-size:13px;line-height:1.9;color:#a7adbd}
+.notes p:first-child{margin-top:4px}
+.regions{border-top:1px solid var(--line);padding-top:28px;margin-top:clamp(44px,7vw,84px)}
+.reg-head{display:flex;justify-content:space-between;align-items:baseline;gap:18px;flex-wrap:wrap}
+.reg-head h2{margin:0;font-size:clamp(20px,2.6vw,28px);letter-spacing:-.03em;font-weight:620}
+.reg-head p{margin:0;font-size:11.5px;color:var(--muted)}
+.reg-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
+.reg{min-width:0;padding:18px 16px 16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02)}
+.reg .rg{font-size:11.5px;color:var(--muted)}
+.reg b{display:block;margin:8px 0 0;font-size:34px;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.reg b small{font-size:12px;color:var(--muted);margin-left:3px;letter-spacing:0;font-weight:500}
+.reg .lat{display:block;margin-top:7px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.reg i{position:relative;display:block;height:3px;margin-top:12px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.reg i::after{content:"";position:absolute;inset:0;width:var(--w);border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+.band{max-width:1080px;margin:clamp(48px,8vw,92px) auto 0;padding:0 22px}
+.band .inner{display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;
+  border:1px solid var(--line);border-radius:22px;padding:clamp(24px,4vw,40px);
+  background:radial-gradient(70% 90% at 80% 0%,rgba(157,184,255,.16),transparent 60%),var(--panel)}
+.band h2{margin:0;font-size:clamp(21px,2.6vw,30px);line-height:1.2;letter-spacing:-.03em}
+.band p{margin:8px 0 0;font-size:12px;line-height:1.7;color:var(--muted)}
+.btn{height:44px;padding:0 20px;display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;
+  background:var(--accent);color:#11141c;font:600 12px/1 -apple-system,"Segoe UI","PingFang SC",sans-serif;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#b9ccff}
+footer{max-width:1080px;margin:56px auto 0;padding:22px 22px 56px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
+  font:600 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;
+  font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px) and (min-width:561px){
+  #numbers,#curve,#regions,#report{scroll-margin-top:60px}
+  .nav{height:46px;padding:0 22px;gap:16px}
+  .nav nav{display:none}
+  .nav .pdf{height:26px;padding:0 10px;font-size:9px;margin-left:auto}
+  .hero{padding:14px 22px 0}
+  .hero::before{height:260px}
+  .kicker{display:none}
+  h1{font-size:clamp(22px,3.6vw,27px);line-height:1.1;letter-spacing:-.035em}
+  h1 br{display:none}
+  .lede,.byline{display:none}
+  .stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0 0}
+  .stat{padding:12px 12px 11px;border-radius:12px}
+  .stat .k{font-size:10px}
+  .delta{display:none}
+  .stat .v{font-size:26px;margin-top:8px}
+  .stat .sub{display:none}
+  .track{height:2px;margin-top:10px}
+  .note{margin:8px 0 0;font-size:8px}
+  .curve{display:block;margin:12px 0 0}
+  .curve .facts{display:none}
+  .curve .panel{padding:12px 14px 8px;border-radius:12px}
+  .curve .panel h2{font-size:11px}
+  .curve .cap,.curve .chart-top,.months{display:none}
+  .chart{height:78px;margin-top:10px;border-bottom:0;padding-bottom:0;gap:3px}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c4048;
+    background:rgba(255,255,255,.82);border:1px solid rgba(22,21,15,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (max-width:560px){
+  #numbers,#curve,#regions,#report{scroll-margin-top:66px}
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav nav{display:none}
+  .brand b{font-size:12.5px}
+  .brand span{display:none}
+  .nav .pdf{height:28px;margin-left:auto;font-size:9px;padding:0 10px}
+  .hero{padding:28px 16px 0}
+  .hero::before{height:360px}
+  .kicker{font-size:8.5px}
+  h1{font-size:clamp(33px,10.5vw,44px)}
+  .lede{font-size:12.5px;margin-top:16px}
+  .byline{gap:12px;font-size:8.5px}
+  .sec{padding:0 16px}
+  .stats{grid-template-columns:1fr;gap:10px;margin:24px 0 0}
+  .stat{padding:16px}
+  .stat .v{font-size:40px}
+  .note{flex-direction:column;gap:4px}
+  .note span:last-child{text-align:left}
+  .curve{grid-template-columns:1fr;margin:36px 0 0;gap:12px}
+  .panel{padding:16px;border-radius:16px}
+  .chart{height:150px;gap:4px}
+  .months{gap:4px}
+  .notes{grid-template-columns:1fr;gap:20px;margin:38px 0 0}
+  .regions{margin-top:38px;padding-top:22px}
+  .reg-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .reg b{font-size:30px}
+  .band{padding:0 16px;margin-top:42px}
+  .band .inner{padding:22px}
+  .band .btn{width:100%;justify-content:center}
+  footer{margin-top:40px;padding:18px 16px 26px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">SCROLL / 06</p>
-    <h1>数字不该「跳」出来，<br><em>它该走过来。</em></h1>
+
+<header class="nav">
+  <a class="brand" href="#top"><b>NIMBUS CLOUD</b><span>2025 年度报告</span></a>
+  <nav aria-label="章节">
+    <a href="#numbers">数字</a>
+    <a href="#curve">曲线</a>
+    <a href="#regions">区域</a>
+  </nav>
+  <a class="pdf" href="#report">下载 PDF</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <p class="kicker">NIMBUS CLOUD · ANNUAL REPORT 2025</p>
+    <h1>把一整年的运行，<br><em>收进三个数字。</em></h1>
+    <p class="lede">4.2 万亿次请求、182,000 的峰值 QPS、37 个边缘节点——这些数字不该等到年终才被看见。它们进入视口时会从 0 走到终值，像一次缓慢而确定的确认。</p>
+    <p class="byline"><span><b>统计周期</b> 2025.01 — 2025.12</span><span><b>口径</b> 全区域加权</span><span><b>来源</b> 可观测平台</span></p>
+  </section>
+
+  <section class="sec" id="numbers" aria-labelledby="numbers-t">
+    <h2 class="sr" id="numbers-t">年度关键数字</h2>
     <div class="stats" id="stats">
-      <div class="stat"><span class="k">可用性</span><span class="v" data-to="99.98" data-dec="2">0.00<small>%</small></span><p class="sub">过去 90 天，全部区域加权</p><span class="track"><i style="--w:92%"></i></span></div>
-      <div class="stat"><span class="k">每日部署</span><span class="v" data-to="1284" data-dec="0">0<small>次</small></span><p class="sub">平均 41 秒完成一次发布</p><span class="track"><i style="--w:74%"></i></span></div>
-      <div class="stat"><span class="k">边缘节点</span><span class="v" data-to="37" data-dec="0">0<small>个</small></span><p class="sub">覆盖 21 个国家和地区</p><span class="track"><i style="--w:58%"></i></span></div>
+      <div class="stat">
+        <span class="sr">可用性 99.98%，过去 90 天全部区域加权，同比提升 0.03 个百分点。</span>
+        <div class="k"><span>可用性</span><span class="delta" aria-hidden="true">+0.03 pt</span></div>
+        <span class="v" data-to="99.98" data-dec="2" aria-hidden="true">0.00<small>%</small></span>
+        <p class="sub">过去 90 天，全部区域加权</p>
+        <span class="track" aria-hidden="true"><i style="--w:92%"></i></span>
+      </div>
+      <div class="stat">
+        <span class="sr">每日部署 1,284 次，平均 41 秒完成一次发布，同比增加 18%。</span>
+        <div class="k"><span>每日部署</span><span class="delta" aria-hidden="true">+18% 同比</span></div>
+        <span class="v" data-to="1284" data-dec="0" aria-hidden="true">0<small>次</small></span>
+        <p class="sub">平均 41 秒完成一次发布</p>
+        <span class="track" aria-hidden="true"><i style="--w:74%"></i></span>
+      </div>
+      <div class="stat">
+        <span class="sr">边缘节点 37 个，覆盖 21 个国家和地区，今年新增 6 座。</span>
+        <div class="k"><span>边缘节点</span><span class="delta" aria-hidden="true">+6 座</span></div>
+        <span class="v" data-to="37" data-dec="0" aria-hidden="true">0<small>个</small></span>
+        <p class="sub">覆盖 21 个国家和地区</p>
+        <span class="track" aria-hidden="true"><i style="--w:58%"></i></span>
+      </div>
     </div>
-  </div>
+    <p class="note"><span>数据截至 2025.12.31 · 由可观测平台自动汇总</span><span>数值保留原始精度</span></p>
+  </section>
+
+  <section class="sec" id="curve" aria-labelledby="curve-t">
+    <div class="curve">
+      <div class="panel">
+        <h2 id="curve-t">月请求量，一路往上</h2>
+        <p class="cap">单位：十亿次 · 12 月为全年峰值 448</p>
+        <p class="sr">月请求量从 1 月的 240 十亿次增长到 12 月的 448 十亿次，全年累计 4.2 万亿次。</p>
+        <div class="chart" aria-hidden="true">
+          <div class="b" style="--h:54%"></div>
+          <div class="b" style="--h:59%"></div>
+          <div class="b" style="--h:63%"></div>
+          <div class="b" style="--h:66%"></div>
+          <div class="b" style="--h:71%"></div>
+          <div class="b" style="--h:75%"></div>
+          <div class="b" style="--h:79%"></div>
+          <div class="b" style="--h:82%"></div>
+          <div class="b" style="--h:85%"></div>
+          <div class="b" style="--h:90%"></div>
+          <div class="b" style="--h:94%"></div>
+          <div class="b hi" style="--h:100%"></div>
+        </div>
+        <div class="months" aria-hidden="true"><span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span><span>09</span><span>10</span><span>11</span><span>12</span></div>
+      </div>
+      <div class="panel facts">
+        <h3>峰值与延迟</h3>
+        <dl class="fact-list">
+          <div><dt>峰值 QPS</dt><dd>182,000</dd></div>
+          <div><dt>P99 延迟</dt><dd>42 ms</dd></div>
+          <div><dt>缓存命中</dt><dd>94.7%</dd></div>
+        </dl>
+        <p class="cap">黑色星期五 20:14 UTC 录得全年峰值，自动扩容在 38 秒内补齐容量。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="notes">
+      <figure>
+        <blockquote>“可用性不是一年一度的成绩单，<br>是每一天的<span>默认值</span>。”</blockquote>
+        <figcaption>陈可 · 平台工程负责人</figcaption>
+      </figure>
+      <div>
+        <p>2025 年，我们把发布流程拆成构建、灰度、放量三段，任何一段失败都只回退自己。每日 1,284 次部署里，有 96% 由流水线自动完成。</p>
+        <p>全年发生三次区域级波动，最长一次持续 6 分 12 秒。每一次都写进了公开复盘：触发条件、影响面、修复动作和之后加上的护栏。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="regions" aria-labelledby="regions-t">
+    <div class="regions">
+      <div class="reg-head">
+        <h2 id="regions-t">37 个节点，落在 21 个国家和地区</h2>
+        <p>按区域统计 · 延迟为 95 分位</p>
+      </div>
+      <div class="reg-grid">
+        <div class="reg"><span class="rg">亚太</span><b>14<small>座</small></b><span class="lat">P95 38 ms</span><i style="--w:100%"></i></div>
+        <div class="reg"><span class="rg">北美</span><b>11<small>座</small></b><span class="lat">P95 41 ms</span><i style="--w:79%"></i></div>
+        <div class="reg"><span class="rg">欧洲</span><b>9<small>座</small></b><span class="lat">P95 47 ms</span><i style="--w:64%"></i></div>
+        <div class="reg"><span class="rg">中东与非洲</span><b>3<small>座</small></b><span class="lat">P95 73 ms</span><i style="--w:21%"></i></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="report">
+    <div class="inner">
+      <div>
+        <h2>把这一年的数字，带回你的复盘。</h2>
+        <p>2025 年度报告全本 · 含区域明细、故障复盘与方法说明 · PDF 8.4 MB</p>
+      </div>
+      <button class="btn" type="button">下载 PDF · 8.4 MB</button>
+    </div>
+  </section>
+
+  <footer>
+    <span>NIMBUS CLOUD · 2025 年度报告</span>
+    <span>数据截至 2025.12.31</span>
+    <span>© 2026 NIMBUS</span>
+  </footer>
 </main>
-<p class="hint">进入视口才开始计数</p>
+
+<p class="hint">数字进入视口才开始</p>
 <script>
 (function () {
   var box = document.getElementById('stats');
@@ -88,6 +347,61 @@ h1 em{font-style:normal;color:var(--accent)}
       if (es[0].isIntersecting) run();
     }, { threshold: .3 }).observe(box);
   } else { run(); }
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

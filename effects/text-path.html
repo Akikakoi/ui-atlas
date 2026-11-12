@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>弧线文字 · ORBIT 穹顶天文馆</title>
+<style>
+:root{--bg:#0a0f1c;--panel:#101728;--card:#0d1424;--ink:#ece6d6;--muted:#8e94a8;--line:rgba(236,230,214,.13);
+  --accent:#e8b45a;--accent2:#7fa6ff}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip;
+  background-image:radial-gradient(1000px 600px at 78% -12%,rgba(127,166,255,.12),transparent 60%),
+  radial-gradient(800px 600px at 8% 24%,rgba(232,180,90,.05),transparent 62%)}
+a{color:inherit}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.nav{position:sticky;top:0;z-index:10;height:64px;display:flex;align-items:center;gap:30px;
+  padding:0 max(24px,calc((100vw - 1180px)/2));background:rgba(10,15,28,.84);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-size:14px;font-weight:700;letter-spacing:.05em;text-decoration:none;white-space:nowrap}
+.brand .mark{position:relative;width:26px;height:26px;border:1px solid rgba(232,180,90,.65);border-radius:50%}
+.brand .mark::before{content:"";position:absolute;inset:5px;border:1px solid rgba(127,166,255,.55);border-radius:50%}
+.brand .mark::after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:var(--accent);top:3px;right:5px}
+.brand i{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:#a5aaba;text-decoration:none}
+.nav-links a:hover{color:var(--accent)}
+.cta{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--accent);background:var(--accent);color:#17120a;
+  border-radius:999px;padding:9px 17px;font-size:12px;font-weight:650;text-decoration:none;cursor:pointer;white-space:nowrap}
+.cta:hover{background:#f2c879;border-color:#f2c879}
+.nav .cta{margin-left:auto;padding:7px 14px;font-size:11.5px}
+.hero{max-width:1180px;margin:0 auto;padding:clamp(34px,4.8vw,64px) 24px 34px;
+  display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:clamp(30px,5vw,62px);align-items:center}
+.kicker{margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;font-size:clamp(44px,5.9vw,78px);line-height:1.05;letter-spacing:-.05em;font-weight:640}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:22px 0 0;max-width:31em;font-size:13.5px;line-height:1.95;color:#a5aaba}
+.actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:26px}
+.link{font-size:12.5px;text-decoration:none;border-bottom:1px solid rgba(236,230,214,.32);padding-bottom:2px}
+.link:hover{color:var(--accent);border-color:var(--accent)}
+.meta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:24px;
+  font:600 9.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.meta-row i{width:1px;height:10px;background:var(--line)}
+.dome{position:relative;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:var(--card);
+  box-shadow:0 44px 90px -60px rgba(0,0,0,.95);
+  background-image:
+    radial-gradient(1.2px 1.2px at 9% 18%,rgba(236,230,214,.7),transparent),
+    radial-gradient(1.6px 1.6px at 21% 8%,rgba(236,230,214,.5),transparent),
+    radial-gradient(1px 1px at 33% 26%,rgba(236,230,214,.6),transparent),
+    radial-gradient(1.4px 1.4px at 47% 12%,rgba(236,230,214,.55),transparent),
+    radial-gradient(1px 1px at 58% 30%,rgba(236,230,214,.5),transparent),
+    radial-gradient(1.6px 1.6px at 71% 9%,rgba(236,230,214,.7),transparent),
+    radial-gradient(1px 1px at 84% 22%,rgba(236,230,214,.5),transparent),
+    radial-gradient(1.3px 1.3px at 93% 14%,rgba(236,230,214,.6),transparent),
+    radial-gradient(1px 1px at 15% 34%,rgba(236,230,214,.4),transparent),
+    linear-gradient(180deg,#0c1427,#0a0f1c 70%)}
+svg#arcBox{display:block;width:100%;height:auto;overflow:visible;outline:none}
+svg#arcBox:focus-visible{outline:1px dashed var(--accent);outline-offset:-10px;border-radius:20px}
+.guide{fill:none;stroke:rgba(232,180,90,.34);stroke-width:1.1;stroke-dasharray:4 8}
+.guide.faint{stroke:rgba(236,230,214,.12);stroke-dasharray:2 9}
+.label{fill:var(--ink);font:500 30px/1 -apple-system,"Segoe UI","PingFang SC",sans-serif;letter-spacing:.1em}
+.label .accent{fill:var(--accent)}
+.star{fill:rgba(236,230,214,.65)}
+.star.big{fill:rgba(232,180,90,.85)}
+.planet{fill:#d9b880}
+.planet-ring{fill:none;stroke:rgba(232,180,90,.35);stroke-width:1}
+.horizon{fill:url(#hglow)}
+.city{fill:#070b14}
+.dome-tag{position:absolute;left:14px;bottom:12px;display:flex;align-items:center;gap:7px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(236,230,214,.55);pointer-events:none}
+.dome-tag::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.sessions{max-width:1180px;margin:0 auto;padding:6px 24px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ses{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:rgba(16,23,40,.62);min-width:0}
+.ses.hot{border-color:rgba(232,180,90,.4);background:linear-gradient(150deg,rgba(232,180,90,.09),transparent 62%),rgba(16,23,40,.72)}
+.ses-top{display:flex;align-items:baseline;gap:10px}
+.ses-top span{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--accent)}
+.ses-top b{margin-left:auto;font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.ses h3{margin:9px 0 0;font-size:14px;font-weight:640;letter-spacing:-.01em}
+.ses p{margin:5px 0 0;font-size:10.5px;line-height:1.7;color:var(--muted)}
+.ses-foot{display:flex;justify-content:space-between;gap:10px;margin-top:11px;padding-top:9px;border-top:1px solid var(--line);
+  font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:#767d92}
+.sec{max-width:1180px;margin:0 auto;padding:clamp(44px,6.4vw,78px) 24px 0}
+.sec-head{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:22px;margin-bottom:20px}
+.sec-head .kicker{margin:0 0 8px}
+h2{margin:0;font-size:clamp(23px,2.8vw,34px);line-height:1.18;letter-spacing:-.03em;font-weight:640}
+.sec-head p{margin:0 0 3px auto;max-width:26em;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.sky{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,4vw,54px);align-items:start}
+.sky-note{margin:14px 0 0;font-size:11.5px;line-height:1.95;color:#9aa0b0;max-width:31em}
+.sky-note b{color:var(--ink);font-weight:600}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:20px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.fact{background:var(--panel);padding:14px 13px}
+.fact b{display:block;font:600 18px/1 ui-monospace,Consolas,monospace;letter-spacing:-.02em;color:var(--accent)}
+.fact span{display:block;margin-top:5px;font-size:8.5px;color:var(--muted);letter-spacing:.04em}
+.events{border-top:1px solid var(--line)}
+.ev{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line)}
+.ev .dt{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--accent)}
+.ev b{font-size:12.5px;font-weight:600}
+.ev small{display:block;margin-top:3px;font-size:9.5px;color:var(--muted)}
+.ev .vis{font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted);white-space:nowrap}
+.band{max-width:1180px;margin:clamp(44px,6.4vw,78px) auto 0;padding:0 24px}
+.band-inner{display:flex;align-items:center;gap:28px;flex-wrap:wrap;border:1px solid rgba(232,180,90,.28);border-radius:18px;
+  padding:clamp(24px,3.6vw,36px);background:linear-gradient(115deg,rgba(232,180,90,.1),transparent 58%),var(--panel)}
+.band h2{font-size:clamp(22px,2.7vw,32px)}
+.band p{margin:8px 0 0;font-size:11.5px;line-height:1.8;color:var(--muted);max-width:34em}
+.band .cta{margin-left:auto}
+footer{max-width:1180px;margin:48px auto 0;padding:20px 24px 30px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
+  font:600 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;
+  font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}
+  .brand .mark{width:20px;height:20px}
+  .brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .hero{grid-template-columns:minmax(0,1fr) 286px;gap:22px;padding:14px 20px 8px}
+  .kicker{margin-bottom:6px;font-size:8.5px}
+  h1{font-size:27px;line-height:1.1;letter-spacing:-.04em}
+  .lede{margin-top:9px;font-size:10.5px;line-height:1.65;max-width:34em}
+  .actions{margin-top:11px;gap:12px}
+  .cta{padding:7px 13px;font-size:10.5px}
+  .link{font-size:10.5px}
+  .meta-row{display:none}
+  .dome{border-radius:14px;box-shadow:none}
+  .dome-tag{left:10px;bottom:8px;font-size:6.5px}
+  .sessions{grid-template-columns:repeat(3,1fr);gap:8px;padding:4px 20px 0}
+  .ses{padding:8px 10px;border-radius:9px}
+  .ses-top span{font-size:8px}
+  .ses-top b{font-size:6.5px}
+  .ses h3{margin-top:5px;font-size:10.5px}
+  .ses p{display:none}
+  .ses-foot{margin-top:6px;padding-top:5px;font-size:6px}
+  .sec,.band,footer{display:none}
+  .sec#dome{display:block;padding:10px 20px 0}
+  #dome .sec-head{display:none}
+  #dome .sky{grid-template-columns:1fr;gap:8px}
+  #dome .sky-note{display:none}
+  #dome .facts{grid-template-columns:repeat(3,1fr);margin-top:0}
+  #dome .fact{padding:8px 10px}
+  #dome .fact b{font-size:13px}
+  #dome .fact span{font-size:6.5px;margin-top:2px}
+  #dome .events{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:0}
+  #dome .ev{display:flex;flex-direction:column;gap:2px;padding:7px 9px;border:1px solid var(--line);border-radius:9px}
+  #dome .ev .dt{font-size:6.5px}
+  #dome .ev b{font-size:9px}
+  #dome .ev small{display:none}
+  #dome .ev .vis{font-size:6px}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#d8d3c6;
+    background:rgba(30,36,52,.9);border:1px solid rgba(236,230,214,.16);
+    box-shadow:0 1px 6px rgba(0,0,0,.3)}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav-links{display:none}
+  .nav .cta{margin-left:auto;padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}
+  .brand i{display:none}
+  .hero{grid-template-columns:1fr;gap:24px;padding:28px 16px 18px}
+  h1{font-size:clamp(40px,12.8vw,56px);line-height:1.08}
+  .lede{font-size:12px;line-height:1.9;margin-top:16px}
+  .actions{margin-top:18px}
+  .meta-row{margin-top:18px;font-size:8.5px;gap:10px}
+  .dome{border-radius:16px}
+  .sessions{grid-template-columns:1fr;gap:8px;padding:4px 16px 0}
+  .ses{padding:13px 14px}
+  .ses p{font-size:10.5px}
+  .sec{padding-left:16px;padding-right:16px}
+  .sec-head{padding-top:18px;margin-bottom:16px}
+  .sec-head p{display:none}
+  .sky{grid-template-columns:1fr;gap:20px}
+  .facts{grid-template-columns:repeat(3,1fr)}
+  .ev{grid-template-columns:56px minmax(0,1fr);gap:10px}
+  .ev .vis{grid-column:2;justify-self:start}
+  .band{padding:0 16px;margin-top:38px}
+  .band-inner{padding:22px 20px;gap:16px}
+  .band .cta{margin-left:0}
+  footer{padding-left:16px;padding-right:16px;font-size:8.5px;margin-top:34px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .guide{stroke-dasharray:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span>ORBIT 穹顶天文馆<i>HANGZHOU</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#tonight">今晚</a>
+    <a href="#program">场次</a>
+    <a href="#dome">穹顶</a>
+  </nav>
+  <a class="cta" href="#tickets">购票</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">DOMED PLANETARIUM · SPRING 2026</p>
+      <h1>把星光，<br>排成一条<em>弧</em>。</h1>
+      <p class="lede">二十五米穹顶把整片夜空折到头顶。我们不做特效，只把真实的星图，沿着建筑的弧度慢慢铺开。</p>
+      <div class="actions">
+        <a class="cta" href="#tickets">预订今晚场次</a>
+        <a class="link" href="#program">查看三场时间</a>
+      </div>
+      <p class="meta-row"><span>25 米穹顶</span><i></i><span>8K 激光投影</span><i></i><span>360° 环幕</span></p>
+    </div>
+    <div class="dome">
+      <svg id="arcBox" viewBox="0 0 640 360" tabindex="0" role="img" aria-label="穹顶上沿弧线排列的文字，悬停或聚焦后沿穹顶移动">
+        <defs>
+          <path id="curve" d="M24 205 C 150 28 490 28 616 205"/>
+          <linearGradient id="hglow" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="rgba(232,180,90,0)"/>
+            <stop offset="1" stop-color="rgba(232,180,90,.16)"/>
+          </linearGradient>
+        </defs>
+        <circle class="star" cx="52" cy="72" r="1.3"/>
+        <circle class="star" cx="118" cy="46" r="1"/>
+        <circle class="star big" cx="176" cy="96" r="1.6"/>
+        <circle class="star" cx="238" cy="54" r="1.1"/>
+        <circle class="star" cx="300" cy="38" r="1.3"/>
+        <circle class="star" cx="372" cy="66" r="1"/>
+        <circle class="star big" cx="438" cy="40" r="1.5"/>
+        <circle class="star" cx="506" cy="82" r="1.1"/>
+        <circle class="star" cx="566" cy="54" r="1.3"/>
+        <circle class="star" cx="604" cy="104" r="1"/>
+        <circle class="star" cx="86" cy="132" r="1"/>
+        <circle class="star" cx="548" cy="146" r="1.1"/>
+        <circle class="planet" cx="520" cy="126" r="13"/>
+        <circle class="planet-ring" cx="520" cy="126" r="21"/>
+        <path class="guide faint" d="M8 270 C 160 96 480 96 632 270"/>
+        <path class="guide" d="M24 205 C 150 28 490 28 616 205"/>
+        <text class="label">
+          <textPath id="tp" href="#curve" startOffset="4%">沿着穹顶，星光慢慢走<tspan class="accent">。</tspan></textPath>
+        </text>
+        <rect class="horizon" x="0" y="286" width="640" height="74"/>
+        <path class="city" d="M0 330 L22 330 22 316 38 316 38 330 58 330 58 306 72 306 72 322 96 322 96 298 112 298 112 330 150 330 150 312 168 312 168 330 200 330 200 300 218 300 218 330 260 330 260 318 278 318 278 330 320 330 320 292 338 292 338 330 380 330 380 314 398 314 398 330 440 330 440 304 458 304 458 322 482 322 482 330 530 330 530 310 548 310 548 330 590 330 590 320 610 320 610 330 640 330 640 360 0 360 Z"/>
+      </svg>
+      <span class="dome-tag">ORBIT DOME · 25 M</span>
+    </div>
+  </section>
+
+  <section class="sessions" id="program" aria-label="今晚场次">
+    <article class="ses hot" id="tonight">
+      <div class="ses-top"><span>19:30</span><b>还剩 42 座</b></div>
+      <h3>春季星空</h3>
+      <p>从北斗开始，认一遍这个季节最亮的九颗星。</p>
+      <div class="ses-foot"><span>45 MIN</span><span>中文讲解</span></div>
+    </article>
+    <article class="ses">
+      <div class="ses-top"><span>20:30</span><b>还剩 17 座</b></div>
+      <h3>月球背面</h3>
+      <p>用环幕走一遍人类第一次看见的那一面。</p>
+      <div class="ses-foot"><span>50 MIN</span><span>中文讲解</span></div>
+    </article>
+    <article class="ses">
+      <div class="ses-top"><span>21:30</span><b>还剩 28 座</b></div>
+      <h3>深空天体</h3>
+      <p>星云、星团与银河，把视线推到太阳系之外。</p>
+      <div class="ses-foot"><span>60 MIN</span><span>中文讲解</span></div>
+    </article>
+  </section>
+
+  <section class="sec" id="dome">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">UNDER THE DOME / THIS WEEK</p>
+        <h2>穹顶之下</h2>
+      </div>
+      <p>每周四闭馆维护。天象数据来自紫金山天文台公开星历。</p>
+    </div>
+    <div class="sky">
+      <div>
+        <p class="sky-note">穹顶不是一块屏幕。二十五米的结构把投影分成 <b>18 个校正区</b>，每一区的星点都经过几何对齐。你抬头看到的弧线，和真实的天空保持同样的角度。</p>
+        <div class="facts">
+          <div class="fact"><b>25 m</b><span>穹顶直径</span></div>
+          <div class="fact"><b>8K</b><span>激光分辨率</span></div>
+          <div class="fact"><b>18</b><span>校正分区</span></div>
+        </div>
+      </div>
+      <div class="events">
+        <div class="ev"><span class="dt">11-12</span><span><b>金牛座流星雨</b><small>午夜后辐射点升高，郊外可见约 12 颗/小时</small></span><span class="vis">19:30 场次加映</span></div>
+        <div class="ev"><span class="dt">11-14</span><span><b>木星冲日</b><small>全年最亮，肉眼可见，穹顶将同步放大</small></span><span class="vis">21:30 场次</span></div>
+        <div class="ev"><span class="dt">11-16</span><span><b>月球过近地点</b><small>月面视直径增加 7%，适合看环形山</small></span><span class="vis">20:30 场次</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="tickets">
+    <div class="band-inner">
+      <div>
+        <h2>今晚还有 42 个座位。</h2>
+        <p>19:30 开场，提前十分钟入场。穹顶内保持安静，迟到的人要等第一段星图结束。</p>
+      </div>
+      <a class="cta" href="#top">预订今晚场次</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>ORBIT DOME · 杭州</span>
+  <span>天象数据 紫金山天文台 / 每周四闭馆</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">悬停穹顶上的文字，或 Tab 聚焦</p>
+
+<script>
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var box = document.getElementById('arcBox'), tp = document.getElementById('tp');
+  var cur = 4, target = 4, raf = null;
+
+  function frame() {
+    raf = null;
+    cur += (target - cur) * .085;
+    if (Math.abs(target - cur) < .04) cur = target;
+    tp.setAttribute('startOffset', cur.toFixed(2) + '%');
+    if (cur !== target) raf = requestAnimationFrame(frame);
+  }
+  function aim(v) {
+    target = v;
+    if (!raf) raf = requestAnimationFrame(frame);
+  }
+
+  box.addEventListener('pointerenter', function () { aim(26); });
+  box.addEventListener('pointerleave', function () { aim(4); });
+  box.addEventListener('focus', function () { aim(26); });
+  box.addEventListener('blur', function () { aim(4); });
+  tp.setAttribute('startOffset', '4%');
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

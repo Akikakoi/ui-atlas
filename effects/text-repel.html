@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文字斥力 · OFFGRID 隐私浏览器</title>
+<style>
+:root{--bg:#edf0e9;--paper:#f9fbf5;--ink:#101611;--muted:#5a655c;--line:#d2d9d0;--accent:#187a4c;
+  --accent-soft:rgba(24,122,76,.08);--dark:#0e1712;--cream:#eef3ea}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip;
+  background-image:radial-gradient(900px 520px at 92% -8%,rgba(24,122,76,.08),transparent 62%),
+    linear-gradient(rgba(16,22,17,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(16,22,17,.035) 1px,transparent 1px);
+  background-size:auto,44px 44px,44px 44px}
+a{color:inherit}
+button{font:inherit}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.nav{position:sticky;top:0;z-index:10;height:64px;display:flex;align-items:center;gap:30px;
+  padding:0 max(24px,calc((100vw - 1180px)/2));background:rgba(237,240,233,.9);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-size:14px;font-weight:700;letter-spacing:.04em;text-decoration:none;white-space:nowrap}
+.brand .mark{width:26px;height:26px;display:grid;place-items:center;border:1.5px solid var(--ink);border-radius:7px;
+  font:700 11px/1 ui-monospace,Consolas,monospace;color:var(--accent);background:var(--paper)}
+.brand i{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:#48534b;text-decoration:none}
+.nav-links a:hover{color:var(--accent)}
+.cta{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ink);background:var(--ink);color:var(--cream);
+  border-radius:999px;padding:9px 17px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap;
+  transition:background .2s,border-color .2s}
+.cta:hover{background:var(--accent);border-color:var(--accent)}
+.nav .cta{margin-left:auto;padding:7px 14px;font-size:11.5px}
+.hero{max-width:1180px;margin:0 auto;padding:clamp(36px,5vw,68px) 24px 34px;
+  display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:clamp(30px,5vw,64px);align-items:center}
+.kicker{margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;max-width:7.4em;font-size:clamp(40px,5.2vw,68px);line-height:1.16;letter-spacing:-.045em;font-weight:650;outline:none}
+h1 .ch{display:inline-block;will-change:transform}
+.lede{margin:22px 0 0;max-width:31em;font-size:13.5px;line-height:1.95;color:#48534b}
+.actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:26px}
+.link{font-size:12.5px;text-decoration:none;border-bottom:1px solid rgba(16,22,17,.32);padding-bottom:2px;transition:color .2s,border-color .2s}
+.link:hover{border-color:var(--accent);color:var(--accent)}
+.meta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:24px;
+  font:600 9.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.meta-row i{width:1px;height:10px;background:var(--line)}
+.panel{position:relative;overflow:hidden;background:var(--paper);border:1px solid var(--line);border-radius:18px;
+  padding:18px 22px 16px;box-shadow:0 40px 80px -58px rgba(16,22,17,.75)}
+.panel::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(rgba(16,22,17,.08) .7px,transparent .7px);background-size:5px 5px}
+.panel-top{position:relative;display:flex;justify-content:space-between;gap:12px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.panel-top b{display:inline-flex;align-items:center;gap:5px;color:var(--accent);font-weight:600}
+.panel-top b::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.big-stat{position:relative;display:flex;align-items:baseline;gap:10px;margin-top:16px;padding:14px 0 12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.big-stat b{font:600 clamp(38px,4.4vw,52px)/1 ui-monospace,Consolas,monospace;letter-spacing:-.05em;color:var(--accent);font-variant-numeric:tabular-nums}
+.big-stat span{font-size:11px;color:var(--muted);letter-spacing:.02em}
+.blocked{list-style:none;position:relative;margin:0;padding:6px 0 2px}
+.blocked li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);
+  font:600 10px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.02em;color:#48534b}
+.blocked li:last-child{border-bottom:0}
+.blocked li span{text-decoration:line-through;text-decoration-color:rgba(24,122,76,.55);text-decoration-thickness:1px}
+.blocked li b{color:var(--accent);font-weight:600;white-space:nowrap}
+.panel-foot{position:relative;display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;padding-top:10px;border-top:1px solid var(--line);
+  font:600 8.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.panel-foot b{color:var(--ink);font-weight:650}
+.panel-foot span:last-child{margin-left:auto}
+.figures{max-width:1180px;margin:0 auto;padding:6px 24px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.figure{border:1px solid var(--line);border-radius:12px;padding:15px 18px;background:rgba(249,251,245,.6);display:flex;align-items:baseline;gap:10px}
+.figure span{font-size:10px;color:var(--muted);letter-spacing:.03em}
+.figure b{margin-left:auto;font:600 clamp(17px,2vw,24px)/1 ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.figure b small{font-size:9px;color:var(--muted);font-weight:500;margin-left:2px;letter-spacing:0}
+.sec{max-width:1180px;margin:0 auto;padding:clamp(44px,6.4vw,78px) 24px 0}
+.sec-head{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:22px;margin-bottom:20px}
+.sec-head .kicker{margin:0 0 8px}
+h2{margin:0;font:650 clamp(23px,2.8vw,34px)/1.18 -apple-system,"Segoe UI","PingFang SC",sans-serif;letter-spacing:-.03em}
+.sec-head p{margin:0 0 3px auto;max-width:27em;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.shields{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.shield{display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:14px;
+  background:rgba(249,251,245,.6);padding:18px 20px 16px;transition:border-color .2s,transform .2s}
+.shield:hover{border-color:rgba(24,122,76,.4);transform:translateY(-2px)}
+.shield-top{display:flex;justify-content:space-between;gap:10px;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.shield-top b{color:var(--accent);font-weight:600}
+.shield h3{margin:12px 0 0;font-size:15.5px;font-weight:650;letter-spacing:-.01em}
+.shield p{margin:7px 0 0;font-size:10.5px;line-height:1.85;color:#5a655c;flex:1}
+.shield .meter{display:flex;gap:3px;margin-top:14px;height:6px}
+.shield .meter i{flex:1;border-radius:2px;background:rgba(24,122,76,.14)}
+.shield .meter i.on{background:var(--accent)}
+.shield-foot{display:flex;justify-content:space-between;gap:10px;margin-top:10px;
+  font:600 8.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.shield-foot b{color:var(--ink);font-weight:650}
+.compare{display:grid;grid-template-columns:minmax(0,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper)}
+.crow{display:grid;grid-template-columns:1.1fr .9fr .9fr;gap:14px;align-items:center;padding:13px 18px;border-top:1px solid var(--line);
+  font-size:11.5px;color:#48534b}
+.crow:first-child{border-top:0;background:rgba(16,22,17,.035);
+  font:600 8.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.crow b{font:600 12px/1.4 ui-monospace,Consolas,monospace;color:#6b756d}
+.crow b.good{color:var(--accent)}
+.crow .lbl{font-weight:550;color:var(--ink)}
+.compare-note{margin:12px 0 0;font-size:10px;line-height:1.8;color:var(--muted)}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.plan{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;padding:18px 20px 16px;
+  background:rgba(249,251,245,.55);min-width:0}
+.plan.hot{border-color:rgba(24,122,76,.42);background:linear-gradient(150deg,rgba(24,122,76,.08),transparent 62%),rgba(249,251,245,.9)}
+.pname{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.price{margin-top:12px;font:600 clamp(24px,2.6vw,30px)/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em}
+.price small{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:0}
+.plan ul{list-style:none;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line);font-size:10.5px;line-height:2;color:#5a655c}
+.plan li::before{content:"—";margin-right:7px;color:var(--accent)}
+.plan .link{margin-top:14px;align-self:flex-start;font-size:11.5px}
+.band{max-width:1180px;margin:clamp(44px,6.4vw,78px) auto 0;padding:0 24px}
+.band-inner{display:flex;align-items:center;gap:28px;flex-wrap:wrap;border-radius:18px;padding:clamp(24px,3.6vw,36px);
+  background:linear-gradient(115deg,rgba(24,122,76,.4),transparent 58%),var(--dark);color:var(--cream)}
+.band h2{font-size:clamp(22px,2.7vw,32px)}
+.band p{margin:8px 0 0;font-size:11.5px;line-height:1.8;color:#a3b0a5;max-width:34em}
+.band .cta{margin-left:auto;background:var(--cream);border-color:var(--cream);color:var(--dark)}
+.band .cta:hover{background:var(--accent);border-color:var(--accent);color:var(--cream)}
+footer{max-width:1180px;margin:48px auto 0;padding:20px 24px 30px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
+  font:600 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;
+  font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}
+  .brand .mark{width:20px;height:20px;font-size:9px}
+  .brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .hero{grid-template-columns:minmax(0,1fr) 246px;gap:22px;padding:12px 20px 6px;align-items:start}
+  .kicker{margin-bottom:6px;font-size:8.5px}
+  h1{font-size:29px;line-height:1.14}
+  .lede{margin-top:8px;font-size:10px;line-height:1.65;max-width:36em}
+  .actions{margin-top:9px;gap:12px}
+  .cta{padding:7px 13px;font-size:10.5px}
+  .link{font-size:10.5px}
+  .meta-row{display:none}
+  .panel{padding:10px 12px 8px;border-radius:12px;box-shadow:none}
+  .panel-top{font-size:6.5px}
+  .big-stat{margin-top:8px;padding:7px 0 6px;gap:7px}
+  .big-stat b{font-size:26px}
+  .big-stat span{font-size:7px}
+  .blocked{padding:2px 0 0}
+  .blocked li{padding:4px 0;font-size:6.5px}
+  .panel-foot{margin-top:4px;padding-top:5px;font-size:6px;gap:8px}
+  .figures{grid-template-columns:repeat(4,1fr);gap:8px;padding:4px 20px 0}
+  .figure{padding:8px 10px;border-radius:9px;gap:6px}
+  .figure span{font-size:7px}
+  .figure b{font-size:14px}
+  .figure b small{font-size:6px}
+  .sec,.band,footer{display:none}
+  .sec.shield-sec{display:block;padding:10px 20px 0}
+  .shield-sec .sec-head{display:none}
+  .shields{grid-template-columns:repeat(3,1fr);gap:8px}
+  .shield{padding:9px 11px 8px;border-radius:10px}
+  .shield-top{font-size:6px}
+  .shield h3{font-size:10.5px;margin-top:6px}
+  .shield p{font-size:6.5px;line-height:1.55;margin-top:3px}
+  .shield .meter{margin-top:7px;height:4px;gap:2px}
+  .shield-foot{margin-top:5px;font-size:6px;gap:6px}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c443e;
+    background:rgba(255,255,255,.84);border:1px solid rgba(16,22,17,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav-links{display:none}
+  .nav .cta{margin-left:auto;padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}
+  .brand i{display:none}
+  .hero{grid-template-columns:1fr;gap:22px;padding:28px 16px 18px}
+  h1{font-size:clamp(38px,9.8vw,46px);line-height:1.18}
+  .lede{font-size:12px;line-height:1.9;margin-top:16px}
+  .actions{margin-top:18px}
+  .meta-row{margin-top:18px;font-size:8.5px;gap:10px}
+  .panel{padding:15px 16px 13px;border-radius:16px}
+  .figures{grid-template-columns:repeat(2,1fr);gap:8px;padding:4px 16px 0}
+  .figure{padding:11px 13px}
+  .figure b{font-size:18px}
+  .sec{padding-left:16px;padding-right:16px}
+  .sec-head{padding-top:18px;margin-bottom:16px}
+  .sec-head p{display:none}
+  .shields{grid-template-columns:1fr;gap:10px}
+  .crow{grid-template-columns:1.1fr .9fr .9fr;gap:8px;padding:11px 14px;font-size:10.5px}
+  .crow b{font-size:10.5px}
+  .plans{grid-template-columns:1fr;gap:10px}
+  .band{padding:0 16px;margin-top:38px}
+  .band-inner{padding:22px 20px;gap:16px}
+  .band .cta{margin-left:0}
+  footer{padding-left:16px;padding-right:16px;font-size:8.5px;margin-top:34px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .cta,.link,.shield{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark" aria-hidden="true">O</span>OFFGRID<i>PRIVACY BROWSER</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#shields">防护</a>
+    <a href="#compare">对比</a>
+    <a href="#plans">定价</a>
+  </nav>
+  <a class="cta" href="#plans">安装扩展</a>
+</header>
+
+<main id="top">
+  <section class="hero" id="repel">
+    <div id="wrap">
+      <p class="kicker">PRIVACY / 17 · 追踪器靠不近</p>
+      <h1 id="title" aria-label="靠近一点，追踪会让开。">靠近一点，追踪会让开。</h1>
+      <p class="lede">OFFGRID 把追踪器挡在 100 像素之外：指纹打散、请求拦截、DNS 不落盘。你越把光标靠近标题，越能看见它躲。</p>
+      <div class="actions">
+        <a class="cta" href="#plans">安装扩展</a>
+        <a class="link" href="#shields">看三层防护</a>
+      </div>
+      <p class="meta-row"><span>0 Cookie</span><i></i><span>42 追踪器已拦</span><i></i><span>12 ms 启动</span></p>
+    </div>
+    <aside class="panel" aria-label="本次会话拦截面板">
+      <div class="panel-top"><span>PROTECTION / THIS SESSION</span><b>ON</b></div>
+      <div class="big-stat"><b>42</b><span>追踪器已拦截</span></div>
+      <ul class="blocked">
+        <li><span>ads.doubleclick.net</span><b>×12</b></li>
+        <li><span>pixel.track.io</span><b>×9</b></li>
+        <li><span>fingerprint.js</span><b>×4</b></li>
+        <li><span>beacon.analytics.co</span><b>×3</b></li>
+      </ul>
+      <div class="panel-foot"><span>Cookie <b>0</b></span><span>指纹熵 <b>8.1 bits</b></span><span>规则 <b>40 万条</b></span></div>
+    </aside>
+  </section>
+
+  <section class="figures" aria-label="防护数据">
+    <div class="figure"><span>内置规则</span><b>400<small>k</small></b></div>
+    <div class="figure"><span>启动耗时</span><b>12<small>ms</small></b></div>
+    <div class="figure"><span>默认 Cookie</span><b>0<small>个</small></b></div>
+    <div class="figure"><span>指纹熵</span><b>8.1<small>bits</small></b></div>
+  </section>
+
+  <section class="sec shield-sec" id="shields">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">THREE LAYERS / 默认全开</p>
+        <h2>三层防护</h2>
+      </div>
+      <p>不用装插件、不用调设置。装好那一刻，三层就已经在跑了。</p>
+    </div>
+    <div class="shields">
+      <article class="shield">
+        <div class="shield-top"><span>01 / SPOOF</span><b>指纹伪装</b></div>
+        <h3>让设备看起来普通</h3>
+        <p>Canvas、WebGL、字体与屏幕参数全部加噪。每 30 分钟换一次指纹，跨站也拼不起来。</p>
+        <div class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+        <div class="shield-foot"><span>指纹熵</span><b>8.1 bits</b></div>
+      </article>
+      <article class="shield">
+        <div class="shield-top"><span>02 / BLOCK</span><b>请求拦截</b></div>
+        <h3>在发出前掐断</h3>
+        <p>40 万条规则覆盖广告、统计与指纹脚本。请求还没离开浏览器，就已经被拦下来。</p>
+        <div class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+        <div class="shield-foot"><span>规则库</span><b>40 万条</b></div>
+      </article>
+      <article class="shield">
+        <div class="shield-top"><span>03 / ISOLATE</span><b>DNS 隔离</b></div>
+        <h3>解析记录不落盘</h3>
+        <p>每个标签页独立 DNS，退出即清空。没有缓存，也就没有“上次你搜过什么”。</p>
+        <div class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+        <div class="shield-foot"><span>本地记录</span><b>0 条</b></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" id="compare">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">BENCHMARK / 30 分钟浏览</p>
+        <h2>一次会话的差别</h2>
+      </div>
+      <p>同一组新闻站、同一段 30 分钟。数字越小越安静。</p>
+    </div>
+    <div class="compare" role="table" aria-label="普通浏览器与 OFFGRID 对比">
+      <div class="crow" role="row"><span role="columnheader">指标</span><span role="columnheader">普通浏览器</span><span role="columnheader">OFFGRID</span></div>
+      <div class="crow" role="row"><span class="lbl" role="cell">第三方请求</span><b role="cell">42</b><b class="good" role="cell">0</b></div>
+      <div class="crow" role="row"><span class="lbl" role="cell">Cookie 写入</span><b role="cell">27</b><b class="good" role="cell">0</b></div>
+      <div class="crow" role="row"><span class="lbl" role="cell">指纹熵</span><b role="cell">19.4 bits</b><b class="good" role="cell">8.1 bits</b></div>
+      <div class="crow" role="row"><span class="lbl" role="cell">首屏加载</span><b role="cell">1.8 s</b><b class="good" role="cell">1.2 s</b></div>
+      <div class="crow" role="row"><span class="lbl" role="cell">页面脚本</span><b role="cell">31 个</b><b class="good" role="cell">9 个</b></div>
+    </div>
+    <p class="compare-note">数据来自 2026 年 10 月的内部测试，仅代表平均值，不构成对任何站点的指控。</p>
+  </section>
+
+  <section class="sec" id="plans">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">PRICING / 无广告，无追踪</p>
+        <h2>定价</h2>
+      </div>
+      <p>免费版就有完整三层防护。付费买的是多设备同步与团队策略。</p>
+    </div>
+    <div class="plans">
+      <article class="plan">
+        <span class="pname">个人免费</span>
+        <b class="price">¥0</b>
+        <ul><li>完整三层防护</li><li>单设备</li><li>手动更新规则</li></ul>
+        <a class="link" href="#top">安装扩展</a>
+      </article>
+      <article class="plan hot">
+        <span class="pname">Pro</span>
+        <b class="price">¥28<small> / 月</small></b>
+        <ul><li>5 台设备同步</li><li>每小时更新规则</li><li>独立 DNS 节点</li></ul>
+        <a class="link" href="#top">升级 Pro</a>
+      </article>
+      <article class="plan">
+        <span class="pname">团队</span>
+        <b class="price">¥18<small> / 席位 / 月</small></b>
+        <ul><li>统一策略与审计</li><li>成员设备管理</li><li>专属支持</li></ul>
+        <a class="link" href="#top">联系我们</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="band-inner">
+      <div>
+        <h2>先让追踪器找不到你。</h2>
+        <p>安装只要 12 毫秒，卸载也只要一次点击。默认全开，不需要你懂任何术语。</p>
+      </div>
+      <a class="cta" href="#top">安装扩展</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>OFFGRID · 隐私浏览器 · 独立开发</span>
+  <span>40 万条规则 / 0 Cookie / 开源可审计</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">把光标移进标题，字会躲开；点按也可以</p>
+
+<script>
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var hero = document.getElementById('repel'), title = document.getElementById('title'), wrap = document.getElementById('wrap');
+  if (!hero || !title || !wrap) return;
+  var text = title.textContent;
+  title.textContent = '';
+  var chars = [];
+
+  for (var i = 0; i < text.length; i++) {
+    var s = document.createElement('span');
+    s.className = 'ch';
+    s.textContent = text[i];
+    title.appendChild(s);
+    chars.push({ el: s, x: 0, y: 0, tx: 0, ty: 0, cx: 0, cy: 0 });
+  }
+
+  function measure() {
+    var base = wrap.getBoundingClientRect();
+    chars.forEach(function (c) {
+      var r = c.el.getBoundingClientRect();
+      c.cx = r.left - base.left + r.width / 2;
+      c.cy = r.top - base.top + r.height / 2;
+    });
+  }
+
+  var raf = null;
+  function frame() {
+    raf = null;
+    var busy = false;
+    chars.forEach(function (c) {
+      c.x += (c.tx - c.x) * .12;
+      c.y += (c.ty - c.y) * .12;
+      if (Math.abs(c.tx - c.x) > .05 || Math.abs(c.ty - c.y) > .05) busy = true;
+      c.el.style.transform = 'translate3d(' + c.x.toFixed(2) + 'px,' + c.y.toFixed(2) + 'px,0)';
+    });
+    if (busy) raf = requestAnimationFrame(frame);
+  }
+
+  function aim(e) {
+    var base = wrap.getBoundingClientRect();
+    var px = e.clientX - base.left, py = e.clientY - base.top;
+    chars.forEach(function (c) {
+      var dx = c.cx - px, dy = c.cy - py;
+      var d = Math.hypot(dx, dy), R = 100;
+      if (d < R && d > 0) {
+        var f = (1 - d / R) * 18;
+        c.tx = dx / d * f;
+        c.ty = dy / d * f;
+      } else {
+        c.tx = 0;
+        c.ty = 0;
+      }
+    });
+    if (!raf) raf = requestAnimationFrame(frame);
+  }
+
+  function reset() {
+    chars.forEach(function (c) { c.tx = 0; c.ty = 0; });
+    if (!raf) raf = requestAnimationFrame(frame);
+  }
+
+  measure();
+  addEventListener('resize', measure);
+  addEventListener('load', measure);
+  hero.addEventListener('pointermove', aim);
+  hero.addEventListener('pointerdown', aim);
+  hero.addEventListener('pointerleave', reset);
+  hero.addEventListener('pointerup', reset);
+  hero.addEventListener('pointercancel', reset);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

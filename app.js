@@ -488,7 +488,18 @@
       });
     });
 
+    /* 锁滚动时把滚动条宽度补成 body 右内边距，避免弹层打开瞬间的布局位移 */
+    function lockScroll(on) {
+      if (on) {
+        var sbw = window.innerWidth - document.documentElement.clientWidth;
+        if (sbw > 0) document.body.style.paddingRight = sbw + 'px';
+      } else {
+        document.body.style.paddingRight = '';
+      }
+    }
+
     compare.hidden = false;
+    lockScroll(true);
     document.body.classList.add('compare-open');
     setTimeout(function () { document.getElementById('c-close').focus(); }, 30);
   }
@@ -497,6 +508,7 @@
     compare.hidden = true;
     COMPARE_IDS = [];
     document.body.classList.remove('compare-open');
+    document.body.style.paddingRight = '';
     var body = document.getElementById('c-body');
     if (body) body.textContent = '';
     if (lastFocus && lastFocus.focus) lastFocus.focus();

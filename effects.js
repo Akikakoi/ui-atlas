@@ -13,6 +13,8 @@
       curTab = 'all',
       cache = {},
       io = null,
+      ioAway = null,
+      mountedShots = [],
       notesBtn = document.getElementById('cm-notes'),
       codeBox = document.querySelector('.fx-code-box'),
       zoomModal = document.getElementById('zoomModal'),
@@ -27,6 +29,16 @@
     document.querySelector('.foot'),
     document.querySelector('.skip')
   ];
+
+  /* 锁滚动时把滚动条宽度补成 body 右内边距，避免弹层打开瞬间的布局位移 */
+  function lockScroll(on) {
+    if (on) {
+      var sbw = window.innerWidth - document.documentElement.clientWidth;
+      if (sbw > 0) document.body.style.paddingRight = sbw + 'px';
+    } else {
+      document.body.style.paddingRight = '';
+    }
+  }
 
   function setZoomInert(on) {
     zoomRegions.forEach(function (r) {
@@ -47,7 +59,7 @@
     }, 0);
   });
 
-  var CAT = {}, TRIG = { hover: '悬停', scroll: '滚动', click: '点击', view: '进入视口', load: '加载', auto: '自动', drag: '拖拽' };
+  var CAT = {}, FAM = {}, TRIG = { hover: '悬停', scroll: '滚动', click: '点击', view: '进入视口', load: '加载', auto: '自动', drag: '拖拽' };
   var LEVEL = { 1: '基础', 2: '进阶', 3: '复杂' };
 
   /* ------------------------------------------------------------ 工具 */
@@ -66,6 +78,14 @@
   }
   function byId(id) {
     return DATA ? DATA.effects.filter(function (e) { return e.id === id; })[0] : null;
+  }
+  /* 「原页」统一走 view.html：默认全宽打开真实页面，页内可切 600 × 450 画板对照 */
+  function viewHref(id) {
+    return 'view.html?id=' + encodeURIComponent(id);
+  }
+  /* demo 文件名固定，加版本号避免浏览器沿用缓存里的旧页面 */
+  function demoSrc(e) {
+    return e.demo + '?v=' + ((DATA && DATA.demoV) || '1');
   }
   function load(k, dflt) {
     try { var v = JSON.parse(localStorage.getItem(k)); return v === null ? dflt : v; }
@@ -126,7 +146,54 @@
     ['顶栏', '导航栏', '收缩', 'header', 'sticky'],
     ['按钮', 'loading', '成功', '对勾', '提交'],
     ['星空', '星星', 'starfield', '穿越', '纵深'],
-    ['菜单', '全屏', 'menu', 'overlay', '导航']
+    ['菜单', '全屏', 'menu', 'overlay', '导航'],
+    ['拖尾', '轨迹', 'trail', 'canvas', '余温', '光标'],
+    ['缩放', '滚动缩放', 'zoom', 'scale', '镜头', '推进'],
+    ['描边', '画线', 'stroke', 'dashoffset', '路径', 'svg'],
+    ['里程表', 'odometer', '翻牌', '滚轮', '数字'],
+    ['抖动', 'jitter', 'shake', '发抖', '错误', '校验', '表单'],
+    ['变形', 'morph', '展开', '搜索框', '伸缩', '输入框'],
+    ['自动保存', 'autosave', '保存', '草稿', '防抖'],
+    ['流光', '边框', 'conic', '旋转', '渐变'],
+    ['汉堡', 'hamburger', '图标变形', '叉'],
+    ['拖拽惯性', '甩动', 'inertia', '动量', 'drag'],
+    ['填充', '点亮', '逐字', '阅读', 'fill', '滚动文字'],
+    ['弧线', 'textpath', '曲线', '路径文字', '排版'],
+    ['分栏', 'split', 'separator', 'resize', '对比'],
+    ['复制', 'copy', '剪贴板', 'clipboard', '已复制'],
+    ['提示', 'tooltip', '气泡', '延迟', '悬停说明'],
+    ['透视', '网格', 'grid', 'synthwave', '纵深', 'perspective'],
+    ['路由', 'route', '进度条', '加载', '导航'],
+    ['旋钮', 'knob', '角度', 'atan2', '旋转调节'],
+    ['序列', '帧', 'sequence', 'frames', '交叉淡化', '逐帧'],
+    ['轮换', 'rotate', '关键词', '词', 'hero'],
+    ['故障', 'glitch', '切片', 'rgb', '扫描线'],
+    ['瀑布流', 'masonry', '多列', '重排'],
+    ['侧栏', 'rail', 'sidebar', '折叠导航', '收轨'],
+    ['角标', 'badge', '徽标', '未读', '通知数字'],
+    ['下拉刷新', 'pull', 'refresh', '手势刷新', '下拉'],
+    ['字符雨', 'matrix', '数字雨', '代码雨'],
+    ['翻卡', 'flip', '3d', '正反面', '卡片翻转'],
+    ['擦洗', 'scrub', '胶片', '逐帧', '时间线'],
+    ['唱片', 'rotate', '齿轮', '角度', '表盘'],
+    ['斥力', 'repel', '推开', '文字散开'],
+    ['下划线', 'underline', '链接线', '展开线'],
+    ['横滑', 'drag', 'gallery', '拖拽画廊', 'swipe'],
+    ['底部导航', 'tabbar', '底栏', '手机导航'],
+    ['撤销', 'undo', '删除', '恢复', '撤回'],
+    ['纸屑', 'confetti', '撒花', '庆祝', '礼花'],
+    ['熔岩', 'lava', 'gooey', '液态', 'blob', '黏'],
+    ['推入', 'push', '详情页', '返回', '层级'],
+    ['Dock', '邻近', '放大图标', 'macos', '图标'],
+    ['图片平移', 'pan', '视差', '镜头', '图片'],
+    ['色相', 'hue', '换色', '背景色', '滚动换色'],
+    ['探照灯', 'spotlight', '遮罩文字', '手电筒', '文字遮罩'],
+    ['表格', 'table', '展开行', '行详情', 'colspan'],
+    ['步骤', 'stepper', '向导', '多步', '步骤进度'],
+    ['对勾', 'check', '勾选', '完成', '成功'],
+    ['音频', '波形', 'audio', 'wave', '播放', '声音'],
+    ['体积光', 'rays', '光束', '舞台光'],
+    ['错峰', 'stagger', '入场', '延迟', '逐个']
   ];
   function aliases(term) {
     var out = [term];
@@ -140,10 +207,15 @@
 
   function index() {
     DATA.cats.forEach(function (c) { CAT[c.id] = c.name; });
+    (DATA.families || []).forEach(function (f) { FAM[f.id] = f; });
     DATA.effects.forEach(function (e) {
+      var fam = FAM[e.family] || {};
       e._cat = CAT[e.cat] || e.cat;
       e._trig = TRIG[e.trigger] || e.trigger;
+      e._family = fam.name || e.family || '';
+      e._famNote = fam.note || '';
       e._hay = [e.id, e.name, e.name_en, e._cat, e._trig, LEVEL[e.level],
+                e.family || '', e._family, e._famNote,
                 (e.tech || []).join(' '), (e.features || []).join(' '),
                 e.how || '', e.watch || '', (e.tags || []).join(' ')].join(' ').toLowerCase();
     });
@@ -157,6 +229,20 @@
     return terms.every(function (t) {
       return aliases(t).some(function (a) { return e._hay.indexOf(a.toLowerCase()) >= 0; });
     });
+  }
+
+  /* 别名会放大命中面，原顺序下精确名会被挤到十几位之后 */
+  function score(e) {
+    var q = state.q.toLowerCase().trim();
+    if (!q) return 0;
+    var name = e.name.toLowerCase(), en = (e.name_en || '').toLowerCase(), id = e.id.toLowerCase();
+    if (name === q || en === q || id === q) return 0;
+    var terms = q.split(/\s+/).filter(Boolean);
+    function allIn(s) { return terms.every(function (t) { return s.indexOf(t) >= 0; }); }
+    if (allIn(name) || allIn(en)) return 1;
+    if (name.indexOf(q) >= 0 || en.indexOf(q) >= 0) return 2;
+    if (e._hay.indexOf(q) >= 0) return 3;
+    return 4;
   }
 
   /* ------------------------------------------------------------ 预览挂载 */
@@ -176,7 +262,20 @@
     f.dataset.mounted = '1';
     fitShot(shot);
     f.src = f.dataset.src;
+    /* 最多保留 24 个预览，超出的先卸载最久的一个 */
+    mountedShots = mountedShots.filter(function (s) { return s !== shot; });
+    mountedShots.push(shot);
+    while (mountedShots.length > 24) {
+      var old = mountedShots.shift();
+      if (old && old !== shot && old.__unmount) old.__unmount();
+    }
     if (shot.__fail) shot.__fail();
+  }
+
+  function unmount(shot) {
+    var f = shot.querySelector('iframe');
+    if (!f || !f.dataset.mounted) return;
+    if (shot.__unmount) shot.__unmount();
   }
   function tidy(f) {
     try {
@@ -215,7 +314,7 @@
       box.appendChild(retry);
     }
 
-    var f = el('iframe', { 'data-src': e.demo, title: e.name + ' 交互预览', loading: 'lazy' });
+    var f = el('iframe', { 'data-src': demoSrc(e), title: e.name + ' 交互预览', loading: 'lazy' });
     f.addEventListener('load', function () {
       if (!f.dataset.mounted) return;
       clearTimeout(failTimer);
@@ -236,8 +335,7 @@
     ]);
 
     var act = el('div', { class: 'fx-act' }, [
-      el('button', { type: 'button', text: '代码', onclick: function (ev) { ev.stopPropagation(); openCode(e.id); } }),
-      el('a', { href: e.demo, target: '_blank', rel: 'noopener', text: '原页' })
+      el('a', { href: viewHref(e.id), target: '_blank', rel: 'noopener', text: '原页' })
     ]);
     shot.appendChild(act);
 
@@ -249,6 +347,17 @@
     shot.appendChild(zoomBtn);
 
     shot.__fail = function () { failTimer = setTimeout(function () { fail(shot); }, 8000); };
+
+    shot.__unmount = function () {
+      clearTimeout(failTimer);
+      f.dataset.mounted = '';
+      shot.classList.remove('ready', 'failed');
+      f.src = 'about:blank';
+      mountedShots = mountedShots.filter(function (s) { return s !== shot; });
+      var box = shot.querySelector('.fx-loading');
+      if (box) { delete box.dataset.failed; box.textContent = '加载预览…'; }
+      if (io) io.observe(shot);
+    };
 
     var star = el('button', {
       class: 'star', type: 'button', title: '收藏',
@@ -279,6 +388,7 @@
         el('p', { class: 'fx-how', text: e.features[0] }),
         el('div', { class: 'fx-meta' }, [
           el('i', { class: 'trig', text: e._trig }),
+          e._family ? el('i', { class: 'fam', title: '机制：' + e._family + (e._famNote ? ' · ' + e._famNote : ''), text: e._family }) : null,
           el('i', { text: (e.tech || [])[0] || 'CSS' }),
           e.depth && e.depth.cost ? el('i', { class: 'cost', 'data-tier': e.depth.cost.tier, text: '成本 ' + e.depth.cost.tier }) : null,
           e.level >= 3 ? el('i', { text: '慎用' }) : null
@@ -319,6 +429,8 @@
   function render() {
     grid.textContent = '';
     if (io) io.disconnect();
+    if (ioAway) ioAway.disconnect();
+    mountedShots = [];
     document.querySelectorAll('.fx-cats .chip').forEach(function (b) {
       b.setAttribute('aria-pressed', b.getAttribute('data-cat') === state.cat ? 'true' : 'false');
     });
@@ -326,6 +438,12 @@
     document.getElementById('n-fav').textContent = FAV.size;
 
     var list = DATA.effects.filter(match);
+    if (state.q) {
+      list = list.slice().sort(function (a, b) { return score(a) - score(b); });
+      /* 输入完整标题时只留精确命中，避免别名把结果扩成几十条 */
+      var exact = list.filter(function (e) { return score(e) === 0; });
+      if (exact.length) list = exact;
+    }
     document.getElementById('count-info').textContent = list.length + ' / ' + DATA.total + ' 个';
     if (!list.length) { grid.appendChild(emptyBlock()); return; }
 
@@ -334,6 +452,7 @@
       grid.appendChild(c);
       var shot = c.querySelector('.fx-shot');
       if (io) io.observe(shot); else mount(shot);
+      if (ioAway) ioAway.observe(shot);
     });
   }
 
@@ -352,15 +471,20 @@
     if (!e) return;
     zoomOpenId = id;
     zoomLastFocus = document.activeElement;
+    /* hash 直达 / popstate 恢复时 activeElement 是 body，关闭后应回到该卡片而非无处可去 */
+    if (!zoomLastFocus || zoomLastFocus === document.body) {
+      zoomLastFocus = grid.querySelector('.fx-card[data-id="' + id + '"] .fx-zoom-btn') || null;
+    }
     document.getElementById('zm-title').textContent = e.name;
     document.getElementById('zm-sub').textContent = e.name_en + ' · ' + e._cat + ' · 600 × 450 等比放大';
-    document.getElementById('zm-open').href = e.demo;
+    document.getElementById('zm-open').href = viewHref(e.id);
     zoomFrame.title = '放大预览：' + e.name;
     zoomStage.classList.remove('ready');
     zoomModal.hidden = false;
     document.body.classList.add('fx-lock');
+    lockScroll(true);
     setZoomInert(true);
-    zoomFrame.src = e.demo;
+    zoomFrame.src = demoSrc(e);
     fitZoom();
     if (push !== false) history.pushState({ z: id }, '', '#z=' + encodeURIComponent(id));
     setTimeout(function () { document.getElementById('zm-close').focus(); }, 50);
@@ -374,6 +498,7 @@
     zoomStage.classList.remove('ready');
     zoomFrame.src = 'about:blank';
     document.body.classList.remove('fx-lock');
+    lockScroll(false);
     setZoomInert(false);
     if (cleanHash !== false && decodeURIComponent(location.hash.slice(1)) === 'z=' + id) {
       history.replaceState(null, '', location.pathname + location.search);
@@ -384,7 +509,7 @@
   /* ------------------------------------------------------------ 源码弹层 */
   function getSource(e) {
     if (cache[e.id]) return Promise.resolve(cache[e.id]);
-    return fetch(e.demo).then(function (r) {
+    return fetch(demoSrc(e)).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.text();
     }).then(function (t) { cache[e.id] = t; return t; });
@@ -429,9 +554,11 @@
     openId = id;
     modal.hidden = false;
     document.body.classList.add('fx-lock');
+    lockScroll(true);
 
     document.getElementById('cm-title').textContent = e.name;
-    document.getElementById('cm-sub').textContent = e.name_en + ' · ' + e._cat + ' · ' + e._trig;
+    document.getElementById('cm-sub').textContent =
+      e.name_en + ' · ' + e._cat + ' · ' + e._trig + (e._family ? ' · ' + e._family : '');
     document.getElementById('cm-how').textContent = e.how;
     document.getElementById('cm-watch').textContent = e.watch;
 
@@ -453,6 +580,19 @@
       variants.appendChild(el('li', {}, [el('b', { text: v[0] }), el('span', { text: v[1] })]));
     });
 
+    var sameWrap = document.getElementById('cm-same-wrap');
+    var sameBtn = document.getElementById('cm-same-open');
+    var base = e.variant_of ? byId(e.variant_of) : null;
+    if (base) {
+      document.getElementById('cm-same').textContent =
+        '与《' + base.name + '》同属「' + e._family + '」，共用同一套内核；本条只换了载体、触发方式或参数。';
+      sameBtn.textContent = '打开《' + base.name + '》→';
+      sameBtn.onclick = function () { openCode(base.id); };
+      sameWrap.hidden = false;
+    } else {
+      sameWrap.hidden = true;
+    }
+
     var cost = d.cost || {};
     var tier = document.getElementById('cm-cost-tier');
     tier.textContent = cost.tier || '—';
@@ -469,7 +609,7 @@
     var tags = document.getElementById('cm-tech');
     tags.textContent = '';
     (e.tech || []).forEach(function (t) { tags.appendChild(el('span', { text: t })); });
-    document.getElementById('cm-open').href = e.demo;
+    document.getElementById('cm-open').href = viewHref(e.id);
     document.getElementById('cm-code').textContent = '载入源码…';
     document.getElementById('cm-lines').textContent = '';
 
@@ -494,6 +634,7 @@
     codeBox.classList.remove('notes-on');
     notesBtn.setAttribute('aria-expanded', 'false');
     document.body.classList.remove('fx-lock');
+    lockScroll(false);
     if (decodeURIComponent(location.hash.slice(1)) === id) {
       history.replaceState(null, '', location.pathname + location.search);
     }
@@ -678,6 +819,13 @@
           io.unobserve(en.target);
         });
       }, { rootMargin: '500px 0px' });
+      /* 离视口太远的预览主动卸载，滚回来会重新挂载 */
+      ioAway = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) return;
+          unmount(en.target);
+        });
+      }, { rootMargin: '1400px 0px' });
     }
 
     render();

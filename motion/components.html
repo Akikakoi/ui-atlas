@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>可配置组件 · UI Atlas</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<meta name="description" content="把 8 个高频动效做成零依赖可配置组件：入场、错峰、磁吸、提示、通知、骨架屏、手风琴、复制反馈；实时调参并复制 JS / CSS / HTML。">
+<link rel="stylesheet" href="../site.css?v=13">
+<link rel="stylesheet" href="tokens.css">
+<style>
+.comp-page{max-width:1180px;margin:0 auto;padding:0 22px}
+.hero{padding:44px 0 26px;border-bottom:1px solid var(--line)}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+.hero h1{margin:0 0 14px;font-size:clamp(34px,6.2vw,54px);line-height:1.03;letter-spacing:-.05em;font-weight:650}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .lede{margin:0;max-width:40em;font-size:13.5px;line-height:1.9;color:var(--muted)}
+.hero .facts{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
+.hero .facts span{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);
+  border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:var(--panel)}
+.layout{display:grid;grid-template-columns:246px minmax(0,1fr);gap:18px;padding:22px 0 54px;align-items:start}
+.side{position:sticky;top:74px;display:grid;gap:5px}
+.side-head{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted);padding:0 4px 7px}
+.comp{display:grid;gap:2px;text-align:left;border:1px solid transparent;border-radius:10px;background:transparent;
+  padding:9px 10px;color:inherit;font:inherit;cursor:pointer;transition:background .18s,border-color .18s}
+.comp:hover{background:var(--panel);border-color:var(--line)}
+.comp[aria-pressed="true"]{background:var(--panel);border-color:var(--line);box-shadow:0 8px 18px -18px rgba(0,0,0,.5)}
+.comp b{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px}
+.comp b i{width:5px;height:5px;border-radius:50%;background:#d8d3c5;font-style:normal}
+.comp[aria-pressed="true"] b i{background:var(--accent)}
+.comp small{font-size:10.5px;line-height:1.55;color:var(--muted)}
+.comp:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.main{display:grid;gap:14px;min-width:0}
+.stage{border:1px solid var(--line);border-radius:16px;background:linear-gradient(160deg,#fbf9f3,#f1eee4);overflow:hidden}
+.stage-head{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)}
+.stage-head b{color:var(--ink);font-size:12px}
+.stage-head .tag{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;background:#edf3ec;color:#4a6b52;border-radius:999px;padding:3px 7px}
+.stage-head .spacer{flex:1}
+.replay{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:7px;padding:4px 9px;font:inherit;font-size:10.5px;cursor:pointer}
+.replay:hover{border-color:var(--accent);color:var(--accent)}
+.replay:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.preview{min-height:368px;display:grid;place-items:center;padding:26px 20px;position:relative;overflow:hidden}
+.controls{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.control{display:grid;gap:5px;font-size:11.5px}
+.c-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.c-top label{font-weight:600}
+.c-top output{font:600 10.5px/1.4 ui-monospace,Consolas,monospace;color:var(--accent)}
+input[type="range"]{width:100%;accent-color:var(--accent);cursor:pointer}
+select{width:100%;height:32px;padding:0 8px;border:1px solid var(--line);border-radius:7px;background:#fbfaf5;color:var(--ink);font:inherit;font-size:11.5px}
+.check{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#4b4e55;cursor:pointer;padding-top:5px}
+.check input{accent-color:var(--accent)}
+.codebox{border:1px solid var(--line);border-radius:14px;background:#fbfaf6;overflow:hidden}
+.code-head{display:flex;align-items:center;gap:2px;padding:8px 9px;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:2px}
+.tabs button{border:0;background:transparent;color:var(--muted);padding:5px 9px;border-radius:6px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;cursor:pointer}
+.tabs button[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(20,20,15,.08)}
+.copy{margin-left:auto;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:7px;padding:5px 10px;font:inherit;font-size:11px;font-weight:600;cursor:pointer}
+.copy:hover{border-color:var(--accent);color:var(--accent)}
+.copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+pre{margin:0;padding:14px;max-height:360px;overflow:auto;font:11.5px/1.75 ui-monospace,Consolas,monospace;color:#2f3238;white-space:pre}
+.hint{position:fixed;left:16px;bottom:14px;z-index:9;display:flex;align-items:center;gap:6px;margin:0;
+  padding:4px 9px;border:1px solid rgba(128,128,128,.18);border-radius:999px;background:rgba(128,128,128,.10);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.foot{max-width:1180px;margin:0 auto;padding-left:0;padding-right:0}
+/* ---- 预览里用到的演示容器，不属于组件本身 ---- */
+.demo-stack{width:100%;max-width:460px;display:grid;gap:9px}
+.demo-card{padding:13px 14px;border:1px solid #e2ddd0;border-radius:11px;background:#fff}
+.demo-card span{display:block;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent);margin-bottom:6px}
+.demo-card b{display:block;font-size:14px;letter-spacing:-.02em}
+.demo-card p{margin:4px 0 0;font-size:11px;line-height:1.65;color:#6b6e75}
+.demo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:440px}
+.demo-grid .demo-card{padding:10px}
+.demo-center{display:grid;place-items:center;gap:12px}
+.demo-btn{border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:999px;padding:9px 17px;font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.demo-btn:hover{background:var(--accent);border-color:var(--accent)}
+.demo-btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.demo-mag{height:52px;padding:0 22px;border:0;border-radius:999px;background:var(--accent);color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.demo-mag span{display:inline-block}
+.demo-toast{display:grid;gap:14px;justify-items:center;width:100%;max-width:360px}
+.demo-sk{display:grid;width:100%;max-width:340px;padding:14px;border:1px solid #e2ddd0;border-radius:13px;background:#fff;position:relative;min-height:178px}
+.demo-sk .fx-sk,.demo-sk .fx-real{grid-area:1/1}
+.demo-sk .fx-sk{display:grid;gap:9px;grid-template-columns:40px 1fr}
+.demo-sk .fx-sk i{display:block;border-radius:6px;background:linear-gradient(100deg,#eeece5 20%,#f8f6ef 40%,#eeece5 60%) 0 0/220% 100%;animation:fx-shimmer var(--fx-shimmer,1.4s) linear infinite}
+.demo-sk .fx-sk i.av{width:40px;height:40px;border-radius:50%}
+.demo-sk .fx-sk i.l1{height:10px;width:44%}
+.demo-sk .fx-sk i.l2{height:10px;width:82%}
+.demo-sk .fx-sk i.media{grid-column:1/-1;height:76px;margin-top:4px}
+.demo-sk .fx-real{display:grid;gap:9px;grid-template-columns:40px 1fr}
+.demo-sk .fx-real .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2f5fd0,#8fb4ff);display:grid;place-items:center;color:#fff;font-size:11px;font-weight:600}
+.demo-sk .fx-real b{font-size:13px}
+.demo-sk .fx-real small{display:block;font-size:10.5px;color:#7b7e85;margin-top:2px}
+.demo-sk .fx-real p{grid-column:1/-1;margin:0;font-size:11.5px;line-height:1.75;color:#4b4e55}
+.demo-sk .fx-real .media{grid-column:1/-1;height:70px;border-radius:8px;background:radial-gradient(circle at 25% 30%,#f0d7b4,transparent 55%),linear-gradient(135deg,#c9a06a,#5d6b52)}
+.demo-copy{display:flex;align-items:center;gap:10px;max-width:100%;padding:12px 14px;border:1px solid #e2ddd0;border-radius:11px;background:#fff}
+.demo-copy code{font:11.5px/1.6 ui-monospace,Consolas,monospace;color:#2f3238;white-space:nowrap;overflow:auto}
+@media (max-width:900px){.layout{grid-template-columns:1fr}.side{position:static;display:flex;overflow:auto;gap:6px;padding-bottom:4px}.side-head{display:none}.comp{min-width:150px;flex:0 0 auto}.comp small{display:none}}
+@media (max-width:720px){.comp-page{padding:0 14px}.hero{padding:34px 0 22px}.preview{padding:20px 14px;min-height:330px}}
+@media (prefers-reduced-motion:reduce){
+  .demo-sk .fx-sk i{animation:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#workshop">跳到组件工坊</a>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">◆</span>
+      <div>
+        <h1>UI Atlas</h1>
+        <p>动效系统 · 可配置组件</p>
+      </div>
+    </div>
+    <div class="tools">
+      <span class="spacer"></span>
+      <a class="ref-link" href="../motion.html">← 动效系统</a>
+      <a class="ref-link" href="../effects.html">动效图鉴 →</a>
+    </div>
+  </div>
+</header>
+
+<main class="comp-page" id="workshop">
+  <section class="hero">
+    <p class="kicker">MOTION COMPONENTS · 03</p>
+    <h1>不是片段，<br><em>是能带走的参数。</em></h1>
+    <p class="lede">从 100 条里挑了 8 个高频效果，做成零依赖的小组件：入场、错峰、磁吸、提示、通知、骨架屏、手风琴、复制反馈。调完参数可以直接复制 JS / CSS / HTML。</p>
+    <div class="facts"><span>8 个组件</span><span>零依赖</span><span>键盘可用</span><span>尊重减动效</span><span>可复制</span></div>
+  </section>
+
+  <div class="layout">
+    <aside class="side" id="side" aria-label="组件列表"><p class="side-head">COMPONENTS / 08</p></aside>
+    <section class="main">
+      <div class="stage">
+        <div class="stage-head">
+          <b id="stageTitle">逐段入场</b>
+          <span class="tag" id="stageTag">指针距离场</span>
+          <span id="stageNote">进入视口才动</span>
+          <span class="spacer"></span>
+          <button class="replay" id="replay" type="button">重播</button>
+        </div>
+        <div class="preview" id="preview"></div>
+      </div>
+      <div class="controls" id="controls" aria-label="组件参数"></div>
+      <div class="codebox">
+        <div class="code-head">
+          <div class="tabs" role="tablist" aria-label="代码类型">
+            <button type="button" role="tab" data-tab="js" aria-selected="true" aria-controls="code">JS</button>
+            <button type="button" role="tab" data-tab="css" aria-selected="false" aria-controls="code">CSS</button>
+            <button type="button" role="tab" data-tab="html" aria-selected="false" aria-controls="code">HTML</button>
+          </div>
+          <button class="copy" id="copy" type="button">复制当前</button>
+        </div>
+        <pre id="code" role="tabpanel" tabindex="0"></pre>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <p>组件都是同一个约定：显式参数、可销毁、键盘可达、减动效下给终态。页面本身零依赖，复制走的也是同一份实现。</p>
+  <p><a href="../motion.html">动效系统</a> · <a href="../effects.html">100 条动效</a> · <a href="../README.md">说明</a></p>
+</footer>
+<p class="hint">选组件、拖参数，再复制代码</p>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ------------------------------------------------------------ 组件实现
+     每个函数都自包含，复制时直接 toString()，不依赖页面里的任何变量。 */
+
+  function fxReveal(root, options) {
+    var o = Object.assign({ selector: '[data-fx]', distance: 28, duration: 480, easing: 'cubic-bezier(0,0,.2,1)', threshold: .2, once: true }, options || {});
+    var items = [].slice.call(root.querySelectorAll(o.selector));
+    root.style.setProperty('--fx-distance', o.distance + 'px');
+    root.style.setProperty('--fx-duration', o.duration + 'ms');
+    root.style.setProperty('--fx-ease', o.easing);
+    items.forEach(function (el) { el.classList.remove('is-in'); });
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      items.forEach(function (el) { el.classList.add('is-in'); });
+      return { destroy: function () {} };
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('is-in');
+          if (o.once) io.unobserve(en.target);
+        } else if (!o.once) {
+          en.target.classList.remove('is-in');
+        }
+      });
+    }, { threshold: o.threshold });
+    items.forEach(function (el) { io.observe(el); });
+    return { destroy: function () { io.disconnect(); items.forEach(function (el) { el.classList.remove('is-in'); }); } };
+  }
+
+  function fxStagger(root, options) {
+    var o = Object.assign({ selector: '[data-fx]', delay: 60, distance: 14, duration: 440, easing: 'cubic-bezier(.2,.8,.2,1)', once: true }, options || {});
+    var items = [].slice.call(root.querySelectorAll(o.selector));
+    root.style.setProperty('--fx-stagger', o.delay + 'ms');
+    root.style.setProperty('--fx-distance', o.distance + 'px');
+    root.style.setProperty('--fx-duration', o.duration + 'ms');
+    root.style.setProperty('--fx-ease', o.easing);
+    root.classList.remove('is-in');
+    items.forEach(function (el, i) { el.style.setProperty('--i', i); });
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      root.classList.add('is-in');
+      return { destroy: function () {} };
+    }
+    var io = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) {
+        root.classList.add('is-in');
+        if (o.once) io.disconnect();
+      } else if (!o.once) {
+        root.classList.remove('is-in');
+      }
+    }, { threshold: .15 });
+    io.observe(root);
+    return { destroy: function () { io.disconnect(); root.classList.remove('is-in'); } };
+  }
+
+  function fxMagnetic(el, options) {
+    var o = Object.assign({ radius: 140, strength: .3, ease: .16 }, options || {});
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return { destroy: function () {} };
+    var tx = 0, ty = 0, x = 0, y = 0, raf = null, active = false;
+    function tick() {
+      raf = null;
+      x += (tx - x) * o.ease;
+      y += (ty - y) * o.ease;
+      el.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0)';
+      if (Math.abs(tx - x) > .05 || Math.abs(ty - y) > .05) raf = requestAnimationFrame(tick);
+    }
+    function move(e) {
+      var r = el.getBoundingClientRect();
+      var dx = e.clientX - (r.left + r.width / 2);
+      var dy = e.clientY - (r.top + r.height / 2);
+      var d = Math.hypot(dx, dy);
+      var f = d < o.radius ? 1 - d / o.radius : 0;
+      tx = dx * o.strength * f;
+      ty = dy * o.strength * f;
+      if (!raf) raf = requestAnimationFrame(tick);
+    }
+    function enter() { active = true; el.classList.add('is-tracking'); }
+    function leave() {
+      active = false;
+      el.classList.remove('is-tracking');
+      tx = ty = 0;
+      if (!raf) raf = requestAnimationFrame(tick);
+    }
+    el.addEventListener('pointerenter', enter);
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerleave', leave);
+    return {
+      destroy: function () {
+        el.removeEventListener('pointerenter', enter);
+        el.removeEventListener('pointermove', move);
+        el.removeEventListener('pointerleave', leave);
+        if (raf) cancelAnimationFrame(raf);
+        el.style.transform = '';
+        el.classList.remove('is-tracking');
+      }
+    };
+  }
+
+  function fxTooltip(trigger, options) {
+    var o = Object.assign({ text: '', delay: 300, offset: 10 }, options || {});
+    var tip = document.createElement('div');
+    tip.className = 'fx-tip';
+    tip.setAttribute('role', 'tooltip');
+    tip.id = 'fx-tip-' + Math.random().toString(36).slice(2, 8);
+    tip.textContent = o.text || trigger.getAttribute('data-tip') || '';
+    document.body.appendChild(tip);
+    var timer = null;
+    function place() {
+      var r = trigger.getBoundingClientRect();
+      tip.style.left = (r.left + r.width / 2) + 'px';
+      tip.style.top = (r.top - o.offset) + 'px';
+    }
+    function show() {
+      place();
+      tip.classList.add('is-on');
+      trigger.setAttribute('aria-describedby', tip.id);
+    }
+    function hide() {
+      clearTimeout(timer);
+      tip.classList.remove('is-on');
+      trigger.removeAttribute('aria-describedby');
+    }
+    function onEnter() { clearTimeout(timer); timer = setTimeout(show, o.delay); }
+    function onFocus() { clearTimeout(timer); show(); }
+    function onKey(e) { if (e.key === 'Escape') hide(); }
+    trigger.addEventListener('pointerenter', onEnter);
+    trigger.addEventListener('pointerleave', hide);
+    trigger.addEventListener('focus', onFocus);
+    trigger.addEventListener('blur', hide);
+    document.addEventListener('keydown', onKey);
+    return {
+      destroy: function () {
+        clearTimeout(timer);
+        trigger.removeEventListener('pointerenter', onEnter);
+        trigger.removeEventListener('pointerleave', hide);
+        trigger.removeEventListener('focus', onFocus);
+        trigger.removeEventListener('blur', hide);
+        document.removeEventListener('keydown', onKey);
+        trigger.removeAttribute('aria-describedby');
+        tip.remove();
+      }
+    };
+  }
+
+  function fxToast(host, options) {
+    var o = Object.assign({ duration: 3200, max: 3 }, options || {});
+    function push(text) {
+      var t = document.createElement('div');
+      t.className = 'fx-toast';
+      t.setAttribute('role', 'status');
+      t.textContent = text;
+      host.appendChild(t);
+      while (host.children.length > o.max) host.removeChild(host.firstElementChild);
+      requestAnimationFrame(function () { t.classList.add('is-on'); });
+      setTimeout(function () {
+        t.classList.remove('is-on');
+        setTimeout(function () { t.remove(); }, 300);
+      }, o.duration);
+    }
+    return { push: push, destroy: function () { host.textContent = ''; } };
+  }
+
+  function fxSkeleton(root, options) {
+    var o = Object.assign({ delay: 1600, shimmer: 1.4 }, options || {});
+    root.style.setProperty('--fx-shimmer', o.shimmer + 's');
+    root.classList.remove('is-loaded');
+    root.setAttribute('aria-busy', 'true');
+    var timer = setTimeout(function () {
+      root.classList.add('is-loaded');
+      root.setAttribute('aria-busy', 'false');
+    }, o.delay);
+    return { destroy: function () { clearTimeout(timer); } };
+  }
+
+  function fxAccordion(root, options) {
+    var o = Object.assign({ duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)', single: true }, options || {});
+    root.style.setProperty('--fx-duration', o.duration + 'ms');
+    root.style.setProperty('--fx-ease', o.easing);
+    var items = [].slice.call(root.querySelectorAll('.fx-item'));
+    var handlers = [];
+    items.forEach(function (item) {
+      var btn = item.querySelector('.fx-trigger');
+      function toggle() {
+        var open = item.classList.contains('is-open');
+        if (o.single) items.forEach(function (it) {
+          if (it === item) return;
+          it.classList.remove('is-open');
+          it.querySelector('.fx-trigger').setAttribute('aria-expanded', 'false');
+        });
+        item.classList.toggle('is-open', !open);
+        btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      }
+      btn.addEventListener('click', toggle);
+      handlers.push([btn, toggle]);
+    });
+    return {
+      destroy: function () { handlers.forEach(function (h) { h[0].removeEventListener('click', h[1]); }); }
+    };
+  }
+
+  function fxCopy(button, options) {
+    var o = Object.assign({ text: '', duration: 1600 }, options || {});
+    var old = button.textContent;
+    var oldLabel = button.getAttribute('aria-label') || old;
+    var timer = null;
+    function fallback(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      return ok;
+    }
+    function done(ok) {
+      button.textContent = ok ? '已复制' : '复制失败';
+      button.classList.toggle('is-done', ok);
+      button.setAttribute('aria-label', ok ? '已复制' : '复制失败，请重试');
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        button.textContent = old;
+        button.classList.remove('is-done');
+        button.setAttribute('aria-label', oldLabel);
+      }, o.duration);
+    }
+    function click() {
+      var text = o.text || button.getAttribute('data-copy') || '';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallback(text)); });
+      } else {
+        done(fallback(text));
+      }
+    }
+    button.addEventListener('click', click);
+    return {
+      destroy: function () {
+        clearTimeout(timer);
+        button.removeEventListener('click', click);
+        button.textContent = old;
+        button.classList.remove('is-done');
+      }
+    };
+  }
+
+  /* ------------------------------------------------------------ 组件 CSS
+     复制走的 CSS 就是这一份，预览与代码不会不一致。 */
+
+  var CSS = {
+    reveal: '.fx-reveal{--fx-distance:28px;--fx-duration:480ms;--fx-ease:cubic-bezier(0,0,.2,1)}\n' +
+      '.fx-reveal [data-fx]{opacity:0;transform:translate3d(0,var(--fx-distance),0);transition:opacity var(--fx-duration) var(--fx-ease),transform var(--fx-duration) var(--fx-ease)}\n' +
+      '.fx-reveal [data-fx].is-in{opacity:1;transform:none}\n' +
+      '@media (prefers-reduced-motion:reduce){.fx-reveal [data-fx]{opacity:1;transform:none;transition:none}}',
+    stagger: '.fx-stagger{--fx-stagger:60ms;--fx-distance:14px;--fx-duration:440ms;--fx-ease:cubic-bezier(.2,.8,.2,1)}\n' +
+      '.fx-stagger [data-fx]{opacity:0;transform:translate3d(0,var(--fx-distance),0);transition:opacity var(--fx-duration) var(--fx-ease),transform var(--fx-duration) var(--fx-ease);transition-delay:calc(var(--i,0) * var(--fx-stagger))}\n' +
+      '.fx-stagger.is-in [data-fx]{opacity:1;transform:none}\n' +
+      '@media (prefers-reduced-motion:reduce){.fx-stagger [data-fx]{opacity:1;transform:none;transition:none}}',
+    magnetic: '.fx-magnetic{will-change:transform;transition:transform .35s cubic-bezier(.22,.8,.2,1)}\n' +
+      '.fx-magnetic.is-tracking{transition:none}\n' +
+      '@media (prefers-reduced-motion:reduce){.fx-magnetic{transition:none}}',
+    tooltip: '.fx-tip{position:fixed;z-index:99;padding:6px 9px;border-radius:7px;background:#111318;color:#fff;font-size:11.5px;line-height:1.4;white-space:nowrap;pointer-events:none;opacity:0;transform:translate(-50%,-100%) translateY(-6px);transition:opacity .15s ease,transform .2s cubic-bezier(.2,.8,.2,1)}\n' +
+      '.fx-tip.is-on{opacity:1;transform:translate(-50%,-100%) translateY(-10px)}\n' +
+      '.fx-tip::after{content:"";position:absolute;left:50%;bottom:-4px;width:8px;height:8px;background:#111318;transform:translateX(-50%) rotate(45deg);border-radius:1px}\n' +
+      '@media (prefers-reduced-motion:reduce){.fx-tip{transition:none}}',
+    toast: '.fx-toast-host{display:grid;gap:8px;justify-items:end}\n' +
+      '.fx-toast{max-width:280px;padding:9px 13px;border-radius:9px;background:#111318;color:#fff;font-size:12px;line-height:1.6;box-shadow:0 16px 30px -18px rgba(0,0,0,.7);opacity:0;transform:translateY(10px) scale(.98);transition:opacity .22s ease,transform .3s cubic-bezier(.2,.8,.2,1)}\n' +
+      '.fx-toast.is-on{opacity:1;transform:none}\n' +
+      '@media (prefers-reduced-motion:reduce){.fx-toast{transition:none}}',
+    skeleton: '.fx-skeleton{--fx-shimmer:1.4s}\n' +
+      '.fx-skeleton>.fx-sk{transition:opacity .3s ease}\n' +
+      '.fx-skeleton>.fx-real{opacity:0;transform:translateY(6px);transition:opacity .32s ease,transform .4s cubic-bezier(.2,.8,.2,1)}\n' +
+      '.fx-skeleton .fx-sk i{background:linear-gradient(100deg,#eeece5 20%,#f8f6ef 40%,#eeece5 60%) 0 0/220% 100%;animation:fx-shimmer var(--fx-shimmer) linear infinite}\n' +
+      '.fx-skeleton.is-loaded>.fx-sk{opacity:0;pointer-events:none}\n' +
+      '.fx-skeleton.is-loaded>.fx-real{opacity:1;transform:none}\n' +
+      '@keyframes fx-shimmer{from{background-position:110% 0}to{background-position:-110% 0}}\n' +
+      '@media (prefers-reduced-motion:reduce){.fx-skeleton .fx-sk i{animation:none}.fx-skeleton>.fx-real{transition:none}}',
+    accordion: '.fx-accordion{--fx-duration:320ms;--fx-ease:cubic-bezier(.2,.8,.2,1);border:1px solid #e2ddd0;border-radius:11px;background:#fff;overflow:hidden}\n' +
+      '.fx-accordion .fx-item+.fx-item{border-top:1px solid #efede6}\n' +
+      '.fx-accordion .fx-trigger{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;border:0;background:transparent;padding:13px 14px;font:inherit;font-size:12.5px;font-weight:600;color:inherit;text-align:left;cursor:pointer}\n' +
+      '.fx-accordion .fx-trigger::after{content:"+";font:600 14px/1 ui-monospace,Consolas,monospace;color:#a3a6ac;transition:transform var(--fx-duration) var(--fx-ease)}\n' +
+      '.fx-accordion .fx-item.is-open .fx-trigger::after{transform:rotate(45deg)}\n' +
+      '.fx-accordion .fx-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--fx-duration) var(--fx-ease)}\n' +
+      '.fx-accordion .fx-item.is-open .fx-panel{grid-template-rows:1fr}\n' +
+      '.fx-accordion .fx-panel>div{overflow:hidden}\n' +
+      '.fx-accordion .fx-panel p{margin:0;padding:0 14px 13px;font-size:11.5px;line-height:1.8;color:#5b5e65}\n' +
+      '.fx-accordion .fx-trigger:focus-visible{outline:2px solid #2f5fd0;outline-offset:-2px}\n' +
+      '@media (prefers-reduced-motion:reduce){.fx-accordion .fx-panel,.fx-accordion .fx-trigger::after{transition:none}}',
+    copy: '.fx-copy{border:1px solid #ded9cc;background:#fff;color:#121317;border-radius:8px;padding:7px 12px;font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s,color .2s,transform .2s}\n' +
+      '.fx-copy:hover{border-color:#2f5fd0;color:#2f5fd0}\n' +
+      '.fx-copy:focus-visible{outline:2px solid #2f5fd0;outline-offset:2px}\n' +
+      '.fx-copy.is-done{background:#e8f2ec;border-color:#9cc3a9;color:#2f6b45;animation:fx-pop .32s cubic-bezier(.2,.8,.2,1)}\n' +
+      '@keyframes fx-pop{0%{transform:scale(.94)}55%{transform:scale(1.06)}100%{transform:scale(1)}}\n' +
+      '@media (prefers-reduced-motion:reduce){.fx-copy,.fx-copy.is-done{animation:none;transition:none}}'
+  };
+
+  var style = document.createElement('style');
+  style.textContent = Object.keys(CSS).map(function (k) { return CSS[k]; }).join('\n');
+  document.head.appendChild(style);
+
+  /* ------------------------------------------------------------ 组件配置 */
+
+  var EASE = {
+    enter: 'cubic-bezier(0,0,.2,1)',
+    standard: 'cubic-bezier(.2,.8,.2,1)',
+    spring: 'cubic-bezier(.34,1.56,.64,1)'
+  };
+
+  var COMPONENTS = [
+    {
+      id: 'reveal', name: '逐段入场', note: '进入视口才动，滚过去就停', family: '滚动进度',
+      defaults: { distance: 28, duration: 480, easing: EASE.enter, once: true },
+      controls: [
+        { key: 'distance', label: '位移', type: 'range', min: 0, max: 48, step: 2, unit: 'px' },
+        { key: 'duration', label: '时长', type: 'range', min: 200, max: 900, step: 20, unit: 'ms' },
+        { key: 'easing', label: '曲线', type: 'select', options: [['enter', 'enter · 进入'], ['standard', 'standard · 原地'], ['spring', 'spring · 回弹']] },
+        { key: 'once', label: '只播一次', type: 'check' }
+      ],
+      html: function () {
+        return '<div class="demo-stack">' +
+          '<article class="demo-card" data-fx><span>01 / 结论</span><b>先给判断，再给理由</b><p>一段只讲一件事，滚过去就停。</p></article>' +
+          '<article class="demo-card" data-fx><span>02 / 证据</span><b>把细节放在第二屏</b><p>读者愿意继续走，再展开。</p></article>' +
+          '<article class="demo-card" data-fx><span>03 / 收尾</span><b>最后留一个落点</b><p>不追加新的信息。</p></article>' +
+          '</div>';
+      },
+      setup: function (root, o) {
+        var box = root.querySelector('.demo-stack');
+        box.classList.add('fx-reveal');
+        return fxReveal(box, { distance: o.distance, duration: o.duration, easing: o.easing, once: o.once });
+      },
+      usage: function (o) { return "var reveal = fxReveal(document.querySelector('.list'), " + obj(o) + ');\n// 需要时 reveal.destroy()'; }
+    },
+    {
+      id: 'stagger', name: '列表错峰', note: '一张一张出现，但整组要收得住', family: '视图转场',
+      defaults: { delay: 60, distance: 14, duration: 440, easing: EASE.standard, count: 6 },
+      controls: [
+        { key: 'count', label: '项数', type: 'range', min: 3, max: 8, step: 1, unit: ' 项' },
+        { key: 'delay', label: '错峰', type: 'range', min: 20, max: 140, step: 5, unit: 'ms' },
+        { key: 'distance', label: '位移', type: 'range', min: 0, max: 36, step: 2, unit: 'px' },
+        { key: 'duration', label: '时长', type: 'range', min: 300, max: 800, step: 20, unit: 'ms' }
+      ],
+      html: function (o) {
+        var labels = ['类型', '颜色', '留白', '动效', '节奏', '边界', '网格', '终态'];
+        var s = '<div class="demo-grid">';
+        for (var i = 0; i < o.count; i++) {
+          s += '<article class="demo-card" data-fx><span>0' + (i + 1) + '</span><b>' + labels[i % labels.length] + '</b></article>';
+        }
+        return s + '</div>';
+      },
+      setup: function (root, o) {
+        var box = root.querySelector('.demo-grid');
+        box.classList.add('fx-stagger');
+        return fxStagger(box, { delay: o.delay, distance: o.distance, duration: o.duration, easing: o.easing });
+      },
+      usage: function (o) {
+        return "var stagger = fxStagger(document.querySelector('.grid'), " +
+          obj({ delay: o.delay, distance: o.distance, duration: o.duration, easing: o.easing }) +
+          ');\n// 需要时 stagger.destroy()';
+      }
+    },
+    {
+      id: 'magnetic', name: '磁吸按钮', note: '靠近才吸，离开自然回位', family: '指针距离场',
+      defaults: { radius: 140, strength: .3, ease: .16 },
+      controls: [
+        { key: 'radius', label: '吸附半径', type: 'range', min: 60, max: 220, step: 10, unit: 'px' },
+        { key: 'strength', label: '位移系数', type: 'range', min: .1, max: .6, step: .05, unit: '' },
+        { key: 'ease', label: '跟随系数', type: 'range', min: .08, max: .3, step: .02, unit: '' }
+      ],
+      html: function () {
+        return '<div class="demo-center"><button class="demo-mag fx-magnetic" type="button">开始使用 <span>→</span></button></div>';
+      },
+      setup: function (root, o) { return fxMagnetic(root.querySelector('.demo-mag'), o); },
+      usage: function (o) { return "var mag = fxMagnetic(document.querySelector('.mag'), " + obj(o) + ');\n// 需要时 mag.destroy()'; }
+    },
+    {
+      id: 'tooltip', name: '延迟提示', note: '悬停等 300ms，聚焦立即出现', family: '状态反馈',
+      defaults: { delay: 300, offset: 10 },
+      controls: [
+        { key: 'delay', label: '悬停延迟', type: 'range', min: 0, max: 800, step: 50, unit: 'ms' },
+        { key: 'offset', label: '上移距离', type: 'range', min: 4, max: 24, step: 2, unit: 'px' }
+      ],
+      html: function () {
+        return '<div class="demo-center"><button class="demo-btn" type="button" data-tip="保存草稿 ⌘S">把光标放上来</button></div>';
+      },
+      setup: function (root, o) {
+        var btn = root.querySelector('.demo-btn');
+        return fxTooltip(btn, { text: btn.getAttribute('data-tip'), delay: o.delay, offset: o.offset });
+      },
+      usage: function (o) { return "var tip = fxTooltip(document.querySelector('.save'), " + obj({ text: '保存草稿 ⌘S', delay: o.delay, offset: o.offset }) + ');\n// 需要时 tip.destroy()'; }
+    },
+    {
+      id: 'toast', name: '堆叠通知', note: '新消息压旧的，超过上限自动淘汰', family: '状态反馈',
+      defaults: { duration: 3200, max: 3 },
+      controls: [
+        { key: 'duration', label: '停留', type: 'range', min: 1500, max: 6000, step: 250, unit: 'ms' },
+        { key: 'max', label: '最多几条', type: 'range', min: 1, max: 5, step: 1, unit: ' 条' }
+      ],
+      html: function () {
+        return '<div class="demo-toast"><button class="demo-btn" id="fxToastBtn" type="button">发一条通知</button><div class="fx-toast-host" id="fxToastHost" aria-live="polite"></div></div>';
+      },
+      setup: function (root, o) {
+        var api = fxToast(root.querySelector('#fxToastHost'), o);
+        var btn = root.querySelector('#fxToastBtn');
+        var n = 0;
+        function click() { n++; api.push('第 ' + n + ' 条通知 · 已保存到草稿箱'); }
+        btn.addEventListener('click', click);
+        var base = api.destroy;
+        return { push: api.push, destroy: function () { btn.removeEventListener('click', click); base(); } };
+      },
+      usage: function (o) { return "var toasts = fxToast(document.querySelector('.toast-host'), " + obj(o) + ");\ntoasts.push('已保存到草稿箱');"; }
+    },
+    {
+      id: 'skeleton', name: '骨架屏', note: '先给形状，再换内容', family: '状态反馈',
+      defaults: { delay: 1600, shimmer: 1.4 },
+      controls: [
+        { key: 'delay', label: '加载时长', type: 'range', min: 600, max: 3000, step: 100, unit: 'ms' },
+        { key: 'shimmer', label: '扫光周期', type: 'range', min: .8, max: 2.4, step: .1, unit: 's' }
+      ],
+      html: function () {
+        return '<div class="demo-sk fx-skeleton" id="fxSk">' +
+          '<div class="fx-sk" aria-hidden="true"><i class="av"></i><div><i class="l1"></i><i class="l2"></i></div><i class="media"></i><i class="l1" style="grid-column:1/-1"></i><i class="l2" style="grid-column:1/-1"></i></div>' +
+          '<div class="fx-real"><span class="av">星</span><div><b>星野计划</b><small>2 分钟前 · 更新了封面</small></div><p>形状和内容一一对应：头像、两行标题、一块媒体、两行正文。位置不跳，眼睛就不用重新找。</p><div class="media"></div></div>' +
+          '</div>';
+      },
+      setup: function (root, o) { return fxSkeleton(root.querySelector('#fxSk'), o); },
+      usage: function (o) { return "var sk = fxSkeleton(document.querySelector('.card'), " + obj(o) + ');\n// 需要时 sk.destroy()'; }
+    },
+    {
+      id: 'accordion', name: '无缝手风琴', note: '高度从 0fr 到 1fr，不测内容', family: '布局重排',
+      defaults: { duration: 320, easing: EASE.standard, single: true },
+      controls: [
+        { key: 'duration', label: '展开时长', type: 'range', min: 200, max: 600, step: 20, unit: 'ms' },
+        { key: 'single', label: '同时只开一项', type: 'check' }
+      ],
+      html: function () {
+        return '<div class="fx-accordion demo-acc" style="width:100%;max-width:420px">' +
+          '<div class="fx-item is-open"><button class="fx-trigger" type="button" aria-expanded="true">先看结论</button><div class="fx-panel"><div><p>一段只讲一件事。展开的是下一行的 0fr 到 1fr，不需要测量内容高度。</p></div></div></div>' +
+          '<div class="fx-item"><button class="fx-trigger" type="button" aria-expanded="false">再看证据</button><div class="fx-panel"><div><p>把细节放在第二层，读者愿意继续看，再展开。</p></div></div></div>' +
+          '<div class="fx-item"><button class="fx-trigger" type="button" aria-expanded="false">最后收尾</button><div class="fx-panel"><div><p>不追加新信息，只给一个能停下来的位置。</p></div></div></div>' +
+          '</div>';
+      },
+      setup: function (root, o) { return fxAccordion(root.querySelector('.demo-acc'), o); },
+      usage: function (o) { return "var acc = fxAccordion(document.querySelector('.accordion'), " + obj(o) + ');\n// 需要时 acc.destroy()'; }
+    },
+    {
+      id: 'copy', name: '复制反馈', note: '图标、文案、颜色一起变，随后复原', family: '状态反馈',
+      defaults: { duration: 1600 },
+      controls: [
+        { key: 'duration', label: '成功态停留', type: 'range', min: 800, max: 3000, step: 100, unit: 'ms' }
+      ],
+      html: function () {
+        return '<div class="demo-copy"><code>--dur-3: 320ms;</code><button class="fx-copy" type="button" data-copy="--dur-3: 320ms;" aria-label="复制">复制</button></div>';
+      },
+      setup: function (root, o) {
+        var btn = root.querySelector('.fx-copy');
+        return fxCopy(btn, { text: btn.getAttribute('data-copy'), duration: o.duration });
+      },
+      usage: function (o) { return "var cp = fxCopy(document.querySelector('.copy-btn'), " + obj({ text: '--dur-3: 320ms;', duration: o.duration }) + ');\n// 需要时 cp.destroy()'; }
+    }
+  ];
+
+  /* ------------------------------------------------------------ 页面状态 */
+
+  var side = document.getElementById('side');
+  var preview = document.getElementById('preview');
+  var controls = document.getElementById('controls');
+  var stageTitle = document.getElementById('stageTitle');
+  var stageTag = document.getElementById('stageTag');
+  var stageNote = document.getElementById('stageNote');
+  var codeEl = document.getElementById('code');
+  var copyBtn = document.getElementById('copy');
+  var tabs = [].slice.call(document.querySelectorAll('.tabs button'));
+  var cur = COMPONENTS[0];
+  var opts = Object.assign({}, cur.defaults);
+  var tab = 'js';
+  var instance = null;
+  var renderTimer = null;
+
+  function find(id) {
+    return COMPONENTS.filter(function (c) { return c.id === id; })[0] || null;
+  }
+
+  function obj(o) {
+    return '{ ' + Object.keys(o).map(function (k) {
+      var v = o[k];
+      if (typeof v === 'string') return k + ": '" + v.replace(/'/g, "\\'") + "'";
+      return k + ': ' + v;
+    }).join(', ') + ' }';
+  }
+
+  function hashId() {
+    var h = decodeURIComponent(location.hash.slice(1));
+    return h || 'reveal';
+  }
+
+  function buildSide() {
+    COMPONENTS.forEach(function (c) {
+      var b = document.createElement('button');
+      b.className = 'comp';
+      b.type = 'button';
+      b.setAttribute('data-id', c.id);
+      b.setAttribute('aria-pressed', 'false');
+      var t = document.createElement('b');
+      var dot = document.createElement('i');
+      t.appendChild(dot);
+      t.appendChild(document.createTextNode(c.name));
+      var s = document.createElement('small');
+      s.textContent = c.note;
+      b.appendChild(t);
+      b.appendChild(s);
+      b.addEventListener('click', function () { select(c.id); });
+      side.appendChild(b);
+    });
+  }
+
+  function syncSide() {
+    [].slice.call(side.querySelectorAll('.comp')).forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-id') === cur.id ? 'true' : 'false');
+    });
+  }
+
+  function select(id, silent) {
+    var next = find(id);
+    if (!next) return;
+    cur = next;
+    opts = Object.assign({}, cur.defaults);
+    syncSide();
+    if (!silent) history.replaceState(null, '', '#' + id);
+    render();
+  }
+
+  function render() {
+    if (instance && instance.destroy) instance.destroy();
+    instance = null;
+    clearTimeout(renderTimer);
+
+    stageTitle.textContent = cur.name;
+    stageTag.textContent = cur.family;
+    stageNote.textContent = cur.note;
+
+    preview.innerHTML = cur.html(opts);
+    try {
+      instance = cur.setup(preview, opts);
+    } catch (e) {
+      console.error(e);
+    }
+
+    renderControls();
+    renderCode();
+  }
+
+  function renderControls() {
+    controls.textContent = '';
+    cur.controls.forEach(function (c) {
+      var wrap = document.createElement('div');
+      wrap.className = 'control';
+      var top = document.createElement('div');
+      top.className = 'c-top';
+      var label = document.createElement('label');
+      label.textContent = c.label;
+      label.setAttribute('for', 'ctl-' + c.key);
+      var out = document.createElement('output');
+      out.setAttribute('for', 'ctl-' + c.key);
+      top.appendChild(label);
+      top.appendChild(out);
+      wrap.appendChild(top);
+
+      if (c.type === 'range') {
+        var input = document.createElement('input');
+        input.type = 'range';
+        input.id = 'ctl-' + c.key;
+        input.min = c.min;
+        input.max = c.max;
+        input.step = c.step;
+        input.value = opts[c.key];
+        out.textContent = opts[c.key] + (c.unit || '');
+        input.addEventListener('input', function () {
+          opts[c.key] = Number(input.value);
+          out.textContent = opts[c.key] + (c.unit || '');
+          renderCode();
+          clearTimeout(renderTimer);
+          renderTimer = setTimeout(function () { replay(); }, 70);
+        });
+        wrap.appendChild(input);
+      } else if (c.type === 'select') {
+        var sel = document.createElement('select');
+        sel.id = 'ctl-' + c.key;
+        c.options.forEach(function (pair) {
+          var op = document.createElement('option');
+          op.value = pair[0];
+          op.textContent = pair[1];
+          if (opts[c.key] === EASE[pair[0]]) op.selected = true;
+          sel.appendChild(op);
+        });
+        out.textContent = sel.options[sel.selectedIndex].textContent.split(' · ')[0];
+        sel.addEventListener('change', function () {
+          opts[c.key] = EASE[sel.value];
+          out.textContent = sel.options[sel.selectedIndex].textContent.split(' · ')[0];
+          replay();
+        });
+        wrap.appendChild(sel);
+      } else {
+        var lab = document.createElement('label');
+        lab.className = 'check';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.id = 'ctl-' + c.key;
+        cb.checked = !!opts[c.key];
+        lab.appendChild(cb);
+        lab.appendChild(document.createTextNode('开启'));
+        out.textContent = opts[c.key] ? '是' : '否';
+        cb.addEventListener('change', function () {
+          opts[c.key] = cb.checked;
+          out.textContent = cb.checked ? '是' : '否';
+          replay();
+        });
+        wrap.appendChild(lab);
+      }
+      controls.appendChild(wrap);
+    });
+  }
+
+  function fnSource(fn) {
+    return fn.toString();
+  }
+
+  function factoryFor(id) {
+    return { reveal: fxReveal, stagger: fxStagger, magnetic: fxMagnetic, tooltip: fxTooltip, toast: fxToast, skeleton: fxSkeleton, accordion: fxAccordion, copy: fxCopy }[id];
+  }
+
+  function renderCode() {
+    var src = '';
+    if (tab === 'js') {
+      src = '/* 1. 把实现放进页面 */\n' + fnSource(factoryFor(cur.id)) + '\n\n/* 2. 用法 */\n' + cur.usage(opts);
+    } else if (tab === 'css') {
+      src = '/* 放进样式表 */\n' + CSS[cur.id];
+    } else {
+      src = '<!-- 结构与类名 -->\n' + cur.html(opts);
+    }
+    codeEl.textContent = src;
+    tabs.forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-tab') === tab ? 'true' : 'false'); });
+  }
+
+  function replay() {
+    if (instance && instance.destroy) instance.destroy();
+    instance = null;
+    preview.innerHTML = cur.html(opts);
+    try { instance = cur.setup(preview, opts); } catch (e) { console.error(e); }
+    renderCode();
+  }
+
+  /* ------------------------------------------------------------ 绑定 */
+
+  buildSide();
+  var start = find(hashId());
+  if (start) cur = start;
+  opts = Object.assign({}, cur.defaults);
+  syncSide();
+  render();
+
+  tabs.forEach(function (b) {
+    b.addEventListener('click', function () {
+      tab = b.getAttribute('data-tab');
+      renderCode();
+    });
+  });
+
+  document.getElementById('replay').addEventListener('click', replay);
+
+  copyBtn.addEventListener('click', function () {
+    var text = codeEl.textContent;
+    var done = function () {
+      copyBtn.textContent = '已复制 ✓';
+      setTimeout(function () { copyBtn.textContent = '复制当前'; }, 1200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        done();
+      });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      done();
+    }
+  });
+
+  addEventListener('hashchange', function () {
+    var c = find(hashId());
+    if (c && c.id !== cur.id) select(c.id, true);
+  });
+})();
+</script>
+</body>
+</html>

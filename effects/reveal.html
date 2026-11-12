@@ -3,51 +3,162 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>逐段入场 · UI Atlas 动效</title>
+<title>逐段入场 · 北纬 64° 手记</title>
 <style>
-:root{--bg:#f6f5f1;--ink:#111216;--muted:#7a7d84;--line:#e4e1d8;--accent:#2f5fd0}
+:root{--bg:#f4f2ea;--ink:#14161a;--muted:#74766f;--line:#dcd8cb;--moss:#4d6b52;--accent:#4d6b52}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{max-width:620px;margin:0 auto;padding:40px 22px 90px}
-.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-h1{margin:0 0 34px;font-size:clamp(24px,5.6vw,36px);line-height:1.15;letter-spacing:-.03em;font-weight:650}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.nav{position:sticky;top:0;z-index:8;height:64px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1080px)/2));background:rgba(244,242,234,.9);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{font:400 17px/1 Georgia,"Songti SC",serif;letter-spacing:-.01em;text-decoration:none;white-space:nowrap}
+.brand span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);margin-left:9px}
+.nav-links{display:flex;gap:22px;margin-left:8px}
+.nav-links a{font-size:12px;color:#5b5d56;text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.replay{margin-left:auto;height:32px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:transparent;
+  font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--ink);cursor:pointer}
+.replay:hover{border-color:var(--moss);color:var(--moss)}
+.hero{max-width:1080px;margin:0 auto;padding:clamp(44px,7vw,86px) 22px 40px}
+.kicker{margin:0 0 16px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;font-size:clamp(44px,7.4vw,92px);line-height:.98;letter-spacing:-.055em;font-weight:650}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--moss)}
+.standfirst{margin:clamp(24px,4vh,40px) 0 0;max-width:33em;font-size:14px;line-height:1.95;color:#5b5d56}
+.byline{margin:22px 0 0;display:flex;gap:22px;flex-wrap:wrap;font:600 9px/1.6 ui-monospace,Consolas,monospace;
+  letter-spacing:.12em;color:var(--muted)}
+.byline b{color:var(--ink)}
+.journal{max-width:820px;margin:0 auto;padding:18px 22px 8px}
+.block{display:grid;grid-template-columns:54px minmax(0,1fr);gap:16px;padding:26px 0;border-top:1px solid var(--line);align-items:start}
+.block .no{font:600 10px/1.9 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--moss);padding-top:2px}
+.block h2{margin:0 0 6px;font-size:19px;line-height:1.3;letter-spacing:-.02em;font-weight:620}
+.block p{margin:0;font-size:13px;line-height:1.9;color:#5b5d56;max-width:36em}
+.stat{display:flex;justify-content:space-between;gap:12px;margin-top:14px;font:600 8.5px/1.5 ui-monospace,Consolas,monospace;
+  letter-spacing:.1em;color:var(--muted)}
+.bar{display:block;height:5px;margin-top:6px;border-radius:3px;background:#e6e2d5;overflow:hidden}
+.bar i{display:block;height:100%;width:var(--w);background:var(--moss);border-radius:3px;transform-origin:left;
+  transform:scaleX(0);transition:transform 1s .2s cubic-bezier(.2,.8,.2,1)}
 .reveal{opacity:0;transform:translate3d(0,26px,0);
   transition:opacity .72s cubic-bezier(.2,.8,.2,1),transform .72s cubic-bezier(.2,.8,.2,1);
   transition-delay:calc(var(--i,0) * 85ms)}
 .reveal.in{opacity:1;transform:none}
-.block{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:20px 0;border-top:1px solid var(--line);align-items:start}
-.block .no{font:600 10.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);padding-top:3px}
-.block h2{margin:0 0 5px;font-size:16px;letter-spacing:-.01em}
-.block p{margin:0;font-size:13px;line-height:1.75;color:var(--muted);max-width:36em}
-.block .bar{display:block;height:6px;margin-top:12px;border-radius:3px;background:#e8e5db;overflow:hidden}
-.block .bar i{display:block;height:100%;width:var(--w);background:var(--accent);border-radius:3px;transform-origin:left;transform:scaleX(0);transition:transform 1s .2s cubic-bezier(.2,.8,.2,1)}
 .reveal.in .bar i{transform:scaleX(1)}
-.replay{position:fixed;right:16px;top:14px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;
-  font:inherit;font-size:12px;cursor:pointer;color:var(--ink)}
-.replay:hover{border-color:var(--accent);color:var(--accent)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+.wide{max-width:1080px;margin:26px auto 0;padding:0 22px}
+.scene{position:relative;aspect-ratio:2.05;border:1px solid var(--line);overflow:hidden;background:
+  radial-gradient(70% 45% at 50% 8%,#d9d3c5,transparent 65%),
+  linear-gradient(180deg,#9ba2a1 0%,#6d7674 34%,#3c4240 35%,#272b29 62%,#1c1f1d 63%,#101211 100%)}
+.scene::after{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 14px)}
+.wide figcaption{margin:10px 0 0;font:600 8.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.quote{max-width:900px;margin:34px auto 0;padding:0 22px}
+blockquote{margin:0;padding:26px 0 30px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  font:400 clamp(24px,3.2vw,38px)/1.35 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+blockquote span{color:var(--moss);font-style:italic}
+.end{max-width:820px;margin:0 auto;padding:34px 22px 66px}
+.end p{margin:0 0 8px;font-size:11.5px;line-height:1.9;color:var(--muted)}
+.foot{max-width:1080px;margin:0 auto;padding:0 22px 28px;display:flex;gap:18px;flex-wrap:wrap;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.foot span:last-child{margin-left:auto}
+.hint{position:fixed;left:auto;right:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;
+  letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:9;background:rgba(128,128,128,.10);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(128,128,128,.18);
+  border-radius:999px;padding:4px 9px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}.block .bar i{transform:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (hover:none),(max-width:560px){
+  .hint{display:none}
+}
+@media (max-width:560px){
+  .nav{height:56px;padding:0 16px;gap:12px}
+  .nav-links,.brand span{display:none}
+  .hero{padding:34px 16px 24px}
+  h1{font-size:clamp(38px,12vw,54px)}
+  .standfirst{font-size:12.5px;margin-top:20px}
+  .byline{gap:14px}
+  .journal,.wide,.quote,.end,.foot{padding-left:16px;padding-right:16px}
+  .journal{padding-top:6px}
+  .block{grid-template-columns:36px minmax(0,1fr);gap:10px;padding:20px 0}
+  .block h2{font-size:16.5px}
+  .block p{font-size:12px}
+  .scene{aspect-ratio:1.5}
+  blockquote{font-size:23px}
+  .foot span:last-child{margin-left:0}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:48px;padding:0 22px;gap:20px}
+  .nav-links,.brand span{display:none}
+  .replay{height:26px;padding:0 10px;font-size:9px}
+  .hero{padding:14px 22px 8px}
+  .kicker{display:none}
+  h1{font-size:clamp(25px,4.4vw,31px);letter-spacing:-.04em}
+  h1 br{display:none}
+  .standfirst,.byline{display:none}
+  .journal{padding:6px 22px 0;max-width:none}
+  .block{grid-template-columns:30px minmax(0,1fr);gap:10px;padding:9px 0}
+  .block .no{font-size:9px}
+  .block h2{font-size:13.5px;margin:0}
+  .block:nth-of-type(n+6){display:none}
+  .block p,.stat{display:none}
+  .bar{height:3px;margin-top:7px}
+  .wide,.quote,.end,.foot{display:none}
+  .hint{right:12px;bottom:10px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none}
+  .bar i{transform:none}
+}
 </style>
 </head>
 <body>
-<button class="replay" id="replay" type="button">重播</button>
-<main class="stage">
-  <p class="kicker">SCROLL / 01</p>
-  <h1>不是「滚到了」，<br>而是「该出现了」。</h1>
-  <div id="list">
-    <section class="reveal block"><span class="no">01</span><div><h2>先写内容，再决定节奏</h2><p>每块单独观察，进入视口 60% 才播；同一块里的元素按 85ms 递进。</p><span class="bar"><i style="--w:82%"></i></span></div></section>
-    <section class="reveal block"><span class="no">02</span><div><h2>位移只走 26px</h2><p>再远就像从屏幕外飞进来。opacity 与位移同长，收尾用 ease-out。</p><span class="bar"><i style="--w:64%"></i></span></div></section>
-    <section class="reveal block"><span class="no">03</span><div><h2>一次性触发</h2><p>看过就不再重播，避免上下滚动时抽搐。想重看有右上角那个按钮。</p><span class="bar"><i style="--w:91%"></i></span></div></section>
-    <section class="reveal block"><span class="no">04</span><div><h2>关掉动效也要能读</h2><p>prefers-reduced-motion 下直接把元素摆到位，不做位移。</p><span class="bar"><i style="--w:48%"></i></span></div></section>
-    <section class="reveal block"><span class="no">05</span><div><h2>骨架先占好位置</h2><p>动画只改 transform 与 opacity，不碰 height，滚动条不会抖。</p><span class="bar"><i style="--w:73%"></i></span></div></section>
-  </div>
+
+<header class="nav">
+  <a class="brand" href="#top">北纬 64°<span>FIELD NOTES · ISSUE 07</span></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#journal">手记</a>
+    <a href="#route">路线</a>
+    <a href="mailto:notes@fj64.is">订阅</a>
+  </nav>
+  <button class="replay" id="replay" type="button">重播 ↺</button>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <p class="kicker">ICELAND · 66°N · OCTOBER</p>
+    <h1>在风停之前，<br><em>把岛走完。</em></h1>
+    <p class="standfirst">十月的冰岛没有极光保证，只有天气窗口。我们租了一辆旧旅行车，用九天绕了一号公路一圈，把每天的风速和里程记在本子上。</p>
+    <p class="byline"><span><b>文字 / 摄影</b> 林岚</span><span><b>路线</b> 雷克雅未克 → 米湖 → 雷克雅未克</span><span><b>总里程</b> 1,928 km</span></p>
+  </section>
+
+  <article class="journal" id="journal">
+    <section class="reveal block"><span class="no">01</span><div><h2>先往南，沿着一号公路。</h2><p>出城时雨刷还没开，二十公里后挡风玻璃就被侧风推着响。第一晚住在维克，窗外是黑沙滩和一条看不见尽头的浪线。</p><div class="stat"><span>186 KM · 西南岸</span><span>本段 42%</span></div><span class="bar"><i style="--w:42%"></i></span></div></section>
+    <section class="reveal block"><span class="no">02</span><div><h2>黑沙滩上，风把人往海里推。</h2><p>警示牌写着「不要背对大海」。浪来得很快，前一秒还是干的沙，下一秒就漫到鞋边。我们把三脚架压到最低，只拍了两张。</p><div class="stat"><span>64 KM · 维克 → 教堂镇</span><span>本段 28%</span></div><span class="bar"><i style="--w:28%"></i></span></div></section>
+    <section class="reveal block"><span class="no">03</span><div><h2>东峡湾的雨，下了整整一天。</h2><p>路窄，弯多，雾把山切成一层一层。收音机只有两个台，一个在报风速，一个在放老歌。那天开了七个小时，只遇到三辆车。</p><div class="stat"><span>240 KM · 东峡湾</span><span>本段 66%</span></div><span class="bar"><i style="--w:66%"></i></span></div></section>
+
+    <figure class="reveal wide" style="--i:1">
+      <div class="scene" aria-hidden="true"></div>
+      <figcaption>DAY 04 · 东峡湾 · 09:42 · 风速 17 m/s</figcaption>
+    </figure>
+
+    <section class="reveal block"><span class="no">04</span><div><h2>米湖的硫磺味，比照片更早到。</h2><p>车还没停稳就闻到那股味道。地热区在冒白汽，地面是灰白色的，踩上去像踩在结块的盐上。晚上住进一间没有电视的木屋。</p><div class="stat"><span>128 KM · 米湖</span><span>本段 35%</span></div><span class="bar"><i style="--w:35%"></i></span></div></section>
+    <section class="reveal block"><span class="no">05</span><div><h2>回程，风终于停了。</h2><p>最后一天没有安排。我们在半路一个不知名的小镇停了四十分钟，喝了一杯很烫的咖啡，看云从山后面慢慢翻过来。</p><div class="stat"><span>310 KM · 北岸回程</span><span>本段 82%</span></div><span class="bar"><i style="--w:82%"></i></span></div></section>
+
+    <div class="reveal quote" style="--i:2">
+      <blockquote>“旅行里真正留下来的，<br>往往是那些<span>没有拍下来</span>的部分。”</blockquote>
+    </div>
+
+    <section class="end">
+      <p>本辑共 21 张照片，完整路线图与每日风速记录见纸质别册。</p>
+      <p>下一篇：北纬 64° 冬季号 · 在冰岛等一场极光。</p>
+    </section>
+  </article>
+
+  <footer class="foot" id="route">
+    <span>北纬 64° · FIELD NOTES</span>
+    <span>雷克雅未克 → 米湖 → 雷克雅未克</span>
+    <span>© 2026</span>
+  </footer>
 </main>
+
 <p class="hint">往下滚，或点右上角「重播」</p>
 <script>
 (function () {
@@ -76,6 +187,61 @@ h1{margin:0 0 34px;font-size:clamp(24px,5.6vw,36px);line-height:1.15;letter-spac
         }
       });
     }, 300);
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

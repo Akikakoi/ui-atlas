@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滚动序列帧 · MÉRIDIEN 短片四幕</title>
+<style>
+:root{--ink:#f4f1e8;--muted:rgba(244,241,232,.52);--accent:#ffcf6e;--line:rgba(255,255,255,.1)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#080a0e;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+.nav{position:fixed;inset:0 0 auto;z-index:8;height:68px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1120px)/2));background:rgba(8,10,14,.6);
+  border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:baseline;gap:10px;font:600 15px/1.1 Georgia,"Songti SC",serif;letter-spacing:.08em;white-space:nowrap}
+.brand .mark{width:24px;height:24px;display:grid;place-items:center;border:1px solid rgba(255,207,110,.55);border-radius:50%;
+  color:var(--accent);font:600 9px/1 ui-monospace,Consolas,monospace}
+.brand i{font:400 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:rgba(244,241,232,.62)}
+.nav-links a:hover{color:var(--accent)}
+.nav .cta{margin-left:auto;border:1px solid rgba(255,207,110,.5);border-radius:999px;padding:7px 14px;
+  font-size:11.5px;font-weight:600;color:var(--accent);white-space:nowrap}
+.nav .cta:hover{background:var(--accent);color:#1a1206}
+.sec{height:175vh;position:relative}
+.stick{position:sticky;top:0;height:100vh;overflow:hidden}
+.frame{position:absolute;inset:0;opacity:0;display:grid;place-items:center;padding:120px 24px 96px;will-change:opacity}
+.frame:nth-child(1){opacity:1;background:radial-gradient(70% 60% at 30% 20%,#2a3c52,#0a0d12 72%)}
+.frame:nth-child(2){background:radial-gradient(70% 60% at 75% 25%,#4a2f3d,#120a10 72%)}
+.frame:nth-child(3){background:radial-gradient(70% 60% at 40% 80%,#2f4436,#0a120d 72%)}
+.frame:nth-child(4){background:radial-gradient(70% 60% at 70% 70%,#3d3a22,#12100a 72%)}
+.frame .no{display:block;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:var(--accent);margin-bottom:16px}
+.frame h2{margin:0;font-size:clamp(46px,8.4vw,96px);line-height:.98;letter-spacing:-.055em;font-weight:600;max-width:10em}
+.frame h2 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:#ffe1a8}
+.frame .sub{margin:18px 0 0;font-size:12px;line-height:1.8;color:var(--muted);max-width:24em}
+.frame .mark{position:absolute;left:50%;bottom:16%;width:76px;height:76px;transform:translateX(-50%);border-radius:50%;
+  border:1px solid rgba(255,255,255,.14)}
+.frame.f1 .mark{background:radial-gradient(circle at 40% 36%,rgba(207,230,255,.34),transparent 66%);box-shadow:0 0 60px rgba(120,160,210,.2)}
+.frame.f2 .mark{border-radius:0;transform:translateX(-50%) rotate(45deg);border-color:rgba(255,200,220,.24)}
+.frame.f3 .mark{border-radius:0;border:0;background:linear-gradient(180deg,transparent,rgba(160,220,180,.22));width:1px;height:120px}
+.frame.f4 .mark{background:radial-gradient(circle,rgba(255,225,168,.4),transparent 68%);border-color:rgba(255,225,168,.3)}
+.head{position:absolute;left:max(24px,calc((100vw - 1120px)/2));top:88px;z-index:3;max-width:380px}
+.head .kicker{margin:0 0 10px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+.head h1{margin:0;font-size:clamp(18px,3.2vw,24px);line-height:1.2;letter-spacing:-.02em;font-weight:600}
+.hud{position:absolute;left:max(24px,calc((100vw - 1120px)/2));right:max(24px,calc((100vw - 1120px)/2));bottom:40px;z-index:3;
+  display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+.hud p{margin:0;max-width:32em;font-size:12px;line-height:1.8;color:var(--muted)}
+.dots{display:flex;gap:7px;flex-shrink:0}
+.dots i{display:block;width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .25s,transform .25s}
+.dots i.on{background:var(--accent);transform:scale(1.45)}
+.sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.credits{max-width:1120px;margin:0 auto;padding:10px 22px 46px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(26px,5vw,64px);align-items:start}
+.credits h2{margin:0 0 12px;font-size:clamp(24px,3.2vw,34px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
+.credits p{margin:0;font-size:12.5px;line-height:1.9;color:var(--muted);max-width:32em}
+.spec{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.spec div{background:#0d1015;padding:14px 16px}
+.spec dt{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);margin-bottom:7px}
+.spec dd{margin:0;font-size:13px;font-weight:600}
+.screenings{max-width:1120px;margin:0 auto;padding:0 22px 48px}
+.screenings caption{text-align:left;margin-bottom:10px;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{text-align:left;padding:13px 8px;border-bottom:1px solid var(--line)}
+th{font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+td:first-child{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--accent)}
+td:last-child{text-align:right;color:var(--muted);font-size:11px}
+.band{max-width:1120px;margin:0 auto;padding:0 22px 46px}
+.inner-band{border:1px solid rgba(255,207,110,.25);border-radius:16px;padding:28px 26px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(255,207,110,.08),rgba(255,207,110,.01) 62%)}
+.inner-band h2{margin:0 0 6px;font-size:clamp(21px,2.6vw,28px);letter-spacing:-.03em;font-weight:600}
+.inner-band p{margin:0;font-size:12px;color:var(--muted);line-height:1.8}
+.inner-band .cta{margin-left:auto;border:1px solid var(--accent);background:var(--accent);color:#1a1206;border-radius:999px;
+  padding:9px 17px;font-size:12px;font-weight:650;white-space:nowrap}
+.inner-band .cta:hover{filter:brightness(1.08)}
+footer{max-width:1120px;margin:0 auto;padding:0 22px 26px;display:flex;gap:18px;flex-wrap:wrap;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;
+  color:rgba(244,241,232,.7);background:rgba(8,10,14,.6);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 9px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);pointer-events:none;z-index:9}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:820px){
+  .nav-links{display:none}
+  .credits{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}.brand .mark{width:20px;height:20px;font-size:8px}.brand i{display:none}
+  .sec{height:165vh}
+  .frame{padding:96px 16px 74px}
+  .frame .no{font-size:8px;margin-bottom:11px}
+  .frame h2{font-size:clamp(40px,13vw,58px)}
+  .frame .sub{font-size:11px;margin-top:12px}
+  .head{left:16px;top:74px;max-width:260px}
+  .head .kicker{font-size:8px;margin-bottom:6px}
+  .head h1{font-size:15px}
+  .hud{left:16px;right:16px;bottom:22px}
+  .hud p{display:none}
+  .dots{margin-left:auto}
+  .credits{padding:0 16px 32px}
+  .spec{grid-template-columns:1fr}
+  .screenings{padding:0 16px 34px}
+  th,td{padding:11px 5px}
+  td:last-child{display:none}
+  .band{padding:0 16px 36px}
+  .inner-band{padding:22px 18px}
+  .inner-band .cta{margin-left:0}
+  footer{padding:0 16px 22px;font-size:8.5px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}.brand .mark{width:19px;height:19px;font-size:8px}.brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .sec{height:155vh}
+  .stick{height:100vh}
+  .frame{padding:90px 20px 54px}
+  .frame .no{font-size:7.5px;margin-bottom:8px}
+  .frame h2{font-size:34px;line-height:1}
+  .frame .sub{font-size:9.5px;margin-top:8px}
+  .frame .mark{width:44px;height:44px;bottom:20%}
+  .head{left:20px;top:54px;max-width:300px}
+  .head .kicker{font-size:7.5px;margin-bottom:5px}
+  .head h1{font-size:12px}
+  .hud{left:20px;right:20px;bottom:14px}
+  .hud p{display:none}
+  .dots{margin-left:auto}
+  .dots i{width:6px;height:6px}
+  .credits,.screenings,.band,footer{display:none}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c4048;
+    background:rgba(255,255,255,.82);border:1px solid rgba(22,21,15,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (prefers-reduced-motion:reduce){
+  .frame{opacity:0}
+  .frame:nth-child(1){opacity:1}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark">M</span>子午<i>MÉRIDIEN FILMS</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#about">关于</a>
+    <a href="#screenings">放映</a>
+    <a href="#watch">观看</a>
+  </nav>
+  <a class="cta" href="#watch">观看短片</a>
+</header>
+
+<section class="sec" id="top">
+  <div class="stick">
+    <div class="frame f1" data-label="起点">
+      <div><span class="no">FRAME 01 / 04 · 起</span><h2>先有一个<br><em>模糊的念头。</em></h2><p class="sub">雨停之前，山里的雾还没散。摄影机放在同一块石头上，等了四十分钟。</p><span class="mark"></span></div>
+    </div>
+    <div class="frame f2" data-label="成形">
+      <div><span class="no">FRAME 02 / 04 · 承</span><h2>把它拆成<br><em>几个步骤。</em></h2><p class="sub">拆解、拼贴、重排。素材被剪成三十六段，按呼吸的长度重新排列。</p><span class="mark"></span></div>
+    </div>
+    <div class="frame f3" data-label="落地">
+      <div><span class="no">FRAME 03 / 04 · 转</span><h2>每一步都<br><em>能看到变化。</em></h2><p class="sub">颜色从冷转暖，声音从环境收进室内。变化很小，但一直没停。</p><span class="mark"></span></div>
+    </div>
+    <div class="frame f4" data-label="完成">
+      <div><span class="no">FRAME 04 / 04 · 合</span><h2>最后停在一个<br><em>干净的画面。</em></h2><p class="sub">没有字幕，没有音乐。只剩一扇窗，和窗外的光。</p><span class="mark"></span></div>
+    </div>
+    <div class="head">
+      <p class="kicker">MÉRIDIEN · 新片 / 14 MIN</p>
+      <h1>四幕，<br>一镜到底。</h1>
+    </div>
+    <div class="hud">
+      <p>四帧叠在同一块 sticky 里，滚动进度换算成 0–3 的浮点位置；相邻两帧按距离交叉淡化，所以不会出现硬切。</p>
+      <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+    </div>
+    <p class="sr">短片《四幕》分为起、承、转、合四个段落，滚动页面时依次交叉淡化。</p>
+  </div>
+</section>
+
+<section class="credits" id="about">
+  <div>
+    <p class="kicker">ABOUT THE FILM</p>
+    <h2>一个人，<br>一台摄影机。</h2>
+    <p>《四幕》拍的是山里一间旧屋在一天里的光。没有对白，没有配乐，只有风、木头和远处的路。成片 14 分钟，按四个长镜头剪成。</p>
+  </div>
+  <dl class="spec">
+    <div><dt>DIRECTOR</dt><dd>沈屿</dd></div>
+    <div><dt>DURATION</dt><dd>14 min</dd></div>
+    <div><dt>FORMAT</dt><dd>4K / 24 fps</dd></div>
+    <div><dt>YEAR</dt><dd>2026</dd></div>
+  </dl>
+</section>
+
+<section class="screenings" id="screenings">
+  <table>
+    <caption>本月放映 · 杭州／上海</caption>
+    <thead><tr><th>日期</th><th>场地</th><th>状态</th></tr></thead>
+    <tbody>
+      <tr><td>11/16 周日</td><td>杭州 · 南山影像空间</td><td>映后谈</td></tr>
+      <tr><td>11/22 周六</td><td>上海 · 西岸艺术中心</td><td>已售罄</td></tr>
+      <tr><td>11/29 周六</td><td>杭州 · 旧厂房 3 号厅</td><td>余票 18</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="band" id="watch">
+  <div class="inner-band">
+    <div>
+      <h2>完整短片，线上放映到 11 月底。</h2>
+      <p>14 分钟，建议戴耳机，在暗一点的房间里看。</p>
+    </div>
+    <a class="cta" href="mailto:film@meridien.studio">索取观看链接 →</a>
+  </div>
+</section>
+
+<footer>
+  <span>子午 · MÉRIDIEN FILMS</span>
+  <span>杭州 · 南山路</span>
+  <span>《四幕》/ 2026</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">往下滚，画面会在四帧之间过渡</p>
+<script>
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var sec = document.getElementById('sec') || document.querySelector('.sec');
+  var frames = [].slice.call(document.querySelectorAll('.frame'));
+  var dots = [].slice.call(document.querySelectorAll('.dots i'));
+  var raf = null;
+
+  function render() {
+    raf = null;
+    var r = sec.getBoundingClientRect();
+    var total = sec.offsetHeight - innerHeight;
+    var p = Math.max(0, Math.min(1, -r.top / total));
+    var t = p * (frames.length - 1);
+    frames.forEach(function (f, i) {
+      f.style.opacity = Math.max(0, 1 - Math.abs(i - t)).toFixed(3);
+    });
+    var idx = Math.round(t);
+    dots.forEach(function (d, i) { d.classList.toggle('on', i === idx); });
+  }
+  addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+  addEventListener('resize', render);
+  render();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

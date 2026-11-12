@@ -3,73 +3,395 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>视差分层 · UI Atlas 动效</title>
+<title>视差分层 · 山望 高原观测站</title>
 <style>
-:root{--ink:#101418;--paper:#f4efe4;--accent:#c4552d}
+:root{--paper:#f5f0e3;--ink:#1b2430;--muted:#6e6f68;--line:#ddd4c2;--accent:#c2603a}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:#0d1b21;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.scene{position:relative;height:135vh;overflow:hidden;background:linear-gradient(#0b1a21 0%,#16323a 26%,#7b5f4d 52%,#e2a06a 72%,#f6d8ab 88%,#f4efe4 100%)}
-.layer{position:absolute;left:-6%;right:-6%;will-change:transform}
-.sun{position:absolute;left:58%;top:24%;width:96px;height:96px;border-radius:50%;
-  background:radial-gradient(circle at 40% 35%,#ffe6b0,#f7b96a 60%,rgba(247,185,106,0) 72%);filter:blur(.4px);opacity:.9}
-.ring{position:absolute;left:58%;top:24%;width:96px;height:96px;margin:-14px 0 0 -14px;border-radius:50%;
-  border:1px solid rgba(255,238,205,.35);width:124px;height:124px}
-.hill-back{top:38%;height:40vh;background:#274a4a;opacity:.85;
-  clip-path:polygon(0 62%,12% 44%,26% 56%,40% 32%,54% 50%,68% 30%,82% 46%,100% 34%,100% 100%,0 100%)}
-.hill-mid{top:52%;height:44vh;background:#1d3438;
-  clip-path:polygon(0 58%,14% 40%,30% 54%,46% 34%,62% 52%,78% 36%,92% 50%,100% 42%,100% 100%,0 100%)}
-.hill-front{top:68%;height:44vh;background:#11262a;
-  clip-path:polygon(0 46%,16% 56%,32% 38%,50% 58%,66% 40%,82% 56%,100% 42%,100% 100%,0 100%)}
-.mast{position:absolute;left:22px;right:22px;top:15%;z-index:3;max-width:600px}
-.kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:rgba(255,240,215,.62)}
-.mast h1{margin:0;font-size:clamp(30px,7.6vw,62px);line-height:.98;letter-spacing:-.045em;font-weight:600;color:#fdf5e6;text-wrap:balance}
-.mast h1 em{display:block;font-style:normal;color:#ffd9a8}
-.mast p{margin:14px 0 0;max-width:26em;font-size:12.5px;line-height:1.8;color:rgba(255,240,220,.7)}
-.meta{position:absolute;left:22px;right:22px;bottom:26px;display:flex;gap:18px;flex-wrap:wrap;
-  font:600 10px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(28,40,40,.55);z-index:3}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:#e9dfc9;pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:#ffd9a8}
-@media (prefers-reduced-motion:reduce){.layer{transform:none!important}}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+.nav{position:fixed;inset:0 0 auto;z-index:8;height:68px;display:flex;align-items:center;gap:28px;
+  padding:0 max(22px,calc((100vw - 1120px)/2));color:#f5efe3;border-bottom:1px solid transparent;
+  transition:background .35s ease,color .35s ease,border-color .35s ease}
+.nav.solid{background:rgba(245,240,227,.92);color:var(--ink);border-color:var(--line);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:baseline;gap:9px;font:600 15px/1.1 Georgia,"Songti SC",serif;letter-spacing:.02em;white-space:nowrap}
+.brand span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;opacity:.62}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12px;opacity:.7}
+.nav-links a:hover{opacity:1}
+.book{margin-left:auto;border:1px solid currentColor;border-radius:999px;padding:8px 16px;font-size:11.5px;white-space:nowrap;opacity:.92}
+.book:hover{background:var(--accent);border-color:var(--accent);color:#fff;opacity:1}
 
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+/* 首屏：四层山各自以不同速度上移 */
+.hero{position:relative;height:128vh;min-height:520px;overflow:hidden;
+  background:
+    radial-gradient(80% 52% at 66% 30%,rgba(255,214,150,.38),transparent 62%),
+    linear-gradient(180deg,#081120 0%,#0f1e33 30%,#2b3a4c 52%,#7d5c52 72%,#cf9468 86%,#f3d7ac 100%)}
+.layer{position:absolute;left:-6%;right:-6%;will-change:transform}
+.sunlane{top:0;bottom:0}
+.sun{position:absolute;left:62%;top:23%;width:92px;height:92px;margin:-46px 0 0 -46px;border-radius:50%;
+  background:radial-gradient(circle at 42% 36%,#fff3d6,#f7c078 58%,rgba(247,192,120,0) 72%);filter:blur(.4px)}
+.ring{position:absolute;left:62%;top:23%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;
+  border:1px solid rgba(255,238,205,.28)}
+.hill-back{top:32%;height:44vh;background:linear-gradient(180deg,#3b5162,#283c4a 58%);opacity:.9;
+  clip-path:polygon(0 58%,10% 42%,24% 54%,38% 30%,52% 48%,66% 28%,80% 46%,92% 36%,100% 50%,100% 100%,0 100%)}
+.hill-mid{top:48%;height:46vh;background:linear-gradient(180deg,#22343f,#16242d 70%);
+  clip-path:polygon(0 54%,12% 38%,28% 52%,44% 32%,60% 50%,76% 34%,90% 48%,100% 40%,100% 100%,0 100%)}
+.hill-front{top:64%;height:48vh;background:linear-gradient(180deg,#13212b,#0a141b 62%);
+  clip-path:polygon(0 44%,14% 54%,30% 36%,48% 56%,64% 38%,80% 54%,92% 42%,100% 52%,100% 100%,0 100%)}
+.mist{position:absolute;left:-10%;right:-10%;top:52%;height:26%;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(244,220,186,.18) 46%,transparent);filter:blur(12px)}
+.mast{position:absolute;left:max(22px,calc((100vw - 1120px)/2));right:22px;top:15%;z-index:3;max-width:680px;will-change:transform}
+.kicker{margin:0 0 16px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.28em;color:rgba(255,240,215,.64)}
+.mast h1{margin:0;font-size:clamp(40px,6.2vw,76px);line-height:1.02;letter-spacing:-.05em;font-weight:600;color:#fdf5e6;
+  text-shadow:0 2px 34px rgba(4,10,18,.32)}
+.mast h1 em{display:block;font:italic 400 1em/1.08 Georgia,"Songti SC",serif;letter-spacing:-.03em;color:#ffd9a8}
+.mast .sub{margin:20px 0 0;max-width:27em;font-size:12.5px;line-height:1.85;color:rgba(255,240,220,.76)}
+.cta-row{display:flex;align-items:center;gap:16px;margin-top:26px;flex-wrap:wrap}
+.cta{display:inline-block;background:#ffd9a8;color:#1a2430;border-radius:999px;padding:10px 18px;font-size:12px;font-weight:650;letter-spacing:.01em}
+.cta:hover{background:#ffe6c4}
+.note{font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(255,240,220,.55)}
+.meta{position:absolute;left:max(22px,calc((100vw - 1120px)/2));right:22px;top:calc(100vh - 66px);z-index:3;
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;font:600 9.5px/1.8 ui-monospace,Consolas,monospace;
+  letter-spacing:.14em;color:rgba(248,238,222,.6)}
+.meta b{font-weight:600;color:rgba(255,217,168,.9)}
+.cue{position:absolute;right:max(22px,calc((100vw - 1120px)/2));top:calc(100vh - 60px);z-index:3;display:flex;align-items:center;gap:8px;
+  font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:rgba(248,238,222,.5)}
+.cue::after{content:"";width:1px;height:20px;background:linear-gradient(rgba(248,238,222,.6),transparent)}
+
+/* 正文 */
+.intro{max-width:1120px;margin:0 auto;padding:clamp(54px,8vw,92px) 22px 54px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(28px,5vw,72px);align-items:start}
+.kicker2{margin:0 0 14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h2{margin:0;font-size:clamp(28px,3.6vw,44px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
+.intro-body p{margin:0 0 14px;font-size:13.5px;line-height:1.95;color:#4e5049;max-width:34em}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:26px 0 0;padding:0;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;list-style:none}
+.facts div{background:var(--paper);padding:15px 16px}
+.facts dt{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);margin-bottom:7px}
+.facts dd{margin:0;font-size:14px;font-weight:600;letter-spacing:-.01em}
+.spots{max-width:1120px;margin:0 auto;padding:26px 22px 58px}
+.spots-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:22px;flex-wrap:wrap}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#faf6ec}
+.card .art{height:158px;position:relative;overflow:hidden;background:linear-gradient(165deg,#3a4f5f,#16232d)}
+.card .art::before{content:"";position:absolute;inset:34% -8% -16%;background:
+  repeating-linear-gradient(98deg,rgba(255,255,255,.06) 0 2px,transparent 2px 13px),
+  linear-gradient(180deg,transparent,rgba(5,10,14,.9));
+  clip-path:polygon(0 62%,16% 40%,32% 60%,48% 26%,64% 54%,82% 34%,100% 58%,100% 100%,0 100%)}
+.card.a2 .art{background:linear-gradient(165deg,#725a48,#2a2019)}
+.card.a2 .art::before{clip-path:polygon(0 52%,14% 36%,30% 58%,46% 22%,62% 50%,80% 30%,100% 54%,100% 100%,0 100%)}
+.card.a3 .art{background:linear-gradient(165deg,#4a5a4b,#17211b)}
+.card.a3 .art::before{clip-path:polygon(0 66%,18% 42%,34% 62%,52% 30%,70% 56%,86% 36%,100% 60%,100% 100%,0 100%)}
+.card .art::after{content:"";position:absolute;left:26px;top:26px;width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle,#ffe4b4,rgba(255,228,180,.12) 70%)}
+.card .body{padding:17px 17px 19px}
+.card h3{margin:0 0 8px;font-size:16px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:8px;font-weight:620}
+.card h3 i{font:italic 400 11px Georgia,serif;color:var(--muted)}
+.card p{margin:0;font-size:12px;line-height:1.8;color:#5b5d55}
+.card .line{display:flex;justify-content:space-between;gap:10px;margin-top:14px;padding-top:11px;border-top:1px solid #e8e0cf;
+  font:600 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.times{max-width:1120px;margin:0 auto;padding:50px 22px 56px;display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  gap:clamp(26px,5vw,64px);align-items:start;border-top:1px solid var(--line)}
+.times-copy p{margin:16px 0 0;font-size:13px;line-height:1.9;color:#585a52;max-width:30em}
+.textlink{display:inline-block;margin-top:18px;font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;
+  color:var(--accent);border-bottom:1px solid rgba(194,96,58,.4);padding-bottom:5px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+caption{caption-side:top;text-align:left;margin-bottom:10px;font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+th,td{text-align:left;padding:13px 8px;border-bottom:1px solid var(--line)}
+th{font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+td:first-child{font-weight:600}
+td:nth-child(2){font-family:ui-monospace,Consolas,monospace;font-size:12px}
+tr:last-child td{border-bottom:0}
+td .seat{display:inline-block;padding:2px 8px;border-radius:999px;background:#ece4d2;font:600 9.5px/1.7 ui-monospace,Consolas,monospace;color:#6d6a5e}
+td .seat.low{background:#f4d9cc;color:#a04a28}
+.band{max-width:1120px;margin:0 auto;padding:0 22px 58px}
+.inner-band{border:1px solid rgba(194,96,58,.28);border-radius:16px;padding:30px 28px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(194,96,58,.08),rgba(194,96,58,.015) 62%)}
+.inner-band h2{margin:0 0 6px;font-size:clamp(22px,2.8vw,30px)}
+.inner-band p{margin:0;font-size:12px;color:#5d5f56;line-height:1.8}
+.inner-band .cta{margin-left:auto;background:var(--accent);color:#fff;border:1px solid var(--accent)}
+.inner-band .cta:hover{filter:brightness(1.06)}
+footer{max-width:1120px;margin:0 auto;padding:0 22px 28px;display:flex;gap:18px;flex-wrap:wrap;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;pointer-events:none;
+  font-size:11px;letter-spacing:.04em;color:#f3ecdd;background:rgba(10,16,24,.55);border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;padding:4px 9px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:#ffd9a8}
+@media (max-width:860px){
+  .nav{gap:16px}
+  .nav-links{display:none}
+  .intro,.times{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr}
+  .card .art{height:140px}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .brand span{display:none}
+  .book{padding:6px 12px;font-size:10.5px}
+  .mast{left:16px;right:16px;top:17%}
+  .mast h1{font-size:clamp(38px,12vw,54px)}
+  .mast .sub{font-size:12px;margin-top:14px}
+  .cta-row{margin-top:18px}
+  .note,.meta,.cue{display:none}
+  .intro,.spots,.times,.band,footer{padding-left:16px;padding-right:16px}
+  .intro{padding-top:40px;padding-bottom:36px}
+  .spots{padding-top:10px;padding-bottom:42px}
+  .facts{grid-template-columns:1fr 1fr}
+  .times{padding-top:34px;padding-bottom:42px}
+  .inner-band{padding:22px 18px}
+  .inner-band .cta{margin-left:0}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:44px;padding:0 18px;gap:14px}
+  .brand{font-size:12px}
+  .brand span,.nav-links{display:none}
+  .book{padding:5px 12px;font-size:10px}
+  .mast{left:18px;right:18px;top:13%}
+  .kicker{font-size:8px;margin-bottom:9px}
+  .mast h1{font-size:clamp(30px,5.4vw,40px)}
+  .mast .sub,.note{display:none}
+  .cta-row{margin-top:14px}
+  .cta{padding:7px 13px;font-size:10.5px}
+  .meta{left:18px;right:18px;top:calc(100vh - 38px);font-size:8.5px;gap:12px}
+  .cue{display:none}
+  .hero{min-height:0}
+  .intro{padding:24px 18px 18px;gap:18px}
+  .intro h2{font-size:22px}
+  .intro-body p{font-size:11px;line-height:1.7}
+  .facts{margin-top:12px}
+  .facts div{padding:9px 10px}
+  .facts dd{font-size:12px}
+  .spots{padding:8px 18px 22px}
+  .spots-head{margin-bottom:12px}
+  .spots h2{font-size:20px}
+  .cards{gap:10px}
+  .card .art{height:86px}
+  .card .body{padding:10px 11px 12px}
+  .card h3{font-size:13px;margin-bottom:4px}
+  .card p{font-size:10.5px;line-height:1.65}
+  .card .line{margin-top:8px;padding-top:7px;font-size:8px}
+  .times,.band,footer{display:none}
+  .intro-body p:nth-of-type(2){display:none}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c4048;
+    background:rgba(255,255,255,.82);border:1px solid rgba(22,21,15,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (prefers-reduced-motion:reduce){
+  .layer,.mast{transform:none!important}
+  .nav{transition:none}
+}
 </style>
 </head>
 <body>
-<div class="scene" id="scene">
-  <div class="layer" data-k=".10" style="top:0;bottom:0">
-    <div class="sun"></div><div class="ring"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top">山望<span>SHANWANG · 高原观测站</span></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#about">关于</a>
+    <a href="#spots">看台</a>
+    <a href="#times">日出</a>
+  </nav>
+  <a class="book" href="#book">预约明早</a>
+</header>
+
+<section class="hero" id="top">
+  <div class="layer sunlane" data-k=".10" aria-hidden="true">
+    <i class="sun"></i><i class="ring"></i>
   </div>
-  <div class="layer hill-back" data-k=".12"></div>
-  <div class="layer hill-mid" data-k=".24"></div>
-  <div class="mast">
-    <p class="kicker">SCROLL / 02 · 视差分层</p>
-    <h1>地平线<em>在移动。</em></h1>
-    <p>四层各自以不同的速度上移：太阳 0.10、远山 0.12、近山 0.24、标题 0.40。速度差决定纵深。</p>
+  <div class="layer hill-back" data-k=".14" aria-hidden="true"></div>
+  <div class="layer hill-mid" data-k=".26" aria-hidden="true"></div>
+  <div class="mist" aria-hidden="true"></div>
+  <div class="layer hill-front" data-k=".40" aria-hidden="true"></div>
+  <div class="mast" id="mast">
+    <p class="kicker">SHANWANG RIDGE · 海拔 2,360 M</p>
+    <h1>在山的肩上，<em>等第一束光。</em></h1>
+    <p class="sub">日出台只在晴天开放。凌晨四点从山门出发，走四十分钟石阶，刚好在第一束光落到云上之前到达。</p>
+    <div class="cta-row">
+      <a class="cta" href="#book">预约明早日出</a>
+      <span class="note">今晨日出 06:24 · 余 12 席</span>
+    </div>
   </div>
-  <div class="layer hill-front" data-k=".38"></div>
-  <div class="meta"><span>35.6812° N</span><span>139.7671° E</span><span>06:24 / 日出</span></div>
-</div>
-<p class="hint">往下滚，山会以不同速度让开</p>
+  <div class="meta">
+    <span><b>35.6812° N</b></span>
+    <span>139.7671° E</span>
+    <span>06:24 / 日出</span>
+    <span>−4°C / 山顶</span>
+  </div>
+  <p class="cue" aria-hidden="true">SCROLL</p>
+</section>
+
+<main>
+  <section class="intro" id="about">
+    <div>
+      <p class="kicker2">ABOUT THE DECK</p>
+      <h2>一座只在晴天<br>开放的山脊。</h2>
+    </div>
+    <div class="intro-body">
+      <p>山望台建在旧防火瞭望塔的位置，海拔 2,360 米。这里一年有两百多天在云上；日出前半小时，山谷会先亮，然后是云，最后才是太阳。</p>
+      <p>我们不接大巴，也不设商店。每天四十个名额，凌晨四点从山门出发，走四十分钟石阶，刚好在第一束光之前到达。遇到大风云厚，当天全额退款，名额顺延。</p>
+      <ul class="facts">
+        <div><dt>海拔</dt><dd>2,360 m</dd></div>
+        <div><dt>开放</dt><dd>晴天 04:30–08:00</dd></div>
+        <div><dt>凌晨气温</dt><dd>−4 °C</dd></div>
+        <div><dt>每日名额</dt><dd>40 席</dd></div>
+      </ul>
+    </div>
+  </section>
+
+  <section class="spots" id="spots">
+    <div class="spots-head">
+      <div>
+        <p class="kicker2">THREE DECKS</p>
+        <h2>三个看台，三种云。</h2>
+      </div>
+      <span class="kicker2">01 — 03 / 步行均可到达</span>
+    </div>
+    <div class="cards">
+      <article class="card a1">
+        <div class="art" aria-hidden="true"></div>
+        <div class="body">
+          <h3>东台 <i>EAST DECK</i></h3>
+          <p>最早亮的一块岩石，能看见整条云海向东退。风小，适合带老人和小孩。</p>
+          <div class="line"><span>步行 40 分钟</span><span>正对日出</span></div>
+        </div>
+      </article>
+      <article class="card a2">
+        <div class="art" aria-hidden="true"></div>
+        <div class="body">
+          <h3>云台 <i>CLOUD DECK</i></h3>
+          <p>比东台低 80 米。云厚的时候，人像坐在云里，只看得见最近的一座山尖。</p>
+          <div class="line"><span>步行 52 分钟</span><span>看云海</span></div>
+        </div>
+      </article>
+      <article class="card a3">
+        <div class="art" aria-hidden="true"></div>
+        <div class="body">
+          <h3>风口台 <i>RIDGE DECK</i></h3>
+          <p>风大，人少，适合把三脚架压到最低。日出后十分钟，山脊会变成一条金线。</p>
+          <div class="line"><span>步行 58 分钟</span><span>看山脊</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="times" id="times">
+    <div class="times-copy">
+      <p class="kicker2">SUNRISE LOG</p>
+      <h2>明天的日出，<br>比今天晚一分钟。</h2>
+      <p>十一月的日出每天推迟四十秒左右。我们只在前一晚确认天气后发车，出发短信会在 21:00 前发到你的手机。</p>
+      <a class="textlink" href="#book">查看本周余位 →</a>
+    </div>
+    <table>
+      <caption>本周日出与余位 · 山顶观测站</caption>
+      <thead><tr><th>日期</th><th>日出</th><th>云量</th><th>余位</th></tr></thead>
+      <tbody>
+        <tr><td>11/13 周四</td><td>06:24</td><td>少云</td><td><span class="seat">12</span></td></tr>
+        <tr><td>11/14 周五</td><td>06:25</td><td>晴</td><td><span class="seat low">4</span></td></tr>
+        <tr><td>11/15 周六</td><td>06:26</td><td>多云</td><td><span class="seat low">2</span></td></tr>
+        <tr><td>11/16 周日</td><td>06:27</td><td>晴</td><td><span class="seat">18</span></td></tr>
+        <tr><td>11/17 周一</td><td>06:28</td><td>小雨</td><td><span class="seat">40</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="band" id="book">
+    <div class="inner-band">
+      <div>
+        <h2>明早还有 12 个位置。</h2>
+        <p>写下人数和日期，我们回信确认天气、接驳和集合时间。</p>
+      </div>
+      <a class="cta" href="mailto:hello@shanwang.ridge">预约看日出 →</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>山望 · SHANWANG RIDGE</span>
+    <span>35.6812° N · 139.7671° E</span>
+    <span>© 2026</span>
+  </footer>
+</main>
+
+<p class="hint">往下滚，四层山会错开</p>
 <script>
 (function () {
+  var nav = document.getElementById('nav');
   var layers = [].slice.call(document.querySelectorAll('.layer[data-k]'));
-  var mast = document.querySelector('.mast h1');
-  var scene = document.getElementById('scene');
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var mast = document.getElementById('mast');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var raf = null;
+
   function render() {
     raf = null;
-    var y = scrollY;
+    var y = scrollY || document.documentElement.scrollTop;
+    nav.classList.toggle('solid', y > 120);
+    if (reduce) return;
     layers.forEach(function (l) {
       l.style.transform = 'translate3d(0,' + (-y * parseFloat(l.dataset.k)).toFixed(1) + 'px,0)';
     });
-    if (mast) mast.style.transform = 'translate3d(0,' + (y * .16).toFixed(1) + 'px,0)';
+    mast.style.transform = 'translate3d(0,' + (y * .16).toFixed(1) + 'px,0)';
   }
   addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+  addEventListener('resize', render);
   render();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

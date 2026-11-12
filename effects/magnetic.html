@@ -3,44 +3,222 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>磁吸按钮 · UI Atlas 动效</title>
+<title>磁吸按钮 · NORTHBOUND 工作室</title>
 <style>
-:root{--bg:#f7f6f2;--ink:#111216;--muted:#74777e;--accent:#2f5fd0;--line:#e2dfd6}
+:root{--bg:#f5f2ea;--panel:#fbf9f4;--ink:#14151a;--muted:#71747d;--accent:#2f5fd0;--line:#dfdbd0}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden}
-.stage{min-height:100vh;display:grid;place-items:center;padding:36px 22px 70px}
-.wrap{width:100%;max-width:560px}
-.kicker{margin:0 0 14px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-h1{margin:0 0 26px;font-size:clamp(26px,6.6vw,46px);line-height:1.12;letter-spacing:-.03em;font-weight:650}
-h1 em{font-style:normal;color:var(--accent)}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.nav{position:sticky;top:0;z-index:8;height:68px;display:flex;align-items:center;gap:30px;
+  padding:0 max(22px,calc((100vw - 1160px)/2));background:rgba(245,242,234,.86);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:9px;font-size:12px;font-weight:700;letter-spacing:.2em;text-decoration:none;white-space:nowrap}
+.brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.nav-links{display:flex;gap:24px;margin-left:8px}
+.nav-links a{font-size:12.5px;color:#55585f;text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.nav .mag{margin-left:auto}
 .mag{position:relative;height:50px;padding:0 24px;border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:#fff;
-  font:inherit;font-size:14.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:9px;will-change:transform}
-.mag.ghost{background:transparent;color:var(--ink);border-color:#cfcabd}
+  font:inherit;font-size:14.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:9px;text-decoration:none;will-change:transform;
+  transition:background-color .25s,border-color .25s}
+.mag:hover{background:#244bb0;border-color:#244bb0}
+.mag.ghost{background:transparent;color:var(--ink);border-color:#c9c4b7}
+.mag.ghost:hover{background:#ebe7dc;border-color:#b8b2a3}
 .mag span{display:inline-block;will-change:transform}
-.note{margin:22px 0 0;max-width:34em;font-size:12.5px;line-height:1.8;color:var(--muted)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+.nav .mag{height:38px;padding:0 17px;font-size:12px}
+.hero{max-width:1160px;margin:0 auto;padding:clamp(52px,8vw,104px) 22px 70px;
+  display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:clamp(28px,5vw,64px);align-items:center;
+  min-height:calc(100vh - 68px)}
+.kicker{margin:0 0 20px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+h1{margin:0;font-size:clamp(48px,7.4vw,92px);line-height:.94;letter-spacing:-.055em;font-weight:650}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:26px 0 0;max-width:30em;font-size:13.5px;line-height:1.9;color:#55585f}
+.actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:32px}
+.note{margin:22px 0 0;max-width:33em;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.note b{font-weight:600;color:#4c4f57}
+.field{position:relative;aspect-ratio:1;width:min(420px,100%);justify-self:end;display:grid;place-items:center}
+.ring{position:absolute;border:1px solid rgba(47,95,208,.22);border-radius:50%}
+.r1{width:100%;height:100%}
+.r2{width:72%;height:72%;border-color:rgba(47,95,208,.3)}
+.r3{width:44%;height:44%;border-color:rgba(47,95,208,.4)}
+.core{position:relative;width:31%;height:31%;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 36% 30%,#7d9cf0,#2f5fd0 58%,#1d3d8f);
+  color:#f2f5ff;font:650 12px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;
+  box-shadow:0 22px 50px -22px rgba(47,95,208,.7),inset 0 1px 0 rgba(255,255,255,.5)}
+.sat{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 5px rgba(47,95,208,.1)}
+.sat.a{top:9%;left:57%}
+.sat.b{top:58%;left:7%}
+.sat.c{bottom:11%;right:16%;width:6px;height:6px;opacity:.6}
+.tag{position:absolute;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:#868a93;white-space:nowrap}
+.tag.t1{top:4%;left:0}
+.tag.t2{right:0;top:68%}
+.tag.t3{left:13%;bottom:5%}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);max-width:1160px;margin:0 auto;padding:0 22px;border-top:1px solid var(--line)}
+.stat{padding:26px 10px;border-left:1px solid var(--line)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{display:block;font:500 27px/1 ui-monospace,Consolas,monospace;letter-spacing:-.04em;color:var(--accent)}
+.stat span{display:block;margin-top:7px;font-size:10.5px;color:var(--muted)}
+.work,.services{max-width:1160px;margin:0 auto;padding:64px 22px 20px}
+h2{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
+.rows{border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:56px minmax(0,1fr) 140px 58px;gap:16px;align-items:center;
+  padding:20px 2px;border-bottom:1px solid var(--line);text-decoration:none;transition:padding-left .3s cubic-bezier(.2,.8,.2,1)}
+.row:hover{padding-left:10px}
+.row i{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);font-style:normal}
+.row b{font-size:17px;letter-spacing:-.015em;font-weight:560}
+.row small{font-size:11px;color:var(--muted);line-height:1.6}
+.row em{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);font-style:normal;text-align:right}
+.services{padding-bottom:70px}
+.svc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.svc article{border:1px solid var(--line);border-radius:14px;padding:20px 18px;background:var(--panel)}
+.svc h3{margin:0 0 8px;font-size:14px;letter-spacing:-.01em}
+.svc p{margin:0;font-size:11.5px;line-height:1.75;color:var(--muted)}
+.svc span{display:block;margin-bottom:14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent)}
+footer{max-width:1160px;margin:0 auto;padding:0 22px 30px}
+.contact{border-top:1px solid var(--line);padding:38px 0 30px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.contact h2{margin:0}
+.contact p{margin:6px 0 0;font-size:12px;color:var(--muted)}
+.contact .mag{margin-left:auto}
+.foot{display:flex;gap:18px;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--line);
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.foot span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);
+  pointer-events:none;z-index:9;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;min-height:0;padding-bottom:54px}
+  .field{width:min(300px,74vw);justify-self:center}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stat:nth-child(3){border-left:0;padding-left:0}
+  .svc{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .nav{height:56px;padding:0 16px;gap:14px}
+  .nav-links{display:none}
+  .brand span{display:none}
+  .hero{padding:34px 16px 44px}
+  .field{width:min(250px,70vw)}
+  h1{font-size:clamp(40px,12vw,56px)}
+  .lede{font-size:12.5px}
+  .actions .mag{height:46px;padding:0 20px;font-size:13.5px}
+  .row{grid-template-columns:40px minmax(0,1fr) 50px;gap:10px}
+  .row small{display:none}
+  .work,.services,footer{padding-left:16px;padding-right:16px}
+  .contact{padding-bottom:20px}
+  .contact .mag{margin-left:0}
+  .foot span:last-child{margin-left:0}
+  .hint{left:12px;bottom:10px;font-size:10px}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:48px;padding:0 18px;gap:20px}
+  .nav-links{display:none}
+  .brand span{display:none}
+  .hero{min-height:calc(100vh - 48px);grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);
+    padding:16px 22px;gap:20px;align-items:center}
+  .kicker{margin-bottom:10px}
+  h1{font-size:clamp(30px,5vw,40px)}
+  .lede{margin-top:12px;font-size:10.5px;line-height:1.65;max-width:27em}
+  .actions{margin-top:14px;gap:8px}
+  .actions .mag{height:38px;padding:0 15px;font-size:12px}
+  .note{display:none}
+  .field{width:200px;justify-self:end;order:0}
+  .tag{display:none}
+  .stats,.work,.services,footer{display:none}
+  .hint{left:auto;right:12px;bottom:10px;font-size:10px}
+}
+@media (hover:none),(max-width:560px){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">POINTER / 01</p>
-    <h1>光标靠近，<em>按钮会过来。</em></h1>
-    <div class="row">
-      <button class="mag" data-s=".34">开始使用 <span>→</span></button>
-      <button class="mag ghost" data-s=".22">看文档</button>
+
+<header class="nav">
+  <a class="brand" href="#top">NORTHBOUND<span>STUDIO</span></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#work">作品</a>
+    <a href="#services">服务</a>
+    <a href="#contact">关于</a>
+  </nav>
+  <a class="mag" href="#contact" data-s=".2">聊聊项目 <span>↗</span></a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="kicker">INDEPENDENT DESIGN STUDIO · SHANGHAI</p>
+      <h1>让品牌<br><em>有引力。</em></h1>
+      <p class="lede">我们做品牌、网站与产品界面。不追热点，只把每一次点击、每一段阅读，做得更顺手一点。</p>
+      <div class="actions">
+        <a class="mag" href="#contact" data-s=".34">开始一个项目 <span>→</span></a>
+        <a class="mag ghost" href="#work" data-s=".22">看作品</a>
+      </div>
+      <p class="note">按钮在指针进入 <b>150px</b> 半径后开始吸附，越近位移越大；标签再反向偏移 4px，整块按钮才像有厚度。</p>
     </div>
-    <p class="note">进入 150px 半径才开始吸附，越近位移越大；标签再反向偏移 4px，按钮才像有厚度，而不是整块贴纸被拖走。</p>
+    <div class="field" aria-hidden="true">
+      <span class="ring r1"></span>
+      <span class="ring r2"></span>
+      <span class="ring r3"></span>
+      <span class="core">NB</span>
+      <span class="sat a"></span>
+      <span class="sat b"></span>
+      <span class="sat c"></span>
+      <span class="tag t1">FIELD · 150PX</span>
+      <span class="tag t2">PULL · 0.34</span>
+      <span class="tag t3">RELEASE · EASE 0.16</span>
+    </div>
+  </section>
+
+  <div class="stats" aria-label="工作室数据">
+    <div class="stat"><b>38</b><span>已交付项目</span></div>
+    <div class="stat"><b>11</b><span>合作品牌</span></div>
+    <div class="stat"><b>6 年</b><span>独立执业</span></div>
+    <div class="stat"><b>4</b><span>常驻成员</span></div>
   </div>
+
+  <section class="work" id="work">
+    <p class="kicker">SELECTED WORK · 2024—2026</p>
+    <h2>最近做完的几件事。</h2>
+    <div class="rows">
+      <a class="row" href="#contact"><i>01</i><b>青屿民宿 · 品牌与订房站</b><small>山野旅宿 · 视觉、前端</small><em>2026</em></a>
+      <a class="row" href="#contact"><i>02</i><b>折线科技 · 数据产品界面</b><small>可观测性 · 设计系统</small><em>2025</em></a>
+      <a class="row" href="#contact"><i>03</i><b>白噪唱片 · 电商改版</b><small>音乐零售 · 体验与动效</small><em>2025</em></a>
+      <a class="row" href="#contact"><i>04</i><b>北岸书店 · 全年视觉</b><small>文化空间 · 品牌物料</small><em>2024</em></a>
+    </div>
+  </section>
+
+  <section class="services" id="services">
+    <p class="kicker">WHAT WE DO</p>
+    <h2>三件做得很熟的事。</h2>
+    <div class="svc">
+      <article><span>01 / BRAND</span><h3>品牌与视觉系统</h3><p>从命名、标志到一整套可落地的物料，先把气质定下来，再谈风格。</p></article>
+      <article><span>02 / WEB</span><h3>网站与落地页</h3><p>手写前端、真实内容、可维护的结构，不套模板，也不为了动效牺牲速度。</p></article>
+      <article><span>03 / MOTION</span><h3>交互与动效</h3><p>把状态变化讲清楚：什么时候出现、怎么离开、出错时用户看到什么。</p></article>
+    </div>
+  </section>
+
+  <footer id="contact">
+    <div class="contact">
+      <div>
+        <h2>有一个想法？</h2>
+        <p>写清时间、预算和想要的结果，我们 48 小时内回信。</p>
+      </div>
+      <a class="mag" href="mailto:hello@northbound.studio" data-s=".26">hello@northbound.studio <span>↗</span></a>
+    </div>
+    <div class="foot">
+      <span>NORTHBOUND STUDIO · 上海</span>
+      <span>徐汇区 · 常熟路 71 号</span>
+      <span>© 2026</span>
+    </div>
+  </footer>
 </main>
+
 <p class="hint">把光标移向按钮</p>
 <script>
 (function () {
@@ -74,6 +252,61 @@ h1 em{font-style:normal;color:var(--accent)}
   document.addEventListener('pointerleave', function () {
     st.forEach(function (o) { o.tx = 0; o.ty = 0; });
     if (!raf) raf = requestAnimationFrame(tick);
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

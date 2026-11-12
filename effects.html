@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UI Atlas · 动效图鉴</title>
-<meta name="description" content="50 个可交互的前端 UI 动效：指针跟随、滚动叙事、文字动画、布局过渡、反馈、背景与页面转场。全部为零依赖单文件 HTML，可直接预览、查看源码、复制使用。">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="description" content="100 个可交互的前端 UI 动效：指针跟随、滚动叙事、文字动画、布局过渡、反馈、背景与页面转场。全部为零依赖单文件 HTML，可直接预览、查看源码、复制使用。">
 <link rel="stylesheet" href="site.css?v=13">
-<link rel="stylesheet" href="effects.css?v=1">
+<link rel="stylesheet" href="effects.css?v=4">
 </head>
 <body>
 <a class="skip" href="#fx-grid">跳到效果</a>
@@ -17,15 +18,16 @@
       <span class="logo" aria-hidden="true">◆</span>
       <div>
         <h1>UI Atlas</h1>
-        <p>动效图鉴 · <span id="n-sub">50</span> 个可交互效果 · 零依赖</p>
+        <p>动效图鉴 · <span id="n-sub">100</span> 个可交互效果 · 零依赖</p>
       </div>
     </div>
     <div class="tools">
       <input id="q" type="search" placeholder="搜：磁吸、视差、粒子、转场…" aria-label="搜索效果、技术或类别">
       <span class="spacer"></span>
       <button class="btn" id="random" type="button">随机一个</button>
-      <a class="ref-link" href="motion.html">动效系统 →</a>
-      <a class="ref-link" href="index.html">← 风格图鉴</a>
+      <a class="btn" href="motion.html">动效系统 →</a>
+      <a class="btn" href="motion/components.html">组件 →</a>
+      <a class="btn" href="index.html">← 风格图鉴</a>
     </div>
   </div>
   <div class="filterbar">
@@ -40,7 +42,7 @@
 
 <footer class="foot">
   <p>每个效果都是零依赖单文件 HTML：CSS 与 JS 内联，复制一个文件就能跑。全部为本站自行实现，未复制第三方站点的代码或素材。</p>
-  <p>预览可直接交互；点预览右下角「放大」会按 600 × 450 的同一构图等比铺到全屏，想打开响应式原页点「原页」，想拿走源码点「代码」。</p>
+  <p>预览可直接交互；点预览右下角「放大」会按 600 × 450 的同一构图等比铺到全屏，「原页」在新标签打开真实页面（全部 100 条已是完整产品页，页内可切「画板 600×450」对照构图），想拿走源码点「代码」。</p>
 </footer>
 
 <div class="overlay" id="codeModal" hidden>
@@ -63,6 +65,7 @@
         <section><h3>解剖</h3><ol class="code-steps" id="cm-anatomy"></ol></section>
         <section><h3>参数</h3><dl class="code-params" id="cm-params"></dl></section>
         <section><h3>变体</h3><ul class="code-variants" id="cm-variants"></ul></section>
+        <section id="cm-same-wrap" hidden><h3>同源</h3><p id="cm-same"></p><button class="btn small" id="cm-same-open" type="button"></button></section>
         <section><h3>注意</h3><p id="cm-watch"></p></section>
         <section><h3>成本</h3><p class="code-cost"><b id="cm-cost-tier"></b><span id="cm-cost-note"></span></p></section>
         <section><h3>什么时候别用</h3><p id="cm-avoid"></p></section>
@@ -102,6 +105,6 @@
   </div>
 </div>
 
-<script src="effects.js?v=1"></script>
+<script src="effects.js?v=9"></script>
 </body>
 </html>

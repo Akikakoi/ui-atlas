@@ -3,52 +3,161 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>点赞粒子 · UI Atlas 动效</title>
+<title>点赞粒子 · FIELD NOTES 野地手记 · UI Atlas</title>
 <style>
-:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--accent:#e0426b}
+:root{--bg:#f2eee3;--paper:#fbf8f0;--ink:#171612;--muted:#7e7a6e;--line:#ded7c5;--accent:#c9455f;--warm:#a8643c}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:38px 22px 74px}
-.wrap{width:100%;max-width:440px;text-align:center}
-.kicker{margin:0 0 18px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-.quote{margin:0 auto 30px;max-width:17em;font:italic 400 clamp(21px,4.8vw,27px)/1.5 Georgia,"Songti SC",serif;letter-spacing:-.01em}
-.quote span{display:block;margin-top:12px;font:400 11.5px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;font-style:normal;
-  letter-spacing:.08em;color:var(--muted)}
-.like{position:relative;display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 18px 0 15px;border-radius:999px;
-  border:1px solid #e6d6da;background:#fff;cursor:pointer;font:inherit;font-size:13.5px;color:var(--ink);overflow:visible}
-.like:hover{border-color:#e7bcc7}
-.like svg{width:20px;height:20px;display:block;fill:none;stroke:#c9a3ac;stroke-width:1.7;transition:fill .2s,stroke .2s,transform .2s}
+body{background:radial-gradient(85% 65% at 50% 0%,#fbf8f0,#ece6d8 78%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.page{min-height:100svh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:10;flex:0 0 auto;height:54px;display:flex;align-items:center;gap:22px;padding:0 clamp(16px,3.4vw,38px);border-bottom:1px solid var(--line);background:rgba(242,238,227,.84);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:750;font-size:11.5px;letter-spacing:.2em}
+.brand .mark{width:26px;height:26px;border-radius:50%;border:1px solid var(--ink);display:grid;place-items:center;font:700 11px/1 Georgia,serif}
+.brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.topbar nav{display:flex;gap:19px;font-size:11.5px;color:var(--muted)}
+.topbar nav a.on{color:var(--ink);font-weight:600}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.02em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.issue{margin-left:auto;font:600 8.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);text-align:right}
+.shell{flex:1;width:100%;max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 258px;gap:clamp(28px,5vw,64px);padding:clamp(20px,3.4vh,34px) clamp(18px,3.4vw,40px) 40px;align-items:start}
+.article{min-width:0;max-width:680px}
+.kicker{margin:0 0 12px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--warm)}
+h1{margin:0;font-size:clamp(30px,4vw,44px);line-height:1.12;letter-spacing:-.045em;font-weight:640}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--warm)}
+.byline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0 0;padding-bottom:14px;border-bottom:1px solid var(--line);font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.07em;color:var(--muted)}
+.like{position:relative;display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 15px 0 12px;border-radius:999px;border:1px solid #e5d2d5;background:#fff;cursor:pointer;font:inherit;font-size:12px;color:var(--ink);overflow:visible;transition:border-color .2s,background .2s,color .2s;margin-left:auto}
+.like:hover{border-color:#e0b3bd}
+.like:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.like svg{width:18px;height:18px;display:block;fill:none;stroke:#c39aa2;stroke-width:1.7;transition:fill .2s,stroke .2s,transform .2s}
 .like.on svg{fill:var(--accent);stroke:var(--accent)}
-.like.on{color:var(--accent);border-color:#efc3ce;background:#fff7f8}
-.like .n{font-variant-numeric:tabular-nums;min-width:3.4em;text-align:left}
+.like.on{color:var(--accent);border-color:#eec2cb;background:#fff6f7}
+.like .n{font-variant-numeric:tabular-nums;min-width:3.5em;text-align:left;letter-spacing:.02em}
 .like.pop svg{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(.72)}70%{transform:scale(1.22)}100%{transform:scale(1)}}
-.burst{position:absolute;left:24px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--accent);pointer-events:none;z-index:0}
+.burst{position:absolute;left:21px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--accent);pointer-events:none;z-index:0}
 .like svg,.like .n{position:relative;z-index:1}
-.note{margin:26px 0 0;font-size:12px;line-height:1.8;color:var(--muted)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.like svg{animation:none!important}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hero{position:relative;margin:16px 0 0;height:214px;border-radius:12px;overflow:hidden;background:linear-gradient(to bottom,#d9e4df 0%,#b8cbc4 38%,#7d998f 60%,#40554d 100%)}
+.hero::before{content:"";position:absolute;left:-10%;right:34%;bottom:0;height:64%;background:linear-gradient(145deg,#516a60,#2c3d37);clip-path:polygon(0 100%,12% 62%,28% 76%,47% 34%,65% 60%,82% 46%,100% 100%)}
+.hero::after{content:"";position:absolute;left:42%;right:-12%;bottom:0;height:48%;background:linear-gradient(150deg,#6d8478,#3a4b43);clip-path:polygon(0 100%,20% 56%,44% 74%,68% 38%,100% 100%);opacity:.92}
+.hero .sun{position:absolute;left:26%;top:24%;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,#fdf5dd 0%,rgba(253,245,221,.42) 52%,rgba(253,245,221,0) 72%)}
+.hero .cloud{position:absolute;left:8%;right:8%;top:46%;height:24px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.7),rgba(255,255,255,0));filter:blur(3px)}
+.hero .cap{position:absolute;left:12px;bottom:10px;font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.13em;color:rgba(255,255,255,.84)}
+.body p{margin:16px 0 0;font-size:13.5px;line-height:2;color:#3d3f39}
+.body p:first-child{margin-top:18px}
+.body blockquote{margin:20px 0 0;padding:12px 16px;border-left:2px solid var(--warm);background:rgba(255,255,255,.42);border-radius:0 9px 9px 0;font:italic 15px/1.8 Georgia,"Songti SC",serif;color:#3a3c36}
+.body blockquote footer{margin-top:6px;font:500 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);font-style:normal}
+.body .more{margin-top:18px;font-size:11px;line-height:1.8;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.aside{position:sticky;top:78px}
+.aside-k{margin:0 0 9px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.17em;color:var(--muted)}
+.log{border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.44);overflow:hidden}
+.log div{display:flex;justify-content:space-between;gap:10px;padding:8px 11px;border-top:1px solid #e9e2d2;font-size:10.5px}
+.log div:first-child{border-top:0}
+.log small{font:600 7.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.log b{font-weight:600}
+.aside p.text{margin:14px 0 0;font-size:10.5px;line-height:1.8;color:var(--muted)}
+.aside .next{margin-top:16px;padding-top:11px;border-top:1px solid var(--line)}
+.aside .next a{display:block;padding:5px 0;font-size:10.5px;color:#4b4d45}
+.aside .next a::before{content:"→ ";color:var(--warm)}
+.foot{flex:0 0 auto;border-top:1px solid var(--line);padding:11px clamp(18px,3.4vw,40px);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr;gap:24px}
+  .aside{position:static;display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+  .aside-k{grid-column:1/-1}
+  .aside .next{margin-top:0;padding-top:0;border-top:0}
+}
+@media (max-width:560px){
+  .topbar{height:50px;padding:0 14px;gap:10px}
+  .topbar nav,.hint,.issue{display:none}
+  .shell{padding:20px 16px 30px;gap:20px}
+  h1{font-size:30px}
+  .byline{gap:8px;font-size:8.5px}
+  .like{height:38px;padding:0 12px 0 10px;font-size:11px;gap:7px}
+  .hero{height:180px}
+  .body p{font-size:12.5px;line-height:1.9}
+  .aside{grid-template-columns:1fr}
+  .foot{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:40px;padding:0 16px;gap:14px}
+  .topbar nav,.issue{display:none}
+  .hint{left:auto;right:14px;top:50%;transform:translateY(-50%);font-size:9px;padding:2px 7px}
+  .shell{grid-template-columns:minmax(0,1fr) 210px;max-width:600px;gap:22px;padding:10px 16px 12px}
+  .kicker{margin-bottom:5px;font-size:8px}
+  h1{font-size:24px}
+  .byline{margin-top:8px;padding-bottom:7px}
+  .like{height:32px;font-size:10.5px;gap:6px;padding:0 11px 0 9px}
+  .like svg{width:15px;height:15px}
+  .hero{height:110px;margin-top:8px;border-radius:9px}
+  .body p{margin-top:8px;font-size:10.5px;line-height:1.7}
+  .body p:nth-of-type(2),.body blockquote,.body .more{display:none}
+  .aside{top:52px}
+  .aside-k{font-size:7.5px;margin-bottom:6px}
+  .log div{padding:5px 8px;font-size:9px}
+  .aside p.text,.aside .next{display:none}
+  .foot{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .like svg{animation:none!important}
+  .like{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">FEEDBACK / 04</p>
-    <p class="quote">「真正被记住的，<br>是点下去的那一下。」<span>— 设计笔记，第 34 则</span></p>
-    <button class="like" id="like" type="button" aria-pressed="false" aria-label="点赞">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-9.6a4.4 4.4 0 0 1 7.5-3.1 4.4 4.4 0 0 1 7.5 3.1c0 5-7.5 9.6-7.5 9.6Z"/></svg>
-      <span class="n" id="n">1,204</span>
-    </button>
-    <p class="note">粒子用 Web Animations API 现建现删，10 颗、620ms、随机角度与距离；计数只做 +1，不做滚动数字。</p>
+<div class="page">
+  <header class="topbar">
+    <a class="brand" href="#article"><span class="mark">F</span>FIELD NOTES<small>野地手记</small></a>
+    <nav aria-label="主导航"><a class="on" href="#article">文章</a><a href="#article">作者</a><a href="#article">订阅</a></nav>
+    <p class="hint">点一下心形</p>
+    <span class="issue">第 12 期 · 山与云<br>2026 · 冬季号</span>
+  </header>
+
+  <div class="shell">
+    <article class="article" id="article">
+      <p class="kicker">FIELD NOTE 031 / 莫干山 · 大斗坞</p>
+      <h1>在海拔 3,200 米，<br><em>等一场云散。</em></h1>
+      <p class="byline">
+        <span>撰文 · 摄影 / 林一</span><span>2026.11.12</span><span>阅读 6 分钟</span>
+        <button class="like" id="like" type="button" aria-pressed="false" aria-label="喜欢这篇文章">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-9.6a4.4 4.4 0 0 1 7.5-3.1 4.4 4.4 0 0 1 7.5 3.1c0 5-7.5 9.6-7.5 9.6Z"/></svg>
+          <span class="n" id="n">1,204</span>
+        </button>
+      </p>
+      <div class="hero"><span class="sun" aria-hidden="true"></span><span class="cloud" aria-hidden="true"></span><span class="cap">MOGANSHAN · 05:47 · 612 M · 等待第 41 分钟</span></div>
+      <div class="body">
+        <p>四点半起床的时候，山下还在下雨。我把相机塞进防水袋，沿着湿滑的石阶往上走，头灯照出去只有两米。走到第二道山脊，风突然变大，云从谷底翻上来，又落回去。</p>
+        <p>五点四十七分，云裂开了一条缝。光落在谷底的茶田上，颜色从灰蓝变成暖金，只持续了四十几秒。我按下快门的时候手是抖的，但那张照片最后没有糊。</p>
+        <blockquote>“山不会为谁准时。你能做的，只是比它早到一点。”<footer>—— 手记页边批注</footer></blockquote>
+        <p class="more">下一篇：在雨里等一场没有出现的日出。订阅野地手记，每月两封长信，不追热点。</p>
+      </div>
+    </article>
+
+    <aside class="aside" aria-label="田野记录与相关阅读">
+      <p class="aside-k">FIELD LOG · 现场记录</p>
+      <div class="log">
+        <div><small>坐标</small><b>30.60°N 119.87°E</b></div>
+        <div><small>出发</small><b>04:32 · 12°C</b></div>
+        <div><small>山顶</small><b>05:47 · 3°C</b></div>
+        <div><small>风力</small><b>山脊 4 级</b></div>
+        <div><small>能见度</small><b>云散后 18 km</b></div>
+      </div>
+      <p class="text">这条环线约 9.4 公里，爬升 680 米。雨后的石阶很滑，建议带登山杖；山顶风大，多备一层抓绒。</p>
+      <div class="next">
+        <p class="aside-k">同栏目</p>
+        <a href="#article">在雨里等一场日出</a>
+        <a href="#article">竹林里的三十七种绿</a>
+        <a href="#article">背包减重的五个决定</a>
+      </div>
+    </aside>
   </div>
-</main>
-<p class="hint">点一下心形</p>
+
+  <footer class="foot">
+    <span>FIELD NOTES · 野地手记</span>
+    <span>每月两封长信 · 不追热点</span>
+    <span>本页为零依赖单文件演示</span>
+  </footer>
+</div>
 <script>
 (function () {
   var btn = document.getElementById('like'), n = document.getElementById('n');
@@ -83,6 +192,61 @@ body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI
     setTimeout(function () { btn.classList.remove('pop'); }, 520);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     n.textContent = count.toLocaleString('zh-CN');
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

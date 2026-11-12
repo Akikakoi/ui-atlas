@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>底部导航 · LILT 晨读 · UI Atlas</title>
+<style>
+:root{--bg:#f3efe5;--paper:#fffdf8;--appbg:#f7f4ec;--ink:#15161a;--muted:#7c7b74;--line:#e1dac9;--accent:#b3542f;--nav:#14161a;--leaf:#2c6e57}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.top{position:sticky;top:0;z-index:30;height:54px;display:flex;align-items:center;gap:20px;padding:0 clamp(16px,3.4vw,38px);border-bottom:1px solid var(--line);background:rgba(247,244,236,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.logo{width:26px;height:26px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font:700 12px/1 Georgia,serif}
+.brand b{font-size:12px;font-weight:750;letter-spacing:.2em}
+.brand .sub{font-size:10px;color:var(--muted);letter-spacing:.06em}
+.site-nav{display:flex;align-items:center;gap:2px}
+.site-nav a{padding:6px 10px;border-radius:7px;font-size:11.5px;color:var(--muted);transition:background .18s,color .18s}
+.site-nav a:hover{background:#ece7da;color:var(--ink)}
+.site-nav a.on{background:var(--paper);color:var(--ink)}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:4px 9px;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.top-cta{margin-left:auto;padding:7px 14px;border-radius:999px;background:var(--ink);color:#fff;font-size:11px;font-weight:600;white-space:nowrap;transition:background .2s}
+.top-cta:hover{background:var(--accent)}
+.hero{width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:clamp(30px,6vw,76px);align-items:center;padding:clamp(22px,4.4vw,58px) clamp(18px,4vw,44px) clamp(26px,4vw,54px)}
+.copy{min-width:0}
+.kicker{margin:0 0 16px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+.copy h1{margin:0 0 20px;font-size:clamp(34px,4.6vw,56px);line-height:1.06;letter-spacing:-.045em;font-weight:640}
+.copy h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:0;font-size:13px;line-height:1.95;color:#5d5c55;max-width:26em}
+.stats{display:flex;gap:26px;margin:26px 0 0;padding-top:20px;border-top:1px solid var(--line);max-width:340px}
+.stats b{display:block;font-size:22px;line-height:1.1;letter-spacing:-.03em}
+.stats small{display:block;margin-top:3px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.stores{display:flex;gap:8px;margin-top:24px;flex-wrap:wrap}
+.stores a{padding:8px 15px;border-radius:999px;border:1px solid var(--line);background:var(--paper);font-size:11.5px;font-weight:600;transition:border-color .2s,color .2s}
+.stores a:first-child{background:var(--ink);border-color:var(--ink);color:#fff}
+.stores a:hover{border-color:var(--accent);color:var(--accent)}
+.stores a:first-child:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.phone-wrap{width:100%;display:flex;flex-direction:column;align-items:center;gap:10px}
+.phone{width:340px;height:560px;background:#fff;border:1px solid var(--line);border-radius:30px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 50px 90px -60px rgba(20,22,30,.75);position:relative}
+.screen{flex:1;position:relative;overflow:hidden;background:var(--appbg)}
+.app-page{position:absolute;inset:0;padding:18px 18px 24px;overflow-y:auto;scrollbar-width:none;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .28s ease,transform .34s cubic-bezier(.22,.8,.2,1)}
+.app-page::-webkit-scrollbar{display:none}
+.app-page.on{opacity:1;transform:none;pointer-events:auto}
+.sys{display:flex;justify-content:space-between;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.sys .sig{letter-spacing:.16em}
+.app-k{margin:16px 0 8px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.app-page h2{margin:0 0 16px;font-size:26px;line-height:1.12;letter-spacing:-.04em;font-weight:650}
+.app-page h2 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.today{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--paper)}
+.ring{width:54px;height:54px;border-radius:50%;background:conic-gradient(var(--leaf) 0 57%,#e8e2d4 57% 100%);display:grid;place-items:center;flex:0 0 auto}
+.ring span{width:42px;height:42px;border-radius:50%;background:var(--paper);display:flex;align-items:baseline;justify-content:center;gap:1px;font:700 14px/42px ui-monospace,Consolas,monospace}
+.ring small{font:600 7px/1 ui-monospace,Consolas,monospace;color:var(--muted)}
+.today b{display:block;font-size:11.5px}
+.today p{margin:3px 0 0;font-size:10px;color:var(--muted)}
+.sec-k{display:flex;justify-content:space-between;margin:16px 0 8px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.sec-k span{color:#a6a198}
+.story{display:block;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);margin-bottom:8px;transition:border-color .18s}
+.story:hover{border-color:#cdc3ad}
+.tag{display:inline-block;font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);background:#f7e9df;border-radius:99px;padding:3px 6px}
+.story h3{margin:7px 0 4px;font-size:13.5px;letter-spacing:-.02em}
+.story p{margin:0 0 6px;font-size:10px;line-height:1.7;color:var(--muted)}
+.story small{font:500 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:#a5a096}
+.story.slim h3{margin-bottom:2px}
+.chips{display:flex;gap:5px;margin:0 0 12px;flex-wrap:wrap}
+.chips span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;border:1px solid var(--line);border-radius:99px;padding:5px 9px;color:var(--muted);background:var(--paper)}
+.chips .on{background:var(--ink);border-color:var(--ink);color:#fff}
+.words{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.words li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.words b{display:block;font-size:12.5px}
+.words small{display:block;margin-top:2px;font-size:9.5px;color:var(--muted)}
+.words span{font:600 8px/1 ui-monospace,Consolas,monospace;color:#a5a096}
+.tip-line{margin:12px 0 0;font-size:9.5px;color:var(--muted)}
+.save-bar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:#f0eadc;margin-bottom:12px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.save-bar b{font-size:16px;letter-spacing:-.02em;color:var(--ink)}
+.save-bar i{flex:1;height:3px;background:#ded5c2;border-radius:2px;position:relative;overflow:hidden}
+.save-bar i::after{content:"";position:absolute;inset:0;width:52%;background:var(--leaf)}
+.save-list{display:grid;gap:8px}
+.save-list a{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid var(--line);border-radius:11px;background:var(--paper)}
+.save-list .cover{width:34px;height:42px;border-radius:5px;flex:0 0 auto;background:linear-gradient(150deg,#c9d3c3,#7e8f7e)}
+.save-list .c2{background:linear-gradient(150deg,#e0c9a8,#a98761)}
+.save-list .c3{background:linear-gradient(150deg,#c9c6d8,#8a859c)}
+.save-list b{display:block;font-size:11px}
+.save-list small{display:block;margin-top:2px;font:500 8px/1 ui-monospace,Consolas,monospace;color:var(--muted)}
+.save-list em{margin-left:auto;font-style:normal;color:#a5a096;font-size:11px}
+.me-card{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--paper)}
+.me-ava{width:38px;height:38px;border-radius:50%;background:linear-gradient(145deg,#b98a63,#7c5333);color:#fff;display:grid;place-items:center;font:700 12px/1 ui-monospace,Consolas,monospace}
+.me-card b{display:block;font-size:12px}
+.me-card small{display:block;margin-top:2px;font-size:9px;color:var(--muted)}
+.me-card em{margin-left:auto;font-style:normal;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.stat-grid div{padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--paper)}
+.stat-grid b{display:block;font-size:19px;letter-spacing:-.03em}
+.stat-grid small{font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.rows{list-style:none;margin:14px 0 0;padding:0;border-top:1px solid var(--line)}
+.rows li{display:flex;justify-content:space-between;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);font-size:11px}
+.rows span{font:500 8.5px/1 ui-monospace,Consolas,monospace;color:var(--muted)}
+.ver{margin:16px 0 0;font:500 7.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:#aaa49a}
+.tabbar{position:relative;flex:0 0 auto;display:flex;background:var(--nav);padding:8px}
+.pill{position:absolute;left:8px;top:8px;bottom:8px;width:calc((100% - 16px) / 4);border-radius:12px;background:rgba(255,255,255,.13);transition:transform .38s cubic-bezier(.22,.8,.2,1)}
+.item{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:transparent;color:rgba(242,243,239,.55);padding:7px 0 5px;cursor:pointer;font:inherit;font-size:9.5px;transition:color .2s}
+.item svg{width:19px;height:19px}
+.item[aria-current="page"]{color:#fff}
+.item:focus-visible{outline:2px solid #8fa9e8;outline-offset:-2px;border-radius:10px}
+.under{margin:0;font:600 7.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.features{width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:0 clamp(18px,4vw,44px) clamp(30px,5vw,58px)}
+.feature{padding:18px;border:1px solid var(--line);border-radius:12px;background:rgba(255,253,248,.5)}
+.feature b{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--accent)}
+.feature h3{margin:9px 0 6px;font-size:14px;letter-spacing:-.01em}
+.feature p{margin:0;font-size:11px;line-height:1.8;color:var(--muted)}
+.foot{width:100%;max-width:1180px;margin:0 auto;border-top:1px solid var(--line);padding:16px clamp(18px,4vw,44px) 24px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.foot nav{display:flex;gap:14px}
+@media (max-width:1000px){
+  .site-nav{display:none}
+  .hero{grid-template-columns:1fr;justify-items:center;text-align:center;gap:34px;padding-top:26px}
+  .copy .lede{margin-left:auto;margin-right:auto}
+  .stats{margin-left:auto;margin-right:auto;justify-content:center}
+  .stores{justify-content:center}
+  .features{grid-template-columns:1fr;max-width:620px}
+}
+@media (max-width:560px){
+  .top,.copy,.under,.features,.foot{display:none}
+  .hint{display:none}
+  body{background:#fff}
+  .hero{display:block;padding:0;max-width:none;min-height:0}
+  .phone-wrap{padding:0;gap:0}
+  .phone{width:100%;height:100svh;max-width:none;border:0;border-radius:0;box-shadow:none}
+  .app-page{padding:calc(16px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom))}
+  .tabbar{padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+}
+@media (max-height:560px) and (min-width:561px){
+  .top{height:38px;padding:0 16px;gap:12px}
+  .site-nav{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .top-cta{font-size:9.5px;padding:5px 10px}
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:26px;max-width:700px;min-height:calc(100svh - 38px);padding:12px 20px 14px;text-align:left;justify-items:stretch;align-items:center}
+  .copy h1{font-size:clamp(22px,3.6vw,30px);margin-bottom:10px}
+  .kicker{font-size:8.5px;margin-bottom:9px}
+  .copy .lede{font-size:11px;line-height:1.75;margin:0;max-width:24em}
+  .stats,.stores{display:none}
+  .phone{width:300px;height:calc(100svh - 66px);border-radius:22px}
+  .phone-wrap{gap:0}
+  .under{display:none}
+  .app-page{padding:14px 16px 18px}
+  .app-k{margin:12px 0 7px}
+  .app-page h2{font-size:22px;margin-bottom:12px}
+  .today{padding:10px;gap:10px}
+  .ring{width:48px;height:48px}
+  .ring span{width:37px;height:37px;line-height:37px;font-size:12px}
+  .sec-k{margin:12px 0 7px}
+  .story{padding:10px;margin-bottom:7px}
+  .story.slim{display:none}
+  .features,.foot{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .pill,.app-page,.item,.story,.stores a{transition:none}
+}
+</style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#app" aria-label="LILT 首页"><span class="logo">L</span><b>LILT</b><span class="sub">晨读</span></a>
+    <nav class="site-nav" aria-label="产品导航">
+      <a class="on" href="#app">今日</a>
+      <a href="#features">精选</a>
+      <a href="#about">关于</a>
+    </nav>
+    <p class="hint">点手机底部的四项，看滑块怎么走</p>
+    <a class="top-cta" href="#app">打开 App</a>
+  </header>
+
+  <main class="hero" id="app">
+    <section class="copy">
+      <p class="kicker">DAILY READING / 03</p>
+      <h1>每天七分钟，<br><em>把长文读短。</em></h1>
+      <p class="lede">LILT 把长文章拆成早晨的一小段。读完不必收藏，生词会自己留下来。</p>
+      <div class="stats">
+        <div><b>4.9</b><small>APP STORE</small></div>
+        <div><b>120k</b><small>位读者</small></div>
+        <div><b>7 min</b><small>每日刚好</small></div>
+      </div>
+      <div class="stores"><a href="#app">在 App Store 下载</a><a href="#app">Android 版</a></div>
+    </section>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <section class="app-page on" data-page="home">
+            <div class="sys"><span>09:41</span><span class="sig">● ● ●</span></div>
+            <p class="app-k">11 月 12 日 · 周三</p>
+            <h2>早上好，<br><em>今天读点慢的。</em></h2>
+            <div class="today">
+              <div class="ring"><span>4<small>/7</small></span></div>
+              <div><b>今日已读 4 分钟</b><p>再读一篇，就收工。</p></div>
+            </div>
+            <p class="sec-k">接着读 <span>2 篇</span></p>
+            <a class="story" href="#app">
+              <span class="tag">随笔</span>
+              <h3>海雾里的早餐铺</h3>
+              <p>从码头走到巷口，只用了七分钟，我却记了整整一页。</p>
+              <small>剩 3 分钟 · 林一</small>
+            </a>
+            <a class="story slim" href="#app">
+              <span class="tag">短篇</span>
+              <h3>一把旧钥匙</h3>
+              <small>剩 2 分钟 · 阿禾</small>
+            </a>
+          </section>
+
+          <section class="app-page" data-page="notes">
+            <div class="sys"><span>09:41</span><span class="sig">● ● ●</span></div>
+            <p class="app-k">生词本 · 128 个</p>
+            <h2>不懂的，<br><em>先留在这里。</em></h2>
+            <div class="chips"><span class="on">全部</span><span>本周</span><span>待复习</span></div>
+            <ul class="words">
+              <li><div><b>brume</b><small>n. 薄雾</small></div><span>12 次</span></li>
+              <li><div><b>tidal</b><small>adj. 潮汐的</small></div><span>8 次</span></li>
+              <li><div><b>saltmarsh</b><small>n. 盐沼</small></div><span>5 次</span></li>
+              <li><div><b>hush</b><small>n. 寂静</small></div><span>3 次</span></li>
+            </ul>
+            <p class="tip-line">复习 4 个词，约 1 分钟。</p>
+          </section>
+
+          <section class="app-page" data-page="saved">
+            <div class="sys"><span>09:41</span><span class="sig">● ● ●</span></div>
+            <p class="app-k">收藏 · 48 篇</p>
+            <h2>读过一遍，<br><em>还想再读。</em></h2>
+            <div class="save-bar"><span>本周新增</span><b>6</b><i aria-hidden="true"></i></div>
+            <div class="save-list">
+              <a href="#app"><span class="cover" aria-hidden="true"></span><div><b>潮汐表里的空白</b><small>随笔 · 6 分钟</small></div><em>↗</em></a>
+              <a href="#app"><span class="cover c2" aria-hidden="true"></span><div><b>旧城散步指南</b><small>城市 · 8 分钟</small></div><em>↗</em></a>
+              <a href="#app"><span class="cover c3" aria-hidden="true"></span><div><b>一封没有寄出的信</b><small>书信 · 5 分钟</small></div><em>↗</em></a>
+            </div>
+            <p class="tip-line">收藏只存链接，不占手机空间。</p>
+          </section>
+
+          <section class="app-page" data-page="me">
+            <div class="sys"><span>09:41</span><span class="sig">● ● ●</span></div>
+            <p class="app-k">我的</p>
+            <h2>已经连续<br><em>读了 18 天。</em></h2>
+            <div class="me-card">
+              <span class="me-ava" aria-hidden="true">林</span>
+              <div><b>林一</b><small>加入 LILT 的第 126 天</small></div>
+              <em>编辑</em>
+            </div>
+            <div class="stat-grid"><div><b>46</b><small>读完</small></div><div><b>128</b><small>生词</small></div></div>
+            <ul class="rows">
+              <li>阅读提醒 <span>07:30</span></li>
+              <li>主题 <span>纸张</span></li>
+              <li>导出笔记 <span>→</span></li>
+            </ul>
+            <p class="ver">LILT 3.2 · 慢读计划<br>今天也读一点。</p>
+          </section>
+        </div>
+        <nav class="tabbar" id="bar" aria-label="底部导航">
+          <span class="pill" id="pill" aria-hidden="true"></span>
+          <button class="item" type="button" data-page="home" aria-current="page" aria-label="今天">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.5 1.5M16.5 16.5 18 18M18 6l-1.5 1.5M7.5 16.5 6 18"/></svg>
+            <span>今天</span>
+          </button>
+          <button class="item" type="button" data-page="notes" aria-label="生词">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M5 4.5h11.5A2.5 2.5 0 0 1 19 7v12.5H7.5A2.5 2.5 0 0 1 5 17z"/><path d="M5 17a2.5 2.5 0 0 1 2.5-2.5H19"/><path d="M9 8.5h6M9 11.5h4"/></svg>
+            <span>生词</span>
+          </button>
+          <button class="item" type="button" data-page="saved" aria-label="收藏">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 4 2.4 5 5.6.8-4 3.9 1 5.5-5-2.6-5 2.6 1-5.5-4-3.9 5.6-.8z"/></svg>
+            <span>收藏</span>
+          </button>
+          <button class="item" type="button" data-page="me" aria-label="我的">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M4.5 20c.8-3.6 3.8-5.5 7.5-5.5s6.7 1.9 7.5 5.5"/></svg>
+            <span>我的</span>
+          </button>
+        </nav>
+      </div>
+      <p class="under">LILT 3.2 · 已在 iOS / Android 上线</p>
+    </div>
+  </main>
+
+  <section class="features" id="features" aria-label="产品特点">
+    <div class="feature"><b>01 / 七分钟</b><h3>刚好读完一篇</h3><p>每篇都标好剩余时间，地铁到站时刚好收尾。</p></div>
+    <div class="feature"><b>02 / 生词</b><h3>不用手动收藏</h3><p>点一下就有释义，第二天再出现一次，记不住也没关系。</p></div>
+    <div class="feature"><b>03 / 安静</b><h3>没有信息流</h3><p>不推荐、不打断，早上打开只有今天这一篇。</p></div>
+  </section>
+
+  <footer class="foot" id="about">
+    <span>LILT · 慢读计划</span>
+    <nav><a href="#app">今日</a><a href="#features">精选</a><a href="#about">隐私</a></nav>
+    <span>© 2026 LILT Studio</span>
+  </footer>
+<script>
+(function () {
+  var bar = document.getElementById('bar'), pill = document.getElementById('pill');
+  var items = [].slice.call(bar.querySelectorAll('.item'));
+  var pages = [].slice.call(document.querySelectorAll('.app-page'));
+
+  items.forEach(function (btn, i) {
+    btn.addEventListener('click', function () {
+      items.forEach(function (b) { b.removeAttribute('aria-current'); });
+      btn.setAttribute('aria-current', 'page');
+      pages.forEach(function (p) { p.classList.toggle('on', p.dataset.page === btn.dataset.page); });
+      pill.style.transform = 'translateX(' + (i * 100) + '%)';
+    });
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

@@ -3,36 +3,361 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>星空穿越 · UI Atlas 动效</title>
+<title>星空穿越 · APOGEE 亚轨道</title>
 <style>
-:root{--bg:#07090e;--ink:#eef1f7;--muted:rgba(238,241,247,.52);--accent:#8fb0ff}
+:root{--bg:#07090e;--bg2:#0a0e16;--ink:#eef1f7;--muted:rgba(238,241,247,.55);--accent:#8fb0ff;
+  --line:rgba(143,176,255,.16)}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;overflow:hidden}
-body{background:radial-gradient(760px 520px at 50% 50%,#111a2b,#07090e 72%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
-.stage{position:relative;z-index:2;min-height:100vh;display:grid;place-items:center;padding:34px 24px;text-align:center;pointer-events:none}
-.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(238,241,247,.42)}
-h1{margin:0;font-size:clamp(28px,6.8vw,50px);line-height:1.04;letter-spacing:-.04em;font-weight:600}
-h1 em{font-style:normal;color:var(--accent)}
-p.sub{max-width:24em;margin:16px auto 0;font-size:12px;line-height:1.8;color:var(--muted)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:rgba(238,241,247,.5);z-index:3;pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(760px 520px at 50% 42%,#111a2b,#07090e 72%) fixed;color:var(--ink);
+  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block}
+.wrap{width:min(1200px,calc(100% - 48px));margin:0 auto}
 
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+/* 顶栏 */
+.nav{position:sticky;top:0;z-index:6;background:rgba(7,9,14,.5);
+  backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);
+  border-bottom:1px solid rgba(143,176,255,.12)}
+.nav-in{width:min(1200px,calc(100% - 48px));margin:0 auto;height:64px;display:flex;align-items:center;gap:26px}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;
+  font:600 13px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em}
+.brand svg{width:19px;height:19px;display:block}
+.brand span{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:rgba(238,241,247,.4)}
+.nav nav{display:flex;gap:22px}
+.nav nav a{font-size:11.5px;letter-spacing:.05em;color:rgba(238,241,247,.58);text-decoration:none;transition:color .2s}
+.nav nav a:hover{color:var(--ink)}
+.hint{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 auto;padding:4px 9px;
+  font-size:11px;color:rgba(238,241,247,.6);white-space:nowrap;
+  background:rgba(128,128,128,.1);border:1px solid rgba(128,128,128,.18);border-radius:999px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:0 0 5px}
+.nav-cta{flex:0 0 auto;height:31px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;
+  border:1px solid rgba(143,176,255,.34);color:var(--accent);text-decoration:none;font-size:11.5px;
+  background:rgba(143,176,255,.08);transition:background .2s,color .2s}
+.nav-cta:hover{background:rgba(143,176,255,.18);color:#dbe7ff}
+
+/* 首屏 */
+.page{position:relative;z-index:2;overflow-x:clip}
+.hero{position:relative;width:min(1200px,calc(100% - 48px));margin:0 auto;min-height:calc(100vh - 65px);
+  padding:clamp(34px,8vh,88px) 0 22px;display:flex;flex-direction:column}
+.planet{position:absolute;left:50%;bottom:-68vw;width:190vw;height:95vw;border-radius:50%;
+  transform:translateX(-50%);z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%,#0e1a2e 0%,#0a1220 34%,#070a12 62%);
+  border-top:1px solid rgba(143,176,255,.4);
+  box-shadow:0 -24px 110px rgba(96,140,255,.26)}
+.hero-copy{position:relative;z-index:1}
+.hero-foot{position:relative;z-index:1}
+.kicker{margin:0;font:600 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(238,241,247,.5)}
+h1{margin:16px 0 0;font-size:clamp(40px,6.6vw,74px);line-height:.99;letter-spacing:-.045em;font-weight:600;max-width:9em}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:20px 0 0;max-width:31em;font-size:13.5px;line-height:1.85;color:var(--muted)}
+.actions{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{height:44px;padding:0 20px;border-radius:999px;display:inline-flex;align-items:center;
+  font-size:12px;letter-spacing:.03em;text-decoration:none;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s}
+.btn.solid{background:var(--accent);border-color:var(--accent);color:#07101f}
+.btn.solid:hover{background:#b3c9ff;border-color:#b3c9ff}
+.btn.ghost{border-color:rgba(238,241,247,.26);color:var(--ink);background:rgba(9,14,25,.28);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.hero-foot{margin-top:auto;padding-top:clamp(28px,7vh,66px);display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.flight{flex:1 1 640px;display:grid;grid-template-columns:repeat(4,1fr);
+  border:1px solid var(--line);border-radius:14px;background:rgba(9,13,22,.62);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden}
+.stat{padding:14px 18px;border-left:1px solid rgba(143,176,255,.12)}
+.stat:first-child{border-left:0}
+.stat span{display:block;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:rgba(238,241,247,.42)}
+.stat b{display:flex;align-items:baseline;gap:5px;margin-top:4px;font:600 21px/1.2 ui-monospace,Consolas,monospace;letter-spacing:-.02em}
+.stat b small{font-size:10px;font-weight:500;letter-spacing:.02em;color:rgba(238,241,247,.5)}
+.stat p{margin:3px 0 0;font-size:9.5px;line-height:1.5;color:rgba(238,241,247,.4)}
+.live{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;padding:0 4px 2px;
+  font:500 9px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(238,241,247,.4)}
+.live i{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px rgba(143,176,255,.9)}
+
+/* 实底内容 */
+.solid{background:var(--bg);border-top:1px solid rgba(143,176,255,.1)}
+.profile{padding:clamp(62px,10vh,106px) 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px}
+.eyebrow{margin:0;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:rgba(143,176,255,.64)}
+h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spacing:-.04em;font-weight:600}
+.sec-head>p{margin:0;max-width:30em;font-size:12.5px;line-height:1.85;color:var(--muted);justify-self:end;text-align:right}
+.timeline{list-style:none;margin:46px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:0}
+.timeline li{position:relative;padding:18px 20px 0 0;border-top:1px solid rgba(143,176,255,.2)}
+.timeline li::before{content:"";position:absolute;top:-3.5px;left:0;width:6px;height:6px;border-radius:50%;
+  background:var(--bg);border:1px solid rgba(143,176,255,.55)}
+.timeline li:first-child::before{background:var(--accent);border-color:var(--accent);box-shadow:0 0 12px rgba(143,176,255,.8)}
+.timeline b{font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
+.timeline h3{margin:8px 0 0;font-size:15px;letter-spacing:-.01em}
+.timeline p{margin:8px 0 0;max-width:15em;font-size:11px;line-height:1.8;color:rgba(238,241,247,.5)}
+
+/* 训练 */
+.train{background:var(--bg2);border-top:1px solid rgba(143,176,255,.1);padding:clamp(58px,9vh,98px) 0}
+.train-grid{margin-top:42px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{border:1px solid var(--line);border-radius:14px;padding:20px;
+  background:linear-gradient(180deg,rgba(17,24,40,.6),rgba(8,11,18,.86));transition:transform .25s,border-color .25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(143,176,255,.34)}
+.card b{font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--accent)}
+.card h3{margin:10px 0 0;font-size:16px;letter-spacing:-.01em}
+.card p{margin:8px 0 0;font-size:11.5px;line-height:1.85;color:rgba(238,241,247,.52)}
+.card .meta{margin-top:16px;padding-top:10px;border-top:1px dashed rgba(143,176,255,.16);
+  display:flex;justify-content:space-between;gap:10px;font:400 9px/1.6 ui-monospace,Consolas,monospace;
+  letter-spacing:.1em;color:rgba(238,241,247,.36)}
+.train .footnote{margin:22px 0 0;font:400 9.5px/1.9 ui-monospace,Consolas,monospace;
+  letter-spacing:.06em;color:rgba(238,241,247,.32)}
+
+/* 引文 */
+.quote{background:var(--bg);border-top:1px solid rgba(143,176,255,.1);padding:clamp(62px,10vh,108px) 0}
+.quote blockquote{margin:0;max-width:21em;font:400 clamp(27px,3.7vw,46px)/1.26 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+.quote blockquote em{font-style:italic;color:var(--accent)}
+.quote .cite{margin:20px 0 0;font:400 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(238,241,247,.4)}
+
+/* 预约 */
+.cta{padding:clamp(72px,12vh,132px) 0;border-top:1px solid rgba(143,176,255,.14);
+  background:linear-gradient(180deg,rgba(7,9,14,.64),rgba(7,9,14,.9))}
+.cta-in{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.cta .kicker{color:rgba(143,176,255,.72)}
+.cta h2{margin:12px 0 0;font-size:clamp(32px,5vw,58px);line-height:1.02}
+.cta .note{margin:16px 0 0;max-width:31em;font-size:12px;line-height:1.85;color:var(--muted)}
+.cta-actions{display:flex;gap:10px;flex-wrap:wrap}
+.foot{background:#05070b;border-top:1px solid rgba(143,176,255,.1);padding:22px 0 28px}
+.foot-in{display:flex;flex-wrap:wrap;gap:10px 22px;font:400 9.5px/1.8 ui-monospace,Consolas,monospace;
+  letter-spacing:.08em;color:rgba(238,241,247,.34)}
+.foot-in span:last-child{margin-left:auto}
+
+/* 平板 */
+@media (max-width:900px){
+  .nav nav{display:none}
+  .sec-head{grid-template-columns:1fr;gap:12px}
+  .sec-head>p{justify-self:start;text-align:left}
+  .timeline{grid-template-columns:1fr;margin-top:34px}
+  .timeline li{padding:14px 0 18px 22px;border-top:0;border-left:1px solid rgba(143,176,255,.2)}
+  .timeline li::before{top:18px;left:-3.5px}
+  .timeline p{max-width:none}
+  .train-grid{grid-template-columns:1fr;gap:14px}
+}
+
+/* 手机 */
+@media (max-width:560px){
+  body{background:radial-gradient(420px 340px at 50% 30%,#111a2b,#07090e 76%) fixed}
+  .nav-in{width:calc(100% - 32px);height:56px;gap:12px}
+  .brand span{display:none}
+  .hint{display:none}
+  .nav-cta{margin-left:auto;height:29px;padding:0 12px;font-size:11px}
+  .wrap,.hero{width:calc(100% - 32px)}
+  .hero{min-height:calc(100vh - 57px);padding:34px 0 20px}
+  .planet{width:260vw;height:130vw;bottom:-62vw}
+  h1{font-size:clamp(38px,11vw,48px);max-width:8em}
+  .lede{font-size:12.5px;margin-top:16px}
+  .actions{margin-top:20px}
+  .btn{height:42px;padding:0 17px}
+  .hero-foot{padding-top:24px;gap:12px}
+  .flight{grid-template-columns:1fr 1fr}
+  .stat{padding:11px 13px;border-top:1px solid rgba(143,176,255,.12)}
+  .stat:nth-child(odd){border-left:0}
+  .stat:nth-child(-n+2){border-top:0}
+  .stat b{font-size:18px}
+  .live{display:none}
+  .profile{padding-top:52px}
+  .quote blockquote{max-width:none}
+  .cta-in{align-items:flex-start}
+  .foot-in span:last-child{margin-left:0}
+}
+
+/* 画廊 600×450 紧凑首屏 */
+@media (max-height:560px) and (min-width:561px){
+  .nav-in{height:44px;gap:14px}
+  .brand span{display:none}
+  .nav nav{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .nav-cta{height:27px;padding:0 11px;font-size:10.5px}
+  .hero{min-height:calc(100vh - 45px);padding:12px 0 10px}
+  .planet{width:170vw;height:85vw;bottom:-60vw}
+  .kicker{font-size:9px}
+  h1{margin-top:7px;font-size:clamp(30px,4.9vw,40px);max-width:9em}
+  .lede{margin-top:8px;font-size:10.5px;line-height:1.6;max-width:44em}
+  .actions{margin-top:10px;gap:8px}
+  .btn{height:32px;padding:0 13px;font-size:11px}
+  .hero-foot{padding-top:10px;gap:10px}
+  .flight{border-radius:11px}
+  .stat{padding:8px 12px}
+  .stat span{font-size:7.5px}
+  .stat b{font-size:15px;margin-top:2px}
+  .stat b small{font-size:8px}
+  .stat p{font-size:8px;margin-top:1px}
+  .live{font-size:8px}
+}
+
+@media (hover:none){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  canvas{opacity:1}
+}
 </style>
 </head>
 <body>
 <canvas id="c" aria-hidden="true"></canvas>
-<main class="stage">
-  <div>
-    <p class="kicker">BACKGROUND / 05</p>
-    <h1>星星不动，<br><em>是我们在穿过它。</em></h1>
-    <p class="sub">每颗星只有一个 z 值：z 越小，投影越大、拖线越长；z 小于 1 就回到远处重生。光标只轻轻挪动消失点。</p>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top" aria-label="APOGEE 亚轨道">
+      <svg viewBox="0 0 20 20" aria-hidden="true" fill="none">
+        <circle cx="10" cy="10" r="8.2" stroke="#8fb0ff" stroke-width="1.2" opacity=".55"/>
+        <ellipse cx="10" cy="10" rx="8.2" ry="3.2" stroke="#8fb0ff" stroke-width="1" opacity=".38"/>
+        <circle cx="16.8" cy="7.6" r="1.7" fill="#8fb0ff"/>
+      </svg>
+      APOGEE<span>SUBORBITAL</span>
+    </a>
+    <nav aria-label="主导航">
+      <a href="#profile">飞行剖面</a>
+      <a href="#train">训练</a>
+      <a href="#book">船票</a>
+    </nav>
+    <p class="hint">移动光标，星空会轻微偏移</p>
+    <a class="nav-cta" href="#book">预约首航</a>
   </div>
+</header>
+
+<main class="page" id="top">
+  <section class="hero">
+    <div class="planet" aria-hidden="true"></div>
+    <div class="hero-copy">
+      <p class="kicker">SUBORBITAL PROGRAM · 2027 首航</p>
+      <h1>把地球，<br><em>看成一个弧。</em></h1>
+      <p class="lede">六个人，一张票，一百公里的高度。四分钟失重，然后在平流层上慢慢看完一整次日出。</p>
+      <div class="actions">
+        <a class="btn solid" href="#profile">查看飞行剖面 →</a>
+        <a class="btn ghost" href="#train">训练怎么安排</a>
+      </div>
+    </div>
+    <div class="hero-foot">
+      <div class="flight" aria-label="飞行参数">
+        <div class="stat">
+          <span>最高点 / APOGEE</span>
+          <b>100<small>km</small></b>
+          <p>越过卡门线</p>
+        </div>
+        <div class="stat">
+          <span>失重 / ZERO-G</span>
+          <b>4<small>min</small></b>
+          <p>解开安全带</p>
+        </div>
+        <div class="stat">
+          <span>全程 / DURATION</span>
+          <b>11<small>min</small></b>
+          <p>从点火到着陆</p>
+        </div>
+        <div class="stat">
+          <span>过载 / G-LOAD</span>
+          <b>3.2<small>g</small></b>
+          <p>再入峰值</p>
+        </div>
+      </div>
+      <p class="live"><i></i>SIMULATED VIEW · 100 KM</p>
+    </div>
+  </section>
+
+  <section class="profile solid" id="profile">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">01 / 飞行剖面</p>
+          <h2>十一分钟，五个节点。</h2>
+        </div>
+        <p>全程自动飞行，两名驾驶员在舱内。你唯一要做的，是在失重开始时松开扶手。</p>
+      </div>
+      <ol class="timeline">
+        <li>
+          <b>T-0</b>
+          <h3>点火</h3>
+          <p>三台发动机同时点火，跑道尽头抬头，四十秒后进入超音速。</p>
+        </li>
+        <li>
+          <b>T+1:30</b>
+          <h3>越过卡门线</h3>
+          <p>天空从深蓝变黑。第一次看见地球的弧线，和弧线外那层很薄的蓝。</p>
+        </li>
+        <li>
+          <b>T+2:10</b>
+          <h3>失重开始</h3>
+          <p>引擎关机。四分钟的自由落体，安全带解开，你可以贴到舷窗上。</p>
+        </li>
+        <li>
+          <b>T+6:10</b>
+          <h3>再入</h3>
+          <p>3.2 g 把你按回座椅。窗外先亮成橙色，再慢慢暗下来。</p>
+        </li>
+        <li>
+          <b>T+11:00</b>
+          <h3>着陆</h3>
+          <p>滑回出发的那条跑道。舱门打开，重力重新归你所有。</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="train" id="train">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">02 / 三天训练</p>
+          <h2>身体先上去一次。</h2>
+        </div>
+        <p>三次地面课程，都在出发前一个月内完成。飞行当天早上只做一件事：吃一顿正常的早餐。</p>
+      </div>
+      <div class="train-grid">
+        <article class="card">
+          <b>DAY 01</b>
+          <h3>适应与体检</h3>
+          <p>心肺、前庭、血压。医生会和你一起看完整份飞行剖面，告诉你哪个节点会紧张。</p>
+          <div class="meta"><span>4 小时</span><span>基地医务室</span></div>
+        </article>
+        <article class="card">
+          <b>DAY 02</b>
+          <h3>离心机 3.2g</h3>
+          <p>在长臂离心机上体验再入过载。学会收紧腿部肌肉，让血液留在该在的地方。</p>
+          <div class="meta"><span>2 小时</span><span>离心机舱</span></div>
+        </article>
+        <article class="card">
+          <b>DAY 03</b>
+          <h3>失重舱</h3>
+          <p>抛物线飞行，每轮 22 秒失重，共 12 轮。重点只有两个：别蹬墙，别抓别人。</p>
+          <div class="meta"><span>半天</span><span>失重训练机</span></div>
+        </article>
+      </div>
+      <p class="footnote">不适合人群：孕妇、近期做过胸腔手术者、未控制的高血压。最终解释权归飞行医生所有。</p>
+    </div>
+  </section>
+
+  <section class="quote solid">
+    <div class="wrap">
+      <blockquote>上去只有四分钟，<br><em>下来以后看什么都变宽了。</em></blockquote>
+      <p class="cite">乘客 04 号 · 2026 年试飞 · 返回后第 3 天</p>
+    </div>
+  </section>
+
+  <section class="cta" id="book">
+    <div class="wrap cta-in">
+      <div>
+        <p class="kicker">NEXT WINDOW · 2027.04</p>
+        <h2>下一次窗口，<br>只坐六个人。</h2>
+        <p class="note">首航前最后一次开放预约。定金可退，训练开始前全额返还。</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn solid" href="#book">预约首航</a>
+        <a class="btn ghost" href="#profile">看飞行条款</a>
+      </div>
+    </div>
+  </section>
 </main>
-<p class="hint">移动光标，星空会轻微偏移</p>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>APOGEE SUBORBITAL · 酒泉 · 2027 首航窗口</span>
+    <span>背景星场由 Canvas 2D 投影绘制</span>
+  </div>
+</footer>
+
 <script>
 (function () {
   var c = document.getElementById('c');
@@ -121,6 +446,61 @@ p.sub{max-width:24em;margin:16px auto 0;font-size:12px;line-height:1.8;color:var
 
   resize();
   if (!reduce) frame();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

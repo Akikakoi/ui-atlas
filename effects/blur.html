@@ -3,69 +3,335 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>模糊聚焦 · UI Atlas 动效</title>
+<title>模糊聚焦 · 明视 CLEARVIEW 验光工作室</title>
 <style>
-:root{--bg:#f2f1fb;--ink:#12131a;--muted:#747786;--line:#dedcec;--accent:#5546c9}
+:root{--bg:#f2f1fb;--ink:#15161d;--muted:#747786;--line:#dedcec;--accent:#5546c9;--card:#fff}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{background:radial-gradient(720px 420px at 50% 0%,#fff,#f2f1fb 68%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:38px 24px 80px}
-.wrap{width:100%;max-width:610px}
-.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
-.head{margin:0;font-size:clamp(30px,7.4vw,50px);line-height:1.06;letter-spacing:-.045em;font-weight:650}
-.head .word{padding-right:.12em}
-.head em{font-style:normal;color:var(--accent)}
-.lede{margin:20px 0 0;font-size:13.5px;line-height:1.9;color:var(--muted);max-width:31em}
-.word{display:inline-block;filter:blur(10px);opacity:0;letter-spacing:.13em;
-  transition:filter .95s ease,opacity .78s ease,letter-spacing .95s cubic-bezier(.2,.8,.2,1);
-  transition-delay:calc(var(--i,0) * 150ms)}
-.on .word{filter:none;opacity:1;letter-spacing:inherit}
-.note{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;line-height:1.8;color:var(--muted)}
-.replay{position:fixed;right:16px;top:14px;z-index:3;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;
-  font:inherit;font-size:12px;color:var(--ink);cursor:pointer}
-.replay:hover{border-color:var(--accent);color:var(--accent)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+body{background:radial-gradient(760px 460px at 50% -8%,#fff,#f2f1fb 66%) fixed;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.head{max-width:1200px;margin:0 auto;height:74px;padding:0 40px;display:flex;align-items:center;gap:34px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:.02em}
+.brand .ring{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--ink);position:relative;display:inline-block}
+.brand .ring::before{content:"";position:absolute;inset:4px;border-radius:50%;border:1.5px solid var(--accent)}
+.brand i{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted);font-style:normal;margin-left:2px}
+.nav{display:flex;gap:26px;font-size:12.5px;color:var(--muted)}
+.nav a:hover{color:var(--ink)}
+.hint{margin:0 0 0 auto;display:inline-flex;align-items:center;gap:7px;font:400 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 12px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.word{filter:none;opacity:1;letter-spacing:inherit}}
+.cta{background:var(--accent);color:#fff;border-radius:999px;padding:9px 16px;font-size:12px;font-weight:700;letter-spacing:.02em}
+.cta:hover{filter:brightness(1.08)}
+.hero{max-width:1200px;margin:0 auto;padding:76px 40px 84px;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:64px;align-items:center}
+.kicker{margin:0 0 20px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--accent)}
+.headline{margin:0;font-size:clamp(42px,4.9vw,66px);line-height:1.06;letter-spacing:-.045em;font-weight:650}
+.headline .word{padding-right:.12em}
+.headline em{font-style:normal;color:var(--accent)}
+.word{display:inline-block;filter:blur(10px);opacity:0;letter-spacing:.13em;transition:filter .95s ease,opacity .78s ease,letter-spacing .95s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--i,0) * 150ms)}
+.on .word{filter:none;opacity:1;letter-spacing:inherit}
+.lede{margin:22px 0 0;max-width:30em;font-size:14px;line-height:1.9;color:var(--muted)}
+.lede .word{display:inline}
+.actions{display:flex;align-items:center;gap:16px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border-radius:999px;padding:11px 20px;font-size:12.5px;font-weight:700}
+.btn:hover{background:var(--accent)}
+.replay{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font:inherit;font-size:11.5px;color:var(--muted);cursor:pointer}
+.replay:hover{border-color:var(--accent);color:var(--accent)}
+.meta{display:flex;align-items:center;gap:10px;margin-top:32px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.meta b{color:var(--accent);font-weight:600}
+.meta i{width:1px;height:10px;background:var(--line)}
+.book{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 26px 22px;box-shadow:0 36px 70px -50px rgba(38,32,90,.4);position:relative}
+.book-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid #eae8f4}
+.book-top span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.book-top b{display:inline-flex;align-items:center;gap:6px;font-size:9.5px;color:#2f8f5b;font-weight:600}
+.book-top b::before{content:"";width:5px;height:5px;border-radius:50%;background:#35b06f}
+.eye{margin:16px 0 14px;text-align:center;line-height:.92;color:#2c2d3a;font-family:Georgia,"Times New Roman",serif;user-select:none}
+.eye span{display:block;letter-spacing:.34em;padding-left:.34em}
+.eye .r1{font-size:30px}
+.eye .r2{font-size:23px;opacity:.78}
+.eye .r3{font-size:17px;opacity:.58}
+.eye .r4{font-size:12px;opacity:.4}
+.eye small{display:block;margin-top:10px;font:500 7px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted);opacity:1}
+.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:14px 0 16px}
+.slots span{text-align:center;font:600 8px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);border:1px solid #eae8f4;border-radius:7px;padding:6px 0 5px}
+.slots span b{display:block;font-size:11px;color:var(--ink);font-weight:600}
+.slots span.on{border-color:var(--accent);background:#f4f2ff;color:var(--accent)}
+.slots span.on b{color:var(--accent)}
+.book-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #eae8f4;padding-top:14px}
+.book-foot p{margin:0;font-size:10.5px;color:var(--muted)}
+.book-foot p b{display:block;color:var(--ink);font-size:11.5px;margin-bottom:2px}
+.book .btn{padding:9px 14px;font-size:11px;background:var(--accent)}
+.services{max-width:1200px;margin:0 auto;padding:0 40px 64px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.svc{border-top:1px solid var(--line);padding:26px 0 0}
+.svc .no{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
+.svc h3{margin:12px 0 8px;font-size:16px;letter-spacing:.01em}
+.svc p{margin:0 0 14px;font-size:12px;line-height:1.8;color:var(--muted)}
+.svc .price{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--ink)}
+.svc .price i{font-style:normal;color:var(--muted);margin-left:8px;letter-spacing:.06em}
+.steps{max-width:1120px;margin:0 auto 76px;padding:36px 40px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:.8fr repeat(4,1fr);gap:26px;align-items:start}
+.steps h2{margin:0;font-size:20px;line-height:1.4;letter-spacing:-.01em;font-weight:650}
+.steps h2 span{display:block;margin-top:8px;font:500 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.step b{display:block;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent);margin-bottom:10px}
+.step h4{margin:0 0 6px;font-size:12.5px;font-weight:650}
+.step p{margin:0;font-size:10.5px;line-height:1.7;color:var(--muted)}
+.visit{max-width:1120px;margin:0 auto 76px;padding:30px 38px;border-radius:14px;background:#1a1b25;color:#f4f3fb;display:flex;align-items:center;justify-content:space-between;gap:32px}
+.visit h2{margin:0;font-size:19px;letter-spacing:.01em;font-weight:600}
+.visit p{margin:4px 0 0;font-size:11px;color:#a4a6b8}
+.visit .btn{background:#fff;color:var(--ink)}
+.visit .btn:hover{background:var(--accent);color:#fff}
+footer{max-width:1200px;margin:0 auto;padding:20px 40px 26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+@media (max-height:560px) and (min-width:561px){
+  .head{height:44px;padding:0 18px;gap:14px}
+  .brand{font-size:13px;gap:7px}
+  .brand .ring{width:14px;height:14px}
+  .brand .ring::before{inset:3px}
+  .brand i{display:none}
+  .nav{display:none}
+  .hint{margin-left:auto;font-size:8px;padding:5px 8px;gap:5px}
+  .hint::before{width:4px;height:4px}
+  .cta{font-size:9.5px;padding:6px 11px}
+  .hero{padding:20px 18px 14px;gap:24px;grid-template-columns:minmax(0,1fr) 316px;align-items:start}
+  .kicker{font-size:7.5px;margin-bottom:9px;letter-spacing:.2em}
+  .headline{font-size:31px;line-height:1.1}
+  .lede{font-size:10px;line-height:1.7;margin-top:11px}
+  .actions{margin-top:13px;gap:10px}
+  .btn{font-size:9.5px;padding:7px 12px}
+  .replay{font-size:9px;padding:6px 10px}
+  .meta{display:none}
+  .book{padding:14px 16px 13px;border-radius:11px}
+  .book-top{padding-bottom:8px}
+  .book-top span{font-size:6.5px}
+  .book-top b{font-size:7.5px}
+  .eye{margin:9px 0 8px}
+  .eye .r1{font-size:21px}
+  .eye .r2{font-size:16px}
+  .eye .r3{font-size:12px}
+  .eye .r4{font-size:9px}
+  .eye small{font-size:5.5px;margin-top:6px}
+  .slots{gap:4px;margin:8px 0 9px}
+  .slots span{font-size:6px;padding:4px 0;border-radius:5px}
+  .slots span b{font-size:8px}
+  .book-foot{padding-top:9px}
+  .book-foot p{font-size:8px}
+  .book-foot p b{font-size:8.5px}
+  .book .btn{font-size:8.5px;padding:6px 9px}
+  .services{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:12px 18px 14px;border-top:1px solid var(--line)}
+  .svc{border-top:none;padding:0}
+  .svc .no{font-size:6.5px}
+  .svc h3{font-size:10px;margin:4px 0 2px}
+  .svc p{font-size:7.5px;line-height:1.5;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .svc .price{font-size:6.5px}
+  .svc .price i{font-size:6px;margin-left:4px}
+  .steps,.visit,footer{display:none}
+}
+@media (max-width:560px){
+  .head{height:56px;padding:0 16px;gap:10px}
+  .brand{font-size:13.5px;gap:8px}
+  .brand .ring{width:15px;height:15px}
+  .brand .ring::before{inset:3px}
+  .brand i{display:none}
+  .nav{display:none}
+  .hint{display:none}
+  .cta{margin-left:auto;font-size:10.5px;padding:7px 12px}
+  .hero{grid-template-columns:1fr;gap:26px;padding:32px 16px 34px}
+  .kicker{font-size:8.5px;margin-bottom:12px}
+  .headline{font-size:clamp(34px,10.4vw,46px)}
+  .lede{font-size:12px;line-height:1.8;margin-top:14px}
+  .actions{margin-top:18px;gap:12px}
+  .btn{font-size:11px;padding:9px 15px}
+  .replay{font-size:10.5px;padding:8px 12px}
+  .meta{margin-top:20px;font-size:8px;flex-wrap:wrap;gap:8px}
+  .book{padding:20px 20px 18px}
+  .eye{margin:14px 0 12px}
+  .slots span{font-size:7px}
+  .slots span b{font-size:10px}
+  .services{grid-template-columns:1fr;gap:0;padding:0 16px 30px}
+  .svc{padding:18px 0;border-top:1px solid var(--line)}
+  .svc h3{font-size:14px}
+  .svc p{font-size:11.5px}
+  .steps{grid-template-columns:1fr 1fr;gap:20px 16px;padding:26px 16px 0;margin-bottom:36px}
+  .steps h2{grid-column:1 / -1;font-size:17px}
+  .step h4{font-size:11.5px}
+  .step p{font-size:10px}
+  .visit{flex-direction:column;align-items:flex-start;gap:16px;margin:0 16px 40px;padding:22px 20px}
+  .visit h2{font-size:17px}
+  footer{flex-wrap:wrap;padding:16px 16px 22px;font-size:8px}
+  footer span:last-child{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .word{filter:none;opacity:1;letter-spacing:inherit}
+  .btn,.replay{transition:none}
+}
 </style>
 </head>
 <body>
-<button class="replay" id="replay" type="button">重播</button>
-<main class="stage">
-  <div class="wrap" id="wrap">
-    <p class="kicker">TYPE / 07</p>
-    <h1 class="head">
-      <span class="word" style="--i:0">先是一片模糊，</span><br>
-      <span class="word" style="--i:1">再慢慢<em>对焦</em>。</span>
-    </h1>
-    <p class="lede">
-      <span class="word" style="--i:2">模糊 10px、字距多出 0.13em、透明度归零——三个信号一起收，</span>
-      <span class="word" style="--i:3">像镜头合焦。每行错开 150ms，视线有地方落。</span>
-    </p>
-    <p class="note">只对标题与短句用。正文整段模糊会让人等，也会让首屏在慢设备上显得没加载完。</p>
-  </div>
+
+<header class="head">
+  <a class="brand" href="#top"><span class="ring"></span>明视<i>CLEARVIEW</i></a>
+  <nav class="nav" aria-label="主导航">
+    <a href="#services">验光</a>
+    <a href="#steps">流程</a>
+    <a href="#visit">到店</a>
+  </nav>
+  <p class="hint">等它合焦，或点「重播对焦」</p>
+  <a class="cta" href="#book">预约验光</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div id="focus">
+      <p class="kicker">EYE CARE STUDIO / SHANGHAI</p>
+      <h1 class="headline">
+        <span class="word" style="--i:0">世界很细，</span><br>
+        <span class="word" style="--i:1">值得<em>看清</em>。</span>
+      </h1>
+      <p class="lede">
+        <span class="word" style="--i:2">一次 40 分钟的验光，不赶时间。</span>
+        <span class="word" style="--i:3">我们先听你怎么用眼，再决定你该戴什么。</span>
+      </p>
+      <div class="actions">
+        <a class="btn" href="#book">预约本周 <span aria-hidden="true">→</span></a>
+        <button class="replay" id="replay" type="button" aria-label="重播对焦动效">重播对焦 ↻</button>
+      </div>
+      <p class="meta"><b>9 年</b>只做验光<i></i>不卖镜架 · 不推销加价</p>
+    </div>
+
+    <aside class="book" id="book" aria-label="本周预约">
+      <div class="book-top"><span>NOV / WEEK 2 · 本周可约</span><b>还有 2 个空位</b></div>
+      <div class="eye" aria-hidden="true">
+        <span class="r1">E F P</span>
+        <span class="r2">T O Z L</span>
+        <span class="r3">P E C F D</span>
+        <span class="r4">E D F C Z P</span>
+        <small>20 / 20 · 明视验光室</small>
+      </div>
+      <div class="slots" aria-hidden="true">
+        <span>一<b>11</b></span><span class="on">二<b>12</b></span><span>三<b>13</b></span><span class="on">四<b>14</b></span><span>五<b>15</b></span>
+      </div>
+      <div class="book-foot">
+        <p><b>最近可约 · 今天 16:30</b>约 40 分钟 · 含视功能检查</p>
+        <a class="btn" href="#book">选时间</a>
+      </div>
+    </aside>
+  </section>
+
+  <section class="services" id="services" aria-label="验光服务">
+    <div class="svc">
+      <p class="no">01 / EXAM</p>
+      <h3>综合验光</h3>
+      <p>电脑验光只做参考。主觉验光、双眼平衡、试戴确认，一步一步来。</p>
+      <p class="price">¥280 <i>40 MIN</i></p>
+    </div>
+    <div class="svc">
+      <p class="no">02 / VISION</p>
+      <h3>视功能评估</h3>
+      <p>容易累、看久了重影？查调节与集合，找出「度数没问题但看不清」的原因。</p>
+      <p class="price">¥420 <i>60 MIN</i></p>
+    </div>
+    <div class="svc">
+      <p class="no">03 / KIDS</p>
+      <h3>儿童近视管理</h3>
+      <p>建立屈光档案，每三个月复查一次，把增长速度控制在可解释的范围内。</p>
+      <p class="price">¥360 <i>50 MIN</i></p>
+    </div>
+  </section>
+
+  <section class="steps" id="steps" aria-label="验光流程">
+    <h2>四十分钟，<br>只做一件事。<span>HOW IT WORKS</span></h2>
+    <div class="step"><b>01</b><h4>聊用眼</h4><p>工作距离、屏幕时长、旧镜多久没换。</p></div>
+    <div class="step"><b>02</b><h4>测基础</h4><p>电脑验光与角膜曲率，先拿到初始值。</p></div>
+    <div class="step"><b>03</b><h4>做主觉</h4><p>红绿、散光、双眼平衡，你说了算。</p></div>
+    <div class="step"><b>04</b><h4>试戴</h4><p>走动十分钟，确认不晕再开处方。</p></div>
+  </section>
+
+  <section class="visit" id="visit">
+    <div>
+      <h2>静安区 · 陕西北路 128 号 2 层</h2>
+      <p>周二至周日 10:00–19:00 · 周一休息 · 地铁 2/12/13 号线南京西路站</p>
+    </div>
+    <a class="btn" href="#book">预约到店 <span aria-hidden="true">→</span></a>
+  </section>
 </main>
-<p class="hint">等它合焦，或点右上角「重播」</p>
+
+<footer>
+  <span>© 2026 明视 CLEARVIEW · 上海</span>
+  <span>隐私 · 验光须知 · 联系</span>
+</footer>
+
 <script>
 (function () {
-  var wrap = document.getElementById('wrap'), replay = document.getElementById('replay');
+  var wrap = document.getElementById('focus'), replay = document.getElementById('replay');
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
     wrap.classList.add('on');
-    replay.hidden = true;
+    if (replay) replay.hidden = true;
     return;
   }
   function play() {
+    var words = wrap.querySelectorAll('.word');
+    words.forEach(function (w) { w.style.transition = 'none'; });
     wrap.classList.remove('on');
+    void wrap.offsetWidth;
     requestAnimationFrame(function () {
+      words.forEach(function (w) { w.style.transition = ''; });
       requestAnimationFrame(function () { wrap.classList.add('on'); });
     });
   }
-  replay.addEventListener('click', play);
+  if (replay) replay.addEventListener('click', play);
   setTimeout(play, 180);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

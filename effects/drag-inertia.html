@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拖拽惯性 · LETTERPRESS 凸版印刷所 · UI Atlas</title>
+<style>
+:root{--bg:#f0ece1;--paper:#faf6ec;--ink:#191712;--muted:#777264;--line:#d8d1c0;--accent:#b5432a;--deep:#15211b}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(80% 55% at 50% 0%,#faf6ec,#ece7d9 72%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.head{position:sticky;top:0;z-index:8;height:68px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1160px)/2));background:rgba(240,236,225,.86);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;white-space:nowrap}
+.brand .mark{width:26px;height:26px;border-radius:5px;background:var(--deep);color:#f5efe1;display:grid;place-items:center;
+  font:600 11px/1 Georgia,"Songti SC",serif;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.brand b{font:600 13px/1 Georgia,"Songti SC",serif;letter-spacing:.14em}
+.brand span{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.head nav{display:flex;gap:22px;margin-left:auto;font-size:12px;color:var(--muted)}
+.head nav a{text-decoration:none}
+.head nav a:hover{color:var(--ink)}
+.book{font:600 11.5px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;text-decoration:none;color:var(--paper);background:var(--accent);border-radius:999px;
+  padding:10px 16px;white-space:nowrap;margin-left:6px}
+.book:hover{background:#9e3721}
+.stage{max-width:1160px;margin:0 auto;padding:clamp(26px,4.4vw,54px) 22px clamp(30px,5vw,56px)}
+.hero{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:clamp(26px,4.6vw,58px);align-items:center;
+  min-height:calc(100vh - 68px - clamp(26px,4.4vw,54px) - clamp(30px,5vw,56px))}
+.kicker{margin:0 0 18px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--accent)}
+h1{margin:0;font-size:clamp(42px,5.6vw,70px);line-height:1.02;letter-spacing:-.05em;font-weight:620}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:22px 0 0;max-width:26em;font-size:13px;line-height:1.95;color:var(--muted)}
+.lede b{font-weight:600;color:var(--ink)}
+.meta{margin-top:28px;border-top:1px solid var(--line);max-width:24em}
+.meta div{display:flex;justify-content:space-between;gap:18px;padding:10px 0;border-bottom:1px solid var(--line);
+  font:600 10px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.meta b{font-weight:600;color:var(--ink);letter-spacing:0}
+.cta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:26px}
+.cta .book{margin-left:0;padding:12px 20px;font-size:12.5px}
+.cta small{font:600 9.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.board{position:relative;border-radius:18px;overflow:hidden;background:
+  radial-gradient(120% 90% at 50% 0%,#203129,#101915 68%);
+  border:1px solid rgba(21,33,27,.22);box-shadow:0 40px 80px -46px rgba(21,33,27,.75),inset 0 0 0 1px rgba(255,255,255,.04);
+  height:clamp(350px,48vw,430px);display:flex;flex-direction:column;color:#eef1e6}
+.board::before{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:38px 38px}
+.board::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(70% 60% at 50% 38%,transparent 40%,rgba(6,10,8,.42) 100%)}
+.board-bar{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 18px 12px;border-bottom:1px solid rgba(255,255,255,.1);
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(238,241,230,.5)}
+.board-bar b{font-weight:600;color:#d8b98c;letter-spacing:.14em}
+.table{position:relative;z-index:2;flex:1;min-height:0;overflow:hidden}
+.card{position:absolute;left:0;top:0;width:clamp(178px,30%,214px);padding:18px 18px 16px;border-radius:4px;touch-action:none;cursor:grab;
+  background:linear-gradient(155deg,#fbf7ec,#e9e1ce);color:#1b1a14;will-change:transform;user-select:none;
+  box-shadow:0 24px 44px -22px rgba(0,0,0,.8),0 2px 0 rgba(255,255,255,.5) inset;
+  border:1px solid rgba(255,255,255,.55);outline:none}
+.card:active{cursor:grabbing}
+.card:focus-visible{box-shadow:0 0 0 3px rgba(216,185,140,.75),0 24px 44px -22px rgba(0,0,0,.8)}
+.card .tag{display:block;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:#8a6a4a}
+.card b{display:block;margin:14px 0 10px;font:600 30px/1.05 Georgia,"Songti SC",serif;letter-spacing:-.03em}
+.card .rule{display:block;height:1px;background:linear-gradient(90deg,#b5432a 42%,#c9bda6 42%);margin-bottom:12px}
+.card small{display:block;font-size:10.5px;line-height:1.7;color:#6a6156}
+.card .stamp{margin-top:14px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;
+  font:600 8px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#8a6a4a}
+.card .stamp i{display:grid;place-items:center;width:26px;height:26px;border:1px solid #b5432a;border-radius:3px;
+  color:#b5432a;font:600 13px/1 Georgia,serif;font-style:normal;transform:rotate(-4deg)}
+.board-foot{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:11px 18px 13px;border-top:1px solid rgba(255,255,255,.1);
+  font:500 9px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:rgba(238,241,230,.45)}
+.board-foot button{border:1px solid rgba(255,255,255,.22);background:transparent;color:#e9e4d3;border-radius:999px;
+  font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;padding:5px 10px;cursor:pointer}
+.board-foot button:hover{border-color:#d8b98c;color:#f4dfb8}
+.board-foot button:focus-visible{outline:2px solid #d8b98c;outline-offset:2px}
+.craft{max-width:1160px;margin:0 auto;padding:44px 22px 24px;border-top:1px solid var(--line)}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:24px;flex-wrap:wrap}
+.sec-head h2{margin:0;font-size:clamp(24px,3.2vw,36px);line-height:1.12;letter-spacing:-.04em;font-weight:620}
+.sec-head h2 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.sec-head p{margin:0;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.three article{border:1px solid var(--line);border-radius:12px;padding:20px 18px;background:rgba(255,255,255,.4)}
+.three span{display:block;margin-bottom:12px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent)}
+.three h3{margin:0 0 7px;font-size:14.5px;letter-spacing:-.01em}
+.three p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.ledger{max-width:1160px;margin:0 auto;padding:14px 22px 44px}
+.ledger .kicker{margin-bottom:12px}
+.ledger .row{display:grid;grid-template-columns:64px minmax(0,1fr) 170px 80px;gap:16px;align-items:baseline;
+  padding:13px 2px;border-top:1px solid var(--line);font-size:12px;text-decoration:none}
+.ledger .row:last-child{border-bottom:1px solid var(--line)}
+.ledger .row i{font:600 9.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--accent);font-style:normal}
+.ledger .row b{font-weight:600;letter-spacing:-.01em}
+.ledger .row small{font-size:10.5px;color:var(--muted)}
+.ledger .row em{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);font-style:normal;text-align:right}
+.band{max-width:1160px;margin:0 auto;padding:0 22px 30px}
+.band>div{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:26px 0;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.band h2{margin:0;font-size:clamp(20px,2.6vw,28px);letter-spacing:-.03em;font-weight:620}
+.band p{margin:5px 0 0;font-size:12px;color:var(--muted)}
+.band .book{margin-left:auto}
+.foot{max-width:1160px;margin:0 auto;padding:8px 22px 30px;display:flex;gap:18px;flex-wrap:wrap;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.foot span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);
+  pointer-events:none;z-index:9;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.sr{position:absolute;top:0;left:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:920px){
+  .hero{grid-template-columns:1fr;min-height:0}
+  .board{height:min(440px,72vw)}
+}
+@media (max-width:560px){
+  .head{height:56px;padding:0 16px;gap:14px}
+  .head nav,.brand span{display:none}
+  .book{margin-left:auto;padding:9px 13px;font-size:11px}
+  .stage{padding:26px 18px 34px}
+  h1{font-size:clamp(40px,12.5vw,54px)}
+  .lede{font-size:12.5px;margin-top:16px}
+  .meta{margin-top:20px}
+  .cta{margin-top:20px}
+  .board{height:320px;border-radius:14px;margin-top:26px}
+  .card{width:186px;padding:16px}
+  .card b{font-size:27px}
+  .board-foot{font-size:8.5px}
+  .craft,.ledger,.band,.foot{padding-left:18px;padding-right:18px}
+  .three{grid-template-columns:1fr}
+  .ledger .row{grid-template-columns:50px minmax(0,1fr) 64px;gap:10px}
+  .ledger .row small{display:none}
+  .band .book{margin-left:0}
+  .foot span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .head{height:48px;padding:0 20px;gap:16px}
+  .head nav,.brand span{display:none}
+  .book{padding:8px 13px;font-size:10.5px}
+  .stage{padding:14px 22px 18px}
+  .hero{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);min-height:calc(100vh - 48px - 32px);gap:20px;align-items:center}
+  .kicker{display:none}
+  h1{font-size:clamp(28px,4vw,36px)}
+  .lede{margin-top:9px;font-size:10px;line-height:1.65;max-width:22em}
+  .meta,.cta{display:none}
+  .board{height:calc(100vh - 48px - 60px);min-height:318px;max-height:362px;border-radius:13px}
+  .board-bar{padding:10px 14px 8px}
+  .board-foot{padding:8px 14px 9px;font-size:8px}
+  .card{width:190px;padding:15px}
+  .card b{font-size:27px;margin:10px 0 8px}
+  .card small{font-size:10px}
+  .craft,.ledger,.band,.foot{display:none}
+  .hint{left:22px;bottom:10px;font-size:10px;padding:3px 8px}
+}
+@media (hover:none),(max-width:560px){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .card,.three article{box-shadow:0 10px 24px -18px rgba(0,0,0,.8)}
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<header class="head">
+  <a class="brand" href="#top"><span class="mark" aria-hidden="true">凸</span><b>LETTERPRESS</b><span>凸版印刷所</span></a>
+  <nav aria-label="主导航">
+    <a href="#craft">工艺</a>
+    <a href="#ledger">样张</a>
+    <a href="#order">预约</a>
+  </nav>
+  <a class="book" href="#order">约打样</a>
+</header>
+
+<main id="top">
+  <div class="stage">
+    <section class="hero">
+      <div>
+        <p class="kicker">LETTERPRESS STUDIO · 杭州</p>
+        <h1>先打样，<br><em>再定稿。</em></h1>
+        <p class="lede">棉纸、活字、压痕。每一张名片先在打样桌上过一遍手——<b>纸的厚度、压凹的深浅、朱色的干湿</b>，都等你看过再上机。</p>
+        <div class="meta">
+          <div><span>创立</span><b>2009 · 拱墅</b></div>
+          <div><span>机器</span><b>海德堡风车 3 台</b></div>
+          <div><span>打样周期</span><b>3–5 个工作日</b></div>
+        </div>
+        <div class="cta">
+          <a class="book" href="#order">寄一张纸来试压 →</a>
+          <small>首轮样张免费 · 顺丰到付</small>
+        </div>
+      </div>
+
+      <div class="board" role="group" aria-label="打样桌：样张可以拖拽，松手后会顺着速度滑出去">
+        <div class="board-bar"><span>PROOF TABLE · 001</span><b>压凹 / 双面</b></div>
+        <div class="table" id="table">
+          <div class="card" id="card" tabindex="0" aria-label="可拖拽样张：禾野茶室名片，方向键可微调位置">
+            <span class="tag">PROOF 08 · 棉纸 240g</span>
+            <b>禾野茶室</b>
+            <span class="rule" aria-hidden="true"></span>
+            <small>活字 8pt · 双面压凹<br>朱色手拓 · 90 × 54 mm</small>
+            <div class="stamp"><span>打样 08 / 10<br>2026.11.12</span><i aria-hidden="true">禾</i></div>
+          </div>
+        </div>
+        <div class="board-foot">
+          <span>按住样张拖动，松手会顺着速度滑出去</span>
+          <button type="button" id="reset">归位</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="craft" id="craft">
+    <div class="sec-head">
+      <h2>三件小事，<br><em>决定一张纸的分量。</em></h2>
+      <p>PRINT / PRESS / TRIM</p>
+    </div>
+    <div class="three">
+      <article><span>01 / TYPE</span><h3>活字排版</h3><p>字距、行距、边距都落在铅字上。改一个字，就要重新排一行，所以每个字都被认真想过。</p></article>
+      <article><span>02 / PRESS</span><h3>棉纸压凹</h3><p>240g 棉纸吃墨深，压凹后边缘会起一层薄薄的绒。手感比照片更诚实。</p></article>
+      <article><span>03 / TRIM</span><h3>手工裁切</h3><p>先压再裁，毛边留 0.5mm。每一叠的边不会完全一样，这是它像手作的原因。</p></article>
+    </div>
+  </section>
+
+  <section class="ledger" id="ledger">
+    <p class="kicker">RECENT PROOFS · 最近打样</p>
+    <a class="row" href="#order"><i>08 / 11</i><b>禾野茶室 · 名片</b><small>棉纸 240g · 双面压凹 · 朱</small><em>已确认</em></a>
+    <a class="row" href="#order"><i>07 / 11</i><b>白噪唱片 · 封套</b><small>灰板 1.5mm · 单面压凹</small><em>待取</em></a>
+    <a class="row" href="#order"><i>05 / 11</i><b>山舍 · 房卡</b><small>棉纸 320g · 烫黑 · 圆角</small><em>已上机</em></a>
+  </section>
+
+  <section class="band" id="order">
+    <div>
+      <div>
+        <h2>把你的纸，放到这张桌上。</h2>
+        <p>寄一张你喜欢的纸来，我们先压一张样张给你。</p>
+      </div>
+      <a class="book" href="#top">预约打样 →</a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>LETTERPRESS 凸版印刷所</span>
+    <span>杭州 · 拱墅 小河直街 17 号</span>
+    <span>© 2026</span>
+  </footer>
+</main>
+
+<p class="hint">按住样张拖动，松手看它滑多远；方向键可微调</p>
+<span class="sr" role="status">样张可以被拖动并带有惯性，键盘方向键可微调位置。</span>
+<script>
+(function () {
+  var board = document.getElementById('table'), card = document.getElementById('card');
+  var reset = document.getElementById('reset');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var x = 0, y = 0, vx = 0, vy = 0, raf = null;
+  var drag = false, lastX = 0, lastY = 0, lastT = 0;
+
+  function maxX() { return Math.max(0, board.clientWidth - card.offsetWidth); }
+  function maxY() { return Math.max(0, board.clientHeight - card.offsetHeight); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function paint() { card.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0)'; }
+
+  function center() {
+    x = Math.max(0, (board.clientWidth - card.offsetWidth) / 2);
+    y = Math.max(0, (board.clientHeight - card.offsetHeight) / 2);
+    paint();
+  }
+  center();
+  addEventListener('resize', function () { x = clamp(x, 0, maxX()); y = clamp(y, 0, maxY()); paint(); });
+
+  card.addEventListener('pointerdown', function (e) {
+    drag = true;
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    vx = vy = 0;
+    lastX = e.clientX; lastY = e.clientY; lastT = performance.now();
+    card.setPointerCapture(e.pointerId);
+    card.focus();
+  });
+
+  card.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - lastX, dy = e.clientY - lastY;
+    var now = performance.now(), dt = Math.max(8, now - lastT);
+    x = clamp(x + dx, 0, maxX());
+    y = clamp(y + dy, 0, maxY());
+    vx = dx / dt * 16;
+    vy = dy / dt * 16;
+    lastX = e.clientX; lastY = e.clientY; lastT = now;
+    paint();
+  });
+
+  function release() {
+    if (!drag) return;
+    drag = false;
+    if (reduce || (!vx && !vy)) return;
+    raf = requestAnimationFrame(tick);
+  }
+  card.addEventListener('pointerup', release);
+  card.addEventListener('pointercancel', release);
+
+  function tick() {
+    raf = null;
+    x += vx; y += vy;
+    if (x < 0) { x = 0; vx = -vx * .7; }
+    if (x > maxX()) { x = maxX(); vx = -vx * .7; }
+    if (y < 0) { y = 0; vy = -vy * .7; }
+    if (y > maxY()) { y = maxY(); vy = -vy * .7; }
+    vx *= .94; vy *= .94;
+    paint();
+    if (Math.abs(vx) > .15 || Math.abs(vy) > .15) raf = requestAnimationFrame(tick);
+  }
+
+  card.addEventListener('keydown', function (e) {
+    var step = e.shiftKey ? 28 : 12, hit = true;
+    if (e.key === 'ArrowLeft') x = clamp(x - step, 0, maxX());
+    else if (e.key === 'ArrowRight') x = clamp(x + step, 0, maxX());
+    else if (e.key === 'ArrowUp') y = clamp(y - step, 0, maxY());
+    else if (e.key === 'ArrowDown') y = clamp(y + step, 0, maxY());
+    else hit = false;
+    if (hit) { e.preventDefault(); paint(); }
+  });
+
+  reset.addEventListener('click', function () {
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    vx = vy = 0;
+    center();
+    card.focus();
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

@@ -3,118 +3,379 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>光标裁切揭示 · UI Atlas 动效</title>
+<title>光标裁切揭示 · DAYLIGHT 影像档案馆</title>
 <style>
-:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85}
+:root{--bg:#f4f1e8;--panel:#fbf9f2;--ink:#17171b;--muted:#73726c;--line:#ded8c8;--accent:#c8552c}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:26px 20px 54px}
-.wrap{width:100%;max-width:600px;height:calc(100vh - 80px);max-height:620px;display:grid;grid-template-rows:auto minmax(0,1fr)}
-.head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
-.kicker{margin:0;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-h1{margin:0;font-size:clamp(21px,4.8vw,30px);letter-spacing:-.03em;font-weight:600}
-.grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px;min-height:0}
-.tile{position:relative;min-height:0;border-radius:13px;overflow:hidden;cursor:crosshair;isolation:isolate}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.nav{position:sticky;top:0;z-index:9;height:64px;display:flex;align-items:center;gap:28px;
+  padding:0 max(22px,calc((100vw - 1180px)/2));background:rgba(244,241,232,.88);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:9px;font-size:12px;font-weight:700;letter-spacing:.24em;text-decoration:none;white-space:nowrap}
+.brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.nav-links{display:flex;gap:24px;margin-left:8px}
+.nav-links a{font-size:12.5px;color:#55544f;text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a.on{color:var(--ink);border-bottom:1px solid var(--accent);padding-bottom:2px}
+.book{margin-left:auto;border:1px solid var(--line);border-radius:999px;padding:8px 15px;font-size:11.5px;text-decoration:none;white-space:nowrap;background:var(--panel)}
+.book:hover{border-color:var(--accent);color:var(--accent)}
+.hero{max-width:1180px;margin:0 auto;padding:clamp(32px,5vw,72px) 22px 54px;
+  display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:clamp(28px,5vw,64px);align-items:center}
+.kicker{margin:0 0 18px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+h1{margin:0;font-size:clamp(44px,6.4vw,82px);line-height:.96;letter-spacing:-.05em;font-weight:640}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:24px 0 0;max-width:29em;font-size:13.5px;line-height:1.9;color:#55544f}
+.meta{display:flex;gap:18px;flex-wrap:wrap;margin:28px 0 0;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font:10.5px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:500}
+.note{margin:20px 0 0;max-width:33em;font-size:11.5px;line-height:1.85;color:var(--muted)}
+.note b{color:#4c4b46;font-weight:600}
+.plate{position:relative;margin:0;overflow:hidden;border-radius:16px;isolation:isolate;cursor:crosshair;
+  box-shadow:0 30px 60px -42px rgba(35,30,20,.7);background:var(--panel)}
+.hero .plate{aspect-ratio:4/3.1;justify-self:end;width:100%;max-width:560px}
 .layer{position:absolute;inset:0}
 .base{background:
-  repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 9px),
-  linear-gradient(150deg,#7c7f86,#3b3e45);filter:grayscale(1) contrast(.92) brightness(.85)}
-.c1 .base{background-image:radial-gradient(circle at 30% 25%,#d9cbb4,transparent 55%),linear-gradient(150deg,#8b8377,#3c3a36)}
-.c2 .base{background-image:radial-gradient(circle at 70% 20%,#c9d3da,transparent 55%),linear-gradient(150deg,#7d8790,#333a42)}
-.c3 .base{background-image:radial-gradient(circle at 35% 70%,#d6d0c4,transparent 55%),linear-gradient(150deg,#8a8177,#403b34)}
-.c4 .base{background-image:radial-gradient(circle at 65% 65%,#c8cfc4,transparent 55%),linear-gradient(150deg,#7c8478,#363c34)}
-.tile .base{filter:grayscale(1) contrast(.9) brightness(.72)}
-.color{clip-path:circle(var(--r,0px) at var(--x,50%) var(--y,50%));transition:clip-path .25s ease-out}
-.c1 .color{background:radial-gradient(circle at 30% 25%,#f7d19a,transparent 58%),linear-gradient(150deg,#e0663c,#8e2b1c)}
-.c2 .color{background:radial-gradient(circle at 70% 20%,#b8e6f2,transparent 58%),linear-gradient(150deg,#3f7f9e,#1b3b56)}
-.c3 .color{background:radial-gradient(circle at 35% 70%,#f2e6a8,transparent 58%),linear-gradient(150deg,#c79a3a,#6d4d16)}
-.c4 .color{background:radial-gradient(circle at 65% 65%,#cdf0b6,transparent 58%),linear-gradient(150deg,#5f9b52,#234a22)}
-.grain{position:absolute;inset:0;opacity:.18;mix-blend-mode:overlay;
+  radial-gradient(circle at 32% 24%,var(--c1),transparent 58%),
+  linear-gradient(150deg,var(--c2),var(--c3));
+  filter:grayscale(1) contrast(.92) brightness(.8)}
+.color{background:
+  radial-gradient(circle at 32% 24%,var(--c1),transparent 58%),
+  linear-gradient(150deg,var(--c2),var(--c3));
+  clip-path:circle(var(--r,0px) at var(--x,50%) var(--y,50%));
+  transition:clip-path .25s ease-out}
+.grain{opacity:.16;mix-blend-mode:overlay;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E")}
-.cap{position:absolute;left:12px;right:12px;bottom:11px;z-index:2;display:flex;align-items:baseline;gap:7px;color:#fff}
-.cap b{font-size:12.5px;letter-spacing:-.01em}
-.cap span{margin-left:auto;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;opacity:.65}
-.tile .no{position:absolute;left:12px;top:11px;z-index:2;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(255,255,255,.6)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:#e0663c}
-@media (hover:none){.color{--r:200px}}
-@media (prefers-reduced-motion:reduce){.color{transition:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+.rim{position:absolute;inset:14px;border:1px solid rgba(255,255,255,.26);border-radius:9px;pointer-events:none;z-index:2}
+.plate .no{position:absolute;left:22px;top:19px;z-index:3;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(255,255,255,.66)}
+.plate .scale{position:absolute;right:22px;top:19px;z-index:3;display:flex;align-items:center;gap:7px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:rgba(255,255,255,.58)}
+.plate .scale::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(200,85,44,.25)}
+.plate-foot{position:absolute;left:22px;right:22px;bottom:18px;z-index:3;display:flex;align-items:flex-end;gap:12px;color:#fff}
+.plate-foot b{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.plate-foot span{margin-left:auto;font:9px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.12em;opacity:.7;text-align:right;white-space:nowrap}
+.plate-foot small{display:block;font-size:9.5px;letter-spacing:.02em;opacity:.62}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);max-width:1180px;margin:0 auto;padding:0 22px;border-top:1px solid var(--line)}
+.stat{padding:24px 10px;border-left:1px solid var(--line)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{display:block;font:500 25px/1 ui-monospace,Consolas,monospace;letter-spacing:-.04em;color:var(--accent)}
+.stat span{display:block;margin-top:7px;font-size:10.5px;color:var(--muted)}
+.archive,.notes{max-width:1180px;margin:0 auto;padding:58px 22px 12px}
+.section-head{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:22px}
+h2{margin:0;font-size:clamp(24px,3.2vw,36px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
+.section-head>p:last-child{margin:0 0 3px auto;font:10px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.series{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.series .plate{aspect-ratio:3/4}
+.series .plate-foot b{font-size:13px}
+.series .plate-foot span{font-size:8px}
+.notes{padding-bottom:62px}
+.note-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;border-top:1px solid var(--line);padding-top:22px}
+.note-grid article{padding-right:10px}
+.note-grid span{display:block;margin-bottom:10px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
+.note-grid h3{margin:0 0 7px;font-size:13.5px;letter-spacing:-.01em;font-weight:600}
+.note-grid p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+footer{max-width:1180px;margin:0 auto;padding:0 22px 30px}
+.foot{display:flex;gap:18px;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--line);
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.foot span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);
+  pointer-events:none;z-index:10;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;padding-bottom:44px}
+  .hero .plate{justify-self:stretch;max-width:none}
+  .nav-links{display:none}
+  .series{grid-template-columns:1fr 1fr}
+  .note-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stat:nth-child(3){border-left:0;padding-left:0}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:14px}
+  .brand span{display:none}
+  .book{padding:6px 11px;font-size:10.5px}
+  .hero{padding:28px 16px 38px}
+  h1{font-size:clamp(38px,11vw,52px)}
+  .lede{font-size:12.5px;margin-top:18px}
+  .meta{gap:10px 16px;font-size:9.5px}
+  .note{display:none}
+  .hero .plate{aspect-ratio:1/1.06}
+  .archive,.notes,footer{padding-left:16px;padding-right:16px}
+  .series{grid-template-columns:1fr}
+  .series .plate{aspect-ratio:4/3}
+  .plate-foot span{display:none}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:44px;padding:0 16px;gap:16px}
+  .nav-links{display:none}
+  .brand span{display:none}
+  .book{padding:5px 11px;font-size:10px}
+  .hero{min-height:calc(100vh - 44px);padding:14px 20px;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:24px;align-items:center;max-width:760px}
+  .kicker{margin-bottom:10px;font-size:8.5px}
+  h1{font-size:clamp(30px,5.4vw,42px)}
+  .lede{margin-top:12px;font-size:10.5px;line-height:1.7;max-width:26em}
+  .meta{margin-top:12px;padding:8px 0;gap:12px;font-size:8.5px}
+  .note{display:none}
+  .hero .plate{aspect-ratio:4/3.2;max-height:330px}
+  .plate-foot b{font-size:12px}
+  .stats,.archive,.notes,footer{display:none}
+  .hint{left:12px;bottom:10px;font-size:10px}
+}
+@media (hover:none){
+  .color{--x:50%;--y:50%;--r:220%;transition:none}
+  .plate{cursor:default}
+}
+@media (prefers-reduced-motion:reduce){
+  .color{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <div class="head"><p class="kicker">LAYOUT / 01</p><h1>灰片下面压着一张彩色底片。</h1></div>
-    <div class="grid">
-      <figure class="tile c1" style="margin:0"><div class="layer base"></div><div class="layer color"></div><div class="layer grain"></div><div class="no">01</div><figcaption class="cap"><b>熔岩</b><span>2026</span></figcaption></figure>
-      <figure class="tile c2" style="margin:0"><div class="layer base"></div><div class="layer color"></div><div class="layer grain"></div><div class="no">02</div><figcaption class="cap"><b>深水</b><span>2026</span></figcaption></figure>
-      <figure class="tile c3" style="margin:0"><div class="layer base"></div><div class="layer color"></div><div class="layer grain"></div><div class="no">03</div><figcaption class="cap"><b>琥珀</b><span>2025</span></figcaption></figure>
-      <figure class="tile c4" style="margin:0"><div class="layer base"></div><div class="layer color"></div><div class="layer grain"></div><div class="no">04</div><figcaption class="cap"><b>苔原</b><span>2025</span></figcaption></figure>
+
+<header class="nav">
+  <a class="brand" href="#top">DAYLIGHT<span>影像档案馆</span></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a class="on" href="#archive">馆藏</a>
+    <a href="#archive">显影室</a>
+    <a href="#notes">关于</a>
+  </nav>
+  <a class="book" href="#archive">预约看片 ↗</a>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">ARCHIVE 04 · 灰阶与彩色</p>
+      <h1>灰片之下，<br><em>另一张照片。</em></h1>
+      <p class="lede">同一次曝光，冲印成两张：一张收着颜色，一张留着光。把光标放上去，圆孔会替你把底下的那张找出来。</p>
+      <div class="meta">
+        <span><b>4 组</b> 底片</span>
+        <span><b>2025 — 2026</b></span>
+        <span><b>银盐</b> 转数字</span>
+        <span><b>96 px</b> 显影孔</span>
+      </div>
+      <p class="note">彩色层用 <b>clip-path: circle()</b> 盖在灰片上，圆心跟着指针走；没人碰的时候，它会自己慢慢巡游，像暗房里晃动的安全灯。</p>
     </div>
+    <figure class="plate" role="img" aria-label="熔岩，2026 年拍摄的彩色底片，悬停可显影" style="--c1:#f7d19a;--c2:#e0663c;--c3:#8e2b1c">
+      <div class="layer base" aria-hidden="true"></div>
+      <div class="layer color" aria-hidden="true"></div>
+      <div class="layer grain" aria-hidden="true"></div>
+      <span class="rim" aria-hidden="true"></span>
+      <span class="no">PLATE 04 / 01</span>
+      <span class="scale">DESATURATE → COLOR</span>
+      <div class="plate-foot">
+        <div><b>熔岩</b><small>冰岛 · 2026 春</small></div>
+        <span>120 FILM<br>COLOR / GRAY</span>
+      </div>
+    </figure>
+  </section>
+
+  <div class="stats" aria-label="馆藏数据">
+    <div class="stat"><b>04</b><span>本季显影组</span></div>
+    <div class="stat"><b>96px</b><span>显影孔半径</span></div>
+    <div class="stat"><b>2</b><span>灰阶与彩色版本</span></div>
+    <div class="stat"><b>1.4s</b><span>松开后开始巡游</span></div>
   </div>
+
+  <section class="archive" id="archive">
+    <div class="section-head">
+      <p class="kicker" style="margin:0">SAME NEGATIVE · FOUR PRINTS</p>
+      <h2>同一次曝光，四种显影。</h2>
+      <p>2025 — 2026 · 银盐 / 数字</p>
+    </div>
+    <div class="series">
+      <figure class="plate" role="img" aria-label="深水，2026 年拍摄的彩色底片，悬停可显影" style="--c1:#b8e6f2;--c2:#3f7f9e;--c3:#1b3b56">
+        <div class="layer base" aria-hidden="true"></div>
+        <div class="layer color" aria-hidden="true"></div>
+        <div class="layer grain" aria-hidden="true"></div>
+        <span class="rim" aria-hidden="true"></span>
+        <span class="no">02</span>
+        <span class="scale">COLOR</span>
+        <div class="plate-foot"><div><b>深水</b><small>青岛 · 2026</small></div><span>120 FILM</span></div>
+      </figure>
+      <figure class="plate" role="img" aria-label="琥珀，2025 年拍摄的彩色底片，悬停可显影" style="--c1:#f2e6a8;--c2:#c79a3a;--c3:#6d4d16">
+        <div class="layer base" aria-hidden="true"></div>
+        <div class="layer color" aria-hidden="true"></div>
+        <div class="layer grain" aria-hidden="true"></div>
+        <span class="rim" aria-hidden="true"></span>
+        <span class="no">03</span>
+        <span class="scale">COLOR</span>
+        <div class="plate-foot"><div><b>琥珀</b><small>泉州 · 2025</small></div><span>120 FILM</span></div>
+      </figure>
+      <figure class="plate" role="img" aria-label="苔原，2025 年拍摄的彩色底片，悬停可显影" style="--c1:#cdf0b6;--c2:#5f9b52;--c3:#234a22">
+        <div class="layer base" aria-hidden="true"></div>
+        <div class="layer color" aria-hidden="true"></div>
+        <div class="layer grain" aria-hidden="true"></div>
+        <span class="rim" aria-hidden="true"></span>
+        <span class="no">04</span>
+        <span class="scale">COLOR</span>
+        <div class="plate-foot"><div><b>苔原</b><small>祁连 · 2025</small></div><span>120 FILM</span></div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="notes" id="notes">
+    <div class="section-head">
+      <p class="kicker" style="margin:0">DARKROOM NOTES</p>
+      <h2>为什么是圆，不是方。</h2>
+    </div>
+    <div class="note-grid">
+      <article><span>01 / 对齐</span><h3>两层共用同一组颜色</h3><p>灰片不是另一张图，只是同一层渐变加了 grayscale。圆孔怎么移动，边缘都对得上。</p></article>
+      <article><span>02 / 尺寸</span><h3>96px 刚好露出一种颜色</h3><p>太小像放大镜，太大整张都亮了。进入时半径从 0 涨到 96px，离开再收回去。</p></article>
+      <article><span>03 / 静止</span><h3>没人看的时候也要活着</h3><p>闲置巡游只改 CSS 变量，颗粒层压在两张图之上，两种状态共用同一种质感。</p></article>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot">
+      <span>DAYLIGHT ARCHIVE · 上海</span>
+      <span>安福路 62 号 · 周二至周日</span>
+      <span>© 2026</span>
+      <span>冲印 / 扫描 / 展览</span>
+    </div>
+  </footer>
 </main>
-<p class="hint">在图上移动光标，圆孔会跟着走</p>
+
+<p class="hint">把光标移到照片上，彩色会从圆孔里显出来</p>
 <script>
 (function () {
-  var tiles = [].slice.call(document.querySelectorAll('.tile'));
+  var plates = [].slice.call(document.querySelectorAll('.plate'));
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var R = 96;
+  var noHover = matchMedia('(hover:none)').matches;
+  var R = 96, t = 0, raf = null, running = true;
 
-  tiles.forEach(function (tile, idx) {
-    var color = tile.querySelector('.color');
-    var idle = null, idleTimer = null, touched = false;
+  var items = plates.map(function (plate, i) {
+    return {
+      plate: plate,
+      color: plate.querySelector('.color'),
+      phase: i * 1.7,
+      touched: false,
+      timer: null
+    };
+  });
 
-    function move(e) {
-      var r = tile.getBoundingClientRect();
-      color.style.setProperty('--x', (e.clientX - r.left).toFixed(0) + 'px');
-      color.style.setProperty('--y', (e.clientY - r.top).toFixed(0) + 'px');
-    }
+  function put(o, x, y, r) {
+    o.color.style.setProperty('--x', x + 'px');
+    o.color.style.setProperty('--y', y + 'px');
+    o.color.style.setProperty('--r', r + 'px');
+  }
 
-    // 没人操作时自己慢慢走一圈，预览里也能看见彩色底片
-    function roam() {
-      if (touched || reduce) return;
-      var t = idx * 1.7;
-      function frame() {
-        if (touched) return;
-        var r = tile.getBoundingClientRect();
-        t += .011;
-        color.style.setProperty('--x', (r.width * (.5 + .3 * Math.cos(t))).toFixed(0) + 'px');
-        color.style.setProperty('--y', (r.height * (.5 + .3 * Math.sin(t * 1.13))).toFixed(0) + 'px');
-        color.style.setProperty('--r', (76 + 16 * Math.sin(t * 1.9)) + 'px');
-        idle = requestAnimationFrame(frame);
-      }
-      cancelAnimationFrame(idle);
-      idle = requestAnimationFrame(frame);
-    }
-
-    tile.addEventListener('pointermove', move);
-    tile.addEventListener('pointerenter', function (e) {
-      touched = true;
-      cancelAnimationFrame(idle);
-      clearTimeout(idleTimer);
-      move(e);
-      color.style.setProperty('--r', R + 'px');
+  function roam() {
+    if (!running || reduce) return;
+    t += .012;
+    items.forEach(function (o) {
+      if (o.touched) return;
+      var w = o.plate.clientWidth, h = o.plate.clientHeight;
+      var x = w * (.5 + .3 * Math.cos(t + o.phase));
+      var y = h * (.5 + .28 * Math.sin((t + o.phase) * 1.13));
+      var r = 74 + 16 * Math.sin((t + o.phase) * 1.9);
+      put(o, Math.round(x), Math.round(y), Math.round(r));
     });
-    tile.addEventListener('pointerleave', function () {
-      color.style.setProperty('--r', '0px');
-      idleTimer = setTimeout(function () {
-        touched = false;
-        roam();
-      }, 1400);
-    });
+    raf = requestAnimationFrame(roam);
+  }
 
+  if (noHover) {
     if (reduce) {
-      color.style.setProperty('--x', '50%');
-      color.style.setProperty('--y', '50%');
-      color.style.setProperty('--r', '84px');
-    } else {
-      idleTimer = setTimeout(roam, 400 + idx * 260);
+      items.forEach(function (o) {
+        o.color.style.setProperty('--x', '50%');
+        o.color.style.setProperty('--y', '50%');
+        o.color.style.setProperty('--r', '160px');
+      });
     }
+    return;
+  }
+
+  items.forEach(function (o) {
+    function move(e) {
+      var r = o.plate.getBoundingClientRect();
+      put(o, Math.round(e.clientX - r.left), Math.round(e.clientY - r.top), R);
+    }
+    o.plate.addEventListener('pointerenter', function (e) {
+      if (reduce) return;
+      o.touched = true;
+      clearTimeout(o.timer);
+      move(e);
+    });
+    o.plate.addEventListener('pointermove', function (e) {
+      if (reduce) return;
+      move(e);
+    });
+    o.plate.addEventListener('pointerleave', function () {
+      if (reduce) return;
+      o.color.style.setProperty('--r', '0px');
+      clearTimeout(o.timer);
+      o.timer = setTimeout(function () { o.touched = false; }, 1400);
+    });
+    if (reduce) {
+      o.color.style.setProperty('--x', '50%');
+      o.color.style.setProperty('--y', '50%');
+      o.color.style.setProperty('--r', '84px');
+    }
+  });
+
+  if (!reduce) {
+    raf = requestAnimationFrame(roam);
+    document.addEventListener('visibilitychange', function () {
+      running = !document.hidden;
+      if (running && !raf) raf = requestAnimationFrame(roam);
+      else if (!running) { cancelAnimationFrame(raf); raf = null; }
+    });
+  }
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

@@ -3,67 +3,259 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>点击涟漪 · UI Atlas 动效</title>
+<title>点击涟漪 · NOCTURNE 夜航放映 · UI Atlas</title>
 <style>
-:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e2dfd5;--accent:#2f5fd0}
+:root{--bg:#0d0f14;--paper:#151922;--ink:#f3f0e9;--muted:#8d92a3;--line:rgba(255,255,255,.11);--accent:#e3b264;--accent-ink:#231a0c}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
-.stage{min-height:100vh;display:grid;place-items:center;padding:38px 22px 74px}
-.wrap{width:100%;max-width:480px}
-.kicker{margin:0 0 14px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-h1{margin:0 0 26px;font-size:clamp(25px,6vw,38px);line-height:1.12;letter-spacing:-.035em;font-weight:640}
-h1 em{font-style:normal;color:var(--accent)}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.btn{position:relative;overflow:hidden;isolation:isolate;height:48px;padding:0 22px;border-radius:11px;border:1px solid var(--accent);
-  background:var(--accent);color:#fff;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-.btn.ghost{background:#fff;color:var(--ink);border-color:#d6d2c6}
-.btn:active{transform:translateY(1px)}
-.rp{position:absolute;border-radius:50%;transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:-1;
-  background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,0) 70%);animation:rp .62s cubic-bezier(.2,.6,.2,1) forwards}
-.ghost .rp{background:radial-gradient(circle,rgba(47,95,208,.3),rgba(47,95,208,0) 70%)}
-@keyframes rp{to{transform:translate(-50%,-50%) scale(1);opacity:0}}
-.note{margin:22px 0 0;font-size:12.5px;line-height:1.85;color:var(--muted);max-width:30em}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none}
+body{background:radial-gradient(90% 70% at 50% -10%,#1a1f2b,#0a0c10 72%);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.page{min-height:100svh;display:flex;flex-direction:column}
+.top{position:sticky;top:0;z-index:20;flex:0 0 auto;height:56px;display:flex;align-items:center;gap:22px;padding:0 clamp(18px,3.4vw,42px);border-bottom:1px solid var(--line);background:rgba(13,15,20,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:750;font-size:12px;letter-spacing:.22em}
+.brand .mark{width:27px;height:27px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:700 12px/1 Georgia,serif}
+.brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.top nav{display:flex;gap:20px;font-size:11.5px;color:var(--muted)}
+.top nav a:hover{color:var(--ink)}
+.top .venue{margin-left:auto;font:600 8.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);text-align:right}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.2);border-radius:999px;padding:4px 9px;white-space:nowrap}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.rp{display:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.stage{flex:1;width:100%;max-width:1160px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 408px;gap:clamp(30px,5vw,80px);align-items:center;padding:clamp(26px,5vh,58px) clamp(20px,4vw,46px) clamp(24px,4vh,44px)}
+.kicker{margin:0 0 16px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+h1{margin:0;font-size:clamp(36px,4.7vw,58px);line-height:1.06;letter-spacing:-.045em;font-weight:640}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:18px 0 0;max-width:27em;font-size:13px;line-height:1.95;color:#b9bcc8}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.meta span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.btn{position:relative;overflow:hidden;isolation:isolate;height:48px;padding:0 24px;border-radius:11px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:inherit;font-size:13.5px;font-weight:650;letter-spacing:.02em;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:transform .15s,background .2s,border-color .2s}
+.btn:hover{background:#eec07a}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:rgba(255,255,255,.22)}
+.btn.ghost:hover{background:rgba(255,255,255,.05)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.btn .price{margin-left:4px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;opacity:.7}
+.rp{position:absolute;border-radius:50%;transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:-1;background:radial-gradient(circle,rgba(255,255,255,.62),rgba(255,255,255,0) 70%);animation:rp .62s cubic-bezier(.2,.6,.2,1) forwards}
+.ghost .rp{background:radial-gradient(circle,rgba(227,178,100,.36),rgba(227,178,100,0) 70%)}
+@keyframes rp{to{transform:translate(-50%,-50%) scale(1);opacity:0}}
+.feedback{min-height:1.7em;margin:12px 0 0;font-size:11.5px;color:var(--accent);letter-spacing:.02em}
+.note{margin:16px 0 0;font-size:11px;line-height:1.8;color:var(--muted);max-width:32em;border-top:1px solid var(--line);padding-top:12px}
+.poster{border:1px solid var(--line);border-radius:16px;background:var(--paper);padding:14px;box-shadow:0 50px 90px -70px rgba(0,0,0,.9)}
+.art{position:relative;height:238px;border-radius:10px;overflow:hidden;background:radial-gradient(120% 90% at 72% 18%,#e8bb72 0%,#b0713c 32%,#4c3430 62%,#191c25 100%)}
+.art::before{content:"";position:absolute;left:18%;right:18%;bottom:0;height:46%;background:linear-gradient(to top,rgba(9,11,16,.92),rgba(9,11,16,0));}
+.art .sun{position:absolute;left:50%;top:30%;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle,#fff4d8,#f0c377 60%,rgba(240,195,119,0) 72%);transform:translate(-50%,-50%);filter:blur(.4px)}
+.art .title{position:absolute;left:18px;bottom:16px;z-index:1;font:italic 400 25px/1.05 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+.art .title small{display:block;margin-top:5px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;font-style:normal;color:rgba(243,240,233,.66)}
+.art .no{position:absolute;right:16px;top:14px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(243,240,233,.6)}
+.times{display:grid;gap:6px;margin-top:12px}
+.time{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 11px;border:1px solid transparent;border-radius:9px;background:rgba(255,255,255,.03);font-size:11.5px;color:#c6c9d3}
+.time b{font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.05em;color:var(--ink)}
+.time small{color:var(--muted);font-size:10.5px}
+.time .tag{font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;border:1px solid rgba(227,178,100,.34);color:var(--accent);border-radius:999px;padding:4px 7px}
+.time.now{border-color:rgba(227,178,100,.34);background:rgba(227,178,100,.07)}
+.caption{margin:10px 2px 0;font:500 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:10px}
+.lower{flex:0 0 auto;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,4vw,48px);padding:18px clamp(20px,4vw,46px);max-width:1160px;margin:0 auto;width:100%}
+.film{display:flex;gap:12px;align-items:baseline}
+.film .yr{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);flex:0 0 auto}
+.film b{display:block;font-size:12px;font-weight:600}
+.film span{display:block;margin-top:2px;font-size:10.5px;color:var(--muted)}
+.foot{flex:0 0 auto;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px clamp(20px,4vw,46px);border-top:1px solid var(--line);font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr;gap:24px;padding-top:24px}
+  .poster{max-width:440px}
+  .lower{grid-template-columns:1fr;gap:10px}
+  .film:nth-child(n+3){display:none}
+  .top nav{display:none}
+}
+@media (max-width:560px){
+  .top{height:50px;padding:0 14px;gap:12px}
+  .hint,.venue{display:none}
+  .stage{padding:20px 16px 26px;gap:22px}
+  h1{font-size:34px}
+  .lede{font-size:12.5px;line-height:1.85}
+  .meta{margin-top:16px}
+  .row{margin-top:20px}
+  .btn{height:46px;padding:0 18px;font-size:13px}
+  .poster{padding:11px;border-radius:14px}
+  .art{height:200px}
+  .lower,.foot{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .top{height:42px;padding:0 16px;gap:14px}
+  .top nav,.top .venue{display:none}
+  .hint{left:auto;right:16px;top:50%;transform:translateY(-50%);font-size:9.5px;padding:3px 8px}
+  .stage{grid-template-columns:minmax(0,1fr) 300px;gap:26px;align-items:center;padding:14px 18px 12px;max-width:600px}
+  .kicker{margin-bottom:8px;font-size:8.5px}
+  h1{font-size:30px}
+  .lede,.meta,.note{display:none}
+  .row{margin-top:16px;gap:8px}
+  .btn{height:38px;padding:0 15px;font-size:12px;border-radius:9px}
+  .btn .price{display:none}
+  .feedback{margin-top:8px;font-size:10px;min-height:1.4em}
+  .poster{padding:10px;border-radius:13px}
+  .art{height:150px}
+  .art .title{font-size:19px;left:14px;bottom:12px}
+  .times{gap:4px;margin-top:8px}
+  .time{padding:6px 9px;font-size:10px;grid-template-columns:48px minmax(0,1fr) auto}
+  .time b{font-size:10px}
+  .time small{font-size:9.5px}
+  .caption{margin-top:7px;font-size:7px}
+  .lower,.foot{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .rp{display:none}
+  .btn{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">FEEDBACK / 01</p>
-    <h1>点在哪儿，<br><em>波纹就从哪儿起。</em></h1>
-    <div class="row">
-      <button class="btn" type="button">确认发布</button>
-      <button class="btn ghost" type="button">取消</button>
-    </div>
-    <p class="note">波纹直径取按钮对角线，保证任何角落点击都能铺满；600ms 后自动移除节点，连点也不会堆 DOM。</p>
-  </div>
-</main>
-<p class="hint">点按钮的不同位置试试</p>
+<div class="page">
+  <header class="top">
+    <a class="brand" href="#stage"><span class="mark">N</span>NOCTURNE<small>夜航放映</small></a>
+    <nav aria-label="主导航"><a href="#stage">本周排片</a><a href="#stage">修复单元</a><a href="#stage">会员</a></nav>
+    <p class="hint">点按钮的不同位置试试</p>
+    <span class="venue">上海 · 静安区西康路 1095 号<br>二号厅 · 88 座</span>
+  </header>
+
+  <main class="stage" id="stage">
+    <section>
+      <p class="kicker">WINTER RESTORATION / 修复单元 07</p>
+      <h1>今晚十点，<br><em>看一部旧片。</em></h1>
+      <p class="lede">《雾港》4K 修复版，只在二号厅放三场。胶片颗粒没有抹掉，声音重新从 35mm 母带转了一遍——我们想让你听见海风里的杂音。</p>
+      <div class="meta"><span>4K 修复</span><span>118 分钟</span><span>中文字幕</span><span>映后谈 15 分钟</span></div>
+      <div class="row">
+        <button class="btn" id="buy" type="button">购票<span class="price">¥ 60</span></button>
+        <button class="btn ghost" id="save" type="button" aria-pressed="false">加入片单</button>
+      </div>
+      <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+      <p class="note">涟漪从指针落点起，直径取按钮对角线，四角也能铺满；620ms 后节点自动移除，连点不会堆 DOM。</p>
+    </section>
+
+    <aside class="poster" aria-label="影片与场次">
+      <div class="art">
+        <span class="no">NOCTURNE · 07</span>
+        <span class="sun" aria-hidden="true"></span>
+        <div class="title">雾港<small>THE FOG HARBOUR · 1978</small></div>
+      </div>
+      <div class="times" role="group" aria-label="场次">
+        <div class="time"><b>18:30</b><small>一号厅 · 已满</small><span class="tag">售罄</span></div>
+        <div class="time now"><b>22:00</b><small>二号厅 · 余 12 座</small><span class="tag">推荐</span></div>
+        <div class="time"><b>00:20</b><small>二号厅 · 余 31 座</small><span class="tag">午夜</span></div>
+      </div>
+      <p class="caption"><span>SCREENING 07 · 11.12</span><span>现场取票 · 提前 20 分钟</span></p>
+    </aside>
+  </main>
+
+  <section class="lower" aria-label="接下来的排片">
+    <div class="film"><span class="yr">11.13</span><div><b>《夜航西飞》</b><span>修复版 · 21:00</span></div></div>
+    <div class="film"><span class="yr">11.14</span><div><b>《站台》</b><span>导演剪辑 · 19:30</span></div></div>
+    <div class="film"><span class="yr">11.15</span><div><b>《海边的电影院》</b><span>露天场 · 19:00</span></div></div>
+  </section>
+
+  <footer class="foot">
+    <span>NOCTURNE 夜航放映 · 独立影院</span>
+    <span>周二休映 · 学生票 ¥ 45</span>
+    <span>本页为零依赖单文件演示</span>
+  </footer>
+</div>
 <script>
 (function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var feedback = document.getElementById('feedback');
+  var save = document.getElementById('save');
+
+  function ripple(btn, x, y) {
+    if (reduce) return;
+    var r = btn.getBoundingClientRect();
+    var d = Math.hypot(r.width, r.height) * 2;
+    var s = document.createElement('span');
+    s.className = 'rp';
+    s.style.width = s.style.height = d + 'px';
+    s.style.left = x + 'px';
+    s.style.top = y + 'px';
+    btn.appendChild(s);
+    s.addEventListener('animationend', function () { s.remove(); });
+    setTimeout(function () { if (s.parentNode) s.remove(); }, 900);
+  }
+
   [].forEach.call(document.querySelectorAll('.btn'), function (btn) {
     btn.addEventListener('pointerdown', function (e) {
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       var r = btn.getBoundingClientRect();
-      var d = Math.hypot(r.width, r.height) * 2;
-      var x = e.clientX ? e.clientX - r.left : r.width / 2;
-      var y = e.clientY ? e.clientY - r.top : r.height / 2;
-      var s = document.createElement('span');
-      s.className = 'rp';
-      s.style.width = s.style.height = d + 'px';
-      s.style.left = x + 'px';
-      s.style.top = y + 'px';
-      btn.appendChild(s);
-      s.addEventListener('animationend', function () { s.remove(); });
-      setTimeout(function () { if (s.parentNode) s.remove(); }, 900);
+      ripple(btn, e.clientX ? e.clientX - r.left : r.width / 2, e.clientY ? e.clientY - r.top : r.height / 2);
     });
+    btn.addEventListener('click', function (e) {
+      if (e.detail === 0) {
+        var r = btn.getBoundingClientRect();
+        ripple(btn, r.width / 2, r.height / 2);
+      }
+    });
+  });
+
+  document.getElementById('buy').addEventListener('click', function () {
+    feedback.textContent = '已锁定 22:00 场 · 到店凭手机号取票';
+  });
+
+  save.addEventListener('click', function () {
+    var on = save.getAttribute('aria-pressed') !== 'true';
+    save.setAttribute('aria-pressed', on ? 'true' : 'false');
+    save.textContent = on ? '已加入片单' : '加入片单';
+    feedback.textContent = on ? '《雾港》已加入片单' : '已从片单移除';
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

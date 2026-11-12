@@ -3,112 +3,319 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>拖拽底部抽屉 · UI Atlas 动效</title>
+<title>拖拽底部抽屉 · KIOSK 咖啡烘焙 · UI Atlas</title>
 <style>
-:root{--bg:#f6f5f1;--ink:#111216;--muted:#7b7e85;--line:#e3e0d7;--accent:#2f5fd0}
+:root{--bg:#efe9dc;--paper:#faf6ed;--ink:#221a12;--muted:#7d7263;--line:#ddd2bf;--accent:#8a5a35;--green:#4f5f45}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
-.stage{min-height:100vh;display:grid;place-items:center;padding:34px 20px 70px}
-.wrap{width:100%;max-width:400px}
-.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
-h1{margin:0 0 18px;font-size:clamp(23px,5.4vw,33px);line-height:1.14;letter-spacing:-.03em;font-weight:640}
-.card{background:#fff;border:1px solid var(--line);border-radius:15px;overflow:hidden}
-.cover{height:150px;background:radial-gradient(circle at 28% 22%,#f0d9b8,transparent 55%),linear-gradient(135deg,#c9a06a,#4f5f4a)}
-.card .body{padding:14px 15px 16px}
-.card .body b{font-size:14px}
-.card .body p{margin:4px 0 12px;font-size:12px;color:var(--muted)}
-.btn{height:42px;width:100%;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#fff;
-  font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
-.backdrop{position:fixed;inset:0;background:rgba(15,16,20,.42);opacity:0;pointer-events:none;transition:opacity .3s;z-index:8}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+.page{min-height:100svh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;flex:0 0 auto;height:54px;display:flex;align-items:center;gap:14px;padding:0 clamp(16px,3vw,36px);border-bottom:1px solid var(--line);background:rgba(250,246,237,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.logo{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:700 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em}
+.brand b{font-size:12px;font-weight:750;letter-spacing:.2em}
+.brand span{font-size:9px;letter-spacing:.1em;color:var(--muted)}
+.crumb{display:flex;align-items:center;gap:8px;padding-left:13px;border-left:1px solid var(--line);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.crumb em{font-style:normal;color:var(--ink)}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:4px 9px;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex:0 0 auto}
+.cart{display:flex;align-items:center;gap:6px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 10px}
+.cart b{display:grid;place-items:center;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--accent);color:#fff8ee;font-size:8.5px}
+.product{flex:1;width:100%;max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(26px,5vw,70px);padding:clamp(24px,4vw,52px) clamp(18px,4vw,44px) 30px;align-items:start}
+.visual{position:sticky;top:84px}
+.bag{position:relative;aspect-ratio:4/4.5;max-height:540px;margin:0;border-radius:18px;overflow:hidden;display:grid;place-items:center;
+  background:radial-gradient(ellipse 70% 55% at 70% 18%,#d9c39e,transparent 60%),linear-gradient(158deg,#b6c0ac,#6f7d68 52%,#4a5545);
+  box-shadow:0 40px 80px -58px rgba(40,35,22,.65)}
+.bag::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 8px);mix-blend-mode:soft-light}
+.pack{position:relative;width:54%;height:62%;border-radius:7px 7px 4px 4px;background:linear-gradient(180deg,#f7f0e2,#e8dcc7);box-shadow:0 26px 50px -28px rgba(20,20,15,.7);transform:rotate(-2.5deg)}
+.pack::before{content:"";position:absolute;left:5%;right:5%;top:-4px;height:9px;border-radius:4px;background:repeating-linear-gradient(90deg,#d8cab2 0 3px,#efe5d3 3px 7px)}
+.pack::after{content:"";position:absolute;left:8%;right:8%;bottom:7%;height:1px;background:#d3c3aa}
+.label{position:absolute;left:9%;right:9%;top:17%;bottom:24%;border:1px solid #cdbda2;border-radius:3px;padding:9% 8%;display:flex;flex-direction:column;background:#fbf7ee}
+.label-k{font:600 5.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:#8b7c66}
+.label b{font:600 clamp(22px,2.4vw,34px)/1.1 "Songti SC",Georgia,serif;letter-spacing:.08em;margin:5px 0 2px;color:#2c2418}
+.label-sub{font:600 5.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:#8b7c66}
+.label-line{height:1px;background:#d8c8ad;margin:8px 0 6px}
+.label-meta{font:500 5.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:#8b7c66}
+.stamp{position:absolute;right:14px;top:14px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.36);border-radius:999px;padding:5px 8px}
+.batch{display:flex;align-items:center;gap:7px;margin-top:10px;padding:0 2px;font:500 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);flex-wrap:wrap}
+.batch i{font-style:normal;display:flex;gap:4px;align-items:center}
+.batch i::before{content:"";width:7px;height:7px;border-radius:50%;background:#c8a87e;box-shadow:0 0 0 2px rgba(200,168,126,.22)}
+.batch i:nth-child(2)::before{background:#a67c52;box-shadow:none}
+.batch i:nth-child(3)::before{background:#6d4a32;box-shadow:none}
+.batch .on{color:var(--ink);font-weight:700}
+.caption{margin:11px 0 0;font:500 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);display:flex;justify-content:space-between;gap:12px}
+.info{padding-top:2px}
+.kicker{margin:0 0 12px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+.info h1{margin:0 0 5px;font-size:clamp(34px,4.6vw,56px);line-height:1.03;letter-spacing:-.05em;font-weight:640}
+.origin{margin:0 0 16px;font:500 9.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.price{margin:0 0 16px;font-size:15px;display:flex;align-items:baseline;gap:7px}
+.price b{font:600 34px/1 "Songti SC",Georgia,serif;letter-spacing:-.03em}
+.price span{font:500 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.desc{margin:0 0 16px;font-size:13.5px;line-height:1.9;color:#4f4638;max-width:32em}
+.flavors{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 20px}
+.flavors span{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--accent);border:1px solid #cdbba1;border-radius:999px;padding:6px 10px;background:rgba(250,246,237,.6)}
+.add{width:100%;max-width:330px;height:44px;border-radius:11px;border:1px solid var(--accent);background:var(--accent);color:#fdf8ef;font:600 13.5px/1 inherit;letter-spacing:.02em;cursor:pointer;transition:background .2s,transform .2s}
+.add:hover{background:#76492a;transform:translateY(-1px)}
+.add:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.added{min-height:18px;margin:8px 0 14px;font:600 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--green)}
+.specs{border-top:1px solid var(--line);margin:0}
+.specs div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--line)}
+.specs dt{font:500 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.specs dd{margin:0;font-size:11.5px;font-weight:600}
+.story{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,3vw,34px);margin-top:8px;padding-top:24px;border-top:1px solid var(--line)}
+.story article{padding-right:4px}
+.sk{margin:0 0 8px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
+.story h3{margin:0 0 7px;font-size:15px;letter-spacing:-.02em}
+.story p{margin:0;font-size:11.5px;line-height:1.9;color:#5a5143}
+.foot{flex:0 0 auto;border-top:1px solid var(--line);padding:12px clamp(18px,4vw,44px);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.backdrop{position:fixed;inset:0;background:rgba(20,16,11,.44);opacity:0;pointer-events:none;transition:opacity .3s;z-index:55}
 .backdrop.on{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:9;background:#fff;border-radius:20px 20px 0 0;padding:8px 20px calc(20px + env(safe-area-inset-bottom));
-  transform:translateY(102%);transition:transform .44s cubic-bezier(.2,.8,.2,1);box-shadow:0 -18px 50px rgba(20,20,15,.22);
-  max-width:520px;margin:0 auto;touch-action:none}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--paper);border-radius:20px 20px 0 0;padding:8px 22px calc(20px + env(safe-area-inset-bottom));box-shadow:0 -18px 50px rgba(20,16,10,.28);max-width:520px;margin:0 auto;
+  transform:translateY(102%);transition:transform .44s cubic-bezier(.2,.8,.2,1);max-height:calc(100svh - 20px);overflow:auto}
 .sheet.on{transform:none}
 .sheet.drag{transition:none}
-.grab{width:100%;padding:6px 0 12px;cursor:grab;touch-action:none;display:grid;place-items:center}
-.grab i{display:block;width:38px;height:4px;border-radius:2px;background:#d8d4c9}
-.sheet h2{margin:0 0 4px;font-size:17px;letter-spacing:-.02em}
-.sheet p{margin:0 0 14px;font-size:12px;color:var(--muted)}
-.sizes{display:flex;gap:8px;margin-bottom:16px}
-.size{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 0;font:inherit;font-size:12.5px;cursor:pointer}
-.size[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:#fff}
-.sheet .row{display:flex;gap:8px}
-.sheet .row .btn{flex:1}
-.sheet .btn.quiet{background:#fff;color:var(--ink);border-color:var(--line)}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:10}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){.sheet,.backdrop{transition:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.grab{width:100%;padding:5px 0 10px;cursor:grab;touch-action:none;display:grid;place-items:center;border:0;background:transparent}
+.grab:active{cursor:grabbing}
+.grab i{display:block;width:38px;height:4px;border-radius:2px;background:#d3c6b2}
+.sheet h2{margin:0 0 3px;font-size:18px;letter-spacing:-.02em}
+.sheet > p{margin:0 0 14px;font-size:11.5px;color:var(--muted)}
+.sheet .x{position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:#fffaf1;cursor:pointer;display:grid;place-items:center;font:16px/1 system-ui;color:var(--muted)}
+.sheet .x:hover{border-color:var(--accent);color:var(--accent)}
+.group{margin:0 0 13px}
+.glabel{display:block;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.15em;color:var(--muted);margin-bottom:6px}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.opt{border:1px solid var(--line);background:#fffaf1;border-radius:9px;padding:9px 4px;font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:background .18s,border-color .18s,color .18s}
+.opt small{display:block;margin-top:2px;font:500 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted)}
+.opt[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.opt[aria-pressed="true"] small{color:rgba(250,246,237,.65)}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:8px;margin-top:4px}
+.btn{flex:1;height:42px;border-radius:10px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);font-size:12.5px;font-weight:600;cursor:pointer}
+.btn.quiet{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:900px){
+  .product{grid-template-columns:1fr;gap:20px}
+  .visual{position:static}
+  .bag{aspect-ratio:16/9;max-height:340px}
+  .pack{width:32%;height:74%}
+  .story{grid-template-columns:1fr}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:42px;padding:0 16px;gap:10px}
+  .brand span,.crumb{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .product{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;padding:12px 18px 8px}
+  .visual{position:static}
+  .bag{aspect-ratio:4/3.6;max-height:calc(100svh - 128px)}
+  .pack{width:56%;height:64%}
+  .label b{font-size:20px}
+  .batch{display:none}
+  .caption{font-size:7px;margin-top:7px}
+  .kicker{font-size:7.5px;margin-bottom:7px}
+  .info h1{font-size:27px}
+  .origin{font-size:8px;margin-bottom:8px}
+  .price{margin-bottom:8px}
+  .price b{font-size:25px}
+  .desc{font-size:10.5px;line-height:1.7;margin-bottom:9px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .flavors{margin-bottom:10px}
+  .flavors span{font-size:7.5px;padding:4px 7px}
+  .add{height:36px;font-size:11.5px;max-width:none}
+  .added{font-size:8px;margin:5px 0 7px;min-height:14px}
+  .specs div{padding:5px 0}
+  .specs dt{font-size:7px}
+  .specs dd{font-size:9.5px}
+  .story,.foot{display:none}
+  .sheet{padding:5px 18px calc(12px + env(safe-area-inset-bottom));max-height:calc(100svh - 12px)}
+  .grab{padding:3px 0 6px}
+  .sheet h2{font-size:15px}
+  .sheet > p{font-size:9.5px;margin-bottom:8px}
+  .group{margin-bottom:8px}
+  .glabel{font-size:7px;margin-bottom:4px}
+  .opt{padding:6px 3px;font-size:10px}
+  .row .btn{height:34px;font-size:11px}
+}
+@media (max-width:560px){
+  .topbar{height:48px;padding:0 13px;gap:9px}
+  .brand span,.crumb,.hint{display:none}
+  .product{grid-template-columns:1fr;gap:16px;padding:16px 16px 24px}
+  .visual{position:static}
+  .bag{aspect-ratio:16/10;max-height:240px;border-radius:14px}
+  .pack{width:38%;height:76%}
+  .label b{font-size:22px}
+  .batch{display:none}
+  .info h1{font-size:36px}
+  .desc{font-size:12.5px}
+  .add{max-width:none;height:42px}
+  .story{grid-template-columns:1fr;gap:16px;padding-top:18px}
+  .story h3{font-size:14px}
+  .story p{font-size:11px}
+  .foot{padding:10px 14px;font-size:7px}
+  .foot span:nth-child(3){display:none}
+  .sheet{max-width:none;padding:7px 18px calc(16px + env(safe-area-inset-bottom))}
+  .opt{font-size:10.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  .sheet,.backdrop,.add,.opt{transition:none}
+}
 </style>
 </head>
 <body>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">TRANSITION / 03</p>
-    <h1>抽屉可以<br>被手指推回去。</h1>
-    <div class="card">
-      <div class="cover"></div>
-      <div class="body">
-        <b>苔原笔记 · 布面精装</b>
-        <p>¥ 168 · 现货 12 本</p>
-        <button class="btn" id="open" type="button">加入清单</button>
-      </div>
+<div class="page" id="page">
+  <header class="topbar">
+    <div class="brand"><span class="logo" aria-hidden="true">K</span><b>KIOSK</b><span>咖啡烘焙</span></div>
+    <span class="crumb">咖啡豆 <em>/ 雾岭 · 水洗</em></span>
+    <p class="hint">点「加入清单」打开抽屉；往下拖手柄可以关掉</p>
+    <div class="top-right">
+      <span class="cart">清单 <b id="cartCount">0</b></span>
     </div>
-  </div>
-</main>
+  </header>
+
+  <main class="product">
+    <section class="visual" aria-label="产品图">
+      <figure class="bag">
+        <div class="pack" aria-hidden="true">
+          <div class="label">
+            <span class="label-k">KIOSK / SINGLE ORIGIN</span>
+            <b>雾岭</b>
+            <span class="label-sub">WASHED · 2026</span>
+            <span class="label-line"></span>
+            <span class="label-meta">云南保山 · 1,860 m<br>浅烘 · 柑橘 / 红糖 / 乌龙</span>
+          </div>
+        </div>
+        <span class="stamp">LOT 026</span>
+      </figure>
+      <div class="batch" aria-label="烘焙度">
+        <i class="on">浅烘</i><i>中烘</i><i>深烘</i>
+      </div>
+      <p class="caption"><span>2026 春季批次 · 水洗处理</span><span>烘焙 10.28</span></p>
+    </section>
+
+    <section class="info">
+      <p class="kicker">SINGLE ORIGIN · YUNNAN</p>
+      <h1>雾岭 · 水洗</h1>
+      <p class="origin">云南保山 · 1,860 m · 卡蒂姆 / 铁皮卡</p>
+      <p class="price">¥ <b id="priceNow">128</b> <span id="unitNow">/ 200g</span></p>
+      <p class="desc">清晨的雾从山谷里漫上来，咖啡果在下午才慢慢晒干。水洗后的豆子很干净，冲出来是柑橘的酸、红糖的甜，尾段有一点乌龙茶的涩香。</p>
+      <div class="flavors" aria-label="风味"><span>柑橘</span><span>红糖</span><span>乌龙茶</span></div>
+      <button class="add" id="openBtn" type="button">加入清单</button>
+      <p class="added" id="added" role="status" aria-live="polite"></p>
+      <dl class="specs">
+        <div><dt>产地</dt><dd>云南 · 保山</dd></div>
+        <div><dt>处理法</dt><dd>水洗</dd></div>
+        <div><dt>烘焙度</dt><dd>浅烘 · 手冲推荐</dd></div>
+      </dl>
+    </section>
+
+    <section class="story" aria-label="产地与冲煮">
+      <article><p class="sk">01 / ORIGIN</p><h3>云雾里的坡地</h3><p>庄园在海拔 1,800 米以上，早晚温差大，咖啡果熟得慢。采摘季从十一月开始，持续六周。</p></article>
+      <article><p class="sk">02 / PROCESS</p><h3>水洗后的干净</h3><p>去果皮后发酵 36 小时，再在山泉水里分级。豆子晒在架高的晒床上，每天翻动两次。</p></article>
+      <article><p class="sk">03 / BREW</p><h3>15 克，1:15</h3><p>92°C 水温，三段注水，总时长 2 分 20 秒。前段柑橘，中段红糖，尾段茶感收得很干净。</p></article>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>KIOSK ROASTERS · 上海</span>
+    <span>每周二 / 五烘焙</span>
+    <span>满 ¥200 包邮</span>
+  </footer>
+</div>
 
 <div class="backdrop" id="backdrop"></div>
-<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true">
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true" inert>
+  <button class="x" id="sheetClose" type="button" aria-label="关闭">×</button>
   <div class="grab" id="grab" aria-hidden="true"><i></i></div>
-  <h2 id="sheet-title">选择装帧</h2>
+  <h2 id="sheet-title">选择规格</h2>
   <p>往下拖动手柄可以直接关掉；松手时超过 110px 才判定为关闭。</p>
-  <div class="sizes" role="group" aria-label="装帧">
-    <button class="size" type="button" aria-pressed="true">布面</button>
-    <button class="size" type="button" aria-pressed="false">纸面</button>
-    <button class="size" type="button" aria-pressed="false">皮面</button>
+  <div class="group" role="group" aria-label="包装规格">
+    <span class="glabel">包装</span>
+    <div class="opts">
+      <button class="opt" type="button" data-price="128" data-unit="200g" aria-pressed="true">200g<small>¥128</small></button>
+      <button class="opt" type="button" data-price="268" data-unit="500g" aria-pressed="false">500g<small>¥268</small></button>
+      <button class="opt" type="button" data-price="498" data-unit="1kg" aria-pressed="false">1kg<small>¥498</small></button>
+    </div>
+  </div>
+  <div class="group" role="group" aria-label="研磨方式">
+    <span class="glabel">研磨</span>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="true">原豆</button>
+      <button class="opt" type="button" aria-pressed="false">手冲</button>
+      <button class="opt" type="button" aria-pressed="false">意式</button>
+    </div>
   </div>
   <div class="row">
     <button class="btn quiet" type="button" data-close>取消</button>
-    <button class="btn" type="button" data-close>加入 · ¥168</button>
+    <button class="btn" id="confirm" type="button">加入 · ¥128</button>
   </div>
 </section>
-<p class="hint">打开后拖顶部手柄，或按 Esc</p>
 <script>
 (function () {
+  var page = document.getElementById('page');
   var sheet = document.getElementById('sheet'), backdrop = document.getElementById('backdrop');
-  var openBtn = document.getElementById('open'), grab = document.getElementById('grab');
-  var drag = null;
+  var openBtn = document.getElementById('openBtn'), grab = document.getElementById('grab');
+  var sheetClose = document.getElementById('sheetClose'), confirm = document.getElementById('confirm');
+  var cartCount = document.getElementById('cartCount'), added = document.getElementById('added');
+  var priceNow = document.getElementById('priceNow'), unitNow = document.getElementById('unitNow');
+  var drag = null, selectedPrice = 128, selectedUnit = '200g';
 
-  function open() {
+  function openSheet() {
     sheet.classList.add('on');
+    sheet.removeAttribute('inert');
     sheet.setAttribute('aria-hidden', 'false');
     backdrop.classList.add('on');
+    page.inert = true;
     document.body.style.overflow = 'hidden';
-    setTimeout(function () { grab.focus && grab.focus(); }, 300);
+    sheet.scrollTop = 0;
+    setTimeout(function () { sheetClose.focus(); }, 300);
   }
-  function close() {
+
+  function closeSheet() {
     sheet.classList.remove('on');
+    sheet.classList.remove('drag');
     sheet.setAttribute('aria-hidden', 'true');
+    sheet.setAttribute('inert', '');
     backdrop.classList.remove('on');
-    document.body.style.overflow = '';
+    backdrop.style.opacity = '';
     sheet.style.transform = '';
+    page.inert = false;
+    document.body.style.overflow = '';
     openBtn.focus();
   }
-  openBtn.addEventListener('click', open);
-  backdrop.addEventListener('click', close);
-  document.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', close); });
-  addEventListener('keydown', function (e) { if (e.key === 'Escape' && sheet.classList.contains('on')) close(); });
 
-  document.querySelectorAll('.size').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('.size').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
-      b.setAttribute('aria-pressed', 'true');
+  function pick(btn) {
+    btn.parentElement.querySelectorAll('.opt').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+    btn.setAttribute('aria-pressed', 'true');
+  }
+
+  openBtn.addEventListener('click', openSheet);
+  backdrop.addEventListener('click', closeSheet);
+  sheetClose.addEventListener('click', closeSheet);
+  document.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', closeSheet); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sheet.classList.contains('on')) closeSheet();
+  });
+
+  sheet.querySelectorAll('.group').forEach(function (g) {
+    g.querySelectorAll('.opt').forEach(function (b) {
+      b.addEventListener('click', function () {
+        pick(b);
+        if (b.dataset.price) {
+          selectedPrice = Number(b.dataset.price);
+          selectedUnit = b.dataset.unit;
+          priceNow.textContent = selectedPrice;
+          unitNow.textContent = '/ ' + selectedUnit;
+          confirm.textContent = '加入 · ¥' + selectedPrice;
+        }
+      });
     });
+  });
+
+  confirm.addEventListener('click', function () {
+    cartCount.textContent = String(Number(cartCount.textContent) + 1);
+    added.textContent = '已加入清单 · ' + selectedUnit + ' / ' + selectedPrice + ' 元';
+    closeSheet();
   });
 
   grab.addEventListener('pointerdown', function (e) {
@@ -124,17 +331,72 @@ h1{margin:0 0 18px;font-size:clamp(23px,5.4vw,33px);line-height:1.14;letter-spac
     sheet.style.transform = 'translateY(' + dy + 'px)';
     backdrop.style.opacity = Math.max(.15, 1 - dy / 420);
   });
-  function end() {
+  function endDrag() {
     if (!drag) return;
     var dy = drag.dy;
     drag = null;
     sheet.classList.remove('drag');
     sheet.style.transform = '';
     backdrop.style.opacity = '';
-    if (dy > 110) close();
+    if (dy > 110) closeSheet();
   }
-  grab.addEventListener('pointerup', end);
-  grab.addEventListener('pointercancel', end);
+  grab.addEventListener('pointerup', endDrag);
+  grab.addEventListener('pointercancel', endDrag);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
 })();
 </script>
 </body>

@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>流动网格渐变 · UI Atlas 动效</title>
+<title>流动网格渐变 · AURORA 睡眠声音</title>
 <style>
-:root{--ink:#f4f2ec;--muted:rgba(244,242,236,.55)}
+:root{--bg:#08090c;--ink:#f4f2ec;--muted:rgba(244,242,236,.58);--line:rgba(244,242,236,.14);--accent:#ffd9c2;--panel:rgba(10,11,15,.42)}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:#08090c;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
-.bg{position:fixed;inset:-10%;filter:blur(64px) saturate(140%);opacity:.92}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.bg{position:fixed;inset:-10%;filter:blur(64px) saturate(140%);opacity:.92;z-index:0;pointer-events:none}
 .blob{position:absolute;border-radius:50%;mix-blend-mode:screen;will-change:transform}
 .b1{width:52vw;height:52vw;left:4%;top:6%;background:radial-gradient(circle,#ff6a3d,transparent 68%);animation:drift1 19s ease-in-out infinite alternate}
 .b2{width:46vw;height:46vw;right:2%;top:-4%;background:radial-gradient(circle,#5f7dff,transparent 68%);animation:drift2 23s ease-in-out infinite alternate}
@@ -19,39 +20,327 @@ body{background:#08090c;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI",
 @keyframes drift2{to{transform:translate3d(-12%,16%,0) scale(1.2)}}
 @keyframes drift3{to{transform:translate3d(10%,-14%,0) scale(.92)}}
 @keyframes drift4{to{transform:translate3d(-16%,-10%,0) scale(1.1)}}
-.grain{position:fixed;inset:0;pointer-events:none;opacity:.16;mix-blend-mode:overlay;
+.grain{position:fixed;inset:0;pointer-events:none;opacity:.16;mix-blend-mode:overlay;z-index:1;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
-.stage{position:relative;min-height:100vh;display:grid;align-content:space-between;padding:34px 24px 26px;z-index:2}
-.kicker{margin:0;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
-h1{margin:14px 0 0;font-size:clamp(30px,7.4vw,58px);line-height:1.02;letter-spacing:-.045em;font-weight:600;max-width:9em}
-h1 em{font-style:normal;font-family:Georgia,serif;font-weight:400;color:#ffd9c2}
-.foot{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;max-width:640px}
-.foot p{margin:0;font-size:12px;line-height:1.8;color:var(--muted);max-width:30em}
-.foot .mark{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(244,242,236,.42)}
-.hint{position:fixed;left:16px;bottom:10px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:rgba(244,242,236,.5);z-index:3;pointer-events:none}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:#ffd9c2}
-@media (prefers-reduced-motion:reduce){.blob{animation:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.shell{position:relative;z-index:2}
+.nav{height:72px;display:flex;align-items:center;gap:26px;padding:0 max(22px,calc((100vw - 1160px)/2))}
+.brand{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:650;letter-spacing:.24em;text-decoration:none;white-space:nowrap}
+.brand i{width:17px;height:17px;border-radius:50%;flex:0 0 17px;background:conic-gradient(from 40deg,#ff6a3d,#f2c14e,#3fd6a8,#5f7dff,#ff6a3d);filter:saturate(1.15)}
+.brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.nav-links{display:flex;gap:22px;margin-left:6px}
+.nav-links a{font-size:12.5px;color:rgba(244,242,236,.66);text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.hint{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.03em;color:rgba(244,242,236,.62);
+  background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 10px;pointer-events:none;white-space:nowrap}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:0 0 5px}
+.trial{margin-left:14px;height:36px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;
+  background:var(--ink);color:#12100d;font-size:12px;font-weight:650;text-decoration:none;white-space:nowrap}
+.trial:hover{background:#fffdf6}
+.hero{max-width:1160px;margin:0 auto;min-height:calc(100vh - 72px);padding:clamp(26px,4.6vw,64px) 22px 34px;
+  display:flex;flex-direction:column;justify-content:space-between;gap:36px}
+.kicker{margin:0 0 18px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(244,242,236,.5)}
+h1{margin:0;font-size:clamp(44px,7.4vw,88px);line-height:.98;letter-spacing:-.055em;font-weight:600;max-width:9em}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:22px 0 0;max-width:29em;font-size:13.5px;line-height:1.9;color:rgba(244,242,236,.72)}
+.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:26px}
+.btn{height:44px;display:inline-flex;align-items:center;padding:0 20px;border-radius:999px;text-decoration:none;
+  font-size:12.5px;font-weight:650;transition:background-color .2s,border-color .2s,color .2s}
+.btn.solid{background:var(--accent);color:#1c120b}
+.btn.solid:hover{background:#ffe9d8}
+.btn.ghost{border:1px solid rgba(244,242,236,.28);color:var(--ink)}
+.btn.ghost:hover{border-color:rgba(244,242,236,.6);background:rgba(244,242,236,.06)}
+.hero-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:26px;flex-wrap:wrap}
+.player{display:flex;align-items:center;gap:12px;max-width:390px;padding:11px 16px 11px 12px;border-radius:15px;
+  text-decoration:none;background:var(--panel);border:1px solid rgba(244,242,236,.16);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);transition:border-color .2s,background-color .2s}
+.player:hover{border-color:rgba(244,242,236,.34);background:rgba(10,11,15,.56)}
+.play{width:40px;height:40px;border-radius:50%;flex:0 0 40px;display:grid;place-items:center;
+  background:var(--accent);color:#1c120b;box-shadow:0 8px 24px -10px rgba(255,217,194,.7)}
+.play svg{width:11px;height:13px;margin-left:1px;fill:currentColor}
+.p-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.p-copy b{font-size:13px;font-weight:560;letter-spacing:-.01em}
+.p-copy span{font:400 10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:rgba(244,242,236,.52);white-space:nowrap}
+.p-time{margin-left:auto;font:500 10px ui-monospace,Consolas,monospace;color:rgba(244,242,236,.5);white-space:nowrap}
+.recipes{display:flex;gap:26px;flex-wrap:wrap;padding-bottom:4px}
+.recipe{display:flex;flex-direction:column;gap:4px;text-decoration:none;min-width:0}
+.recipe b{font-size:12px;font-weight:500;color:rgba(244,242,236,.82);white-space:nowrap}
+.recipe span{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(244,242,236,.44)}
+.recipe:hover b{color:#fff}
+.after{position:relative;background:#08090c;border-top:1px solid rgba(244,242,236,.07)}
+.listen,.method,.quote,.end{max-width:1160px;margin:0 auto;padding-left:22px;padding-right:22px}
+.listen{padding-top:70px;padding-bottom:26px}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.72fr);gap:24px;align-items:end;margin-bottom:26px}
+h2{margin:0;font-size:clamp(24px,3.2vw,38px);line-height:1.12;letter-spacing:-.04em;font-weight:600}
+.sec-head p{margin:0;font-size:12px;line-height:1.85;color:var(--muted);max-width:26em;justify-self:end}
+.sound-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.sound{border:1px solid rgba(244,242,236,.11);border-radius:15px;overflow:hidden;background:rgba(16,17,22,.55)}
+.sound-art{height:150px;position:relative}
+.sound-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(8,9,12,.5))}
+.sound-art.a{background:radial-gradient(90% 120% at 24% 16%,rgba(255,106,61,.55),transparent 62%),linear-gradient(160deg,#40301f,#101319)}
+.sound-art.b{background:radial-gradient(90% 120% at 70% 10%,rgba(95,125,255,.48),transparent 62%),linear-gradient(160deg,#1d2a48,#0c111b)}
+.sound-art.c{background:radial-gradient(90% 120% at 44% 20%,rgba(63,214,168,.4),transparent 62%),linear-gradient(160deg,#173328,#0a1210)}
+.sound-body{padding:16px 16px 15px}
+.sound .tag{font:600 9px ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(244,242,236,.44)}
+.sound h3{margin:7px 0 0;font-size:15px;font-weight:560;letter-spacing:-.01em}
+.sound p{margin:6px 0 0;font-size:11.5px;line-height:1.75;color:var(--muted)}
+.sound-meta{display:flex;justify-content:space-between;gap:10px;margin-top:14px;padding-top:11px;border-top:1px solid rgba(244,242,236,.08);
+  font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(244,242,236,.46)}
+.method{padding-top:48px;padding-bottom:56px;border-top:1px solid rgba(244,242,236,.08);margin-top:36px}
+.method-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(28px,5vw,60px);align-items:start}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.steps li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:16px;padding:15px 0;border-bottom:1px solid rgba(244,242,236,.09)}
+.steps li:first-child{padding-top:0}
+.steps b{font:500 11px ui-monospace,Consolas,monospace;color:var(--accent);letter-spacing:.06em;padding-top:2px}
+.steps h3{margin:0;font-size:13.5px;font-weight:560}
+.steps p{margin:5px 0 0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.quote{padding-top:30px;padding-bottom:64px}
+.quote blockquote{margin:0;border-top:1px solid rgba(244,242,236,.1);padding:30px 0 0;max-width:780px;
+  font-size:clamp(22px,2.8vw,32px);line-height:1.45;letter-spacing:-.025em;font-weight:520;color:rgba(244,242,236,.92)}
+.quote blockquote em{font-style:italic;font-family:Georgia,"Songti SC",serif;color:var(--accent)}
+.quote p{margin:14px 0 0;font:400 10px ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.end{padding-bottom:26px}
+.band{border-top:1px solid rgba(244,242,236,.12);border-bottom:1px solid rgba(244,242,236,.12);padding:26px 0;
+  display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.band h2{font-size:clamp(20px,2.6vw,28px);letter-spacing:-.03em}
+.band p{margin:6px 0 0;font-size:12px;color:var(--muted)}
+.band .btn{margin-left:auto}
+.foot{display:flex;gap:18px;flex-wrap:wrap;padding-top:18px;font:400 10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:rgba(244,242,236,.4)}
+.foot span:last-child{margin-left:auto}
+@media (max-width:900px){
+  .nav-links{display:none}
+  .hint{margin-left:auto}
+  .hero{min-height:0;padding-bottom:26px}
+  .sound-grid{grid-template-columns:1fr}
+  .sec-head{grid-template-columns:1fr;gap:10px}
+  .sec-head p{justify-self:start}
+  .method-grid{grid-template-columns:1fr}
+  .listen{padding-top:52px}
+}
+@media (max-width:560px){
+  .nav{height:58px;padding:0 16px;gap:12px}
+  .brand span{display:none}
+  .hint{display:none}
+  .trial{margin-left:auto;height:33px;padding:0 13px;font-size:11.5px}
+  .hero{padding:28px 16px 26px;min-height:calc(100vh - 58px);gap:34px}
+  h1{font-size:clamp(42px,12.6vw,60px)}
+  .lede{font-size:12.5px;margin-top:16px}
+  .actions{margin-top:20px}
+  .btn{height:42px;padding:0 17px}
+  .hero-foot{gap:20px}
+  .player{max-width:none;width:100%}
+  .recipes{gap:10px 20px}
+  .recipe b{font-size:11px}
+  .listen,.method,.quote,.end{padding-left:16px;padding-right:16px}
+  .sound-art{height:132px}
+  .band .btn{margin-left:0}
+  .foot span:last-child{margin-left:0}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 18px;gap:14px}
+  .brand span{display:none}
+  .nav-links{display:none}
+  .hint{font-size:10px;padding:3px 8px}
+  .trial{height:30px;padding:0 12px;font-size:11px;margin-left:8px}
+  .hero{min-height:calc(100vh - 46px);padding:14px 22px 12px;gap:10px}
+  .kicker{margin-bottom:8px;font-size:9px}
+  h1{font-size:clamp(30px,4.8vw,40px)}
+  .lede{margin-top:9px;font-size:10.5px;line-height:1.6;max-width:26em}
+  .actions{margin-top:11px;gap:8px}
+  .btn{height:32px;padding:0 13px;font-size:11px}
+  .hero-foot{gap:14px}
+  .player{max-width:310px;padding:7px 10px 7px 8px;border-radius:11px}
+  .play{width:30px;height:30px;flex:0 0 30px}
+  .play svg{width:9px;height:10px}
+  .p-copy b{font-size:11.5px}
+  .p-copy span{font-size:8.5px}
+  .p-time{font-size:8.5px}
+  .recipes{gap:0 16px;padding-bottom:2px}
+  .recipe b{font-size:10.5px}
+  .recipe span{font-size:8.5px}
+  .after{display:none}
+}
+@media (hover:none){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .blob{animation:none}
+}
 </style>
 </head>
 <body>
+
 <div class="bg" aria-hidden="true">
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
 </div>
 <div class="grain" aria-hidden="true"></div>
-<main class="stage">
-  <div>
-    <p class="kicker">BACKGROUND / 01</p>
-    <h1>颜色在<br><em>慢慢换气。</em></h1>
-  </div>
-  <div class="foot">
-    <p>四团 36–52vw 的光斑、64px 模糊、screen 混合，各自 19–27s 交替漂移。速度必须不同步，画面才不会「一起呼吸」。</p>
-    <span class="mark">MESH / 04 BLOBS</span>
-  </div>
-</main>
-<p class="hint">这是一段不需要交互的背景</p>
+
+<div class="shell">
+  <header class="nav">
+    <a class="brand" href="#top"><i></i>AURORA<span>SLEEP RADIO</span></a>
+    <nav class="nav-links" aria-label="主导航">
+      <a href="#listen">声音库</a>
+      <a href="#method">怎么做的</a>
+      <a href="#plans">订阅</a>
+    </nav>
+    <p class="hint">背景在慢慢换气，不需要操作</p>
+    <a class="trial" href="#plans">开始 7 晚</a>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div>
+        <p class="kicker">SLEEP RADIO · 凌晨三点</p>
+        <h1>把夜色，<br><em>调成声音。</em></h1>
+        <p class="lede">四层声音叠在一起：远处的雷、帆布上的雨、低频的浪。闭眼之前，先让房间慢慢安静下来。</p>
+        <div class="actions">
+          <a class="btn solid" href="#listen">今晚听什么 →</a>
+          <a class="btn ghost" href="#method">怎么录的</a>
+        </div>
+      </div>
+
+      <div class="hero-foot">
+        <a class="player" href="#listen">
+          <span class="play" aria-hidden="true"><svg viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z"/></svg></span>
+          <span class="p-copy"><b>雨落在帐篷上</b><span>42 分钟 · 立体声 · 无循环断点</span></span>
+          <span class="p-time">03:00</span>
+        </a>
+        <div class="recipes" aria-label="今晚的其他声音">
+          <a class="recipe" href="#listen"><b>夜航的海面</b><span>38 MIN</span></a>
+          <a class="recipe" href="#listen"><b>四点十七分的森林</b><span>51 MIN</span></a>
+          <a class="recipe" href="#listen"><b>远处有雷</b><span>29 MIN</span></a>
+        </div>
+      </div>
+    </section>
+
+    <div class="after">
+      <section class="listen" id="listen">
+        <div class="sec-head">
+          <h2>今晚的三段声音。</h2>
+          <p>都在凌晨三点录制，一次成型的长母带。没有循环接缝，也没有突然出现的鸟叫。</p>
+        </div>
+        <div class="sound-grid">
+          <article class="sound">
+            <div class="sound-art a" aria-hidden="true"></div>
+            <div class="sound-body">
+              <span class="tag">RAIN / TENT</span>
+              <h3>雨落在帐篷上</h3>
+              <p>远雷每四十秒滚过一次，帆布被雨脚敲得很轻，近处偶尔有水珠滑下来。</p>
+              <div class="sound-meta"><span>42 分钟</span><span>立体声</span></div>
+            </div>
+          </article>
+          <article class="sound">
+            <div class="sound-art b" aria-hidden="true"></div>
+            <div class="sound-body">
+              <span class="tag">SEA / NIGHT</span>
+              <h3>夜航的海面</h3>
+              <p>低频浪涌在左声道，缆绳轻碰在右声道。船速很慢，几乎没有引擎声。</p>
+              <div class="sound-meta"><span>38 分钟</span><span>立体声</span></div>
+            </div>
+          </article>
+          <article class="sound">
+            <div class="sound-art c" aria-hidden="true"></div>
+            <div class="sound-body">
+              <span class="tag">FOREST / 04:17</span>
+              <h3>四点十七分的森林</h3>
+              <p>风穿过桦树，远处有一只鸟醒了两次。天亮之前的空气，比白天更厚。</p>
+              <div class="sound-meta"><span>51 分钟</span><span>立体声</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="method" id="method">
+        <div class="method-grid">
+          <div>
+            <p class="kicker">HOW IT'S MADE</p>
+            <h2>先把房间里的声音，<br>搬到很远的地方。</h2>
+          </div>
+          <ol class="steps">
+            <li><b>01</b><div><h3>现场采样</h3><p>带着两支麦克风去录，不补录、不拼接。一晚上只留最好的一段。</p></div></li>
+            <li><b>02</b><div><h3>做成四层</h3><p>低频、雨声、风和远处的人声各占一层，混音时只把响度压到刚好听不见。</p></div></li>
+            <li><b>03</b><div><h3>四十小时母带</h3><p>每条母带至少四十小时，循环点落在自然声的间隙里，整晚不会察觉重来。</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="quote">
+        <blockquote>“以前要靠数呼吸，现在听到第三场雨就睡着了。<em>房间像是被搬到山上。</em>”</blockquote>
+        <p>周意 · 连续使用 41 晚</p>
+      </section>
+
+      <footer class="end" id="plans">
+        <div class="band">
+          <div>
+            <h2>今晚就开始，先睡七晚。</h2>
+            <p>七天免费，之后 ¥28 / 月。随时取消，不需要理由。</p>
+          </div>
+          <a class="btn solid" href="#top">领取 7 晚 →</a>
+        </div>
+        <div class="foot">
+          <span>AURORA SLEEP RADIO · 杭州</span>
+          <span>凌晨三点录音室</span>
+          <span>© 2026</span>
+        </div>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
 </body>
 </html>

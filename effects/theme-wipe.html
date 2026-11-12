@@ -3,95 +3,238 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>圆形主题切换 · UI Atlas 动效</title>
+<meta name="theme-color" content="#f3efe4">
+<title>圆形主题切换 · LAMPREAD 灯下 · UI Atlas</title>
 <style>
 :root{
-  --bg:#f5f3ec;--panel:#fff;--ink:#111216;--muted:#7a7d84;--line:#e3dfd4;--accent:#2f5fd0;
-  --soft:#ece8dd;
+  --bg:#f3efe4;--paper:#fbf8f0;--ink:#1c1a15;--muted:#7d7668;--line:#ddd5c4;--accent:#a8452a;--lamp:#d9a34f;
+  --sky1:#dbe3e4;--sky2:#f2ecdd;--roof:#8d867a;--roof-soft:#a9a294;--glow:rgba(255,206,122,.35);
+  --wipe:#12141a;
 }
 html[data-theme="dark"]{
-  --bg:#0e1014;--panel:#171a20;--ink:#f2efe7;--muted:#9aa0ab;--line:#2a2e36;--accent:#8fb0ff;
-  --soft:#1d212a;
+  --bg:#12141a;--paper:#191c23;--ink:#f0ece1;--muted:#9a978c;--line:#2b2f39;--accent:#e0835e;--lamp:#f3c87c;
+  --sky1:#182430;--sky2:#0b0e13;--roof:#252a31;--roof-soft:#313741;--glow:rgba(255,206,122,.22);
+  --wipe:#f3efe4;
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;
-  transition:background .3s ease,color .3s ease}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;max-width:760px;margin:0 auto}
-.brand{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.02em}
-.brand i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
-.toggle{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px;border:1px solid var(--line);
-  border-radius:999px;background:var(--panel);color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
-.toggle:hover{border-color:var(--accent);color:var(--accent)}
-.stage{min-height:calc(100vh - 66px);display:grid;place-items:center;padding:20px 22px 66px}
-.wrap{width:100%;max-width:620px}
-.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
-h1{margin:0 0 16px;font-size:clamp(30px,7.4vw,50px);line-height:1.04;letter-spacing:-.045em;font-weight:650}
-h1 em{font-style:normal;color:var(--accent)}
-p.sub{margin:0 0 26px;font-size:13px;line-height:1.85;color:var(--muted);max-width:30em}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.tile{padding:16px 14px;border:1px solid var(--line);border-radius:13px;background:var(--panel)}
-.tile b{display:block;font:600 26px/1 ui-monospace,Consolas,monospace;letter-spacing:-.04em}
-.tile span{display:block;margin-top:7px;font-size:11px;color:var(--muted)}
-.note{margin:22px 0 0;padding:12px 14px;border-radius:11px;background:var(--soft);font-size:11.5px;line-height:1.8;color:var(--muted)}
-.wipe{position:fixed;inset:0;z-index:50;pointer-events:none;background:#0e1014;clip-path:circle(0 at 50% 50%);will-change:clip-path}
-.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:40}
+html{background:var(--bg)}
+html[data-theme="dark"]{color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;transition:background .3s ease,color .3s ease}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+.page{min-height:100svh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;flex:0 0 auto;height:54px;display:flex;align-items:center;gap:14px;padding:0 clamp(16px,3vw,36px);border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:baseline;gap:9px;flex:0 0 auto}
+.logo{width:25px;height:25px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:600 11px/1 "Songti SC",Georgia,serif;align-self:center}
+.brand b{font-size:11px;font-weight:750;letter-spacing:.2em}
+.brand span{font-size:9px;letter-spacing:.12em;color:var(--muted)}
+.crumb{display:flex;align-items:center;gap:8px;padding-left:13px;border-left:1px solid var(--line);font-size:11px;color:var(--muted);white-space:nowrap}
+.crumb em{font-style:normal;color:var(--ink)}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:4px 9px;white-space:nowrap}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
-@media (prefers-reduced-motion:reduce){body{transition:none}}
-
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex:0 0 auto}
+.streak{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
+.streak b{color:var(--accent);font-size:10px}
+.toggle{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 11px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);font-size:11px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s}
+.toggle:hover{border-color:var(--accent);color:var(--accent)}
+.toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.toggle .ico{font-size:12px;line-height:1;color:var(--accent)}
+.read{flex:1;width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:clamp(26px,5vw,64px);padding:clamp(26px,4vw,54px) clamp(18px,4vw,44px) 34px;align-items:start}
+.essay{min-width:0;max-width:44em}
+.kicker{margin:0 0 15px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+.essay h1{margin:0 0 14px;font-size:clamp(34px,4.5vw,54px);line-height:1.05;letter-spacing:-.045em;font-weight:640}
+.essay h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.byline{margin:0 0 22px;display:flex;gap:14px;flex-wrap:wrap;font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.byline span{position:relative;padding-left:14px}
+.byline span::before{content:"";position:absolute;left:0;top:50%;width:6px;height:1px;background:var(--line)}
+.lede{margin:0 0 24px;font-size:16px;line-height:1.95;letter-spacing:-.005em;color:var(--ink)}
+.fig{margin:0 0 26px}
+.win{position:relative;height:clamp(180px,30vh,280px);border-radius:14px;overflow:hidden;border:1px solid var(--line);
+  background:radial-gradient(ellipse 52% 44% at 74% 72%,var(--glow),transparent 70%),linear-gradient(168deg,var(--sky1),var(--sky2));
+  transition:background .3s ease}
+.win::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.035) 0 1px,transparent 1px 9px);mix-blend-mode:soft-light}
+.snowline{position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--sky2) 80%,transparent))}
+.roof{position:absolute;left:6%;right:6%;bottom:14%;height:34%;background:var(--roof);clip-path:polygon(0 72%,50% 0,100% 72%,100% 100%,0 100%)}
+.roof i{position:absolute;left:50%;top:46%;transform:translateX(-50%);width:44px;height:32px;border-radius:3px 3px 0 0;background:var(--lamp);box-shadow:0 0 34px 10px var(--glow);opacity:.92}
+.roof i::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:color-mix(in srgb,var(--roof) 65%,#000)}
+.roof i::after{content:"";position:absolute;left:0;right:0;top:46%;height:1px;background:color-mix(in srgb,var(--roof) 65%,#000)}
+.roof b{position:absolute;left:12%;right:12%;top:26%;height:2px;background:var(--roof-soft);opacity:.55;box-shadow:0 9px 0 var(--roof-soft),0 18px 0 var(--roof-soft)}
+.snow{position:absolute;inset:0;background-image:radial-gradient(1.5px 1.5px at 12% 18%,rgba(255,255,255,.7),transparent 100%),radial-gradient(1.5px 1.5px at 32% 42%,rgba(255,255,255,.55),transparent 100%),radial-gradient(1.5px 1.5px at 58% 22%,rgba(255,255,255,.6),transparent 100%),radial-gradient(1.5px 1.5px at 78% 38%,rgba(255,255,255,.5),transparent 100%),radial-gradient(1.5px 1.5px at 88% 12%,rgba(255,255,255,.6),transparent 100%),radial-gradient(1.5px 1.5px at 44% 8%,rgba(255,255,255,.45),transparent 100%);opacity:.8}
+.fig figcaption{margin-top:9px;display:flex;justify-content:space-between;gap:14px;font:500 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.essay p.body{margin:0 0 17px;font-size:13.5px;line-height:1.95;color:color-mix(in srgb,var(--ink) 82%,var(--muted))}
+.essay p.body:first-of-type::first-letter{float:left;font:600 44px/.9 "Songti SC",Georgia,serif;padding:4px 8px 0 0;color:var(--accent)}
+.pull{margin:26px 0;padding:16px 20px;border-left:2px solid var(--accent);background:color-mix(in srgb,var(--paper) 72%,var(--bg));border-radius:0 10px 10px 0;font:italic 16px/1.8 Georgia,"Songti SC",serif;color:color-mix(in srgb,var(--ink) 88%,var(--muted))}
+.pull small{display:block;margin-top:7px;font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;font-style:normal;color:var(--muted)}
+.side{display:flex;flex-direction:column;gap:16px;position:sticky;top:80px}
+.box{border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--paper) 74%,var(--bg));padding:15px 16px}
+.box h2{margin:0 0 12px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
+.toc{list-style:none;margin:0;padding:0}
+.toc li{display:flex;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:12px}
+.toc li:first-child{border-top:0;padding-top:0}
+.toc li b{font:600 8.5px/1 ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.08em}
+.toc li.on{font-weight:700}
+.toc li.on b{color:var(--accent)}
+.toc li span{margin-left:auto;font:500 8px/1 ui-monospace,Consolas,monospace;color:var(--muted)}
+.mode-line{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11.5px}
+.mode-line b{font-weight:650}
+.dot{display:inline-flex;align-items:center;gap:6px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.box p{margin:9px 0 0;font-size:10.5px;line-height:1.8;color:var(--muted)}
+.next{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--paper)}
+.next .cover{display:block;height:88px;background:radial-gradient(ellipse 70% 90% at 20% 20%,var(--glow),transparent 62%),linear-gradient(135deg,var(--sky1),var(--roof))}
+.next div{padding:11px 14px 13px}
+.next small{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.next b{display:block;margin:5px 0 3px;font-size:13px;letter-spacing:-.01em}
+.next span{font-size:10px;color:var(--muted)}
+.foot{flex:0 0 auto;border-top:1px solid var(--line);padding:13px clamp(18px,4vw,44px);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.wipe{position:fixed;inset:0;z-index:60;pointer-events:none;background:var(--wipe);clip-path:circle(0 at 50% 50%);will-change:clip-path}
+@media (max-width:900px){
+  .read{grid-template-columns:1fr;gap:24px}
+  .side{position:static;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .next{grid-column:1/-1}
+}
+@media (max-height:560px) and (min-width:561px){
+  .topbar{height:42px;padding:0 16px;gap:10px}
+  .brand span,.crumb,.streak{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .toggle{height:26px;padding:0 9px;font-size:10px}
+  .read{grid-template-columns:minmax(0,1fr);gap:0;padding:12px 18px 10px}
+  .kicker{font-size:7.5px;margin-bottom:7px}
+  .essay h1{font-size:26px;margin-bottom:6px}
+  .byline{font-size:7.5px;margin-bottom:9px;gap:10px}
+  .lede{font-size:11px;line-height:1.7;margin-bottom:10px}
+  .win{height:96px;border-radius:9px}
+  .fig{margin-bottom:11px}
+  .fig figcaption{font-size:6.5px;margin-top:5px}
+  .essay p.body{font-size:10px;line-height:1.75;margin-bottom:8px}
+  .essay p.body:nth-of-type(n+3){display:none}
+  .pull{display:none}
+  .side{display:none}
+  .foot{display:none}
+}
+@media (max-width:560px){
+  .topbar{height:48px;padding:0 13px;gap:9px}
+  .brand span,.crumb,.streak,.hint{display:none}
+  .toggle{height:28px;font-size:10.5px;padding:0 10px}
+  .read{grid-template-columns:1fr;padding:18px 16px 26px;gap:20px}
+  .essay h1{font-size:34px}
+  .lede{font-size:14px;line-height:1.85}
+  .win{height:170px;border-radius:11px}
+  .essay p.body{font-size:12.5px;line-height:1.9}
+  .essay p.body:nth-of-type(n+4){display:none}
+  .pull{font-size:14px;margin:18px 0}
+  .side{grid-template-columns:1fr}
+  .foot{padding:11px 14px;font-size:7px}
+  .foot span:nth-child(3){display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  body,.toggle,.win{transition:none}
+  .wipe{display:none}
+}
 </style>
 </head>
 <body>
-<header class="bar">
-  <span class="brand"><i aria-hidden="true"></i>Atlas / 主题实验</span>
-  <button class="toggle" id="toggle" type="button" aria-pressed="false">
-    <span aria-hidden="true">◐</span><span id="tlabel">深色</span>
-  </button>
-</header>
-<main class="stage">
-  <div class="wrap">
-    <p class="kicker">TRANSITION / 05</p>
-    <h1>换主题，<br><em>从一个圆开始。</em></h1>
-    <p class="sub">点击按钮后，目标主题的底色先以按钮为圆心铺满视口，等完全盖住再换 class，最后淡出。顺序反了会闪一下白。</p>
-    <div class="grid">
-      <div class="tile"><b>12</b><span>基础组件</span></div>
-      <div class="tile"><b>3</b><span>主题模式</span></div>
-      <div class="tile"><b>0</b><span>外部依赖</span></div>
+<div class="page">
+  <header class="topbar">
+    <div class="brand"><span class="logo" aria-hidden="true">灯</span><b>LAMPREAD</b><span>灯下</span></div>
+    <span class="crumb">2026 冬季刊 <em>/ 第 04 期</em></span>
+    <p class="hint">点右上角「夜间」，主题会从按钮铺满整页</p>
+    <div class="top-right">
+      <span class="streak">连续夜读 <b>12</b> 天</span>
+      <button class="toggle" id="themeBtn" type="button" aria-pressed="false" aria-label="切换到夜间主题">
+        <span class="ico" aria-hidden="true">◐</span><span id="themeLabel">夜间</span>
+      </button>
     </div>
-    <p class="note">圆心的位置来自按钮的 <code>getBoundingClientRect()</code>，半径取到最远角的距离，所以不管按钮在哪个角落都能铺满。减动效时直接换主题，不做扩散。</p>
-  </div>
-</main>
+  </header>
+
+  <main class="read">
+    <article class="essay">
+      <p class="kicker">LONGFORM · 18 MIN · 城市随笔</p>
+      <h1>雪落在旧书店的<br><em>屋顶上。</em></h1>
+      <p class="byline">文 / 沈知白 <span>摄影 / 阿禾</span><span>2026.11.12 · 第 04 期</span></p>
+      <p class="lede">城南那家旧书店没有招牌，只在门把手上挂一块木牌。老板说，下雪天不营业，但门不锁——想进来的人，自己会把雪抖在门口。</p>
+      <figure class="fig">
+        <div class="win" role="img" aria-label="雪夜旧书店的屋顶，一扇窗还亮着灯">
+          <span class="snow" aria-hidden="true"></span>
+          <span class="snowline" aria-hidden="true"></span>
+          <span class="roof" aria-hidden="true"><b></b><i></i></span>
+        </div>
+        <figcaption><span>城南 · 晚 7:40，雪未停</span><span>1/60s · f2.0 · ISO 800</span></figcaption>
+      </figure>
+      <p class="body">第一次去是十一月。推门时带进一阵冷风，柜台后的老板正用浆糊补一本掉页的诗集。他没有抬头，只说书在架上，自己找。店里没有分类牌，书按到店的先后摆，像一排没有名字的旧朋友。</p>
+      <p class="body">那晚我找到一本 1987 年的城市地图，扉页上有人用铅笔写了一行字：<q>愿你在每条路上都能遇见灯。</q>字迹很轻，像怕被后来的人看见。我把它买下来，老板用牛皮纸包好，又塞了一张手写的书签。</p>
+      <blockquote class="pull">“雪把城市的声音压低了以后，旧书店才露出它本来的样子：一间替人保管时间的屋子。”<small>—— 本期编辑手记</small></blockquote>
+      <p class="body">后来我又去过几次。春天门口多了一盆薄荷，夏天电扇转得很慢。老板始终没记住我的名字，但会在我翻书的时候，把台灯往我这边挪一点。这点光不算亮，刚好够看清纸上的字。</p>
+      <p class="body">今年冬天，旧书店门口贴了一张纸：店主身体抱恙，暂停营业。雪照样落在屋顶上，窗户却没有亮。邻居说，等开春吧，开春他就会回来。</p>
+    </article>
+
+    <aside class="side" aria-label="本期目录与阅读状态">
+      <section class="box">
+        <h2>本期目录</h2>
+        <ul class="toc">
+          <li class="on"><b>01</b>雪落在旧书店的屋顶上<span>18 min</span></li>
+          <li><b>02</b>一条河的两岸<span>14 min</span></li>
+          <li><b>03</b>凌晨四点的面包房<span>9 min</span></li>
+          <li><b>04</b>给旧家具写一封信<span>11 min</span></li>
+        </ul>
+      </section>
+      <section class="box">
+        <h2>阅读状态</h2>
+        <div class="mode-line"><b id="modeName">日间纸色</b><span class="dot" id="modeDot">对比度 8.2</span></div>
+        <p id="modeNote" aria-live="polite">纸张偏暖，适合白天读。夜间的底色会更深，长时间阅读不刺眼。</p>
+      </section>
+      <a class="next" href="#issue">
+        <span class="cover" aria-hidden="true"></span>
+        <div><small>NEXT · 第 05 期</small><b>海边邮局的最后一班船</b><span>12 月 01 日 · 已开始编辑</span></div>
+      </a>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    <span>LAMPREAD · 灯下夜读</span>
+    <span>主编 / 沈知白 · 摄影 / 阿禾</span>
+    <span>每周三 21:00 更新</span>
+  </footer>
+</div>
 <div class="wipe" id="wipe" aria-hidden="true"></div>
-<p class="hint">点右上角按钮，看圆形怎么铺开</p>
 <script>
 (function () {
-  var root = document.documentElement, btn = document.getElementById('toggle');
-  var label = document.getElementById('tlabel'), wipe = document.getElementById('wipe');
-  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement, btn = document.getElementById('themeBtn');
+  var label = document.getElementById('themeLabel'), wipe = document.getElementById('wipe');
+  var modeName = document.getElementById('modeName'), modeDot = document.getElementById('modeDot');
+  var modeNote = document.getElementById('modeNote');
+  var meta = document.querySelector('meta[name="theme-color"]');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
   var busy = false;
 
   function setTheme(t) {
-    if (t === 'dark') root.setAttribute('data-theme', 'dark');
+    var dark = t === 'dark';
+    if (dark) root.setAttribute('data-theme', 'dark');
     else root.removeAttribute('data-theme');
-    btn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
-    label.textContent = t === 'dark' ? '浅色' : '深色';
+    btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    btn.setAttribute('aria-label', dark ? '切换到日间主题' : '切换到夜间主题');
+    label.textContent = dark ? '日间' : '夜间';
+    modeName.textContent = dark ? '夜间墨色' : '日间纸色';
+    modeDot.textContent = dark ? '对比度 6.4' : '对比度 8.2';
+    modeNote.textContent = dark
+      ? '底色已换成夜间墨色，灯色保留了一点暖。再点一次回到纸色。'
+      : '纸张偏暖，适合白天读。夜间的底色会更深，长时间阅读不刺眼。';
+    if (meta) meta.setAttribute('content', dark ? '#12141a' : '#f3efe4');
   }
 
   btn.addEventListener('click', function () {
     if (busy) return;
     var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
 
-    if (reduce) { setTheme(next); return; }
+    if (reduce.matches) { setTheme(next); return; }
 
     busy = true;
     var r = btn.getBoundingClientRect();
     var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-    var reach = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
+    var reach = Math.hypot(Math.max(cx, window.innerWidth - cx), Math.max(cy, window.innerHeight - cy));
 
-    wipe.style.background = next === 'dark' ? '#0e1014' : '#f5f3ec';
+    wipe.style.background = next === 'dark' ? '#12141a' : '#f3efe4';
     wipe.style.transition = 'none';
     wipe.style.opacity = '1';
     wipe.style.clipPath = 'circle(0px at ' + cx + 'px ' + cy + 'px)';
@@ -109,7 +252,62 @@ p.sub{margin:0 0 26px;font-size:13px;line-height:1.85;color:var(--muted);max-wid
         wipe.style.clipPath = 'circle(0px at ' + cx + 'px ' + cy + 'px)';
         busy = false;
       }, 280);
-    }, 500);
+    }, 510);
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

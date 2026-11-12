@@ -3,13 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>胶片颗粒 · UI Atlas 动效</title>
+<title>胶片颗粒 · NORD 胶片社</title>
 <style>
-:root{--ink:#f7f1e6;--muted:rgba(247,241,230,.62)}
+:root{--ink:#f7f1e6;--muted:rgba(247,241,230,.62);--sand:#ffd9a8;--rust:#a4532b;
+  --paper:#f2eadc;--paper-ink:#241a13;--paper-muted:rgba(36,26,19,.64);--line:rgba(247,241,230,.14)}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{background:#0d0b0a;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow:hidden}
-.photo{position:fixed;inset:0;background:
+body{background:#0d0b0a;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+
+/* 原始画面：CSS 合成的日落 + 山脊 */
+.photo{position:fixed;inset:0;z-index:0;background:
   radial-gradient(120% 80% at 62% 28%,rgba(255,214,150,.85),rgba(230,140,80,.35) 32%,transparent 62%),
   radial-gradient(80% 70% at 30% 78%,rgba(60,74,52,.9),transparent 70%),
   linear-gradient(180deg,#2b1e18 0%,#6b4330 46%,#171310 100%)}
@@ -18,7 +22,10 @@ body{background:#0d0b0a;color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI",
 .hills{position:absolute;left:-5%;right:-5%;bottom:0;height:46vh;background:#0f1510;
   clip-path:polygon(0 58%,16% 44%,34% 60%,52% 40%,70% 56%,86% 42%,100% 54%,100% 100%,0 100%)}
 .hills.two{height:34vh;background:#080b09;clip-path:polygon(0 44%,20% 56%,38% 38%,58% 54%,76% 40%,92% 52%,100% 46%,100% 100%,0 100%)}
-.grain{position:fixed;inset:-60px;pointer-events:none;opacity:var(--grain,.34);mix-blend-mode:overlay;
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 90% at 55% 40%,transparent 40%,rgba(6,5,4,.72) 100%)}
+
+/* 原始颗粒：feTurbulence + 0.7s 三步位移，overlay 叠在整页上 */
+.grain{position:fixed;inset:-60px;z-index:3;pointer-events:none;opacity:var(--grain,.34);mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   animation:grain .7s steps(3) infinite}
 body.off .grain{opacity:0}
@@ -26,48 +33,376 @@ body.off .grain{opacity:0}
   0%{transform:translate3d(0,0,0)}25%{transform:translate3d(-14px,9px,0)}
   50%{transform:translate3d(10px,-12px,0)}75%{transform:translate3d(-7px,-6px,0)}100%{transform:translate3d(0,0,0)}
 }
-.vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 55% 40%,transparent 40%,rgba(6,5,4,.72) 100%)}
-.stage{position:relative;min-height:100vh;display:grid;align-content:space-between;padding:34px 24px 26px;z-index:2}
-.kicker{margin:0;font:600 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
-h1{margin:14px 0 0;font-size:clamp(30px,7.4vw,58px);line-height:1.02;letter-spacing:-.045em;font-weight:600;max-width:8em}
-h1 em{font-style:italic;font-family:Georgia,serif;font-weight:400;color:#ffd9a8}
-.foot{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
-.foot p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted);max-width:28em}
-.toggle{border:1px solid rgba(255,255,255,.28);background:rgba(10,10,10,.25);backdrop-filter:blur(6px);color:var(--ink);
-  border-radius:999px;padding:6px 13px;font:inherit;font-size:11.5px;cursor:pointer}
-.toggle:hover{border-color:#ffd9a8}
-.hint{display:inline-flex;align-items:center;gap:6px;margin:0;font-size:11px;color:var(--muted)}
-.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:#ffd9a8}
-@media (prefers-reduced-motion:reduce){.grain{animation:none}}
 
-/* hint 胶囊：滚动页里不会与正文糊在一起 */
-.hint{background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
+.wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+
+/* 顶栏 */
+.mast{position:sticky;top:0;z-index:4;background:rgba(13,11,10,.44);
+  backdrop-filter:blur(14px) saturate(120%);-webkit-backdrop-filter:blur(14px) saturate(120%);
+  border-bottom:1px solid rgba(247,241,230,.1)}
+.mast-in{width:min(1180px,calc(100% - 48px));margin:0 auto;height:64px;display:flex;align-items:center;gap:26px}
+.brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+  font:600 13px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em}
+.brand i{width:9px;height:9px;border-radius:50%;background:var(--sand);box-shadow:0 0 12px rgba(255,217,168,.75)}
+.brand span{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:rgba(247,241,230,.42)}
+.mast nav{display:flex;gap:22px}
+.mast nav a{font-size:11.5px;letter-spacing:.05em;color:rgba(247,241,230,.58);text-decoration:none;transition:color .2s}
+.mast nav a:hover{color:var(--ink)}
+.hint{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 auto;padding:4px 9px;
+  font-size:11px;color:rgba(247,241,230,.6);white-space:nowrap;
+  background:rgba(128,128,128,.1);border:1px solid rgba(128,128,128,.18);border-radius:999px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--sand);flex:0 0 5px}
+.toggle{flex:0 0 auto;border:1px solid rgba(255,255,255,.28);background:rgba(10,10,10,.28);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--ink);
+  border-radius:999px;padding:6px 13px;font:inherit;font-size:11.5px;cursor:pointer;transition:border-color .2s,color .2s}
+.toggle:hover{border-color:var(--sand);color:var(--sand)}
+
+/* 首屏 */
+.page{position:relative;z-index:2}
+.hero{width:min(1180px,calc(100% - 48px));margin:0 auto;min-height:calc(100vh - 65px);
+  padding:clamp(34px,8vh,84px) 0 26px;display:flex;flex-direction:column}
+.kicker{margin:0;font:600 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(247,241,230,.52)}
+h1{margin:16px 0 0;font-size:clamp(38px,6.4vw,68px);line-height:.99;letter-spacing:-.045em;font-weight:600;max-width:9.5em}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--sand)}
+.lede{margin:20px 0 0;max-width:33em;font-size:13.5px;line-height:1.85;color:var(--muted)}
+.actions{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{height:44px;padding:0 20px;border-radius:999px;display:inline-flex;align-items:center;
+  font-size:12px;letter-spacing:.03em;text-decoration:none;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s}
+.btn.solid{background:var(--ink);border-color:var(--ink);color:#171310}
+.btn.solid:hover{background:var(--sand);border-color:var(--sand)}
+.btn.ghost{border-color:rgba(247,241,230,.28);color:var(--ink);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.btn.ghost:hover{border-color:var(--sand);color:var(--sand)}
+.hero-foot{margin-top:auto;padding-top:clamp(30px,8vh,76px);display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.specs{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;
+  font:400 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:rgba(247,241,230,.46)}
+.specs li{display:flex;align-items:center}
+.specs li+li::before{content:"";width:20px;height:1px;background:rgba(247,241,230,.22);margin:0 12px;flex:0 0 20px}
+.credit{margin:0;max-width:25em;text-align:right;font-size:11px;line-height:1.85;color:rgba(247,241,230,.5)}
+.credit b{display:block;margin-bottom:5px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:rgba(247,241,230,.38)}
+
+/* 正文纸张 */
+.paper{background:var(--paper);color:var(--paper-ink)}
+.stocks{padding:clamp(60px,10vh,108px) 0 clamp(54px,8vh,84px)}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px}
+.eyebrow{margin:0;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:rgba(36,26,19,.46)}
+h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spacing:-.04em;font-weight:600}
+.sec-head>p{margin:0;max-width:30em;font-size:12.5px;line-height:1.85;color:var(--paper-muted);justify-self:end;text-align:right}
+.stock-grid{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.stock{border-top:1px solid rgba(36,26,19,.2);padding-top:16px}
+.frame{position:relative;aspect-ratio:4/3;border-radius:2px;overflow:hidden;isolation:isolate}
+.frame::before{content:"";position:absolute;inset:0;z-index:0}
+.frame::after{content:"";position:absolute;left:-2%;right:-2%;bottom:0;height:52%;z-index:1;background:#0f1510;
+  clip-path:polygon(0 62%,18% 44%,36% 60%,54% 40%,72% 58%,88% 42%,100% 54%,100% 100%,0 100%)}
+.f1::before{background:
+  radial-gradient(80% 60% at 66% 30%,rgba(255,214,150,.92),rgba(214,126,72,.35) 40%,transparent 66%),
+  linear-gradient(180deg,#3a251c,#8a5334 55%,#1a1612)}
+.f2::before{background:
+  radial-gradient(40% 34% at 74% 62%,rgba(255,196,110,.95),rgba(255,150,60,.25) 46%,transparent 70%),
+  linear-gradient(180deg,#0a1720,#16333a 52%,#10161a)}
+.f2::after{background:#070d10}
+.f3::before{background:linear-gradient(180deg,#d8d2c6,#8e877a 60%,#3e3a33)}
+.f3::after{background:#1b1916;opacity:.9}
+.iso{position:absolute;left:9px;bottom:9px;z-index:2;padding:3px 7px;border-radius:999px;
+  background:rgba(10,10,10,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  color:#f7f1e6;font:600 8.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.14em}
+.stock .tag{display:block;margin-top:15px;font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--rust)}
+.stock h3{margin:5px 0 0;font-size:16.5px;letter-spacing:-.015em}
+.stock p{margin:8px 0 0;font-size:12px;line-height:1.8;color:var(--paper-muted)}
+.stock .meta{margin-top:14px;padding-top:10px;border-top:1px dashed rgba(36,26,19,.18);
+  display:flex;justify-content:space-between;gap:10px;font:400 9.5px/1.6 ui-monospace,Consolas,monospace;
+  letter-spacing:.08em;color:rgba(36,26,19,.52)}
+
+/* 暗房工艺 */
+.method{background:#120f0c;padding:clamp(56px,9vh,96px) 0;border-top:1px solid rgba(247,241,230,.08)}
+.method .sec-head>p{color:rgba(247,241,230,.55)}
+.method .eyebrow{color:rgba(247,241,230,.4)}
+.steps{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.step{border-left:1px solid rgba(247,241,230,.14);padding-left:18px}
+.step b{font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--sand)}
+.step h3{margin:9px 0 0;font-size:15px;letter-spacing:-.01em}
+.step p{margin:8px 0 0;font-size:11.5px;line-height:1.85;color:rgba(247,241,230,.55)}
+.tech{margin:34px 0 0;padding-top:16px;border-top:1px dashed rgba(247,241,230,.16);
+  font:400 9.5px/1.9 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:rgba(247,241,230,.42);max-width:80em}
+.tech b{color:rgba(247,241,230,.72);font-weight:600}
+
+/* 引文 */
+.quote{padding:clamp(62px,10vh,112px) 0}
+.quote blockquote{margin:0;max-width:21em;font:400 clamp(26px,3.6vw,44px)/1.28 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+.quote blockquote em{font-style:italic;color:var(--rust)}
+.quote .cite{margin:20px 0 0;font:400 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(36,26,19,.5)}
+
+/* 收尾 */
+.cta{padding:clamp(70px,12vh,130px) 0;border-top:1px solid rgba(247,241,230,.12);
+  background:linear-gradient(180deg,rgba(13,11,10,.5),rgba(13,11,10,.88))}
+.cta-in{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.cta .kicker{color:rgba(247,241,230,.42)}
+.cta h2{margin:12px 0 0;font-size:clamp(32px,5vw,58px);line-height:1.02;color:var(--ink)}
+.cta .note{margin:16px 0 0;font-size:12px;color:rgba(247,241,230,.55);max-width:30em;line-height:1.85}
+.cta-actions{display:flex;gap:10px;flex-wrap:wrap}
+.foot{background:#0c0a09;border-top:1px solid rgba(247,241,230,.1);padding:22px 0 28px}
+.foot-in{display:flex;flex-wrap:wrap;gap:10px 22px;font:400 9.5px/1.8 ui-monospace,Consolas,monospace;
+  letter-spacing:.08em;color:rgba(247,241,230,.38)}
+.foot-in span:last-child{margin-left:auto}
+
+/* 平板 */
+@media (max-width:900px){
+  .mast nav{display:none}
+  .sec-head{grid-template-columns:1fr;gap:12px}
+  .sec-head>p{justify-self:start;text-align:left}
+  .stock-grid{grid-template-columns:1fr;gap:28px}
+  .frame{aspect-ratio:16/9}
+  .stock-grid .stock:first-child .frame{aspect-ratio:4/3}
+  .steps{grid-template-columns:1fr;gap:20px}
+}
+
+/* 手机 */
+@media (max-width:560px){
+  .mast-in{width:calc(100% - 32px);height:56px;gap:12px}
+  .brand span{display:none}
+  .hint{display:none}
+  .toggle{margin-left:auto;padding:5px 12px;font-size:11px}
+  .wrap,.hero{width:calc(100% - 32px)}
+  .hero{min-height:calc(100vh - 57px);padding:34px 0 22px}
+  h1{font-size:clamp(36px,10.6vw,46px);max-width:8.5em}
+  .lede{font-size:12.5px;margin-top:16px}
+  .actions{margin-top:20px}
+  .btn{height:42px;padding:0 17px}
+  .hero-foot{padding-top:26px;flex-direction:column;align-items:flex-start;gap:18px}
+  .specs{font-size:9px}
+  .specs li+li::before{width:12px;flex-basis:12px;margin:0 8px}
+  .credit{text-align:left;max-width:none;font-size:10.5px}
+  .stocks{padding-top:52px}
+  .stock-grid{margin-top:30px}
+  .frame,.stock-grid .stock:first-child .frame{aspect-ratio:4/3}
+  .quote blockquote{max-width:none}
+  .cta-in{align-items:flex-start}
+  .foot-in span:last-child{margin-left:0}
+}
+
+/* 画廊 600×450 紧凑首屏 */
+@media (max-height:560px) and (min-width:561px){
+  .mast-in{height:44px;gap:14px}
+  .brand span{display:none}
+  .mast nav{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .toggle{padding:4px 11px;font-size:10.5px}
+  .hero{min-height:calc(100vh - 45px);padding:12px 0 10px}
+  .kicker{font-size:9px}
+  h1{margin-top:7px;font-size:clamp(28px,4.7vw,38px);max-width:10.5em}
+  .lede{margin-top:8px;font-size:10.5px;line-height:1.6;max-width:42em}
+  .actions{margin-top:10px;gap:8px}
+  .btn{height:32px;padding:0 13px;font-size:11px}
+  .hero-foot{padding-top:10px;gap:14px}
+  .specs{font-size:8.5px}
+  .specs li+li::before{width:12px;flex-basis:12px;margin:0 8px}
+  .credit{font-size:9.5px;line-height:1.7;max-width:23em}
+  .credit b{font-size:8.5px;margin-bottom:3px}
+}
+
+@media (hover:none){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .grain{animation:none}
+}
 </style>
 </head>
 <body>
 <div class="photo" aria-hidden="true"><div class="hills"></div><div class="hills two"></div></div>
-<div class="grain" aria-hidden="true"></div>
 <div class="vignette" aria-hidden="true"></div>
-<main class="stage">
-  <div>
-    <p class="kicker">BACKGROUND / 03</p>
-    <h1>一点噪声，<br><em>照片就活了。</em></h1>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="mast">
+  <div class="mast-in">
+    <a class="brand" href="#top"><i></i>NORD<span>FILM LAB</span></a>
+    <nav aria-label="主导航">
+      <a href="#stocks">胶片库存</a>
+      <a href="#method">冲洗工艺</a>
+      <a href="#note">暗房手记</a>
+    </nav>
+    <p class="hint">试试关掉颗粒，再打开</p>
+    <button class="toggle" id="toggle" type="button">关掉颗粒</button>
   </div>
-  <div class="foot">
-    <p>内联 SVG feTurbulence 生成噪点，overlay 混合叠在画面上；0.7s 三步位移让它像胶片一样抖。</p>
+</header>
+
+<main class="page" id="top">
+  <section class="hero">
     <div>
-      <p class="hint">点右侧按钮对比开关</p>
-      <button class="toggle" id="toggle" type="button">关掉颗粒</button>
+      <p class="kicker">NORD FILM LAB · EST. 2019 · 上海</p>
+      <h1>把一次日落，<br><em>留在颗粒里。</em></h1>
+      <p class="lede">银盐的颗粒不是噪点，是光落在胶片上的指纹。我们把每一卷的冲洗曲线写进公开日志，你可以查到自己的显影时间。</p>
+      <div class="actions">
+        <a class="btn solid" href="#book">预约冲洗</a>
+        <a class="btn ghost" href="#stocks">看本周的卷 →</a>
+      </div>
     </div>
-  </div>
+    <div class="hero-foot">
+      <ul class="specs">
+        <li>35MM · f/2</li>
+        <li>傍晚 6:42</li>
+        <li>ISO 400</li>
+        <li>C-41 · 48H</li>
+      </ul>
+      <p class="credit"><b>LIVE GRAIN</b>画面颗粒由 feTurbulence 实时生成，0.7 秒三帧位移，像老放映机一样呼吸。</p>
+    </div>
+  </section>
+
+  <section class="stocks paper" id="stocks">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">01 / 胶片库存</p>
+          <h2>三卷，三种脾气。</h2>
+        </div>
+        <p>冰柜里常备三款负片。买卷、冲洗、扫描可以分开算，也可以一次打包。</p>
+      </div>
+      <div class="stock-grid">
+        <article class="stock">
+          <div class="frame f1" aria-hidden="true"><span class="iso">ISO 400</span></div>
+          <span class="tag">COLOR NEGATIVE</span>
+          <h3>NORD 400</h3>
+          <p>阴天也敢开到 f/2。颗粒中等，肤色偏奶油，扫出来几乎不用再调。</p>
+          <div class="meta"><span>C-41 · 36 张</span><span>¥58 / 卷</span></div>
+        </article>
+        <article class="stock">
+          <div class="frame f2" aria-hidden="true"><span class="iso">ISO 800</span></div>
+          <span class="tag">TUNGSTEN NEGATIVE</span>
+          <h3>NORD 800T</h3>
+          <p>钨丝灯下不偏黄，蓝调时刻最好看。颗粒更粗，但粗得讲道理。</p>
+          <div class="meta"><span>C-41 · 36 张</span><span>¥72 / 卷</span></div>
+        </article>
+        <article class="stock">
+          <div class="frame f3" aria-hidden="true"><span class="iso">ISO 100</span></div>
+          <span class="tag">BLACK &amp; WHITE</span>
+          <h3>PAN 100</h3>
+          <p>反差硬，灰阶长。适合把一条街，拍成一部很短的小说。</p>
+          <div class="meta"><span>黑白 · 36 张</span><span>¥66 / 卷</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="method" id="method">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">02 / 冲洗工艺</p>
+          <h2>三步，没有秘密。</h2>
+        </div>
+        <p>配方和温度就贴在暗房墙上，也写在这里。你可以站在门口，看完整个过程。</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <b>01</b>
+          <h3>曝光</h3>
+          <p>把卷装进相机，按平时的习惯拍。测光交给相机，犹豫交给你自己。</p>
+        </div>
+        <div class="step">
+          <b>02</b>
+          <h3>冲洗</h3>
+          <p>C-41 恒温 38°C。手工摇晃的前 30 秒，决定这一卷颗粒的形状。</p>
+        </div>
+        <div class="step">
+          <b>03</b>
+          <h3>扫描</h3>
+          <p>Noritsu 扫到 6000px 长边。保留颗粒，不磨皮，也不做降噪。</p>
+        </div>
+      </div>
+      <p class="tech">画面颗粒 · 内联 SVG <b>feTurbulence</b> baseFrequency .78 / numOctaves 4 · <b>overlay</b> 混合 · <b>0.7s</b> steps(3) 位移 · 右上角按钮可开关对比</p>
+    </div>
+  </section>
+
+  <section class="quote paper" id="note">
+    <div class="wrap">
+      <blockquote>颗粒不是脏。<br><em>它是光留下的指纹。</em></blockquote>
+      <p class="cite">暗房手记 · 第 041 页 · 2025 年冬</p>
+    </div>
+  </section>
+
+  <section class="cta" id="book">
+    <div class="wrap cta-in">
+      <div>
+        <p class="kicker">03 / 洗一卷</p>
+        <h2>带一卷来，<br>洗一卷走。</h2>
+        <p class="note">本周还剩 12 个冲洗位。下午四点前送卷，后天取片。</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn solid" href="#book">预约冲洗</a>
+        <a class="btn ghost" href="#stocks">看价目</a>
+      </div>
+    </div>
+  </section>
 </main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>NORD FILM LAB · 上海杨浦 · 周三至周日 11:00–20:00</span>
+    <span>本站背景由 CSS 与内联 SVG 生成，无外部资源</span>
+  </div>
+</footer>
+
 <script>
 (function () {
   var btn = document.getElementById('toggle');
   btn.addEventListener('click', function () {
     var off = document.body.classList.toggle('off');
     btn.textContent = off ? '打开颗粒' : '关掉颗粒';
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
   });
 })();
 </script>

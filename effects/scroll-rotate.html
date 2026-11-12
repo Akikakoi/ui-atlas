@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滚动旋转 · GROOVE 黑胶唱片店</title>
+<style>
+:root{--ink:#f4f1e8;--muted:rgba(244,241,232,.5);--accent:#ffcf6e;--line:rgba(255,255,255,.1)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(80% 60% at 50% 30%,#1a1a24,#090b0f 72%);color:var(--ink);
+  font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+.nav{position:fixed;inset:0 0 auto;z-index:8;height:68px;display:flex;align-items:center;gap:26px;
+  padding:0 max(22px,calc((100vw - 1120px)/2));background:rgba(10,11,15,.72);
+  border-bottom:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:baseline;gap:10px;font:600 15px/1.1 Georgia,"Songti SC",serif;letter-spacing:.06em;white-space:nowrap}
+.brand .mark{width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:#151006;
+  font:600 11px/1 ui-monospace,Consolas,monospace}
+.brand i{font:400 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:24px;margin-left:12px}
+.nav-links a{font-size:12.5px;color:rgba(244,241,232,.6)}
+.nav-links a:hover{color:var(--accent)}
+.nav .cta{margin-left:auto;border:1px solid rgba(255,207,110,.55);border-radius:999px;padding:7px 14px;
+  font-size:11.5px;font-weight:600;color:var(--accent);white-space:nowrap}
+.nav .cta:hover{background:var(--accent);color:#151006}
+.sec{height:175vh;position:relative}
+.stick{position:sticky;top:0;height:100vh;display:grid;place-items:center;overflow:hidden;padding-top:68px}
+.head{position:absolute;left:max(24px,calc((100vw - 1120px)/2));right:max(24px,calc((100vw - 1120px)/2));top:92px;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;z-index:3}
+.head .kicker{margin:0 0 10px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--muted)}
+.head h1{margin:0;font-size:clamp(24px,4vw,36px);line-height:1.12;letter-spacing:-.035em;font-weight:600}
+.head h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.deg{font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+.disc{position:relative;width:min(360px,64vw);aspect-ratio:1;border-radius:50%;
+  background:
+    repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.055) 0 1px,transparent 1px 5px),
+    radial-gradient(circle at 50% 50%,#2a2c36 0 21%,#15161d 21.5% 100%);
+  box-shadow:0 34px 80px -34px rgba(0,0,0,.95),inset 0 0 0 1px rgba(255,255,255,.08);
+  display:grid;place-items:center;will-change:transform}
+.label{width:33%;aspect-ratio:1;border-radius:50%;background:linear-gradient(140deg,#ffcf6e,#c2452d);display:grid;place-items:center;
+  text-align:center;color:#1a1208;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.label b{display:block;font:600 14px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.1em}
+.label small{display:block;margin-top:5px;font-size:8px;letter-spacing:.16em;opacity:.62}
+.hole{position:absolute;left:50%;top:50%;width:9px;height:9px;border-radius:50%;background:#090b0f;transform:translate(-50%,-50%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+.marker{position:absolute;left:50%;top:5.5%;width:10px;height:10px;border-radius:50%;background:var(--accent);transform:translateX(-50%);
+  box-shadow:0 0 12px rgba(255,207,110,.8)}
+.tag{position:absolute;right:max(24px,calc((100vw - 1120px)/2));top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right center;
+  font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:rgba(244,241,232,.35);white-space:nowrap}
+.hud{position:absolute;left:max(24px,calc((100vw - 1120px)/2));right:max(24px,calc((100vw - 1120px)/2));bottom:44px;
+  display:flex;justify-content:space-between;align-items:flex-end;gap:16px;z-index:3}
+.hud p{margin:0;max-width:30em;font-size:12px;line-height:1.8;color:var(--muted)}
+.bar{flex:0 0 140px;height:2px;background:rgba(255,255,255,.14);position:relative;overflow:hidden}
+.bar i{position:absolute;inset:0;background:var(--accent);transform-origin:left;transform:scaleX(0)}
+.picks{max-width:1120px;margin:0 auto;padding:6px 22px 48px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pick{border:1px solid var(--line);border-radius:14px;padding:20px 20px 18px;background:rgba(255,255,255,.025)}
+.pick .no{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent);margin:0 0 14px}
+.pick h3{margin:0 0 7px;font-size:17px;letter-spacing:-.01em;font-weight:600}
+.pick p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.pick .line{display:flex;justify-content:space-between;gap:10px;margin-top:14px;padding-top:11px;border-top:1px solid var(--line);
+  font:600 8.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(244,241,232,.42)}
+.info{max-width:1120px;margin:0 auto;padding:0 22px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:clamp(26px,5vw,64px);align-items:start}
+.info h2{margin:0 0 10px;font-size:clamp(24px,3.2vw,34px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
+.info p{margin:0;font-size:12.5px;line-height:1.9;color:var(--muted);max-width:30em}
+.hours{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.hours div{background:#0d1015;padding:14px 16px}
+.hours dt{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);margin-bottom:7px}
+.hours dd{margin:0;font-size:13px;font-weight:600}
+.band{max-width:1120px;margin:0 auto;padding:0 22px 46px}
+.inner-band{border:1px solid rgba(255,207,110,.25);border-radius:16px;padding:28px 26px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(255,207,110,.08),rgba(255,207,110,.01) 62%)}
+.inner-band h2{margin:0 0 6px;font-size:clamp(21px,2.6vw,28px);letter-spacing:-.03em;font-weight:600}
+.inner-band p{margin:0;font-size:12px;color:var(--muted);line-height:1.8}
+.inner-band .cta{margin-left:auto;border:1px solid var(--accent);background:var(--accent);color:#151006;border-radius:999px;
+  padding:9px 17px;font-size:12px;font-weight:650;white-space:nowrap}
+.inner-band .cta:hover{filter:brightness(1.08)}
+footer{max-width:1120px;margin:0 auto;padding:0 22px 26px;display:flex;gap:18px;flex-wrap:wrap;
+  font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+footer span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;
+  color:rgba(244,241,232,.7);background:rgba(9,11,15,.6);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 9px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);pointer-events:none;z-index:9}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:860px){
+  .nav-links{display:none}
+  .picks{grid-template-columns:1fr}
+  .info{grid-template-columns:1fr}
+  .tag{display:none}
+}
+@media (max-width:560px){
+  .nav{height:54px;padding:0 16px;gap:12px}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .brand{font-size:12.5px}.brand .mark{width:20px;height:20px;font-size:9px}.brand i{display:none}
+  .sec{height:165vh}
+  .stick{padding-top:54px}
+  .head{left:16px;right:16px;top:72px}
+  .head .kicker{font-size:8px;margin-bottom:7px}
+  .head h1{font-size:clamp(24px,7.4vw,30px)}
+  .deg{font-size:9px}
+  .disc{width:min(260px,64vw)}
+  .hud{left:16px;right:16px;bottom:24px;flex-direction:column;align-items:flex-start;gap:10px}
+  .hud p{font-size:10.5px;line-height:1.7}
+  .bar{flex:0 0 auto;width:100px;height:2px}
+  .picks{padding:0 16px 32px;gap:20px}
+  .info{padding:0 16px 32px}
+  .hours{grid-template-columns:1fr}
+  .band{padding:0 16px 36px}
+  .inner-band{padding:22px 18px}
+  .inner-band .cta{margin-left:0}
+  footer{padding:0 16px 22px;font-size:8.5px}
+  footer span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .nav{height:46px;padding:0 20px;gap:16px}
+  .nav-links{display:none}
+  .brand{font-size:11.5px}.brand .mark{width:19px;height:19px;font-size:9px}.brand i{display:none}
+  .nav .cta{padding:5px 11px;font-size:10.5px}
+  .sec{height:155vh}
+  .stick{padding-top:46px}
+  .head{left:20px;right:20px;top:56px}
+  .head .kicker{font-size:7.5px;margin-bottom:5px}
+  .head h1{font-size:19px;line-height:1.1}
+  .deg{font-size:8.5px}
+  .disc{width:min(210px,38vw)}
+  .label b{font-size:10px}.label small{font-size:6px}
+  .hud{left:20px;right:20px;bottom:14px}
+  .hud p{display:none}
+  .bar{flex:0 0 90px}
+  .picks,.info,.band,footer{display:none}
+  .hint{top:11px;bottom:auto;left:50%;transform:translateX(-50%);z-index:12;
+    font-size:9.5px;line-height:1.2;padding:3px 8px;white-space:nowrap;color:#3c4048;
+    background:rgba(255,255,255,.82);border:1px solid rgba(22,21,15,.12);
+    box-shadow:0 1px 6px rgba(0,0,0,.08)}
+}
+@media (prefers-reduced-motion:reduce){
+  .disc{transform:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark">G</span>凹槽<i>GROOVE RECORDS</i></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#picks">店选</a>
+    <a href="#info">到店</a>
+    <a href="#join">会员</a>
+  </nav>
+  <a class="cta" href="#join">加入会员</a>
+</header>
+
+<section class="sec" id="top">
+  <div class="stick">
+    <div class="head">
+      <div>
+        <p class="kicker">GROOVE · 黑胶唱片店 / 自 1998</p>
+        <h1>把一整面墙，<br><em>转成一张唱片。</em></h1>
+      </div>
+      <span class="deg" id="deg">0°</span>
+    </div>
+    <div class="disc" id="disc">
+      <span class="marker" aria-hidden="true"></span>
+      <div class="label"><span><b>33⅓</b><small>GROOVE</small></span></div>
+      <span class="hole" aria-hidden="true"></span>
+    </div>
+    <span class="tag" aria-hidden="true">SIDE A · 33⅓ RPM</span>
+    <div class="hud">
+      <p>滚动进度乘 720°，只写一条 transform；刻度与进度条共用同一个值，转多少、读多少不会走散。</p>
+      <div class="bar"><i id="bar"></i></div>
+    </div>
+  </div>
+</section>
+
+<section class="picks" id="picks">
+  <article class="pick"><p class="no">STAFF PICK 01 · JAZZ</p><h3>Blue in Green</h3><p>深夜店里最常放的一张。铜管不亮，鼓刷很轻，适合在关店前听完一面。</p><div class="line"><span>Miles Davis</span><span>¥ 280</span></div></article>
+  <article class="pick"><p class="no">STAFF PICK 02 · AMBIENT</p><h3>Music for Airports</h3><p>机场候机厅的循环。听不出从哪儿开始，也不急着结束，像一条很长的走廊。</p><div class="line"><span>Brian Eno</span><span>¥ 320</span></div></article>
+  <article class="pick"><p class="no">STAFF PICK 03 · CITY POP</p><h3>Pacific</h3><p>夏天傍晚的沿海公路。合成器一响，店里所有灯都像晚了一小时才关。</p><div class="line"><span>細野晴臣</span><span>¥ 360</span></div></article>
+</section>
+
+<section class="info" id="info">
+  <div>
+    <p class="kicker">THE STORE</p>
+    <h2>一间不赶时间的<br>唱片店。</h2>
+    <p>店里有三台可以试听的唱机，一面墙按年代排，另一面墙按心情排。我们不做网店，也不卖盲盒；每周五晚上有一场只听完整专辑的夜场。</p>
+  </div>
+  <dl class="hours">
+    <div><dt>ADDRESS</dt><dd>杭州 · 小河直街 31 号</dd></div>
+    <div><dt>HOURS</dt><dd>周三至周日 13:00–22:00</dd></div>
+    <div><dt>LISTENING</dt><dd>试听室 2 间 · 免预约</dd></div>
+    <div><dt>FRIDAY</dt><dd>整张专辑夜场 20:00</dd></div>
+  </dl>
+</section>
+
+<section class="band" id="join">
+  <div class="inner-band">
+    <div>
+      <h2>会员每月一张店选。</h2>
+      <p>按你的听音习惯挑，不重复、不凑数。可以随时暂停，也可以到店换一张。</p>
+    </div>
+    <a class="cta" href="mailto:hello@groove.records">加入会员 →</a>
+  </div>
+</section>
+
+<footer>
+  <span>凹槽 · GROOVE RECORDS</span>
+  <span>杭州 · 小河直街 31 号</span>
+  <span>33⅓ RPM</span>
+  <span>© 2026</span>
+</footer>
+
+<p class="hint">往下滚，唱片会转两圈</p>
+<script>
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var sec = document.getElementById('sec') || document.querySelector('.sec');
+  var disc = document.getElementById('disc');
+  var deg = document.getElementById('deg'), bar = document.getElementById('bar');
+  var raf = null;
+
+  function render() {
+    raf = null;
+    var r = sec.getBoundingClientRect();
+    var total = sec.offsetHeight - innerHeight;
+    var p = Math.max(0, Math.min(1, -r.top / total));
+    disc.style.transform = 'rotate(' + (p * 720).toFixed(2) + 'deg)';
+    deg.textContent = Math.round(p * 720) + '°';
+    bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+  }
+  addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+  addEventListener('resize', render);
+  render();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

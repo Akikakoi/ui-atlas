@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>液态熔岩灯 · MOLTEN 熔光工作室</title>
+<style>
+:root{--bg:#07090f;--bg2:#0a0c15;--ink:#f6f0ff;--muted:rgba(246,240,255,.55);--accent:#ffcf6e;
+  --line:rgba(255,207,110,.14);--c1:#ff6a3d;--c2:#6c7bff;--c3:#ff4f9a;--c4:#3fd6a8;--c5:#ffcf6e}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit}
+.wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+
+/* 背景 */
+.lamp{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--bg)}
+.goo{position:absolute;inset:-14%;filter:blur(30px) contrast(24);background:var(--bg)}
+.goo i{position:absolute;display:block;border-radius:50%;mix-blend-mode:screen;will-change:transform;transition:background-color .8s ease}
+.b1{width:44vw;height:44vw;left:4%;top:8%;background:var(--c1);animation:drift1 18s ease-in-out infinite alternate}
+.b2{width:38vw;height:38vw;right:2%;top:0;background:var(--c2);animation:drift2 23s ease-in-out infinite alternate}
+.b3{width:34vw;height:34vw;left:26%;bottom:-8%;background:var(--c3);animation:drift3 20s ease-in-out infinite alternate}
+.b4{width:26vw;height:26vw;right:20%;bottom:6%;background:var(--c4);animation:drift4 26s ease-in-out infinite alternate}
+.b5{width:20vw;height:20vw;left:8%;bottom:20%;background:var(--c5);animation:drift5 17s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate3d(16%,12%,0) scale(1.18)}}
+@keyframes drift2{to{transform:translate3d(-14%,18%,0) scale(1.22)}}
+@keyframes drift3{to{transform:translate3d(12%,-16%,0) scale(.9)}}
+@keyframes drift4{to{transform:translate3d(-18%,-12%,0) scale(1.14)}}
+@keyframes drift5{to{transform:translate3d(20%,-18%,0) scale(1.3)}}
+.shade{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(7,9,15,.88),rgba(7,9,15,.5) 48%,rgba(7,9,15,.02) 78%),
+  linear-gradient(180deg,rgba(5,7,12,.72),transparent 34%,transparent 70%,rgba(5,7,12,.62)),
+  radial-gradient(110% 80% at 50% 45%,transparent 32%,rgba(5,7,12,.5) 100%)}
+
+/* 顶栏 */
+.nav{position:sticky;top:0;z-index:6;background:rgba(7,9,15,.5);
+  backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);
+  border-bottom:1px solid rgba(255,207,110,.12)}
+.nav-in{width:min(1180px,calc(100% - 48px));margin:0 auto;height:64px;display:flex;align-items:center;gap:26px}
+.brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+  font:600 13px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em}
+.brand svg{width:18px;height:18px;display:block}
+.brand span{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:rgba(246,240,255,.4)}
+.nav nav{display:flex;gap:22px}
+.nav nav a{font-size:11.5px;letter-spacing:.05em;color:rgba(246,240,255,.58);text-decoration:none;transition:color .2s}
+.nav nav a:hover{color:var(--ink)}
+.hint{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 auto;padding:4px 9px;
+  font-size:11px;color:rgba(246,240,255,.6);white-space:nowrap;
+  background:rgba(128,128,128,.1);border:1px solid rgba(128,128,128,.18);border-radius:999px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:0 0 5px}
+.nav-cta{flex:0 0 auto;height:31px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;
+  border:1px solid rgba(255,207,110,.36);color:var(--accent);text-decoration:none;font-size:11.5px;
+  background:rgba(255,207,110,.07);transition:background .2s}
+.nav-cta:hover{background:rgba(255,207,110,.16)}
+
+/* 首屏 */
+.page{position:relative;z-index:2}
+.hero{width:min(1180px,calc(100% - 48px));margin:0 auto;min-height:calc(100vh - 65px);
+  padding:clamp(34px,8vh,84px) 0 24px;display:flex;flex-direction:column}
+.kicker{margin:0;font:600 10px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:rgba(255,207,110,.72)}
+h1{margin:16px 0 0;font-size:clamp(40px,6.4vw,72px);line-height:.99;letter-spacing:-.045em;font-weight:600;max-width:9em;text-shadow:0 2px 32px rgba(0,0,0,.7)}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:#ffe1a8}
+.lede{margin:20px 0 0;max-width:30em;font-size:13.5px;line-height:1.85;color:rgba(246,240,255,.68)}
+.actions{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{height:44px;padding:0 20px;border-radius:999px;display:inline-flex;align-items:center;
+  font-size:12px;letter-spacing:.03em;text-decoration:none;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s}
+.btn.solid{background:var(--accent);border-color:var(--accent);color:#1a1206}
+.btn.solid:hover{background:#ffe2a0;border-color:#ffe2a0}
+.btn.ghost{border-color:rgba(246,240,255,.24);color:var(--ink);background:rgba(10,8,14,.32);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.hero-foot{margin-top:auto;padding-top:clamp(30px,8vh,70px)}
+.pulse{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:14px;
+  background:rgba(8,10,18,.6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden}
+.stat{padding:14px 18px;border-left:1px solid rgba(255,207,110,.1)}
+.stat:first-child{border-left:0}
+.stat span{display:block;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:rgba(246,240,255,.4)}
+.stat b{display:flex;align-items:baseline;gap:5px;margin-top:4px;font:600 21px/1.2 ui-monospace,Consolas,monospace;letter-spacing:-.02em}
+.stat b small{font-size:10px;font-weight:500;color:rgba(246,240,255,.48)}
+.stat p{margin:3px 0 0;font-size:9.5px;line-height:1.5;color:rgba(246,240,255,.38)}
+.stat p.hot{color:var(--accent)}
+.term{margin:12px 0 0;font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:rgba(246,240,255,.34)}
+
+/* 实底内容 */
+.solid{background:var(--bg);border-top:1px solid rgba(255,207,110,.1)}
+.sec{padding:clamp(62px,10vh,106px) 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px}
+.eyebrow{margin:0;font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:rgba(255,207,110,.62)}
+h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spacing:-.04em;font-weight:600}
+.sec-head>p{margin:0;max-width:30em;font-size:12.5px;line-height:1.85;color:var(--muted);justify-self:end;text-align:right}
+
+/* 色号 */
+.color-grid{margin-top:42px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.tone{border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(20,14,12,.55),rgba(8,9,14,.9));transition:transform .25s,border-color .25s}
+.tone:hover{transform:translateY(-3px);border-color:rgba(255,207,110,.34)}
+.swatch{position:relative;aspect-ratio:4/3;overflow:hidden}
+.swatch::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(90% 85% at 50% 118%,rgba(0,0,0,.5),transparent 62%)}
+.swatch .num{position:absolute;left:12px;top:10px;z-index:1;
+  font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(255,255,255,.58)}
+.t-dusk{background:
+  radial-gradient(42% 50% at 30% 34%,#ff6a3d 0 40%,rgba(255,106,61,0) 72%),
+  radial-gradient(50% 60% at 72% 66%,#ffcf6e 0 36%,rgba(255,207,110,0) 74%),
+  radial-gradient(34% 42% at 46% 88%,#ff4f9a 0 38%,rgba(255,79,154,0) 70%),#160b08}
+.t-orchid{background:
+  radial-gradient(42% 50% at 32% 32%,#6c7bff 0 40%,rgba(108,123,255,0) 72%),
+  radial-gradient(48% 58% at 70% 62%,#ff4f9a 0 36%,rgba(255,79,154,0) 74%),
+  radial-gradient(32% 40% at 44% 86%,#ffcf6e 0 38%,rgba(255,207,110,0) 70%),#0d0d1c}
+.t-tide{background:
+  radial-gradient(42% 50% at 32% 30%,#3fd6a8 0 40%,rgba(63,214,168,0) 72%),
+  radial-gradient(48% 58% at 70% 64%,#6c7bff 0 36%,rgba(108,123,255,0) 74%),
+  radial-gradient(32% 40% at 46% 88%,#ffcf6e 0 38%,rgba(255,207,110,0) 70%),#071110}
+.tone-body{padding:16px 18px 18px}
+.tone-body h3{margin:0;font-size:17px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:8px}
+.tone-body h3 small{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:rgba(246,240,255,.4)}
+.tone-body p{margin:8px 0 0;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.tone-foot{margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,207,110,.16);
+  display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tone-foot b{font:600 15px/1 ui-monospace,Consolas,monospace;letter-spacing:-.01em}
+.pick{height:28px;padding:0 11px;border-radius:999px;border:1px solid rgba(255,207,110,.3);
+  background:rgba(255,207,110,.06);color:var(--accent);font-size:10.5px;cursor:pointer;
+  font-family:inherit;transition:background .2s,color .2s}
+.pick:hover{background:rgba(255,207,110,.16)}
+.pick[aria-pressed="true"]{background:var(--accent);color:#1a1206;border-color:var(--accent)}
+
+/* 工艺 */
+.craft{background:var(--bg2);border-top:1px solid rgba(255,207,110,.1);padding:clamp(58px,9vh,98px) 0}
+.craft-grid{margin-top:42px;display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(30px,4vw,58px);align-items:center}
+.craft-copy p{margin:0 0 16px;max-width:30em;font-size:12.5px;line-height:1.9;color:var(--muted)}
+.craft-stats{margin-top:26px;display:flex;gap:30px;flex-wrap:wrap}
+.craft-stats span{display:block;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(246,240,255,.36)}
+.craft-stats b{display:block;margin-top:3px;font:600 18px/1.3 ui-monospace,Consolas,monospace;letter-spacing:-.02em;color:rgba(246,240,255,.9)}
+.panel{border:1px solid var(--line);border-radius:16px;padding:6px 18px;
+  background:rgba(10,12,20,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:0 30px 70px -46px rgba(0,0,0,.9)}
+.panel-row{display:grid;grid-template-columns:92px 1fr;gap:14px;padding:11px 0;
+  border-top:1px dashed rgba(255,207,110,.14);font-size:11.5px;line-height:1.7;color:rgba(246,240,255,.62)}
+.panel-row:first-child{border-top:0}
+.panel-row span{font:600 9px/2.1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(255,207,110,.6)}
+
+/* 引文 */
+.quote{background:var(--bg);border-top:1px solid rgba(255,207,110,.1);padding:clamp(62px,10vh,108px) 0}
+.quote blockquote{margin:0;max-width:21em;font:400 clamp(27px,3.7vw,46px)/1.26 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+.quote blockquote em{font-style:italic;color:#ffe1a8}
+.quote .cite{margin:20px 0 0;font:400 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(246,240,255,.4)}
+
+/* 收尾 */
+.cta{padding:clamp(72px,12vh,132px) 0;border-top:1px solid rgba(255,207,110,.14);
+  background:linear-gradient(180deg,rgba(7,9,15,.55),rgba(7,9,15,.92))}
+.cta-in{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.cta .kicker{color:rgba(255,207,110,.66)}
+.cta h2{margin:12px 0 0;font-size:clamp(32px,5vw,58px);line-height:1.02}
+.cta .note{margin:16px 0 0;max-width:31em;font-size:12px;line-height:1.85;color:var(--muted)}
+.cta-actions{display:flex;gap:10px;flex-wrap:wrap}
+.foot{background:#05070c;border-top:1px solid rgba(255,207,110,.1);padding:22px 0 28px}
+.foot-in{display:flex;flex-wrap:wrap;gap:10px 22px;font:400 9.5px/1.8 ui-monospace,Consolas,monospace;
+  letter-spacing:.08em;color:rgba(246,240,255,.34)}
+.foot-in span:last-child{margin-left:auto}
+
+/* 平板 */
+@media (max-width:900px){
+  .nav nav{display:none}
+  .sec-head{grid-template-columns:1fr;gap:12px}
+  .sec-head>p{justify-self:start;text-align:left}
+  .craft-grid{grid-template-columns:1fr;gap:30px}
+}
+
+/* 手机 */
+@media (max-width:560px){
+  .nav-in{width:calc(100% - 32px);height:56px;gap:12px}
+  .brand span{display:none}
+  .hint{display:none}
+  .nav-cta{margin-left:auto;height:29px;padding:0 12px;font-size:11px}
+  .wrap,.hero{width:calc(100% - 32px)}
+  .hero{min-height:calc(100vh - 57px);padding:34px 0 20px}
+  h1{font-size:clamp(38px,11vw,48px)}
+  .lede{font-size:12.5px;margin-top:16px}
+  .actions{margin-top:20px}
+  .btn{height:42px;padding:0 17px}
+  .hero-foot{padding-top:24px}
+  .pulse{grid-template-columns:1fr 1fr}
+  .stat{padding:11px 13px;border-top:1px solid rgba(255,207,110,.1)}
+  .stat:nth-child(odd){border-left:0}
+  .stat:nth-child(-n+2){border-top:0}
+  .stat b{font-size:18px}
+  .term{font-size:8px}
+  .color-grid{grid-template-columns:1fr}
+  .swatch{aspect-ratio:16/9}
+  .b1{width:64vw;height:64vw;left:-6%;top:5%}
+  .b2{width:56vw;height:56vw;right:-10%;top:1%}
+  .b3{width:56vw;height:56vw;left:12%;bottom:0}
+  .b4{width:40vw;height:40vw;right:-2%;bottom:14%}
+  .b5{width:30vw;height:30vw;left:4%;bottom:8%}
+  .craft{padding-top:52px}
+  .craft-grid{margin-top:30px}
+  .panel{padding:4px 14px}
+  .panel-row{grid-template-columns:76px 1fr;gap:10px;font-size:10.5px}
+  .cta-in{align-items:flex-start}
+  .foot-in span:last-child{margin-left:0}
+}
+
+/* 画廊 600×450 紧凑首屏 */
+@media (max-height:560px) and (min-width:561px){
+  .nav-in{height:44px;gap:14px}
+  .brand span{display:none}
+  .nav nav{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .nav-cta{height:27px;padding:0 11px;font-size:10.5px}
+  .hero{min-height:calc(100vh - 45px);padding:10px 0}
+  .kicker{font-size:9px}
+  h1{margin-top:7px;font-size:clamp(28px,4.7vw,38px);max-width:9em}
+  .lede{margin-top:8px;font-size:10.5px;line-height:1.6;max-width:36em}
+  .actions{margin-top:10px;gap:8px}
+  .btn{height:32px;padding:0 13px;font-size:11px}
+  .hero-foot{padding-top:10px}
+  .pulse{border-radius:11px}
+  .stat{padding:8px 12px}
+  .stat span{font-size:7.5px}
+  .stat b{font-size:15px;margin-top:2px}
+  .stat b small{font-size:8px}
+  .stat p{font-size:8px;margin-top:1px}
+  .term{display:none}
+}
+
+@media (hover:none){
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .goo i{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="lamp" aria-hidden="true">
+  <div class="goo"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><i class="b5"></i></div>
+</div>
+<div class="shade" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top" aria-label="MOLTEN 熔光工作室">
+      <svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="#ffcf6e" stroke-width="1.3">
+        <path d="M6.2 1.6h5.6M7.4 1.6v3.1c0 .8-.4 1.5-1.2 2.1-2.1 1.5-3 3.1-3 5.1 0 3.1 2.2 5.2 5.3 5.2s5.3-2.1 5.3-5.2c0-2-0.9-3.6-3-5.1-.8-.6-1.2-1.3-1.2-2.1V1.6" stroke-linecap="round"/>
+        <circle cx="9" cy="12.6" r="2.1" opacity=".8"/>
+      </svg>
+      MOLTEN<span>熔光</span>
+    </a>
+    <nav aria-label="主导航">
+      <a href="#colors">色号</a>
+      <a href="#craft">工艺</a>
+      <a href="#order">到店</a>
+    </nav>
+    <p class="hint">五团蜡在玻璃里漂，不用操作</p>
+    <a class="nav-cta" href="#order">选一盏</a>
+  </div>
+</header>
+
+<main class="page" id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">MOLTEN · 手作熔岩灯 · 第 12 批</p>
+      <h1>颜色在玻璃里，<br><em>慢慢相遇。</em></h1>
+      <p class="lede">五团矿物蜡，密度精确到 0.002。灯光把玻璃加热到 52°C，它们开始上升、分开、再合在一起。每一盏都不一样，也没有两盏会一样。</p>
+      <div class="actions">
+        <a class="btn solid" href="#colors">选一盏 →</a>
+        <a class="btn ghost" href="#craft">看它怎么热起来</a>
+      </div>
+    </div>
+    <div class="hero-foot">
+      <div class="pulse" aria-label="产品参数">
+        <div class="stat">
+          <span>容量 / VOLUME</span>
+          <b>1.4<small>L</small></b>
+          <p>手工灌装</p>
+        </div>
+        <div class="stat">
+          <span>预热 / WARM-UP</span>
+          <b>40<small>min</small></b>
+          <p class="hot">第一团蜡升起</p>
+        </div>
+        <div class="stat">
+          <span>功率 / POWER</span>
+          <b>25<small>W</small></b>
+          <p>卤素 · 2400K</p>
+        </div>
+        <div class="stat">
+          <span>连续 / RUNTIME</span>
+          <b>8<small>h</small></b>
+          <p>建议关灯散热</p>
+        </div>
+      </div>
+      <p class="term">5 团矿物蜡 · blur 30px · contrast 24 · drift 17–26s · 每盏激光编号</p>
+    </div>
+  </section>
+
+  <section class="sec solid" id="colors">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">01 / 三个色号</p>
+          <h2>先选一种，<br>入夜的颜色。</h2>
+        </div>
+        <p>三个色号来自同一批矿物蜡，只是色母不同。点一下「换成这盏」，背景会跟着换颜色。</p>
+      </div>
+      <div class="color-grid">
+        <article class="tone">
+          <div class="swatch t-dusk"><span class="num">Nº 01 / DUSK</span></div>
+          <div class="tone-body">
+            <h3>黄昏 <small>DUSK</small></h3>
+            <p>橙红、金色和一点玫红互相追赶，像傍晚六点四十分的天空。</p>
+            <div class="tone-foot">
+              <b>¥1,280</b>
+              <button class="pick" type="button" aria-pressed="true"
+                data-c1="#ff6a3d" data-c2="#6c7bff" data-c3="#ff4f9a" data-c4="#3fd6a8" data-c5="#ffcf6e">换成这盏</button>
+            </div>
+          </div>
+        </article>
+        <article class="tone">
+          <div class="swatch t-orchid"><span class="num">Nº 02 / ORCHID</span></div>
+          <div class="tone-body">
+            <h3>兰夜 <small>ORCHID</small></h3>
+            <p>蓝紫底上浮着一团兰粉，适合放在床头，也适合整夜不说话。</p>
+            <div class="tone-foot">
+              <b>¥1,280</b>
+              <button class="pick" type="button" aria-pressed="false"
+                data-c1="#6c7bff" data-c2="#ff4f9a" data-c3="#8a5bff" data-c4="#3fd6a8" data-c5="#ffcf6e">换成这盏</button>
+            </div>
+          </div>
+        </article>
+        <article class="tone">
+          <div class="swatch t-tide"><span class="num">Nº 03 / TIDE</span></div>
+          <div class="tone-body">
+            <h3>潮汐 <small>TIDE</small></h3>
+            <p>青绿和靛蓝缓慢交换位置，看久了会想起退潮后的礁石。</p>
+            <div class="tone-foot">
+              <b>¥1,280</b>
+              <button class="pick" type="button" aria-pressed="false"
+                data-c1="#3fd6a8" data-c2="#6c7bff" data-c3="#2f8fff" data-c4="#ffcf6e" data-c5="#ff4f9a">换成这盏</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="craft" id="craft">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">02 / 工艺</p>
+          <h2>它得先热起来，<br>才肯动。</h2>
+        </div>
+        <p>不是坏了，也不是慢。蜡的密度只差一点，就要等温度把它推上去。</p>
+      </div>
+      <div class="craft-grid">
+        <div class="craft-copy">
+          <p>玻璃是硼硅的，壁厚 3.2mm，手吹成型。底座里一枚 25W 卤素灯，把热量稳稳送上去，玻璃摸着是温的，不会烫手。</p>
+          <p>蜡和液体按密度配好，误差控制在 0.002：差得太多，蜡会一直沉底；差得太少，它就一直贴在最上面。配好的蜡会在四十分钟后开始第一轮旅行。</p>
+          <p>每盏灌装完静置 24 小时，确认能完整跑完一轮，才刻上编号、装箱。</p>
+          <div class="craft-stats">
+            <div><span>壁厚</span><b>3.2 mm</b></div>
+            <div><span>密度差</span><b>0.002</b></div>
+            <div><span>工作温度</span><b>52 °C</b></div>
+          </div>
+        </div>
+        <div class="panel" aria-label="产品工艺参数">
+          <div class="panel-row"><span>玻璃</span>硼硅酸盐 · 手吹 · 3.2mm</div>
+          <div class="panel-row"><span>蜡体</span>矿物蜡 5 团 · 色母 3 色</div>
+          <div class="panel-row"><span>液体</span>去离子水 + 食品级表面活性剂</div>
+          <div class="panel-row"><span>热源</span>25W 卤素 · 2400K · 可更换</div>
+          <div class="panel-row"><span>预热</span>40 分钟 · 第一团蜡上升</div>
+          <div class="panel-row"><span>连续</span>8 小时 · 建议关灯散热</div>
+          <div class="panel-row"><span>编号</span>激光刻在底座 · #0001—#9999</div>
+          <div class="panel-row"><span>背景</span>5 团蜡 + blur 30 / contrast 24</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="quote solid">
+    <div class="wrap">
+      <blockquote>它照不亮一个房间，<br><em>它照亮十分钟。</em></blockquote>
+      <p class="cite">主理人 · 灌装第 8,412 盏 · 凌晨 1:20</p>
+    </div>
+  </section>
+
+  <section class="cta" id="order">
+    <div class="wrap cta-in">
+      <div>
+        <p class="kicker">BATCH 12 · 剩 86 盏</p>
+        <h2>入夜前，<br>让它先热起来。</h2>
+        <p class="note">第 12 批手工灌装，每盏独立编号。下单后 7 天内发出，江浙沪顺丰包邮；到店可以坐着看它慢慢升起。</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn solid" href="#order">预约到店</a>
+        <a class="btn ghost" href="#colors">再看色号</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>MOLTEN 熔光工作室 · 杭州 · 第 12 批</span>
+    <span>背景由 5 团蜡 + blur / contrast 实时合成</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement.style;
+  var picks = Array.prototype.slice.call(document.querySelectorAll('.pick'));
+  picks.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      for (var n = 1; n <= 5; n++) {
+        var v = btn.getAttribute('data-c' + n);
+        if (v) root.setProperty('--c' + n, v);
+      }
+      picks.forEach(function (b) {
+        b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+      });
+    });
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>
