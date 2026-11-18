@@ -48,13 +48,6 @@ ui-atlas/
 │   ├── flow.html        # 3 屏流程：列表 / 详情 / 完成
 │   ├── lab.html         # 参数实验台：滑杆 / 规则体检 / 预设 / 复制 CSS
 │   └── components.html  # 组件工坊：8 个可配置组件 + JS / CSS / HTML 复制
-├── ref.html             # 参考实现总览：十屏 / token 表 / 判定规则
-├── ref/glass/           # 把一条风格做穿（见下文）
-│   ├── tokens.css       # 75 个变量、12 组，含 [data-theme="light"]
-│   ├── base.css         # reset / 背景光斑 / 排版 / 焦点环 / 无障碍
-│   ├── components.css   # 组件库：按钮 6 变体、输入 7 态、表格、弹窗、空态…
-│   ├── pages.css        # 页面骨架：营销页 / 认证页 / 手机框
-│   └── 01–10*.html      # 后台 7 屏 + 营销 / 登录 / 移动端
 ├── serve.py             # 本地预览服务
 ├── 启动预览.bat          # Windows 一键启动
 └── tools/
@@ -267,17 +260,6 @@ ui-atlas/
 
 **还没做**：物理手机（iOS Safari / Android Chrome）实测——移动档是 4× CPU + Slow 4G 仿真，不是真机；分钟级长滚动的内存曲线；Lighthouse 评分报告。仿真数据能定位瓶颈，但不能替代真机结论。
 
-## 参考实现：把一条风格做穿
-
-首屏好看不等于能用——真实项目里决定成败的是表格、表单、错误态、空态和弹窗。所以拿 `glass` 做了一条**参考实现**（[`ref.html`](ref.html)）：75 个 token、12 组；十个页面覆盖三种产品形态；一张反例页和 7 条可判定规则（blur 12–32px、边框亮度 .10–.24、一屏最多三层玻璃、必须有不在透明锚点……）。
-
-- *应用壳*：工作台、详情、表单（错误态同时改边框 / 外环 / 文案 / aria）、状态样张（按钮 7 态、输入 7 态、空态 / 错误 / 无权限）、破坏性确认（遮罩只糊不换色）、浅色主题（只换 `data-theme`）
-- *公开页*：营销页（定价 + 原生 `details` FAQ）、登录（左证言右表单）
-- *手机框*：390 宽做减法，整屏只两处 blur
-- *反例*：6 个做坏的玻璃，左错右对
-
-它是模板，不是第 61 条风格——做完才能估出「做穿一条」的成本（约 2,900 行），再决定铺开还是只保留「反例 + 判定规则」。
-
 ## 数据的体检
 
 ```bash
@@ -287,7 +269,7 @@ python tools/check_effects.py # 校验 100 条动效：数据 / 自包含 / 减�
 python tools/check_motion.py  # 校验动效系统：token / 规则 / 反例 / 3 屏流程
 ```
 
-`check.py` 检查：id 唯一、`styles.json` 与 `demos/` 一一对应、tokens 必填键齐全、样例不含外链与 `<script>`、`var(--x)` 必须已在 `:root` 定义、`features` ≥ 3 条、每条有 `sources` 与 `avoid`；参考实现的页面只能引用已定义的变量。最后打一张表：每条风格的圆角、三组 WCAG 对比度、字号阶梯。故意改坏一处，它会报出**文件与行号**。
+`check.py` 检查：id 唯一、`styles.json` 与 `demos/` 一一对应、tokens 必填键齐全、样例不含外链与 `<script>`、`var(--x)` 必须已在 `:root` 定义、`features` ≥ 3 条、每条有 `sources` 与 `avoid`。最后打一张表：每条风格的圆角、三组 WCAG 对比度、字号阶梯。故意改坏一处，它会报出**文件与行号**。
 
 `check_effects.py` 额外检查：`total` 与条目数一致、`cat / trigger / level / family` 取值合法、`variant_of` 指向同族已有条目、demo 文件名与 id 对齐、没有 `<link>` 与远程 `src/href`（内联 SVG 的 `xmlns` 除外）、有 `.hint` 与 `prefers-reduced-motion`、背景 canvas 的 rAF 有 `visibilitychange` 暂停，并列出每条的行数、体积与是否含 JS。深度档案也在这里兜底：`anatomy` ≥ 3、`params` ≥ 3、`variants` ≥ 2、`cost.tier` 合法、`avoid` 非空。
 

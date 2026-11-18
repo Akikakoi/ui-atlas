@@ -177,72 +177,6 @@ def audit_demo(path: Path, style: dict):
 
 
 
-# ---------------------------------------------------------------- 参考实现
-REF_DIR = ROOT / "ref"
-REF_CSS = ("tokens.css", "base.css", "components.css", "pages.css")
-# 参考实现里允许的「自带兜底值」变量
-REF_OPTIONAL = {"refnav-h"}
-
-
-def audit_ref():
-    """ref/<风格>/ 下：三份 CSS 必须存在，页面只能引用已定义的变量，且不许外链与脚本。
-
-    返回 (页数, root 变量数, 错误, 警告)。
-    """
-    errs, warns = [], []
-    if not REF_DIR.exists():
-        return 0, 0, errs, warns
-
-    pages = 0
-    root_tokens = 0
-    for folder in sorted(p for p in REF_DIR.iterdir() if p.is_dir()):
-        defined, css_texts = set(), {}
-        for name in REF_CSS:
-            f = folder / name
-            if not f.exists():
-                errs.append(f"ref/{folder.name}: 缺少 {name}")
-                continue
-            text = f.read_text(encoding="utf-8")
-            css_texts[f] = text
-            defined |= set(RE_VAR_DEF.findall(text))
-        tok = folder / "tokens.css"
-        if tok.exists():
-            blocks = RE_ROOT.findall(tok.read_text(encoding="utf-8"))
-            root_tokens = max(root_tokens, len(RE_VAR_DEF.findall(blocks[0])) if blocks else 0)
-
-        htmls = sorted(folder.glob("[0-9][0-9]-*.html"))
-        if not htmls:
-            errs.append(f"ref/{folder.name}: 没有任何页面")
-        stale = sorted(p.name for p in folder.glob("*.html")
-                       if not re.match(r"\d\d-", p.name))
-        for s in stale:
-            warns.append(f"ref/{folder.name}/{s}: 不以数字开头，未被参考实现收录")
-
-        sources = dict(css_texts)
-        for p in htmls:
-            sources[p] = p.read_text(encoding="utf-8")
-            pages += 1
-
-        for path, text in sources.items():
-            rel = path.relative_to(ROOT).as_posix()
-            low = text.lower()
-            if "<script" in low:
-                errs.append(f"{rel}: 出现 <script>（参考实现也不许脚本）")
-            for i, line in enumerate(text.splitlines(), 1):
-                if re.search(r"https?://", line) and "www.w3.org" not in line:
-                    errs.append(f"{rel}:{i} 出现外链：{line.strip()[:56]}")
-                for vname, has_fb in RE_VAR_USE.findall(line):
-                    if vname in defined or vname in REF_OPTIONAL:
-                        continue
-                    msg = f"{rel}:{i} var(--{vname}) 未在 tokens.css 定义"
-                    (warns if has_fb else errs).append(msg)
-
-        for name in REF_CSS:
-            if name not in [f.name for f in css_texts]:
-                continue
-    return pages, root_tokens, errs, warns
-
-
 def main() -> int:
     strict = "--strict" in sys.argv
     if not DATA.exists():
@@ -314,15 +248,9 @@ def main() -> int:
     for miss in sorted(in_json - on_disk):
         errs.append(f"demos/{miss}: styles.json 里有，但磁盘上没有")
 
-    # ---------------------------------------------------------------- 参考实现
-    ref_pages, ref_tokens, ref_errs, ref_warns = audit_ref()
-    errs += ref_errs
-    warns += ref_warns
-
     # ---------------------------------------------------------------- 报告
     print("=" * 96)
-    print(f"UI Atlas 校验 · {len(styles)} 条风格 / {len(on_disk)} 个样例文件"
-          f" ＋ 参考实现 {ref_pages} 页 / {ref_tokens} 个 token")
+    print(f"UI Atlas 校验 · {len(styles)} 条风格 / {len(on_disk)} 个样例文件")
     print("=" * 96)
 
     if warns:
