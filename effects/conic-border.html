@@ -26,8 +26,10 @@ a{color:inherit}
   animation:turn 6.4s linear infinite}
 .brand span{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.3em;color:rgba(241,243,240,.4)}
 .nav nav{display:flex;gap:22px}
-.nav nav a{font-size:11.5px;letter-spacing:.05em;color:rgba(241,243,240,.58);text-decoration:none;transition:color .2s}
+.nav nav a{font-size:11.5px;letter-spacing:.05em;color:rgba(241,243,240,.58);text-decoration:none;position:relative;transition:color .2s}
+.nav nav a::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
 .nav nav a:hover{color:var(--ink)}
+.nav nav a:hover::after{transform:scaleX(1)}
 .hint{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 auto;padding:4px 9px;
   font-size:11px;color:rgba(241,243,240,.6);white-space:nowrap;
   background:rgba(128,128,128,.1);border:1px solid rgba(128,128,128,.18);border-radius:999px;
@@ -35,8 +37,9 @@ a{color:inherit}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);flex:0 0 5px}
 .nav-cta{flex:0 0 auto;height:31px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;
   border:1px solid rgba(255,207,110,.36);color:var(--gold);text-decoration:none;font-size:11.5px;
-  background:rgba(255,207,110,.07);transition:background .2s}
-.nav-cta:hover{background:rgba(255,207,110,.15)}
+  background:rgba(255,207,110,.07);transition:background .2s,translate .15s,box-shadow .2s}
+.nav-cta:hover{background:rgba(255,207,110,.15);translate:0 -1px;box-shadow:0 10px 20px -16px rgba(255,207,110,.8)}
+.nav-cta:active{translate:0 1px}
 
 /* 首屏 */
 .hero{min-height:calc(100vh - 65px);padding:clamp(40px,8vh,88px) 0 42px;
@@ -55,16 +58,25 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;
 .btn.ghost{border-color:rgba(241,243,240,.24);color:var(--ink)}
 .btn.ghost:hover{border-color:var(--gold);color:var(--gold)}
 .terms{margin:16px 0 0;font:400 9.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(241,243,240,.36)}
+.hero .kicker{animation:rise .5s both}
+.hero h1{animation:rise .6s .06s both}
+.hero .lede{animation:rise .6s .12s both}
+.hero .actions{animation:rise .6s .18s both}
+.hero .terms{animation:rise .6s .24s both}
+.cards{animation:rise .7s .14s both}
+@keyframes rise{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
 
 /* 两张卡：流动边框在 1.5px 的 padding 里，内部盖实底 */
 .cards{position:relative;justify-self:end;width:min(460px,100%);
   display:flex;flex-direction:column;align-items:flex-start}
 .ring{position:relative;width:86%;aspect-ratio:1.66;border-radius:18px;padding:1.5px;overflow:hidden;
   background:conic-gradient(from var(--ang),rgba(255,255,255,.07) 0 66%,var(--gold) 77%,var(--ice) 85%,rgba(255,255,255,.07) 95%);
-  animation:turn 6.4s linear infinite;
+  animation:turn 6.4s linear infinite,floatA 7.5s ease-in-out infinite;
   box-shadow:0 26px 60px -30px rgba(0,0,0,.9)}
-.ring.alt{animation:turn 8.2s linear infinite reverse;align-self:flex-end;margin-top:-7%;z-index:2}
+.ring.alt{animation:turn 8.2s linear infinite reverse,floatB 8.6s ease-in-out infinite;align-self:flex-end;margin-top:-7%;z-index:2}
 @keyframes turn{to{--ang:360deg}}
+@keyframes floatA{0%,100%{translate:0 0}50%{translate:0 -6px}}
+@keyframes floatB{0%,100%{translate:0 0}50%{translate:0 5px}}
 .ring .in{position:relative;z-index:1;border-radius:16.5px;background:linear-gradient(155deg,#11151d,#0b0e14 62%,#0c1017);
   height:100%;padding:17px 18px 15px;display:flex;flex-direction:column;justify-content:space-between}
 .ring.alt .in{background:linear-gradient(155deg,#0c1420,#090d14 62%,#0b1119)}
@@ -91,8 +103,8 @@ h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spac
 .sec-head>p{margin:0;max-width:30em;font-size:12.5px;line-height:1.85;color:var(--muted);justify-self:end;text-align:right}
 .benefit-grid{margin-top:42px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .benefit{border:1px solid var(--line);border-radius:14px;padding:20px;
-  background:linear-gradient(180deg,rgba(20,25,34,.6),rgba(10,13,19,.86));transition:border-color .25s,transform .25s}
-.benefit:hover{border-color:rgba(255,207,110,.28);transform:translateY(-3px)}
+  background:linear-gradient(180deg,rgba(20,25,34,.6),rgba(10,13,19,.86));transition:border-color .25s,transform .25s,box-shadow .25s}
+.benefit:hover{border-color:rgba(255,207,110,.28);transform:translateY(-3px);box-shadow:0 24px 40px -36px rgba(255,207,110,.45)}
 .benefit b{font:600 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--gold)}
 .benefit h3{margin:10px 0 0;font-size:16px;letter-spacing:-.01em}
 .benefit p{margin:8px 0 0;font-size:11.5px;line-height:1.85;color:rgba(241,243,240,.52)}
@@ -109,6 +121,8 @@ h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spac
 .rates-table tbody th{font-size:11.5px;font-weight:400;color:rgba(241,243,240,.5)}
 .rates-table td{font:500 12.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.02em;color:rgba(241,243,240,.85)}
 .rates-table tr:last-child th,.rates-table tr:last-child td{border-bottom:0}
+.rates-table tbody tr{transition:background .18s}
+.rates-table tbody tr:hover{background:rgba(255,207,110,.035)}
 .rates .cap{margin:16px 0 0;font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(241,243,240,.32)}
 
 /* 工艺 */
@@ -120,7 +134,8 @@ h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spac
 .craft-copy .aside em{color:var(--gold)}
 .params{margin:0;border-top:1px solid rgba(255,255,255,.12)}
 .params div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:9px 0;
-  border-bottom:1px dashed rgba(255,255,255,.1);font:400 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em}
+  border-bottom:1px dashed rgba(255,255,255,.1);font:400 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;transition:translate .18s,background .18s}
+.params div:hover{translate:2px 0;background:rgba(255,207,110,.03)}
 .params dt{color:rgba(241,243,240,.42)}
 .params dd{margin:0;color:rgba(241,243,240,.82);text-align:right}
 .craft .cap{margin:14px 0 0;font:400 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(241,243,240,.32)}
@@ -217,7 +232,10 @@ h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spac
   .hint{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .ring,.brand i{animation:none}
+  .ring,.brand i,.hero .kicker,.hero h1,.hero .lede,.hero .actions,.hero .terms,.cards{animation:none}
+  .nav nav a::after,.nav-cta,.benefit,.rates-table tbody tr,.params div{transition:none}
+  .nav-cta:hover,.params div:hover{translate:none}
+  .benefit:hover{transform:none}
 }
 </style>
 </head>

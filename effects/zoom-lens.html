@@ -19,7 +19,10 @@ a{color:inherit}
 .brand{display:flex;align-items:baseline;gap:10px;font-size:12px;font-weight:750;letter-spacing:.2em;text-decoration:none;white-space:nowrap}
 .brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .nav-links{display:flex;gap:24px}
-.nav-links a{font-size:12.5px;color:#5d5e54;text-decoration:none}
+.nav-links a{position:relative;font-size:12.5px;color:#5d5e54;text-decoration:none}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--ink)}
 .bag{margin-left:auto;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);white-space:nowrap}
 .product{max-width:1180px;margin:0 auto;padding:34px 22px 56px;display:grid;
@@ -29,6 +32,9 @@ a{color:inherit}
   cursor:crosshair;touch-action:none;overflow:hidden}
 .badge{position:absolute;left:12px;bottom:11px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;
   color:rgba(255,255,255,.85);background:rgba(20,22,17,.3);border-radius:999px;padding:5px 9px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.zoom{position:absolute;right:12px;top:12px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;
+  color:rgba(255,255,255,.82);background:rgba(20,22,17,.32);border-radius:999px;padding:5px 9px;
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .lens{position:absolute;left:50%;top:50%;width:108px;height:108px;border-radius:50%;pointer-events:none;
   border:2px solid rgba(255,255,255,.85);background-image:var(--art);background-repeat:no-repeat;
@@ -49,6 +55,16 @@ h1{margin:0 0 10px;font-size:clamp(32px,3.8vw,52px);line-height:1.04;letter-spac
 .buy{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:46px;padding:0 24px;border:1px solid var(--ink);
   border-radius:999px;background:var(--ink);color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
 .buy:hover{background:var(--green);border-color:var(--green)}
+.bag.bump{animation:bagBump .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes bagBump{0%,100%{transform:none}35%{transform:translateY(-3px) scale(1.06)}}
+.print{text-decoration:none;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){.print:hover{transform:translateY(-3px)}}
+.print .pic::after{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.print:hover .pic::after{transform:scale(1.08)}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .meta{margin:26px 0 0;padding:16px 0 0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}
 .meta div{font-size:11px;line-height:1.6;color:var(--muted)}
 .meta b{display:block;font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--ink)}
@@ -119,6 +135,9 @@ h1{margin:0 0 10px;font-size:clamp(32px,3.8vw,52px);line-height:1.04;letter-spac
 }
 @media (prefers-reduced-motion:reduce){
   .lens{transition:none}
+  .print,.print .pic::after,.nav-links a::after{transition:none}
+  .bag.bump{animation:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -168,7 +187,7 @@ h1{margin:0 0 10px;font-size:clamp(32px,3.8vw,52px);line-height:1.04;letter-spac
     <a href="#related">版画</a>
     <a href="mailto:studio@terrain.press">工作室</a>
   </nav>
-  <span class="bag">购物袋 · 0</span>
+  <span class="bag" id="bag">购物袋 · 0</span>
 </header>
 
 <main id="top">
@@ -177,6 +196,7 @@ h1{margin:0 0 10px;font-size:clamp(32px,3.8vw,52px);line-height:1.04;letter-spac
       <div class="frame">
         <div class="art" id="art">
           <span class="badge">TUNDRA · 001</span>
+          <span class="zoom" id="zoom">2.3×</span>
           <span class="lens" id="lens" aria-hidden="true"></span>
         </div>
       </div>
@@ -193,7 +213,7 @@ h1{margin:0 0 10px;font-size:clamp(32px,3.8vw,52px);line-height:1.04;letter-spac
         <button class="chip on" type="button">42 × 52 cm</button>
         <button class="chip" type="button">60 × 74 cm</button>
       </div>
-      <button class="buy" type="button">加入购物袋 →</button>
+      <button class="buy" id="buy" type="button">加入购物袋 →</button>
       <div class="meta">
         <div><b>PAPER</b>310g 纯棉无酸纸</div>
         <div><b>INK</b>12 色颜料微喷</div>
@@ -239,6 +259,8 @@ h1{margin:0 0 10px;font-size:clamp(32px,3.8vw,52px);line-height:1.04;letter-spac
   var art = document.getElementById('art'), lens = document.getElementById('lens');
   if (!art || !lens || matchMedia('(hover:none)').matches) return;
   var Z = 2.3;
+  var zoom = document.getElementById('zoom');
+  if (zoom) zoom.textContent = Z.toFixed(1) + '×';
 
   art.addEventListener('pointermove', function (e) {
     var r = art.getBoundingClientRect();
@@ -259,6 +281,34 @@ h1{margin:0 0 10px;font-size:clamp(32px,3.8vw,52px);line-height:1.04;letter-spac
       chip.classList.add('on');
     });
   });
+})();
+(function () {
+  var bag = document.getElementById('bag'), buy = document.getElementById('buy');
+  if (!bag || !buy) return;
+  var n = 0;
+  buy.addEventListener('click', function () {
+    n++;
+    bag.textContent = '购物袋 · ' + n;
+    bag.classList.remove('bump');
+    void bag.offsetWidth;
+    bag.classList.add('bump');
+  });
+  bag.addEventListener('animationend', function () { bag.classList.remove('bump'); });
+
+  if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      });
+    }, { threshold: .18 });
+    [].slice.call(document.querySelectorAll('.story, .related')).forEach(function (el, i) {
+      el.classList.add('io');
+      el.style.setProperty('--i', i);
+      io.observe(el);
+    });
+  }
 })();
 </script>
 <script>

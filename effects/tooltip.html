@@ -23,13 +23,14 @@ button{font:inherit}
 .nav a.on{background:#fff;color:var(--ink);box-shadow:0 8px 18px -16px rgba(20,22,30,.5)}
 .right{margin-left:auto;display:flex;align-items:center;gap:12px}
 .sync{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);display:flex;align-items:center;gap:5px;white-space:nowrap}
-.sync::before{content:"";width:5px;height:5px;border-radius:50%;background:#3f8f74}
+.sync::before{content:"";width:5px;height:5px;border-radius:50%;background:#3f8f74;animation:syncPulse 2.6s ease-in-out infinite}
+@keyframes syncPulse{0%,100%{opacity:.55;scale:1}50%{opacity:1;scale:1.3}}
 .avatar{width:27px;height:27px;border-radius:50%;background:linear-gradient(145deg,#9c7b5f,#5e4632);color:#fff6ec;display:grid;place-items:center;font:700 10px/1 ui-monospace,Consolas,monospace}
 .shell{flex:1;width:100%;max-width:1380px;margin:0 auto;display:grid;grid-template-columns:196px minmax(0,1fr) 244px;gap:clamp(18px,2.6vw,32px);padding:clamp(16px,2.4vw,28px) clamp(16px,3vw,38px) 32px;align-items:start}
 .side-k{margin:0 0 10px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.17em;color:var(--muted)}
 .docs{position:sticky;top:78px;display:flex;flex-direction:column;gap:2px;padding-top:4px}
-.doc{display:block;padding:9px 10px;border-radius:9px;transition:background .18s}
-.doc:hover{background:rgba(255,255,255,.55)}
+.doc{display:block;padding:9px 10px;border-radius:9px;transition:background .18s,translate .18s}
+.doc:hover{background:rgba(255,255,255,.55);translate:2px 0}
 .doc.on{background:#fff;box-shadow:0 10px 22px -20px rgba(20,22,30,.5)}
 .doc b{display:block;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .doc small{display:block;margin-top:3px;font:500 8.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.03em;color:var(--muted)}
@@ -37,8 +38,10 @@ button{font:inherit}
 .docs-goal span{font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .docs-goal b{display:block;font-size:18px;letter-spacing:-.03em;margin-top:2px}
 .docs-goal i{display:block;height:3px;border-radius:2px;background:#ddd8ca;margin-top:8px;position:relative;overflow:hidden}
-.docs-goal i::after{content:"";position:absolute;inset:0;width:64%;background:var(--warm);border-radius:2px}
-.editor{min-width:0;display:flex;flex-direction:column;min-height:calc(100svh - 54px - 60px);background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:0 40px 80px -74px rgba(20,22,30,.55);position:relative}
+.docs-goal i::after{content:"";position:absolute;inset:0;width:64%;background:var(--warm);border-radius:2px;transform-origin:left;animation:growBar .8s .2s cubic-bezier(.2,.8,.2,1) both}
+@keyframes growBar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.editor{min-width:0;display:flex;flex-direction:column;min-height:calc(100svh - 54px - 60px);background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:0 40px 80px -74px rgba(20,22,30,.55);position:relative;animation:rise .5s .05s both}
+@keyframes rise{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
 .edbar{flex:0 0 auto;height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid #ebe6da;background:rgba(255,255,255,.42);border-radius:14px 14px 0 0}
 .ed-title{display:flex;align-items:baseline;gap:9px;min-width:0}
 .ed-title b{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -47,13 +50,15 @@ button{font:inherit}
 .hint{margin:0 auto;display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.02em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:3px 8px;white-space:nowrap}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
 .toolbar{position:relative;z-index:12;display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:5px 14px;border-bottom:1px solid #ebe6da;background:rgba(255,255,255,.55)}
-.toolbar button{width:40px;height:38px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--ink);font:600 14px/1 ui-monospace,Consolas,monospace;cursor:pointer;display:grid;place-items:center;transition:background .18s,border-color .18s,color .18s}
+.toolbar button{width:40px;height:38px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--ink);font:600 14px/1 ui-monospace,Consolas,monospace;cursor:pointer;display:grid;place-items:center;transition:background .18s,border-color .18s,color .18s,translate .15s,scale .15s}
 .toolbar button:hover{background:#f2efe7;border-color:var(--line)}
+.toolbar button:active{translate:0 1px;scale:.96}
 .toolbar button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.toolbar button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.toolbar button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff;animation:toolOn .3s cubic-bezier(.2,1.4,.4,1)}
+@keyframes toolOn{0%{scale:1}45%{scale:1.1}100%{scale:1}}
 .toolbar .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
-.tip{position:absolute;left:0;top:0;z-index:40;padding:6px 10px;border-radius:8px;background:var(--ink);color:#fff;font:500 11.5px/1.4 -apple-system,"Segoe UI","PingFang SC",sans-serif;white-space:nowrap;pointer-events:none;opacity:0;visibility:hidden;transform:translate(-50%,-100%) translateY(-7px);transition:opacity .16s ease,transform .22s cubic-bezier(.2,.8,.2,1),visibility .16s}
-.tip.on{opacity:1;visibility:visible;transform:translate(-50%,-100%) translateY(-11px)}
+.tip{position:absolute;left:0;top:0;z-index:40;padding:6px 10px;border-radius:8px;background:var(--ink);color:#fff;font:500 11.5px/1.4 -apple-system,"Segoe UI","PingFang SC",sans-serif;white-space:nowrap;pointer-events:none;opacity:0;visibility:hidden;transform:translate(-50%,-100%) translateY(-7px);scale:.96;transition:opacity .16s ease,transform .22s cubic-bezier(.2,.8,.2,1),visibility .16s,scale .18s cubic-bezier(.2,.8,.2,1)}
+.tip.on{opacity:1;visibility:visible;transform:translate(-50%,-100%) translateY(-11px);scale:1}
 .tip::after{content:"";position:absolute;left:50%;bottom:-4px;width:8px;height:8px;background:var(--ink);transform:translateX(-50%) rotate(45deg);border-radius:1px}
 .canvas{flex:1;padding:clamp(22px,3.2vw,40px) clamp(20px,4vw,52px) 30px}
 .canvas article{max-width:648px;margin:0 auto;outline:none}
@@ -67,12 +72,15 @@ button{font:inherit}
 .status{flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:7px 16px;border-top:1px solid #ebe6da;font:500 8px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.07em;color:var(--muted);background:rgba(255,255,255,.35);border-radius:0 0 14px 14px}
 .status .stat-r{margin-left:auto}
 .notes{position:sticky;top:78px;display:flex;flex-direction:column;gap:9px;padding-top:4px}
-.note{padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.5)}
+.note{padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.5);transition:translate .2s,box-shadow .2s;animation:rise .5s both}
+.notes .note:nth-of-type(2){animation-delay:.07s}
+.note:hover{translate:0 -2px;box-shadow:0 16px 26px -24px rgba(20,22,30,.5)}
 .note header{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
 .note header span{font-size:10.5px;font-weight:600}
 .note header small{font:500 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted)}
 .note p{margin:5px 0 0;font-size:10.5px;line-height:1.7;color:#55575d}
-.ver{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(221,216,202,.65);font-size:10.5px;color:var(--muted)}
+.ver{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(221,216,202,.65);font-size:10.5px;color:var(--muted);transition:color .18s,translate .18s}
+.ver:hover{color:var(--ink);translate:2px 0}
 .ver.on{color:var(--ink)}
 .ver small{font:500 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.03em;color:var(--muted)}
 .notes .side-k:not(:first-child){margin-top:14px}
@@ -127,7 +135,10 @@ button{font:inherit}
   .foot{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .toolbar button,.tip,.nav a,.doc{transition:none}
+  .toolbar button,.tip,.nav a,.doc,.note,.ver{transition:none}
+  .editor,.note,.sync::before,.docs-goal i::after,.toolbar button[aria-pressed="true"]{animation:none}
+  .doc:hover,.ver:hover,.note:hover{translate:none}
+  .toolbar button:active{translate:none;scale:none}
 }
 </style>
 </head>

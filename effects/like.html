@@ -17,6 +17,10 @@ button{font:inherit}
 .brand .mark{width:26px;height:26px;border-radius:50%;border:1px solid var(--ink);display:grid;place-items:center;font:700 11px/1 Georgia,serif}
 .brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .topbar nav{display:flex;gap:19px;font-size:11.5px;color:var(--muted)}
+.topbar nav a{position:relative;transition:color .18s}
+.topbar nav a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.topbar nav a:hover{color:var(--ink)}
+.topbar nav a:hover::after{transform:scaleX(1)}
 .topbar nav a.on{color:var(--ink);font-weight:600}
 .hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.02em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:3px 8px;white-space:nowrap}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
@@ -27,38 +31,52 @@ button{font:inherit}
 h1{margin:0;font-size:clamp(30px,4vw,44px);line-height:1.12;letter-spacing:-.045em;font-weight:640}
 h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--warm)}
 .byline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0 0;padding-bottom:14px;border-bottom:1px solid var(--line);font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.07em;color:var(--muted)}
-.like{position:relative;display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 15px 0 12px;border-radius:999px;border:1px solid #e5d2d5;background:#fff;cursor:pointer;font:inherit;font-size:12px;color:var(--ink);overflow:visible;transition:border-color .2s,background .2s,color .2s;margin-left:auto}
-.like:hover{border-color:#e0b3bd}
+.like{position:relative;display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 15px 0 12px;border-radius:999px;border:1px solid #e5d2d5;background:#fff;cursor:pointer;font:inherit;font-size:12px;color:var(--ink);overflow:visible;transition:border-color .2s,background .2s,color .2s,translate .16s;margin-left:auto}
+.like:hover{border-color:#e0b3bd;translate:0 -1px}
+.like:active{translate:0 1px}
 .like:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.like svg{width:18px;height:18px;display:block;fill:none;stroke:#c39aa2;stroke-width:1.7;transition:fill .2s,stroke .2s,transform .2s}
+.like svg{width:18px;height:18px;display:block;fill:none;stroke:#c39aa2;stroke-width:1.7;transition:fill .2s,stroke .2s,scale .2s}
+.like:hover svg{scale:1.08}
 .like.on svg{fill:var(--accent);stroke:var(--accent)}
 .like.on{color:var(--accent);border-color:#eec2cb;background:#fff6f7}
 .like .n{font-variant-numeric:tabular-nums;min-width:3.5em;text-align:left;letter-spacing:.02em}
+.like .n.tick{animation:numTick .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes numTick{from{opacity:.2;translate:0 -5px}to{opacity:1;translate:0 0}}
 .like.pop svg{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(.72)}70%{transform:scale(1.22)}100%{transform:scale(1)}}
 .burst{position:absolute;left:21px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--accent);pointer-events:none;z-index:0}
 .like svg,.like .n{position:relative;z-index:1}
-.hero{position:relative;margin:16px 0 0;height:214px;border-radius:12px;overflow:hidden;background:linear-gradient(to bottom,#d9e4df 0%,#b8cbc4 38%,#7d998f 60%,#40554d 100%)}
+.hero{position:relative;margin:16px 0 0;height:214px;border-radius:12px;overflow:hidden;background:linear-gradient(to bottom,#d9e4df 0%,#b8cbc4 38%,#7d998f 60%,#40554d 100%);animation:rise .65s .08s both}
+@keyframes rise{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
 .hero::before{content:"";position:absolute;left:-10%;right:34%;bottom:0;height:64%;background:linear-gradient(145deg,#516a60,#2c3d37);clip-path:polygon(0 100%,12% 62%,28% 76%,47% 34%,65% 60%,82% 46%,100% 100%)}
 .hero::after{content:"";position:absolute;left:42%;right:-12%;bottom:0;height:48%;background:linear-gradient(150deg,#6d8478,#3a4b43);clip-path:polygon(0 100%,20% 56%,44% 74%,68% 38%,100% 100%);opacity:.92}
-.hero .sun{position:absolute;left:26%;top:24%;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,#fdf5dd 0%,rgba(253,245,221,.42) 52%,rgba(253,245,221,0) 72%)}
-.hero .cloud{position:absolute;left:8%;right:8%;top:46%;height:24px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.7),rgba(255,255,255,0));filter:blur(3px)}
+.hero .sun{position:absolute;left:26%;top:24%;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,#fdf5dd 0%,rgba(253,245,221,.42) 52%,rgba(253,245,221,0) 72%);animation:sunBreath 6.5s ease-in-out infinite}
+.hero .cloud{position:absolute;left:8%;right:8%;top:46%;height:24px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.7),rgba(255,255,255,0));filter:blur(3px);animation:cloudDrift 9s ease-in-out infinite alternate}
+@keyframes sunBreath{0%,100%{opacity:.82;scale:1}50%{opacity:1;scale:1.07}}
+@keyframes cloudDrift{from{translate:-7px 0}to{translate:7px 0}}
 .hero .cap{position:absolute;left:12px;bottom:10px;font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.13em;color:rgba(255,255,255,.84)}
-.body p{margin:16px 0 0;font-size:13.5px;line-height:2;color:#3d3f39}
+.body p{margin:16px 0 0;font-size:13.5px;line-height:2;color:#3d3f39;animation:rise .6s both}
 .body p:first-child{margin-top:18px}
-.body blockquote{margin:20px 0 0;padding:12px 16px;border-left:2px solid var(--warm);background:rgba(255,255,255,.42);border-radius:0 9px 9px 0;font:italic 15px/1.8 Georgia,"Songti SC",serif;color:#3a3c36}
+.body p:nth-of-type(2){animation-delay:.09s}
+.body blockquote{margin:20px 0 0;padding:12px 16px;border-left:2px solid var(--warm);background:rgba(255,255,255,.42);border-radius:0 9px 9px 0;font:italic 15px/1.8 Georgia,"Songti SC",serif;color:#3a3c36;animation:rise .6s .15s both}
 .body blockquote footer{margin-top:6px;font:500 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);font-style:normal}
-.body .more{margin-top:18px;font-size:11px;line-height:1.8;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.body .more{margin-top:18px;font-size:11px;line-height:1.8;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;animation-delay:.22s}
 .aside{position:sticky;top:78px}
 .aside-k{margin:0 0 9px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.17em;color:var(--muted)}
 .log{border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.44);overflow:hidden}
-.log div{display:flex;justify-content:space-between;gap:10px;padding:8px 11px;border-top:1px solid #e9e2d2;font-size:10.5px}
+.log div{display:flex;justify-content:space-between;gap:10px;padding:8px 11px;border-top:1px solid #e9e2d2;font-size:10.5px;transition:background .2s;animation:rise .45s both}
+.log div:hover{background:rgba(201,69,95,.05)}
+.log div:nth-child(2){animation-delay:.04s}
+.log div:nth-child(3){animation-delay:.08s}
+.log div:nth-child(4){animation-delay:.12s}
+.log div:nth-child(5){animation-delay:.16s}
 .log div:first-child{border-top:0}
 .log small{font:600 7.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 .log b{font-weight:600}
 .aside p.text{margin:14px 0 0;font-size:10.5px;line-height:1.8;color:var(--muted)}
 .aside .next{margin-top:16px;padding-top:11px;border-top:1px solid var(--line)}
-.aside .next a{display:block;padding:5px 0;font-size:10.5px;color:#4b4d45}
+.aside .next a{display:block;padding:5px 0;font-size:10.5px;color:#4b4d45;transition:translate .18s,color .18s}
+.aside .next a:hover{translate:3px 0;color:var(--ink)}
 .aside .next a::before{content:"→ ";color:var(--warm)}
 .foot{flex:0 0 auto;border-top:1px solid var(--line);padding:11px clamp(18px,3.4vw,40px);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 @media (max-width:860px){
@@ -99,8 +117,12 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   .foot{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .like svg{animation:none!important}
-  .like{transition:none}
+  .like svg{animation:none!important;transition:none}
+  .like,.like .n{transition:none}
+  .like .n.tick,.hero,.hero .sun,.hero .cloud,.body p,.body blockquote,.log div{animation:none}
+  .topbar nav a::after,.aside .next a{transition:none}
+  .like:hover,.aside .next a:hover{translate:none}
+  .like:hover svg{scale:none}
 }
 </style>
 </head>
@@ -192,6 +214,9 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
     setTimeout(function () { btn.classList.remove('pop'); }, 520);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     n.textContent = count.toLocaleString('zh-CN');
+    n.classList.remove('tick');
+    void n.offsetWidth;
+    n.classList.add('tick');
   });
 })();
 </script>

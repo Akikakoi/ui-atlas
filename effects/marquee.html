@@ -18,11 +18,17 @@ a{color:inherit}
   font:800 10px/1 ui-monospace,Consolas,monospace}
 .brand i{font:500 9px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);font-style:normal}
 .head nav{display:flex;gap:24px;margin-left:8px}
-.head nav a{font-size:12px;color:var(--muted);text-decoration:none}
+.head nav a{position:relative;font-size:12px;color:var(--muted);text-decoration:none}
+.head nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--acid);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.head nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .head nav a:hover{color:var(--ink)}
 .head .hint{margin-left:auto}
-.buy{display:inline-flex;align-items:center;gap:8px;background:var(--acid);color:#131408;border:1px solid var(--acid);border-radius:999px;
+.buy{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:8px;background:var(--acid);color:#131408;border:1px solid var(--acid);border-radius:999px;
   padding:9px 17px;font-size:12px;font-weight:800;text-decoration:none;white-space:nowrap}
+.buy::after{content:"";position:absolute;top:-40%;bottom:-40%;left:-70%;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+  transform:skewX(-18deg);transition:left .55s cubic-bezier(.2,.8,.2,1)}
+.buy:hover::after{left:130%}
 .buy:hover{filter:brightness(1.05)}
 .head .buy{padding:7px 13px;font-size:10.5px}
 .hero{max-width:1240px;margin:0 auto;padding:clamp(26px,3.6vw,46px) 0 0}
@@ -55,14 +61,21 @@ h1 em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:
 h2{margin:0;font-size:clamp(24px,3vw,36px);line-height:1.05;letter-spacing:-.04em;font-weight:800}
 .sec-head .note{margin:0 0 4px auto;font:500 9.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 .acts{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
-.act{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:18px 16px 17px;min-height:118px;display:flex;flex-direction:column}
+.act{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:18px 16px 17px;min-height:118px;display:flex;flex-direction:column;
+  transition:background-color .25s,transform .3s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){.act:hover{background:rgba(217,255,75,.04);transform:translateY(-2px)}}
 .act:nth-child(4n){border-right:0}
 .act span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--acid)}
 .act h3{margin:auto 0 0;font-size:19px;letter-spacing:-.02em;font-weight:750}
 .act i{font:400 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);font-style:normal;margin-top:2px}
 .act p{margin:6px 0 0;font-size:10.5px;color:var(--muted)}
 .sched{max-width:1240px;margin:0 auto;padding:clamp(26px,3.6vw,42px) clamp(20px,4vw,40px) 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.day{border:1px solid var(--line);border-radius:8px;padding:16px 17px}
+.day{border:1px solid var(--line);border-radius:8px;padding:16px 17px;transition:border-color .3s,background-color .3s}
+@media (hover:hover) and (pointer:fine){.day:hover{border-color:rgba(217,255,75,.3);background:rgba(217,255,75,.035)}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .day b{display:block;font-size:18px;letter-spacing:-.02em}
 .day span{display:block;margin-top:3px;font:600 8.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--acid)}
 .day p{margin:10px 0 0;font-size:10.5px;line-height:1.8;color:var(--muted)}
@@ -146,6 +159,9 @@ footer span:last-child{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
   .track{animation:none;transform:none}
+  .buy::after{display:none}
+  .act,.day,.head nav a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -247,6 +263,24 @@ footer span:last-child{margin-left:auto}
   <span>THREE DAYS / TWO STAGES / NO SIGNAL</span>
   <span>© 2026—2027</span>
 </footer>
+<script>
+/* 次级动效：阵容、日程与票务进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.acts, .sched, .tickets')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
+  });
+})();
+</script>
 <script>
 /* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
 (function () {

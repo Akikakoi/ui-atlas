@@ -14,13 +14,19 @@ a{color:inherit;text-decoration:none}
 .nav{position:sticky;top:0;z-index:8;height:62px;display:flex;align-items:center;gap:26px;
   padding:0 max(22px,calc((100vw - 1080px)/2));background:rgba(251,250,246,.92);border-bottom:1px solid var(--line);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.nav-progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;overflow:hidden}
+.nav-progress i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
 .brand{font:600 17px/1 Georgia,"Songti SC",serif;letter-spacing:.02em;white-space:nowrap}
 .brand span{margin-left:9px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
 .nav-links{display:flex;gap:22px;margin-left:auto;font-size:12px;color:var(--muted)}
+.nav-links a{position:relative;color:var(--muted)}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--ink)}
 .sub-btn{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font:600 10px/1 ui-monospace,Consolas,monospace;
-  letter-spacing:.1em;color:var(--ink);white-space:nowrap}
-.sub-btn:hover{border-color:var(--accent);color:var(--accent)}
+  letter-spacing:.1em;color:var(--ink);white-space:nowrap;transition:border-color .25s,color .25s,transform .25s}
+.sub-btn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
 .readout{position:fixed;right:max(16px,calc((100vw - 1080px)/2));top:74px;z-index:7;
   font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);
   background:rgba(251,250,246,.88);padding:7px 9px;border:1px solid var(--line);border-radius:7px}
@@ -38,7 +44,7 @@ a{color:inherit;text-decoration:none}
 .para .w{color:var(--ink);transition:color .32s ease}
 body.js .para .w{color:var(--off)}
 body.js .para .w.on{color:var(--ink)}
-body.js .para .w.hot{color:var(--accent)}
+body.js .para .w.hot{color:var(--accent);text-shadow:0 0 18px rgba(200,70,44,.22)}
 .para-cap{display:flex;justify-content:space-between;gap:16px;margin-top:22px;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;
   letter-spacing:.14em;color:var(--muted)}
 .para-cap i{font-style:normal;color:var(--accent)}
@@ -46,6 +52,13 @@ body.js .para .w.hot{color:var(--accent)}
 .body p{margin:0 0 22px;font-size:15px;line-height:2.05;color:#43453f;letter-spacing:.005em}
 .body p:first-child::first-letter{float:left;margin:8px 10px 0 0;font:600 42px/0.76 Georgia,"Songti SC",serif;color:var(--accent)}
 .body p:last-child{margin-bottom:0}
+body.js .body > p,body.js .body > blockquote,body.js .body > figure,body.js .endnote{opacity:0;transform:translate3d(0,18px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 70ms)}
+body.js .body > p.in,body.js .body > blockquote.in,body.js .body > figure.in,body.js .endnote.in{opacity:1;transform:none}
+body.js figure .col i{opacity:0;transition:opacity .9s .25s ease}
+body.js figure.in .col i{opacity:.5}
+body.js figure.in .col.b i{opacity:.26}
 .body blockquote{margin:34px 0;padding:24px 0 26px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
   font:italic 400 clamp(23px,2.9vw,30px)/1.42 Georgia,"Songti SC",serif;letter-spacing:-.015em;color:#2b2d28}
 .body blockquote span{color:var(--accent)}
@@ -124,6 +137,10 @@ footer span:last-child{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
   .para .w{transition:none}
+  body.js .body > p,body.js .body > blockquote,body.js .body > figure,body.js .endnote{opacity:1;transform:none;transition:none}
+  body.js figure .col i{opacity:.5;transition:none}
+  body.js figure .col.b i{opacity:.26}
+  .nav-links a::after,.sub-btn{transition:none}
 }
 </style>
 </head>
@@ -137,6 +154,7 @@ footer span:last-child{margin-left:auto}
     <a href="#about">关于</a>
   </nav>
   <a class="sub-btn" href="#subscribe">订阅</a>
+  <span class="nav-progress" aria-hidden="true"><i id="navBar"></i></span>
 </header>
 
 <div class="readout" id="readout" aria-hidden="true">00 / 00 词</div>
@@ -226,12 +244,37 @@ footer span:last-child{margin-left:auto}
   function pad(n) { return String(n).padStart(2, '0'); }
   function label(n) { out.textContent = pad(n) + ' / ' + pad(spans.length) + ' 词'; }
 
+  var bar = document.getElementById('navBar');
+  function barPaint() {
+    var max = document.documentElement.scrollHeight - innerHeight;
+    if (bar) bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0).toFixed(4) + ')';
+  }
+  addEventListener('scroll', barPaint, { passive: true });
+  addEventListener('resize', barPaint);
+  barPaint();
+
   if (reduce) {
     label(spans.length);
     return;
   }
 
   document.body.classList.add('js');
+  var reveal = [].slice.call(document.querySelectorAll('.body > p, .body > blockquote, .body > figure, .endnote'));
+  if (!('IntersectionObserver' in window)) {
+    reveal.forEach(function (el) { el.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      });
+    }, { threshold: .2 });
+    reveal.forEach(function (el, i) {
+      el.style.setProperty('--i', i % 3);
+      io.observe(el);
+    });
+  }
   var last = -1;
   var raf = null;
 

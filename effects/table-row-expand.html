@@ -42,7 +42,8 @@ h1{margin:0;font-size:24px;letter-spacing:-.03em;font-weight:650}
 .primary:hover{opacity:.9}
 .toolbar{display:flex;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap}
 .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);min-width:0;overflow-x:auto}
-.tabs button{border:0;background:transparent;font:inherit;font-size:12px;color:var(--muted);padding:8px 10px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button{border:0;background:transparent;font:inherit;font-size:12px;color:var(--muted);padding:8px 10px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:color .2s}
+.tabs button:active{transform:scale(.97)}
 .tabs button:hover{color:var(--ink)}
 .tabs button[aria-selected="true"]{color:var(--ink);font-weight:600;border-color:var(--accent)}
 .tabs button span{font:9.5px ui-monospace,Consolas,monospace;color:var(--muted);margin-left:3px}
@@ -52,6 +53,8 @@ h1{margin:0;font-size:24px;letter-spacing:-.03em;font-weight:650}
 table{width:100%;border-collapse:collapse;font-size:12px}
 th{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);text-align:left;padding:11px 13px;background:#fbfaf7;border-bottom:1px solid var(--line);white-space:nowrap}
 td{padding:10px 13px;border-bottom:1px solid #efede6;vertical-align:middle}
+tbody tr:not(.detail){transition:background-color .2s}
+tbody tr:not(.detail):hover td{background:#faf9f5}
 tbody:last-child tr:last-child td{border-bottom:0}
 tr:last-child td{border-bottom:0}
 td.name{font-weight:600;white-space:nowrap}
@@ -82,6 +85,8 @@ td.dim{color:var(--muted);white-space:nowrap}
 .detail.open .gridwrap{grid-template-rows:1fr}
 .detail .inner{overflow:hidden}
 .detail .body{padding:12px 14px 14px 28px;font-size:11.5px;line-height:1.75;color:#555861}
+.detail.open .body{animation:detailIn .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes detailIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .detailgrid{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
 .detailgrid > div{max-width:38em;min-width:200px}
 .detailgrid b{color:var(--ink);font-weight:600}
@@ -92,7 +97,12 @@ td.dim{color:var(--muted);white-space:nowrap}
 .chips{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
 .chips span{border:1px solid var(--line);border-radius:999px;padding:2px 8px;font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);background:#fff}
 .sidecards{display:grid;gap:14px}
-.mini{border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px}
+.mini{border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s}
+@media (hover:hover) and (pointer:fine){.mini:hover{transform:translateY(-2px);border-color:#cfc9b9}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .mini-k{margin:0 0 10px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stats b{display:block;font:600 22px/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em}
@@ -158,6 +168,9 @@ td.dim{color:var(--muted);white-space:nowrap}
 }
 @media (prefers-reduced-motion:reduce){
   .detail .gridwrap,.toggle i{transition:none}
+  .tabs button,.mini{transition:none}
+  .detail.open .body{animation:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -356,6 +369,21 @@ td.dim{color:var(--muted);white-space:nowrap}
       select(n, true);
     });
   });
+})();
+</script>
+<script>
+/* 次级动效：项目概览侧卡进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  var side = document.querySelector('.sidecards');
+  if (side) { side.classList.add('io'); io.observe(side); }
 })();
 </script>
 <script>

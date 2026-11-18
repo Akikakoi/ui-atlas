@@ -15,6 +15,10 @@ a{color:inherit;text-decoration:none}
 .brand .dot{width:15px;height:15px;border-radius:50%;background:conic-gradient(from 210deg,var(--g1),var(--g2),var(--g3),var(--g4),var(--g1));box-shadow:0 0 14px rgba(201,160,255,.45);display:inline-block}
 .brand i{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted);font-style:normal;margin-left:2px}
 .nav{display:flex;gap:26px;font-size:12.5px;color:var(--muted)}
+.nav a{position:relative}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav a:hover{color:var(--ink)}
 .hint{margin:0 0 0 auto;display:inline-flex;align-items:center;gap:7px;font:400 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);background:rgba(244,241,232,.05);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
@@ -27,7 +31,10 @@ a{color:inherit;text-decoration:none}
 @keyframes sweep{from{background-position:0% 50%}to{background-position:250% 50%}}
 .lede{margin:22px 0 0;max-width:29em;font-size:13.5px;line-height:1.9;color:var(--muted)}
 .actions{display:flex;align-items:center;gap:16px;margin-top:26px}
-.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(100deg,var(--g1),var(--g2) 55%,var(--g4));color:#0c0d12;border-radius:999px;padding:11px 20px;font-size:12.5px;font-weight:700}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(100deg,var(--g1),var(--g2) 55%,var(--g4));color:#0c0d12;border-radius:999px;padding:11px 20px;font-size:12.5px;font-weight:700}
+.btn::after{content:"";position:absolute;top:-40%;bottom:-40%;left:-70%;width:42%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+  transform:skewX(-18deg);transition:left .55s cubic-bezier(.2,.8,.2,1)}
+.btn:hover::after{left:125%}
 .btn:hover{filter:brightness(1.08)}
 .ghost{font-size:12px;color:var(--muted);border-bottom:1px solid rgba(244,241,232,.28);padding-bottom:2px}
 .ghost:hover{color:var(--ink);border-color:var(--ink)}
@@ -36,7 +43,8 @@ a{color:inherit;text-decoration:none}
 .meta i{width:1px;height:10px;background:var(--line)}
 .stage{position:relative;height:430px;display:flex;flex-direction:column;align-items:center;justify-content:center;isolation:isolate}
 .stage::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(201,160,255,.22),rgba(122,162,255,.07) 46%,transparent 68%);z-index:-1}
-.ring{width:250px;height:250px;border-radius:50%;background:conic-gradient(from 215deg,var(--g1),var(--g2) 26%,var(--g3) 48%,var(--g4) 64%,var(--g1) 84%,var(--g2));padding:13px;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 13px),#000 calc(100% - 13px));mask:radial-gradient(farthest-side,transparent calc(100% - 13px),#000 calc(100% - 13px));filter:drop-shadow(0 0 34px rgba(157,184,255,.28))}
+.ring{width:250px;height:250px;border-radius:50%;background:conic-gradient(from 215deg,var(--g1),var(--g2) 26%,var(--g3) 48%,var(--g4) 64%,var(--g1) 84%,var(--g2));padding:13px;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 13px),#000 calc(100% - 13px));mask:radial-gradient(farthest-side,transparent calc(100% - 13px),#000 calc(100% - 13px));filter:drop-shadow(0 0 34px rgba(157,184,255,.28));animation:ringSpin 18s linear infinite}
+@keyframes ringSpin{to{transform:rotate(360deg)}}
 .stem{width:2px;height:74px;background:linear-gradient(rgba(201,160,255,.5),rgba(244,241,232,.08))}
 .base{width:150px;height:9px;border-radius:50%;background:linear-gradient(90deg,transparent,rgba(244,241,232,.34),transparent)}
 .stage-tag{position:absolute;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:rgba(11,12,16,.6)}
@@ -48,7 +56,13 @@ a{color:inherit;text-decoration:none}
 .stage-foot .price{font:600 15px/1 ui-monospace,Consolas,monospace;color:var(--ink)}
 .stage-foot .price small{display:block;font-size:8px;letter-spacing:.14em;color:var(--muted);margin-top:5px}
 .presets{max-width:1220px;margin:0 auto 68px;padding:40px 40px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.preset{padding:0}
+.preset{padding:0;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){.preset:hover{transform:translateY(-3px)}.preset:hover .bar{filter:brightness(1.12)}}
+.preset .bar{transition:filter .3s}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .preset .bar{height:5px;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b));margin-bottom:16px;opacity:.9}
 .preset .time{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
 .preset h3{margin:10px 0 6px;font-size:16px;letter-spacing:.01em}
@@ -140,6 +154,10 @@ footer{max-width:1220px;margin:0 auto;padding:20px 40px 26px;border-top:1px soli
 @media (prefers-reduced-motion:reduce){
   .sweep{animation:none;background-position:32% 50%}
   .btn,.cta{transition:none}
+  .ring{animation:none}
+  .btn::after{display:none}
+  .preset,.preset .bar,.nav a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -221,6 +239,24 @@ footer{max-width:1220px;margin:0 auto;padding:20px 40px 26px;border-top:1px soli
   <span>规格 · 发货 · 联系</span>
 </footer>
 
+<script>
+/* 次级动效：预设、规格与预购区进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.presets, .specs, .band')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
+  });
+})();
+</script>
 <script>
 /* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
 (function () {

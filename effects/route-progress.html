@@ -26,14 +26,15 @@ button{font:inherit;color:inherit}
 .topbar{position:sticky}
 .top-in{position:relative}
 nav.mainnav{display:flex;gap:3px;margin-left:6px}
-.mainnav a{padding:6px 11px;border-radius:999px;font-size:11.5px;color:var(--muted);transition:background .18s,color .18s}
-.mainnav a:hover{background:#e9e5d8;color:var(--ink)}
+.mainnav a{padding:6px 11px;border-radius:999px;font-size:11.5px;color:var(--muted);transition:background .18s,color .18s,translate .15s}
+.mainnav a:hover{background:#e9e5d8;color:var(--ink);translate:0 -1px}
 .mainnav a:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
 .mainnav a[aria-current="page"]{background:var(--ink);color:var(--paper)}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:11px;flex:0 0 auto}
 .issue-tag{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
-.sub-btn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 12px;font-size:10.5px;font-weight:600;white-space:nowrap;cursor:pointer;transition:border-color .2s,color .2s}
-.sub-btn:hover{border-color:var(--moss);color:var(--moss)}
+.sub-btn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 12px;font-size:10.5px;font-weight:600;white-space:nowrap;cursor:pointer;transition:border-color .2s,color .2s,translate .15s,scale .15s}
+.sub-btn:hover{border-color:var(--moss);color:var(--moss);translate:0 -1px}
+.sub-btn:active{translate:0 1px;scale:.97}
 .sub-btn:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
 main{flex:1;width:100%}
 .wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 clamp(18px,4vw,44px) 40px}
@@ -42,14 +43,19 @@ main{flex:1;width:100%}
 .kicker{margin:0 0 13px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
 .view h2{margin:0 0 14px;font-size:clamp(36px,5vw,58px);line-height:1.02;letter-spacing:-.05em;font-weight:640;outline:none}
 .view h2 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--rust)}
+.view:not([hidden]) > .kicker{animation:rise .45s both}
+.view:not([hidden]) > h2{animation:rise .55s .05s both}
+.view:not([hidden]) > .lede{animation:rise .55s .1s both}
+.view:not([hidden]) > .issue-meta{animation:rise .55s .15s both}
+@keyframes rise{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
 .lede{margin:0 0 14px;font-size:14px;line-height:1.95;color:#53594f;max-width:38em}
 .issue-meta{display:flex;gap:16px;flex-wrap:wrap;font:500 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);margin:0 0 26px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 302px;gap:clamp(24px,4vw,46px);padding-top:18px;border-top:1px solid var(--line);align-items:start}
 .rowhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 4px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted)}
 .rowhead span{font-weight:500;letter-spacing:.08em}
 .articles{display:flex;flex-direction:column}
-.article{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:clamp(10px,2vw,22px);align-items:baseline;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);padding:15px 6px;cursor:pointer;transition:background .18s,padding .18s}
-.article:hover{background:rgba(251,249,242,.8);padding-left:12px}
+.article{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:clamp(10px,2vw,22px);align-items:baseline;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);padding:15px 6px;cursor:pointer;transition:background .18s,padding .18s,translate .18s}
+.article:hover{background:rgba(251,249,242,.8);padding-left:12px;translate:2px 0}
 .article:focus-visible{outline:2px solid var(--moss);outline-offset:-2px}
 .article .no{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--moss)}
 .article .txt{min-width:0}
@@ -59,7 +65,8 @@ main{flex:1;width:100%}
 .article .meta i{display:block;font-style:normal;color:#a8ab9f;margin-top:3px}
 .side{display:flex;flex-direction:column;gap:14px}
 .cover{border-radius:13px;overflow:hidden;border:1px solid var(--line);background:var(--paper)}
-.cover .art{height:142px;background:radial-gradient(ellipse 70% 70% at 72% 20%,#e7d9b9,transparent 60%),linear-gradient(158deg,#c3cab8,#6f8069 58%,#3f5044);position:relative}
+.cover .art{height:142px;background:radial-gradient(ellipse 70% 70% at 72% 20%,#e7d9b9,transparent 60%),linear-gradient(158deg,#c3cab8,#6f8069 58%,#3f5044);position:relative;overflow:hidden;animation:artBreath 7s ease-in-out infinite}
+@keyframes artBreath{0%,100%{scale:1}50%{scale:1.02}}
 .cover .art::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 7px);mix-blend-mode:soft-light}
 .cover .art::after{content:"";position:absolute;left:12%;right:12%;top:58%;height:1px;background:rgba(255,255,255,.4);box-shadow:0 12px 0 rgba(255,255,255,.18),0 24px 0 rgba(255,255,255,.1)}
 .cover .art b{position:absolute;left:13px;top:11px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(255,255,255,.75)}
@@ -70,14 +77,15 @@ main{flex:1;width:100%}
 .note-box h3{margin:0 0 7px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--rust)}
 .note-box p{margin:0;font-size:10.5px;line-height:1.85;color:#5b6156}
 .stats{border:1px solid var(--line);border-radius:13px;background:var(--paper);padding:4px 14px}
-.stats div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.stats div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);transition:translate .18s}
+.stats div:hover{translate:2px 0}
 .stats div:last-child{border-bottom:0}
 .stats dt{font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 .stats dd{margin:0;font-size:11.5px;font-weight:600}
 .archive-head{display:grid;grid-template-columns:64px minmax(0,1.4fr) minmax(0,1fr) 90px 90px;gap:14px;padding:0 8px 9px;border-bottom:1px solid var(--ink);font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
 .issues{list-style:none;margin:0;padding:0}
-.issues li{display:grid;grid-template-columns:64px minmax(0,1.4fr) minmax(0,1fr) 90px 90px;gap:14px;align-items:baseline;padding:12px 8px;border-bottom:1px solid var(--line);transition:background .18s}
-.issues li:hover{background:rgba(251,249,242,.8)}
+.issues li{display:grid;grid-template-columns:64px minmax(0,1.4fr) minmax(0,1fr) 90px 90px;gap:14px;align-items:baseline;padding:12px 8px;border-bottom:1px solid var(--line);transition:background .18s,translate .18s}
+.issues li:hover{background:rgba(251,249,242,.8);translate:2px 0}
 .issues .no{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 .issues b{font-size:13.5px;letter-spacing:-.01em}
 .issues .theme{font-size:11px;color:var(--muted)}
@@ -98,6 +106,7 @@ main{flex:1;width:100%}
 .sub-form button{height:34px;padding:0 12px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);font-size:11px;font-weight:600;cursor:pointer}
 .sub-form button:hover{background:var(--moss);border-color:var(--moss)}
 .form-note{min-height:16px;margin:8px 0 0;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--moss)}
+.form-note.say{animation:rise .34s cubic-bezier(.2,.8,.2,1)}
 .team{list-style:none;margin:12px 0 0;padding:0;border-top:1px solid var(--line)}
 .team li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:10.5px}
 .team span{color:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:8.5px;letter-spacing:.06em}
@@ -222,6 +231,10 @@ main{flex:1;width:100%}
 }
 @media (prefers-reduced-motion:reduce){
   .bar,.article,.mainnav a,.back,.sub-btn{transition:none}
+  .view:not([hidden]) > .kicker,.view:not([hidden]) > h2,.view:not([hidden]) > .lede,.view:not([hidden]) > .issue-meta,.cover .art,.form-note.say{animation:none}
+  .stats div,.issues li{transition:none}
+  .mainnav a:hover,.article:hover,.stats div:hover,.issues li:hover,.sub-btn:hover{translate:none}
+  .sub-btn:active{scale:none}
 }
 </style>
 </head>
@@ -469,6 +482,9 @@ main{flex:1;width:100%}
     var email = document.getElementById('subEmail');
     if (!email.value.trim()) return;
     formNote.textContent = '已记下 ' + email.value.trim() + '，下一期开印前提醒你。';
+    formNote.classList.remove('say');
+    void formNote.offsetWidth;
+    formNote.classList.add('say');
     form.reset();
   });
 })();

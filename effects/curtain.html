@@ -23,18 +23,24 @@ button{font:inherit;color:inherit}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex:0 0 auto}
 .issue{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
-.sub{border:1px solid var(--line);border-radius:999px;padding:5px 10px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+.sub{border:1px solid var(--line);border-radius:999px;padding:5px 10px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);white-space:nowrap;transition:background .2s,border-color .2s,translate .15s}
+.sub:hover{background:rgba(178,74,40,.08);border-color:rgba(178,74,40,.3);translate:0 -1px}
 .main{flex:1;display:flex;flex-direction:column;min-height:0}
 .view{flex:1;flex-direction:column;min-height:0}
 .view.show{display:flex}
 .kicker{margin:0 0 16px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
 .cover-body{flex:1;width:100%;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:clamp(26px,5vw,74px);padding:clamp(24px,4.5vw,58px) clamp(18px,4vw,44px) clamp(18px,3vw,36px);align-items:center}
-.cover-copy h1{margin:0 0 20px;font-size:clamp(38px,5.6vw,74px);line-height:1.02;letter-spacing:-.052em;font-weight:620}
+.cover-copy h1{margin:0 0 20px;font-size:clamp(38px,5.6vw,74px);line-height:1.02;letter-spacing:-.052em;font-weight:620;animation:rise .6s .06s both}
+.cover-copy .kicker{animation:rise .5s both}
+.cover-copy .lede{animation:rise .6s .12s both}
+.cover-copy .cta-row{animation:rise .6s .18s both}
+@keyframes rise{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
 .cover-copy h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
 .lede{margin:0 0 24px;font-size:13.5px;line-height:1.9;color:#514b40;max-width:26em}
 .cta-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .cta{border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:999px;padding:11px 20px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:background .22s,border-color .22s,color .22s,transform .22s}
 .cta:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-1px)}
+.cta:active{transform:translateY(1px)}
 .cta:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .cta span{font-size:14px}
 .meta{font:500 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
@@ -44,8 +50,10 @@ button{font:inherit;color:inherit}
   radial-gradient(circle at 50% 38%,transparent 0 12%,rgba(239,231,208,.42) 12.4% 13%,transparent 13.4% 20%,rgba(239,231,208,.3) 20.4% 21%,transparent 21.4% 26%,rgba(239,231,208,.2) 26.4% 27%,transparent 27.4%),
   radial-gradient(ellipse 70% 40% at 50% 95%,rgba(19,35,32,.55),transparent 70%),
   linear-gradient(158deg,#2e4a44 0%,#566f63 46%,#a08a68 78%,#d5c3a2 100%);
-  box-shadow:0 40px 80px -56px rgba(30,35,28,.6)}
-.pool::before{content:"";position:absolute;left:-12%;right:-12%;top:47%;height:22%;border-radius:50%;background:rgba(226,214,188,.16);filter:blur(10px);transform:rotate(-4deg)}
+  box-shadow:0 40px 80px -56px rgba(30,35,28,.6);transition:scale .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.cover-art:hover .pool{scale:1.015;box-shadow:0 48px 90px -54px rgba(30,35,28,.7)}
+.pool::before{content:"";position:absolute;left:-12%;right:-12%;top:47%;height:22%;border-radius:50%;background:rgba(226,214,188,.16);filter:blur(10px);transform:rotate(-4deg);animation:waterDrift 7s ease-in-out infinite alternate}
+@keyframes waterDrift{from{translate:-8px 0}to{translate:8px 0}}
 .pool::after{content:"";position:absolute;left:14%;top:26%;width:16%;aspect-ratio:1.6;border-radius:58% 42% 62% 38%/46% 60% 40% 54%;background:rgba(13,25,23,.55);box-shadow:44px 34px 0 -6px rgba(13,25,23,.35),-18px 88px 0 -10px rgba(13,25,23,.28)}
 .cover-art figcaption{display:flex;justify-content:space-between;gap:12px;margin-top:9px;font:500 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 .cover-foot{flex:0 0 auto;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:12px clamp(18px,4vw,44px);font:600 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
@@ -57,7 +65,12 @@ button{font:inherit;color:inherit}
 .backcta{background:transparent;color:var(--ink);border-color:var(--line);padding:9px 16px;font-size:11.5px}
 .backcta:hover{background:var(--accent);border-color:var(--accent);color:var(--paper)}
 .chapters{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
-.chapters li{display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:16px;padding:19px 0 20px;border-bottom:1px solid var(--line);align-items:start}
+.chapters li{display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:16px;padding:19px 0 20px;border-bottom:1px solid var(--line);align-items:start;transition:translate .2s,background .2s}
+.chapters li:hover{translate:2px 0;background:rgba(178,74,40,.03)}
+.contents.show .contents-head{animation:rise .5s both}
+.contents.show .chapters li{animation:rise .45s backwards}
+.contents.show .chapters li:nth-child(2){animation-delay:.06s}
+.contents.show .chapters li:nth-child(3){animation-delay:.12s}
 .chapters .no{font:600 30px/.9 "Songti SC",Georgia,serif;letter-spacing:-.04em;color:#c2b49a}
 .chapters h3{margin:0 0 4px;font-size:16px;letter-spacing:-.02em;font-weight:650}
 .chapters p{margin:0;font-size:11.5px;line-height:1.85;color:var(--muted);max-width:34em}
@@ -132,6 +145,10 @@ button{font:inherit;color:inherit}
 @media (prefers-reduced-motion:reduce){
   .curtain i{transition:none}
   .cta{transition:none}
+  .cover-copy .kicker,.cover-copy h1,.cover-copy .lede,.cover-copy .cta-row,.contents.show .contents-head,.contents.show .chapters li,.pool::before{animation:none}
+  .sub,.pool,.chapters li{transition:none}
+  .sub:hover,.chapters li:hover{translate:none}
+  .cover-art:hover .pool{scale:none}
 }
 </style>
 </head>

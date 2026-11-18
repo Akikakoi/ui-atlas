@@ -16,7 +16,10 @@ a{color:inherit}
 .brand{display:flex;align-items:baseline;gap:9px;font-size:12px;font-weight:700;letter-spacing:.2em;text-decoration:none;white-space:nowrap}
 .brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .nav-links{display:flex;gap:24px;margin-left:8px}
-.nav-links a{font-size:12.5px;color:#55585f;text-decoration:none}
+.nav-links a{position:relative;font-size:12.5px;color:#55585f;text-decoration:none}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--ink)}
 .btn{margin-left:auto;height:38px;padding:0 17px;border-radius:999px;background:var(--ink);color:#fff;
   font-size:12px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
@@ -65,6 +68,11 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .fig span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:rgba(238,241,248,.42)}
 .spark{margin-top:8px;height:22px;display:block;width:100%;color:#8fb4ff;opacity:.8}
 .spark path{fill:none;stroke:currentColor;stroke-width:1.4}
+.spark path:not(.area){stroke-dasharray:1;stroke-dashoffset:1;animation:sparkDraw 1.2s .2s cubic-bezier(.2,.8,.2,1) forwards}
+.card:nth-of-type(2) .spark path:not(.area){animation-delay:.3s}
+.card:nth-of-type(3) .spark path:not(.area){animation-delay:.4s}
+.card:nth-of-type(4) .spark path:not(.area){animation-delay:.5s}
+@keyframes sparkDraw{to{stroke-dashoffset:0}}
 .spark .area{fill:rgba(143,180,255,.12);stroke:none}
 .board .foot{display:flex;justify-content:space-between;gap:12px;padding:11px 3px 2px;
   font:600 8.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:rgba(238,241,248,.34)}
@@ -74,7 +82,9 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .features{max-width:1160px;margin:0 auto;padding:52px 22px 24px}
 h2.sec{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.12;letter-spacing:-.04em;font-weight:600}
 .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.fgrid article{border:1px solid var(--line);border-radius:14px;padding:22px 20px;background:var(--panel)}
+.fgrid article{border:1px solid var(--line);border-radius:14px;padding:22px 20px;background:var(--panel);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,background-color .35s}
+@media (hover:hover) and (pointer:fine){.fgrid article:hover{transform:translateY(-3px);border-color:rgba(47,95,208,.26);background:#fff}}
 .fgrid span{display:block;margin-bottom:14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent)}
 .fgrid h3{margin:0 0 8px;font-size:15px;letter-spacing:-.01em}
 .fgrid p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
@@ -95,6 +105,10 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 28px}
   pointer-events:none;z-index:9;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 @media (max-width:920px){
   .hero{grid-template-columns:1fr;min-height:0}
   .fgrid{grid-template-columns:1fr}
@@ -150,6 +164,8 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 28px}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
+  .spark path:not(.area){stroke-dashoffset:0!important}
+  .io{opacity:1;transform:none}
 }
 </style>
 </head>
@@ -189,7 +205,7 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 28px}
         <article class="card">
           <div class="num">01 / SIGNAL</div>
           <h2>实时指标</h2>
-          <div class="fig"><b>124</b><span>MS · P95</span></div>
+          <div class="fig"><b data-to="124">124</b><span>MS · P95</span></div>
           <svg class="spark" viewBox="0 0 120 22" preserveAspectRatio="none" aria-hidden="true">
             <path class="area" d="M0 17 L12 15 L24 16 L36 11 L48 13 L60 8 L72 10 L84 6 L96 9 L108 4 L120 7 L120 22 L0 22 Z"/>
             <path d="M0 17 L12 15 L24 16 L36 11 L48 13 L60 8 L72 10 L84 6 L96 9 L108 4 L120 7"/>
@@ -198,7 +214,7 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 28px}
         <article class="card">
           <div class="num">02 / ROUTE</div>
           <h2>边缘节点</h2>
-          <div class="fig"><b>37</b><span>REGIONS</span></div>
+          <div class="fig"><b data-to="37">37</b><span>REGIONS</span></div>
           <svg class="spark" viewBox="0 0 120 22" preserveAspectRatio="none" aria-hidden="true">
             <path class="area" d="M0 13 L12 14 L24 10 L36 12 L48 9 L60 11 L72 7 L84 9 L96 6 L108 8 L120 5 L120 22 L0 22 Z"/>
             <path d="M0 13 L12 14 L24 10 L36 12 L48 9 L60 11 L72 7 L84 9 L96 6 L108 8 L120 5"/>
@@ -207,7 +223,7 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 28px}
         <article class="card">
           <div class="num">03 / TRACE</div>
           <h2>链路追踪</h2>
-          <div class="fig"><b>12</b><span>SERVICES</span></div>
+          <div class="fig"><b data-to="12">12</b><span>SERVICES</span></div>
           <svg class="spark" viewBox="0 0 120 22" preserveAspectRatio="none" aria-hidden="true">
             <path class="area" d="M0 8 L12 11 L24 9 L36 14 L48 10 L60 15 L72 12 L84 16 L96 12 L108 17 L120 13 L120 22 L0 22 Z"/>
             <path d="M0 8 L12 11 L24 9 L36 14 L48 10 L60 15 L72 12 L84 16 L96 12 L108 17 L120 13"/>
@@ -216,7 +232,7 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 28px}
         <article class="card">
           <div class="num">04 / GUARD</div>
           <h2>权限守卫</h2>
-          <div class="fig"><b>6</b><span>ROLES</span></div>
+          <div class="fig"><b data-to="6">6</b><span>ROLES</span></div>
           <svg class="spark" viewBox="0 0 120 22" preserveAspectRatio="none" aria-hidden="true">
             <path class="area" d="M0 16 L12 16 L24 15 L36 15 L48 13 L60 14 L72 13 L84 12 L96 12 L108 11 L120 11 L120 22 L0 22 Z"/>
             <path d="M0 16 L12 16 L24 15 L36 15 L48 13 L60 14 L72 13 L84 12 L96 12 L108 11 L120 11"/>
@@ -277,6 +293,52 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 28px}
       card.style.removeProperty('--my');
     });
   });
+  [].forEach.call(document.querySelectorAll('.spark path:not(.area)'), function (p) {
+    p.setAttribute('pathLength', '1');
+  });
+})();
+</script>
+<script>
+/* 次级动效：面板数字计数与下方内容入场 */
+(function () {
+  var nums = [].slice.call(document.querySelectorAll('.fig b[data-to]'));
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+
+  if (nums.length && 'IntersectionObserver' in window) {
+    var board = document.querySelector('.board');
+    if (board) {
+      var bio = new IntersectionObserver(function (es) {
+        if (!es[0].isIntersecting) return;
+        bio.disconnect();
+        var t0 = 0;
+        function frame(now) {
+          if (!t0) t0 = now;
+          var t = Math.min(1, (now - t0) / 1000);
+          var e = 1 - Math.pow(1 - t, 3);
+          nums.forEach(function (el) { el.textContent = Math.round(+el.dataset.to * e); });
+          if (t < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }, { threshold: .3 });
+      bio.observe(board);
+    }
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      });
+    }, { threshold: .18 });
+    [].slice.call(document.querySelectorAll('.features, .quote, .band')).forEach(function (el, i) {
+      el.classList.add('io');
+      el.style.setProperty('--i', i % 3);
+      io.observe(el);
+    });
+  }
 })();
 </script>
 <script>

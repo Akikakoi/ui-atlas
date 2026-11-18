@@ -19,12 +19,17 @@ a{color:inherit}
 .brand b{font-size:12px;letter-spacing:.28em;font-weight:700}
 .brand span{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .head nav{display:flex;gap:24px;margin-left:6px;font-size:12px;color:var(--muted)}
-.head nav a{text-decoration:none}
+.head nav a{position:relative;text-decoration:none}
+.head nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--moss);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.head nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .head nav a:hover{color:var(--ink)}
 .cart{margin-left:auto;border:1px solid var(--line);background:transparent;border-radius:999px;color:var(--ink);
   font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;padding:10px 14px;cursor:pointer;white-space:nowrap}
 .cart:hover{border-color:var(--moss);color:var(--moss)}
 .cart:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
+.cart.bump{animation:cartBump .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes cartBump{0%,100%{transform:none}35%{transform:translateY(-2px) scale(1.05)}}
 .stage{max-width:1160px;margin:0 auto;padding:clamp(26px,4.4vw,50px) 22px 0}
 .product{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:clamp(30px,5vw,68px);align-items:center;
   min-height:calc(100vh - 68px - clamp(26px,4.4vw,50px))}
@@ -39,6 +44,11 @@ a{color:inherit}
 .badge{position:absolute;left:16px;top:16px;z-index:3;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;
   color:#6f6656;background:rgba(250,247,240,.7);border:1px solid rgba(111,102,86,.22);border-radius:999px;padding:6px 9px;
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.pan-read{position:absolute;right:16px;top:16px;z-index:3;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;
+  color:#6f6656;background:rgba(250,247,240,.7);border:1px solid rgba(111,102,86,.22);border-radius:999px;padding:6px 9px;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);font-variant-numeric:tabular-nums}
+.shot.swap{animation:potSwap .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes potSwap{0%,100%{filter:none}40%{filter:brightness(1.05) saturate(1.05)}}
 .shot-wrap figcaption{display:flex;justify-content:space-between;align-items:baseline;gap:14px;margin-top:11px;
   font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 .shot-wrap figcaption b{font-weight:600;color:var(--ink);letter-spacing:.04em}
@@ -71,6 +81,8 @@ h1{margin:0;font-size:clamp(44px,5.6vw,68px);line-height:1;letter-spacing:-.05em
   font:600 12.5px/1 -apple-system,"Segoe UI","PingFang SC",sans-serif;letter-spacing:.02em;transition:background-color .2s}
 .add:hover{background:#345a43}
 .add:focus-visible{outline:2px solid var(--moss);outline-offset:3px}
+.add.pulse{animation:addPulse .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes addPulse{0%,100%{transform:none}35%{transform:scale(.97)}}
 .buy small{font:600 9px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
 .care-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
 .care-facts div{display:flex;flex-direction:column;gap:5px}
@@ -83,7 +95,9 @@ h1{margin:0;font-size:clamp(44px,5.6vw,68px);line-height:1;letter-spacing:-.05em
 .care h2 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--moss)}
 .care-head p{margin:0;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .care-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.care-grid article{border:1px solid var(--line);border-radius:13px;padding:20px 18px;background:rgba(255,255,255,.4)}
+.care-grid article{border:1px solid var(--line);border-radius:13px;padding:20px 18px;background:rgba(255,255,255,.4);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,background-color .35s}
+@media (hover:hover) and (pointer:fine){.care-grid article:hover{transform:translateY(-3px);border-color:rgba(63,107,80,.3);background:rgba(255,255,255,.7)}}
 .care-grid span{display:block;margin-bottom:12px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--moss)}
 .care-grid h3{margin:0 0 7px;font-size:14.5px;letter-spacing:-.01em}
 .care-grid p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
@@ -101,6 +115,10 @@ h1{margin:0;font-size:clamp(44px,5.6vw,68px);line-height:1;letter-spacing:-.05em
   background:rgba(243,239,230,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--moss)}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .sr{position:absolute;top:0;left:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:1100px){
   .head nav{display:none}
@@ -160,6 +178,9 @@ h1{margin:0;font-size:clamp(44px,5.6vw,68px);line-height:1;letter-spacing:-.05em
   .photo{transition:none}
   .opt,.add{transition:none}
   *{animation:none!important}
+  .shot.swap,.cart.bump,.add.pulse{animation:none}
+  .head nav a::after,.care-grid article{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -241,6 +262,7 @@ h1{margin:0;font-size:clamp(44px,5.6vw,68px);line-height:1;letter-spacing:-.05em
             </svg>
           </div>
           <span class="badge">NO. 12 / INDOOR</span>
+          <span class="pan-read" id="panRead" aria-hidden="true">PAN 50 / 50</span>
         </div>
         <figcaption><span><b>银斑葛</b> · Scindapsus pictus</span><span>45° 侧光 · 室内</span></figcaption>
       </figure>
@@ -311,6 +333,7 @@ h1{margin:0;font-size:clamp(44px,5.6vw,68px);line-height:1;letter-spacing:-.05em
   var shot = document.getElementById('shot'), photo = document.getElementById('photo');
   var add = document.getElementById('addBtn'), cart = document.getElementById('cartBtn');
   var status = document.getElementById('cartStatus'), potName = document.getElementById('potName');
+  var panRead = document.getElementById('panRead');
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
 
@@ -321,10 +344,12 @@ h1{margin:0;font-size:clamp(44px,5.6vw,68px);line-height:1;letter-spacing:-.05em
       var y = (e.clientY - r.top) / r.height - .5;
       shot.classList.add('panning');
       photo.style.transform = 'scale(1.18) translate3d(' + (-x * 18).toFixed(2) + 'px,' + (-y * 18).toFixed(2) + 'px,0)';
+      if (panRead) panRead.textContent = 'PAN ' + Math.round((x + .5) * 100) + ' / ' + Math.round((y + .5) * 100);
     });
     shot.addEventListener('pointerleave', function () {
       shot.classList.remove('panning');
       photo.style.transform = 'scale(1.18)';
+      if (panRead) panRead.textContent = 'PAN 50 / 50';
     });
   }
 
@@ -337,8 +362,12 @@ h1{margin:0;font-size:clamp(44px,5.6vw,68px);line-height:1;letter-spacing:-.05em
       shot.style.setProperty('--pot3', btn.dataset.p3);
       potName.textContent = btn.dataset.name;
       status.textContent = '盆器已切换为' + btn.dataset.name;
+      shot.classList.remove('swap');
+      void shot.offsetWidth;
+      shot.classList.add('swap');
     });
   });
+  shot.addEventListener('animationend', function () { shot.classList.remove('swap'); });
 
   var count = 0;
   add.addEventListener('click', function () {
@@ -346,8 +375,30 @@ h1{margin:0;font-size:clamp(44px,5.6vw,68px);line-height:1;letter-spacing:-.05em
     cart.textContent = '购物袋 (' + count + ')';
     add.textContent = '已放入 · ' + count + ' 件';
     status.textContent = '银斑葛已加入购物袋，共 ' + count + ' 件';
+    add.classList.remove('pulse');
+    cart.classList.remove('bump');
+    void add.offsetWidth;
+    add.classList.add('pulse');
+    cart.classList.add('bump');
     setTimeout(function () { add.textContent = '加入购物袋'; }, 1600);
   });
+  add.addEventListener('animationend', function () { add.classList.remove('pulse'); });
+  cart.addEventListener('animationend', function () { cart.classList.remove('bump'); });
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      });
+    }, { threshold: .18 });
+    [].slice.call(document.querySelectorAll('.care, .band')).forEach(function (el, i) {
+      el.classList.add('io');
+      el.style.setProperty('--i', i);
+      io.observe(el);
+    });
+  }
 })();
 </script>
 <script>

@@ -19,7 +19,10 @@ a{color:inherit}
 .brand b{font-size:12px;letter-spacing:.26em;font-weight:700}
 .brand span{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .head nav{display:flex;gap:24px;margin-left:6px;font-size:12px;color:#a7a196}
-.head nav a{text-decoration:none}
+.head nav a{position:relative;text-decoration:none}
+.head nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.head nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .head nav a:hover{color:var(--ink)}
 .book{margin-left:auto;display:inline-flex;align-items:center;height:36px;padding:0 15px;border-radius:999px;
   background:var(--accent);color:#160c08;font-size:11.5px;font-weight:650;text-decoration:none;white-space:nowrap}
@@ -60,7 +63,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .viewer-tag{position:absolute;right:18px;top:17px;z-index:3;font:600 8px/1 ui-monospace,Consolas,monospace;
   letter-spacing:.18em;color:rgba(241,237,228,.4);pointer-events:none}
 .ruler{position:relative;height:30px;margin-top:10px;border-radius:8px;background:rgba(255,255,255,.035);border:1px solid var(--line);overflow:hidden}
-.ruler i{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.16)}
+.ruler i{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.16);transition:background-color .2s}
+.ruler i.on{background:rgba(224,96,58,.55)}
 .ruler .thumb{position:absolute;top:0;bottom:0;width:2px;background:var(--accent);box-shadow:0 0 10px rgba(224,96,58,.8)}
 .hud{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:9px;
   font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
@@ -73,7 +77,9 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .notes .side p{margin:0 0 12px;font-size:12px;line-height:1.85;color:var(--muted);max-width:26em}
 .notes .side .tag{margin:0 0 14px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--sand)}
 .picks{display:flex;flex-direction:column}
-.pick{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:12px 0;border-top:1px solid var(--line)}
+.pick{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:12px 0;border-top:1px solid var(--line);
+  transition:padding-left .25s,background-color .25s}
+@media (hover:hover) and (pointer:fine){.pick:hover{padding-left:6px;background:rgba(224,96,58,.035)}}
 .pick:last-child{border-bottom:1px solid var(--line)}
 .pick i{font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--accent);font-style:normal}
 .pick b{font-size:12.5px;font-weight:600}
@@ -92,6 +98,10 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   background:rgba(30,30,28,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid var(--line);border-radius:999px;padding:4px 9px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .sr{position:absolute;top:0;left:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:1100px){
   .head nav{display:none}
@@ -152,6 +162,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 @media (prefers-reduced-motion:reduce){
   .viewer{box-shadow:none}
   *{animation:none!important}
+  .ruler i,.pick,.head nav a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -305,11 +317,13 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   var last = frames.length - 1;
   var p = 0, drag = false, startX = 0, startP = 0;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var marks = [], vel = 0, prevP = 0, prevT = 0, iraf = null;
 
   for (var i = 0; i <= 10; i++) {
     var tick = document.createElement('i');
     tick.style.left = (i * 10) + '%';
     ruler.appendChild(tick);
+    marks.push(tick);
   }
   var thumb = document.createElement('span');
   thumb.className = 'thumb';
@@ -321,7 +335,13 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
     frames.forEach(function (f, i) {
       f.style.transition = reduce ? 'none' : 'opacity .12s linear';
       f.style.opacity = Math.max(0, 1 - Math.abs(i - t)).toFixed(3);
+      var d = i - t;
+      var cap = f.querySelector('.cap');
+      var fig = f.querySelector('.fig');
+      if (cap) cap.style.transform = 'translate3d(0,' + (d * 12).toFixed(1) + 'px,0)';
+      if (fig) fig.style.transform = 'translate3d(0,' + (d * -9).toFixed(1) + 'px,0)';
     });
+    marks.forEach(function (m, i) { m.classList.toggle('on', i / 10 <= p + .001); });
     thumb.style.left = (p * 100).toFixed(2) + '%';
     var n = Math.round(t);
     idx.textContent = String(n + 1).padStart(2, '0');
@@ -333,16 +353,35 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 
   viewer.addEventListener('pointerdown', function (e) {
     drag = true;
+    if (iraf) { cancelAnimationFrame(iraf); iraf = null; }
+    vel = 0;
     startX = e.clientX;
     startP = p;
+    prevP = p;
+    prevT = performance.now();
     viewer.setPointerCapture(e.pointerId);
     viewer.focus();
   });
   viewer.addEventListener('pointermove', function (e) {
     if (!drag) return;
     paint(startP + (e.clientX - startX) / 420);
+    var now = performance.now();
+    vel = (p - prevP) / Math.max(8, now - prevT) * 16;
+    prevP = p;
+    prevT = now;
   });
-  function end() { drag = false; }
+  function flick() {
+    iraf = null;
+    var before = p;
+    paint(p + vel);
+    if (p === before) vel = 0;
+    vel *= .92;
+    if (Math.abs(vel) > .002) iraf = requestAnimationFrame(flick);
+  }
+  function end() {
+    drag = false;
+    if (!reduce && Math.abs(vel) > .001) iraf = requestAnimationFrame(flick);
+  }
   viewer.addEventListener('pointerup', end);
   viewer.addEventListener('pointercancel', end);
 
@@ -356,6 +395,21 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   });
 
   paint(0);
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      });
+    }, { threshold: .18 });
+    [].slice.call(document.querySelectorAll('.notes, .band')).forEach(function (el, i) {
+      el.classList.add('io');
+      el.style.setProperty('--i', i);
+      io.observe(el);
+    });
+  }
 })();
 </script>
 <script>

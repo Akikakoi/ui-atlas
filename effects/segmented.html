@@ -16,7 +16,10 @@ button{font:inherit}
 .brand i{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink);position:relative}
 .brand i::after{content:"";position:absolute;inset:4px;background:var(--accent);border-radius:50%}
 .nav{display:flex;gap:22px;font-size:12.5px;color:var(--muted)}
-.nav a{text-decoration:none}
+.nav a{position:relative;text-decoration:none}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav a:hover,.nav a.on{color:var(--ink)}
 .top-actions{margin-left:auto;display:flex;gap:12px;align-items:center}
 .link-btn{font-size:12.5px;color:var(--muted);text-decoration:none}
@@ -43,7 +46,9 @@ h1 em{font-style:normal;color:var(--accent)}
 .clients i{width:1px;height:12px;background:var(--line)}
 .clients span:last-child{margin-left:auto;letter-spacing:.02em;font-family:-apple-system,"Segoe UI","PingFang SC",sans-serif;font-size:11px}
 .plan{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;min-height:322px;
-  box-shadow:0 24px 60px -42px rgba(20,20,15,.5);display:flex;flex-direction:column}
+  box-shadow:0 24px 60px -42px rgba(20,20,15,.5);display:flex;flex-direction:column;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+@media (hover:hover) and (pointer:fine){.plan:hover{transform:translateY(-3px);box-shadow:0 30px 66px -42px rgba(20,20,15,.6)}}
 .plan[hidden]{display:none}
 .plan.on{animation:panelIn .3s cubic-bezier(.2,.8,.2,1)}
 @keyframes panelIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
@@ -64,6 +69,8 @@ table{width:100%;border-collapse:collapse;font-size:12px;min-width:540px}
 th,td{padding:11px 14px;border-bottom:1px solid #efede6;text-align:left}
 thead th{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);background:#fbfaf7}
 tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background-color .2s}
+tbody tr:hover td{background:rgba(47,95,208,.035)}
 tbody td:first-child{color:#55585f}
 tbody td:not(:first-child){font-weight:500}
 .faq{max-width:1120px;margin:0 auto;padding:6px 22px 56px}
@@ -74,6 +81,12 @@ summary::-webkit-details-marker{display:none}
 summary::after{content:"+";color:var(--muted);font-weight:400}
 details[open] summary::after{content:"−"}
 details p{margin:8px 0 0;font-size:12.5px;line-height:1.85;color:#55585f;max-width:44em}
+details[open] p{animation:faqIn .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes faqIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 footer{border-top:1px solid var(--line);padding:24px max(22px,calc((100vw - 1120px)/2));display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
 footer a{text-decoration:none}
 footer a:hover{color:var(--ink)}
@@ -132,6 +145,9 @@ footer span:last-child{margin-left:auto}
 @media (prefers-reduced-motion:reduce){
   .seg .thumb{transition:none}
   .plan.on{animation:none}
+  .plan,.nav a::after,tbody tr{transition:none}
+  details[open] p{animation:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -295,6 +311,24 @@ footer span:last-child{margin-left:auto}
   addEventListener('load', function () { place(tabs[0]); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { place(tabs[0]); });
   place(tabs[0]);
+})();
+</script>
+<script>
+/* 次级动效：对比表与 FAQ 进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.compare, .faq')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i);
+    io.observe(el);
+  });
 })();
 </script>
 <script>

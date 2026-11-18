@@ -32,11 +32,13 @@ a{color:inherit}
 .shell{display:grid;grid-template-columns:216px minmax(0,1fr);min-height:0}
 .sidebar{border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:20px;background:rgba(18,22,29,.55);overflow:auto}
 .side-k{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted);padding:0 8px;margin:0 0 8px}
-.track{display:flex;align-items:baseline;gap:8px;padding:7px 8px;border-radius:6px;font-size:12px;color:#c9cdd6}
+.track{display:flex;align-items:baseline;gap:8px;padding:7px 8px;border-radius:6px;font-size:12px;color:#c9cdd6;transition:background-color .2s,color .2s}
+.track:hover:not(.on){background:rgba(255,255,255,.035);color:var(--ink)}
 .track span{margin-left:auto;font:10px ui-monospace,Consolas,monospace;color:var(--muted)}
 .track.on{background:rgba(142,240,200,.08);color:var(--ink)}
 .chain{display:grid;gap:2px}
-.step{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;font-size:11.5px;color:var(--muted)}
+.step{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;font-size:11.5px;color:var(--muted);transition:background-color .2s,color .2s}
+.step:hover:not(.on){background:rgba(255,255,255,.03);color:#c9cdd6}
 .step i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.18);flex:0 0 5px}
 .step em{margin-left:auto;font:9px ui-monospace,Consolas,monospace;font-style:normal;color:var(--muted)}
 .step.on{color:var(--ink);background:rgba(255,255,255,.05)}
@@ -52,7 +54,12 @@ h1{margin:0;font-size:22px;letter-spacing:-.02em;font-weight:620}
 button.pill{cursor:pointer}
 button.pill:hover{color:var(--ink);border-color:rgba(255,255,255,.24)}
 button.pill[aria-pressed="true"]{color:var(--gold);border-color:rgba(255,207,110,.35);background:rgba(255,207,110,.07)}
-.console{background:linear-gradient(180deg,#151a23,#10141b);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;grid-template-columns:minmax(190px,1fr) minmax(190px,.9fr);gap:22px;box-shadow:0 18px 44px -26px rgba(0,0,0,.8)}
+.console{position:relative;background:linear-gradient(180deg,#151a23,#10141b);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;grid-template-columns:minmax(190px,1fr) minmax(190px,.9fr);gap:22px;box-shadow:0 18px 44px -26px rgba(0,0,0,.8)}
+.console::after{content:"BYPASS";position:absolute;left:50%;top:50%;z-index:3;transform:translate(-50%,-50%) rotate(-12deg) scale(.9);
+  font:700 34px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:rgba(255,207,110,.55);
+  border:2px solid rgba(255,207,110,.35);border-radius:10px;padding:10px 18px;opacity:0;pointer-events:none;
+  transition:opacity .3s,transform .3s cubic-bezier(.2,.8,.2,1)}
+.console.bypassed::after{opacity:1;transform:translate(-50%,-50%) rotate(-12deg) scale(1)}
 .knob-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-width:0}
 .kicker{margin:0;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
 .knob-wrap{position:relative;width:var(--knob,226px);height:var(--knob,226px);margin:2px auto 0;touch-action:none}
@@ -64,7 +71,12 @@ button.pill[aria-pressed="true"]{color:var(--gold);border-color:rgba(255,207,110
 .knob{position:absolute;left:50%;top:50%;width:65%;height:65%;transform:translate(-50%,-50%);border-radius:50%;
   background:radial-gradient(circle at 50% 32%,#252b38,#141922 62%,#0f1319);border:1px solid rgba(255,255,255,.12);
   box-shadow:0 18px 34px -20px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.09);cursor:grab;outline:none;
-  display:grid;place-items:center}
+  display:grid;place-items:center;transition:scale .16s ease,box-shadow .2s}
+.knob.pulse{scale:1.02;box-shadow:0 0 0 3px rgba(142,240,200,.12),0 18px 34px -20px rgba(0,0,0,.9)}
+.val-bubble{position:absolute;left:50%;top:50%;z-index:4;transform:translate(-50%,-150%);pointer-events:none;
+  font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:#07110d;background:var(--accent);
+  border-radius:999px;padding:5px 8px;opacity:0;transition:opacity .15s}
+.wrap.dragging .val-bubble{opacity:1}
 .knob:active{cursor:grabbing}
 .knob:focus-visible{box-shadow:0 0 0 3px rgba(142,240,200,.4),0 18px 34px -20px rgba(0,0,0,.9)}
 .needle{position:absolute;left:50%;bottom:50%;width:2px;height:39%;border-radius:2px;
@@ -95,7 +107,8 @@ button.pill[aria-pressed="true"]{color:var(--gold);border-color:rgba(255,207,110
 .history h2 span{font:9.5px ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.08em;font-weight:400}
 table{width:100%;border-collapse:collapse;font-size:11.5px}
 th{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);text-align:left;padding:9px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--line)}
-td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.05);color:#c9cdd6}
+td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.05);color:#c9cdd6;transition:background-color .2s}
+tbody tr:hover td{background:rgba(142,240,200,.04)}
 tr:last-child td{border-bottom:0}
 td.ok{color:var(--accent)}
 .statusbar{display:flex;align-items:center;gap:18px;height:28px;padding:0 18px;border-top:1px solid var(--line);font:10px ui-monospace,Consolas,monospace;color:var(--muted);background:#0a0c10;letter-spacing:.04em;white-space:nowrap;overflow:hidden}
@@ -141,6 +154,9 @@ td.ok{color:var(--accent)}
 }
 @media (prefers-reduced-motion:reduce){
   .needle,.ring .value,.gr-bar i{transition:none}
+  .knob{transition:none}
+  .console::after{transition:none}
+  .val-bubble,.track,.step,td{transition:none}
 }
 </style>
 </head>
@@ -210,6 +226,7 @@ td.ok{color:var(--accent)}
               <span class="needle" id="needle"></span>
               <span class="num"><b id="num">40</b><small>%</small></span>
             </div>
+            <span class="val-bubble" id="bubble" aria-hidden="true">40%</span>
           </div>
           <div class="knob-foot">增益缩减 <b id="gr-read">-2.1 dB</b><span>·</span><span>峰值 -1.0 dBTP</span></div>
         </div>
@@ -256,6 +273,7 @@ td.ok{color:var(--accent)}
   var wrap = document.getElementById('wrap'), knob = document.getElementById('knob');
   var needle = document.getElementById('needle'), arc = document.getElementById('arc');
   var num = document.getElementById('num'), ticks = document.getElementById('ticks');
+  var bubble = document.getElementById('bubble');
   var consoleEl = document.getElementById('console');
   var bypass = document.getElementById('bypass');
   var grFill = document.getElementById('gr-fill'), grNum = document.getElementById('gr-num'), grRead = document.getElementById('gr-read');
@@ -281,6 +299,7 @@ td.ok{color:var(--accent)}
     grFill.style.width = Math.max(6, val * .68).toFixed(0) + '%';
     grNum.textContent = '-' + gr + ' dB';
     grRead.textContent = '-' + gr + ' dB';
+    if (bubble) bubble.textContent = Math.round(val) + '%';
   }
 
   function fromPoint(x, y) {
@@ -290,12 +309,18 @@ td.ok{color:var(--accent)}
     if (deg > 180) deg -= 360;
     if (deg < -180) deg += 360;
     paint((Math.max(-135, Math.min(135, deg)) + 135) / 2.7);
+    if (bubble) {
+      var wr = wrap.getBoundingClientRect();
+      bubble.style.left = (x - wr.left).toFixed(1) + 'px';
+      bubble.style.top = (y - wr.top).toFixed(1) + 'px';
+    }
   }
 
   knob.addEventListener('pointerdown', function (e) {
     if (knob.getAttribute('aria-disabled') === 'true') return;
     dragging = true;
     wrap.classList.add('dragging');
+    knob.classList.add('pulse');
     knob.setPointerCapture(e.pointerId);
     knob.focus();
     fromPoint(e.clientX, e.clientY);
@@ -305,6 +330,7 @@ td.ok{color:var(--accent)}
     if (!dragging) return;
     dragging = false;
     wrap.classList.remove('dragging');
+    knob.classList.remove('pulse');
     var snap = Math.round(val / 10) * 10;
     if (Math.abs(snap - val) < 3.2) paint(snap);
   }

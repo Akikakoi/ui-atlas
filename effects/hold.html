@@ -17,18 +17,23 @@ button{font:inherit}
 .brand .mark{width:26px;height:26px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font:700 10px/1 ui-monospace,Consolas,monospace}
 .brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 .topbar nav{display:flex;gap:18px;font-size:11.5px;color:var(--muted)}
+.topbar nav a{position:relative;transition:color .18s}
+.topbar nav a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.topbar nav a:hover{color:var(--ink)}
+.topbar nav a:hover::after{transform:scaleX(1)}
 .topbar nav a.on{color:var(--ink);font-weight:600}
 .hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.02em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.10);border:1px solid rgba(128,128,128,.16);border-radius:999px;padding:3px 8px;white-space:nowrap}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
 .quota{margin-left:auto;display:flex;align-items:center;gap:9px;font:600 8px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
 .quota .bar{width:74px;height:4px;border-radius:2px;background:#e2e7ee;overflow:hidden}
-.quota .bar i{display:block;height:100%;width:43%;background:var(--accent);border-radius:2px}
+.quota .bar i{display:block;height:100%;width:43%;background:var(--accent);border-radius:2px;transform-origin:left;animation:grow .9s .2s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .avatar{width:27px;height:27px;border-radius:50%;background:linear-gradient(145deg,#7e93b8,#3d4f6d);color:#f3f6fb;display:grid;place-items:center;font:700 10px/1 ui-monospace,Consolas,monospace}
 .shell{flex:1;width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:176px minmax(0,1fr);gap:clamp(22px,3.4vw,44px);padding:clamp(16px,2.8vh,26px) clamp(16px,3.2vw,38px) 32px;align-items:start}
 .side{position:sticky;top:74px;display:flex;flex-direction:column;gap:2px}
 .side-k{margin:0 0 8px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.17em;color:var(--muted)}
-.side a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px;border-radius:8px;font-size:11.5px;color:var(--muted);transition:background .18s,color .18s}
-.side a:hover{background:rgba(255,255,255,.7);color:var(--ink)}
+.side a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px;border-radius:8px;font-size:11.5px;color:var(--muted);transition:background .18s,color .18s,translate .16s}
+.side a:hover{background:rgba(255,255,255,.7);color:var(--ink);translate:2px 0}
 .side a.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 10px 20px -20px rgba(20,22,30,.45)}
 .side a small{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted)}
 .main{min-width:0}
@@ -41,11 +46,18 @@ button{font:inherit}
 .head .new{border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:9px;padding:8px 13px;font-size:11px;font-weight:600;cursor:pointer}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 264px;gap:12px;align-items:start}
 .files{border:1px solid var(--line);border-radius:12px;background:var(--paper);overflow:hidden;box-shadow:0 30px 50px -55px rgba(20,22,30,.45)}
-.file{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-top:1px solid #eef1f5;background:transparent;padding:10px 12px;cursor:pointer;transition:background .16s}
+.file{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-top:1px solid #eef1f5;background:transparent;padding:10px 12px;cursor:pointer;transition:background .16s,translate .16s;animation:rise .45s both}
+.file:nth-child(2){animation-delay:.04s}
+.file:nth-child(3){animation-delay:.08s}
+.file:nth-child(4){animation-delay:.12s}
+.file:nth-child(5){animation-delay:.16s}
+@keyframes rise{from{opacity:0;translate:0 6px}to{opacity:1;translate:0 0}}
 .file:first-child{border-top:0}
-.file:hover{background:#f6f8fb}
+.file:hover{background:#f6f8fb;translate:2px 0}
 .file:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .file.on{background:#eef3ff}
+.file.on .ico{animation:icoPop .32s cubic-bezier(.2,1.5,.4,1)}
+@keyframes icoPop{0%{scale:1}45%{scale:1.14}100%{scale:1}}
 .file.removed{opacity:.42}
 .file.removed .name b{text-decoration:line-through}
 .file .ico{width:28px;height:28px;border-radius:7px;background:var(--chip);display:grid;place-items:center;font:700 7.5px/1 ui-monospace,Consolas,monospace;color:#8792a1}
@@ -58,6 +70,8 @@ button{font:inherit}
 .detail{border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:14px;box-shadow:0 30px 50px -55px rgba(20,22,30,.4)}
 .detail-k{margin:0 0 10px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
 .dtop{display:flex;align-items:center;gap:9px;padding-bottom:11px;border-bottom:1px solid #eef1f5}
+.dtop.swap{animation:swapIn .34s cubic-bezier(.2,.8,.2,1)}
+@keyframes swapIn{from{opacity:.25;translate:0 -4px}to{opacity:1;translate:0 0}}
 .dtop .ico{width:36px;height:36px;border-radius:9px;flex:0 0 36px;display:grid;place-items:center;background:#eef3ff;color:var(--accent);font:700 8px/1 ui-monospace,Consolas,monospace}
 .dtop b{display:block;font-size:11.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dtop small{display:block;margin-top:2px;font-size:9px;color:var(--muted)}
@@ -65,10 +79,12 @@ button{font:inherit}
 .dmeta div{display:flex;justify-content:space-between;gap:10px}
 .dmeta small{font:600 7.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.07em;color:var(--muted)}
 .dmeta b{font-weight:600}
-.hold{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:42px;border:1px solid #e4c3be;border-radius:10px;background:#fff;color:var(--danger);font:inherit;font-size:12px;font-weight:600;cursor:pointer;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;transition:background .2s,border-color .2s,color .2s}
+.hold{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:42px;border:1px solid #e4c3be;border-radius:10px;background:#fff;color:var(--danger);font:inherit;font-size:12px;font-weight:600;cursor:pointer;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;transition:background .2s,border-color .2s,color .2s,translate .15s}
 .hold:hover{background:#fdf7f6}
+.hold.pressing{background:#fdf1ee;border-color:#dcb3ac;translate:0 1px}
 .hold:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.hold.done{border-color:#c8ddcc;background:#f4faf5;color:var(--ok)}
+.hold.done{border-color:#c8ddcc;background:#f4faf5;color:var(--ok);animation:doneGlow .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes doneGlow{0%{box-shadow:0 0 0 0 rgba(47,107,69,.3)}65%{box-shadow:0 0 0 8px rgba(47,107,69,0)}100%{box-shadow:0 0 0 0 rgba(47,107,69,0)}}
 .ring{width:19px;height:19px;flex:0 0 19px;transform:rotate(-90deg)}
 .ring circle{fill:none;stroke-width:2.4}
 .ring .bg{stroke:#f0d9d5}
@@ -126,6 +142,9 @@ button{font:inherit}
 }
 @media (prefers-reduced-motion:reduce){
   .hold,.file,.side a{transition:none}
+  .file,.file.on .ico,.quota .bar i,.dtop.swap,.hold.done{animation:none}
+  .topbar nav a::after{transition:none}
+  .side a:hover,.file:hover,.hold.pressing{translate:none}
 }
 </style>
 </head>
@@ -209,6 +228,7 @@ button{font:inherit}
   var btn = document.getElementById('hold'), fg = document.getElementById('fg');
   var label = document.getElementById('label'), msg = document.getElementById('msg');
   var dName = document.getElementById('dName'), dSize = document.getElementById('dSize'), dTime = document.getElementById('dTime'), dIcon = document.getElementById('dIcon');
+  var dtop = document.querySelector('.dtop');
   var files = [].slice.call(document.querySelectorAll('.file'));
   var C = 2 * Math.PI * 17;
   var start = 0, raf = null, holding = false, done = false, fadeTimer = null;
@@ -232,6 +252,7 @@ button{font:inherit}
   function begin() {
     if (done || holding) return;
     holding = true;
+    btn.classList.add('pressing');
     start = performance.now();
     clearTimeout(fadeTimer);
     fg.style.transition = 'none';
@@ -251,6 +272,7 @@ button{font:inherit}
   function cancel() {
     if (!holding) return;
     holding = false;
+    btn.classList.remove('pressing');
     cancelAnimationFrame(raf);
     raf = null;
     label.textContent = '按住 1 秒删除';
@@ -264,6 +286,7 @@ button{font:inherit}
   function finish() {
     holding = false;
     done = true;
+    btn.classList.remove('pressing');
     cancelAnimationFrame(raf);
     raf = null;
     fg.style.transition = 'none';
@@ -308,6 +331,9 @@ button{font:inherit}
       dIcon.textContent = ext;
       dSize.textContent = ext + ' · ' + f.dataset.size;
       dTime.textContent = f.dataset.time;
+      dtop.classList.remove('swap');
+      void dtop.offsetWidth;
+      dtop.classList.add('swap');
       idle();
       msg.textContent = '';
       files.forEach(function (x) {

@@ -76,9 +76,13 @@ h1{margin:0;font-size:clamp(23px,3.2vw,32px);line-height:1.1;letter-spacing:-.04
   display:grid;place-items:center;box-shadow:0 6px 18px -6px rgba(0,0,0,.65);transition:transform .18s,box-shadow .18s}
 .handle i::before{content:"↔";font:600 13px/1 ui-monospace,Consolas,monospace;color:#3c3a34}
 .handle:hover i{transform:scale(1.08)}
+.compare.dragging .handle i{transform:scale(1.12);box-shadow:0 0 0 3px rgba(201,168,106,.3),0 6px 18px -6px rgba(0,0,0,.65)}
+.compare.dragging .handle::before{box-shadow:0 0 0 1px rgba(201,168,106,.55),0 0 20px rgba(201,168,106,.35)}
 .handle:focus-visible i{box-shadow:0 0 0 3px rgba(201,168,106,.45),0 6px 18px -6px rgba(0,0,0,.65)}
 .info{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:14px}
-.card{border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.028);padding:15px 16px}
+.card{border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.028);padding:15px 16px;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s,background-color .3s}
+@media (hover:hover) and (pointer:fine){.card:hover{transform:translateY(-2px);border-color:rgba(201,168,106,.28);background:rgba(255,255,255,.045)}}
 .card .k{display:block;margin-bottom:10px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
 .card h2{margin:0 0 4px;font-size:12.5px;letter-spacing:-.01em;font-weight:600}
 .grade{display:grid;gap:6px;margin-top:10px}
@@ -94,6 +98,10 @@ h1{margin:0;font-size:clamp(23px,3.2vw,32px);line-height:1.1;letter-spacing:-.04
 .statusbar{display:flex;align-items:center;gap:16px;max-width:1120px;margin:0 auto;padding:0 22px 20px;
   font:9px ui-monospace,Consolas,monospace;letter-spacing:.07em;color:var(--muted);white-space:nowrap;overflow:hidden}
 .statusbar .grow{flex:1}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:#575b62;
   pointer-events:none;z-index:9;background:rgba(250,248,243,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border:1px solid rgba(20,22,28,.14);border-radius:999px;padding:4px 9px;box-shadow:0 8px 18px -16px rgba(0,0,0,.55)}
@@ -138,6 +146,7 @@ h1{margin:0;font-size:clamp(23px,3.2vw,32px);line-height:1.1;letter-spacing:-.04
   .meta{margin-left:auto}
   .pill{padding:3px 7px;font-size:8px}
   .compare{flex:1;aspect-ratio:auto;min-height:250px;border-radius:11px}
+  .label{bottom:38px}
   .label b{font-size:10px}
   .handle i{width:29px;height:29px}
   .info{display:none}
@@ -146,6 +155,8 @@ h1{margin:0;font-size:clamp(23px,3.2vw,32px);line-height:1.1;letter-spacing:-.04
 }
 @media (prefers-reduced-motion:reduce){
   .handle i{transition:none}
+  .card{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -259,12 +270,13 @@ h1{margin:0;font-size:clamp(23px,3.2vw,32px);line-height:1.1;letter-spacing:-.04
 
   handle.addEventListener('pointerdown', function (e) {
     drag = true;
+    box.classList.add('dragging');
     handle.setPointerCapture(e.pointerId);
     handle.focus();
     e.preventDefault();
   });
   handle.addEventListener('pointermove', function (e) { if (drag) fromPoint(e); });
-  function end() { drag = false; }
+  function end() { drag = false; box.classList.remove('dragging'); }
   handle.addEventListener('pointerup', end);
   handle.addEventListener('pointercancel', end);
 
@@ -286,6 +298,21 @@ h1{margin:0;font-size:clamp(23px,3.2vw,32px);line-height:1.1;letter-spacing:-.04
 
   axis();
   set(p);
+})();
+</script>
+<script>
+/* 次级动效：调色说明进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  var info = document.getElementById('notes');
+  if (info) { info.classList.add('io'); io.observe(info); }
 })();
 </script>
 <script>

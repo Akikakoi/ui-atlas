@@ -20,7 +20,10 @@ a{color:inherit}
 .brand{display:flex;align-items:baseline;gap:9px;font-size:12px;font-weight:700;letter-spacing:.26em;text-decoration:none;white-space:nowrap}
 .brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .nav-links{display:flex;gap:24px;margin-left:8px}
-.nav-links a{font-size:12.5px;color:rgba(242,244,248,.62);text-decoration:none}
+.nav-links a{position:relative;font-size:12.5px;color:rgba(242,244,248,.62);text-decoration:none}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--ink)}
 .btn{margin-left:auto;height:38px;padding:0 18px;border-radius:999px;border:1px solid rgba(242,244,248,.22);
   color:var(--ink);font-size:12px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
@@ -49,7 +52,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
     linear-gradient(135deg,#eef2ff 0%,#ccd9fa 44%,#9fb6f1 100%);
   box-shadow:0 34px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.95);
   transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.8,.2,1);
-  will-change:transform;cursor:grab;overflow:hidden}
+  will-change:transform;cursor:grab;overflow:hidden;animation:cardFloat 6s ease-in-out infinite}
+@keyframes cardFloat{0%,100%{translate:0 0}50%{translate:0 -4px}}
 .card.on{transition:transform .1s linear}
 .card::before{content:"";position:absolute;left:-30%;top:-60%;width:90%;height:220%;
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.5) 45%,transparent 62%);
@@ -73,7 +77,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .bot em{font-style:normal;font-size:17px;letter-spacing:.08em}
 .ring{position:absolute;right:16%;top:24%;width:72px;height:72px;border-radius:50%;
   border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 0 26px rgba(255,255,255,.35);opacity:.7}
-.floor{width:min(400px,100%);height:28px;margin:20px auto 0;border-radius:50%;background:rgba(0,0,0,.6);filter:blur(20px)}
+.floor{width:min(400px,100%);height:28px;margin:20px auto 0;border-radius:50%;background:rgba(0,0,0,.6);filter:blur(20px);
+  transition:transform .25s ease-out,opacity .25s}
 .cap{margin:16px 0 0;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:rgba(242,244,248,.36);text-align:center}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);max-width:1160px;margin:0 auto;padding:0 22px;border-top:1px solid var(--line)}
 .stat{padding:26px 10px;border-left:1px solid var(--line)}
@@ -83,7 +88,9 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .sec{max-width:1160px;margin:0 auto;padding:62px 22px 24px}
 h2{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
 .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.benefits article{border:1px solid var(--line);border-radius:14px;padding:22px 20px;background:rgba(255,255,255,.03)}
+.benefits article{border:1px solid var(--line);border-radius:14px;padding:22px 20px;background:rgba(255,255,255,.03);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,background-color .35s}
+@media (hover:hover) and (pointer:fine){.benefits article:hover{transform:translateY(-3px);border-color:rgba(143,180,255,.3);background:rgba(255,255,255,.05)}}
 .benefits span{display:block;margin-bottom:14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent)}
 .benefits h3{margin:0 0 8px;font-size:15px;letter-spacing:-.01em}
 .benefits p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
@@ -111,6 +118,10 @@ h2{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.1;letter-spaci
   pointer-events:none;z-index:9;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 @media (max-width:900px){
   .hero{grid-template-columns:1fr;min-height:0}
   .stage{order:-1}
@@ -171,7 +182,8 @@ h2{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.1;letter-spaci
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
-  .card{transform:none!important}
+  .card{transform:none!important;translate:none!important}
+  .io{opacity:1;transform:none}
 }
 </style>
 </head>
@@ -214,8 +226,8 @@ h2{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.1;letter-spaci
   </section>
 
   <div class="stats" aria-label="卡片参数">
-    <div class="stat"><b>0.8 mm</b><span>304 不锈钢</span></div>
-    <div class="stat"><b>2.4%</b><span>全网消费返现</span></div>
+    <div class="stat"><b data-to="0.8" data-dec="1" data-suffix=" mm">0.8 mm</b><span>304 不锈钢</span></div>
+    <div class="stat"><b data-to="2.4" data-dec="1" data-suffix="%">2.4%</b><span>全网消费返现</span></div>
     <div class="stat"><b>无限</b><span>机场贵宾厅</span></div>
   </div>
 
@@ -266,6 +278,7 @@ h2{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.1;letter-spaci
 <script>
 (function () {
   var card = document.getElementById('card');
+  var floor = document.querySelector('.floor');
   if (!card || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   card.addEventListener('pointerenter', function () { card.classList.add('on'); });
   card.addEventListener('pointermove', function (e) {
@@ -274,10 +287,62 @@ h2{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.1;letter-spaci
     card.style.transform = 'rotateX(' + ((.5 - py) * 16).toFixed(2) + 'deg) rotateY(' + ((px - .5) * 18).toFixed(2) + 'deg)';
     card.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
     card.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
+    if (floor) {
+      floor.style.transform = 'translateX(' + ((px - .5) * 22).toFixed(1) + 'px) scale(' + (1 - Math.abs(py - .5) * .1).toFixed(3) + ')';
+      floor.style.opacity = (.55 + Math.abs(py - .5) * .35).toFixed(2);
+    }
   });
   card.addEventListener('pointerleave', function () {
     card.classList.remove('on'); card.style.transform = '';
+    if (floor) { floor.style.transform = ''; floor.style.opacity = ''; }
   });
+})();
+</script>
+<script>
+/* 次级动效：数据计数与下方内容入场 */
+(function () {
+  var nums = [].slice.call(document.querySelectorAll('.stat b[data-to]'));
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+
+  function paint(el, n) {
+    var dec = +el.dataset.dec || 0;
+    el.textContent = n.toFixed(dec) + (el.dataset.suffix || '');
+  }
+  if (nums.length && 'IntersectionObserver' in window) {
+    var box = document.querySelector('.stats');
+    if (box) {
+      var sio = new IntersectionObserver(function (es) {
+        if (!es[0].isIntersecting) return;
+        sio.disconnect();
+        var t0 = 0;
+        function frame(now) {
+          if (!t0) t0 = now;
+          var t = Math.min(1, (now - t0) / 1000);
+          var e = 1 - Math.pow(1 - t, 3);
+          nums.forEach(function (el) { paint(el, +el.dataset.to * e); });
+          if (t < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }, { threshold: .3 });
+      sio.observe(box);
+    }
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      });
+    }, { threshold: .18 });
+    [].slice.call(document.querySelectorAll('.benefits, .spec, .band')).forEach(function (el, i) {
+      el.classList.add('io');
+      el.style.setProperty('--i', i % 3);
+      io.observe(el);
+    });
+  }
 })();
 </script>
 <script>

@@ -19,7 +19,10 @@ a{color:inherit}
 .brand b{font:600 14px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em}
 .brand span{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .nav nav{display:flex;gap:22px;margin-left:auto}
-.nav nav a{font-size:12px;color:var(--muted);text-decoration:none}
+.nav nav a{position:relative;font-size:12px;color:var(--muted);text-decoration:none}
+.nav nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav nav a:hover{color:var(--ink)}
 .nav .pdf{height:32px;padding:0 13px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;
   font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;text-decoration:none;color:var(--ink)}
@@ -29,7 +32,9 @@ a{color:inherit}
   background:radial-gradient(58% 70% at 76% 0%,rgba(157,184,255,.16),transparent 70%),
   radial-gradient(42% 60% at 24% 10%,rgba(240,197,138,.07),transparent 70%);
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
-  mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+  mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
+  animation:glowDrift 10s ease-in-out infinite}
+@keyframes glowDrift{0%,100%{transform:translate3d(0,0,0);opacity:.9}50%{transform:translate3d(-2%,2%,0) scale(1.04);opacity:1}}
 .kicker{margin:0 0 14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--accent);position:relative}
 h1{margin:0;font-size:clamp(34px,5.6vw,64px);line-height:1.02;letter-spacing:-.045em;font-weight:640;position:relative}
 h1 em{font-style:normal;color:var(--accent)}
@@ -40,7 +45,11 @@ h1 em{font-style:normal;color:var(--accent)}
 .sec{max-width:1080px;margin:0 auto;padding:0 22px}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:clamp(26px,4vw,44px) 0 0}
 .stat{position:relative;min-width:0;padding:20px 18px 18px;border:1px solid var(--line);border-radius:16px;overflow:hidden;
-  background:linear-gradient(180deg,rgba(157,184,255,.055),rgba(157,184,255,0) 60%),var(--panel)}
+  background:linear-gradient(180deg,rgba(157,184,255,.055),rgba(157,184,255,0) 60%),var(--panel);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s}
+@media (hover:hover) and (pointer:fine){
+  .stat:hover{transform:translateY(-3px);border-color:rgba(157,184,255,.32)}
+}
 .stat .k{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);letter-spacing:.02em}
 .delta{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:#9fe0b4;background:rgba(120,220,160,.1);
   border:1px solid rgba(120,220,160,.22);border-radius:999px;padding:4px 6px;white-space:nowrap}
@@ -63,7 +72,11 @@ h1 em{font-style:normal;color:var(--accent)}
 .chart{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;align-items:end;height:170px;
   margin:22px 0 0;padding-bottom:1px;border-bottom:1px solid var(--line)}
 .chart .b{height:var(--h);min-width:0;border-radius:4px 4px 0 0;
-  background:linear-gradient(180deg,rgba(157,184,255,.75),rgba(157,184,255,.16))}
+  background:linear-gradient(180deg,rgba(157,184,255,.75),rgba(157,184,255,.16));
+  transform-origin:bottom;transition:transform .95s cubic-bezier(.16,.84,.3,1);
+  transition-delay:calc(var(--i,0) * 55ms)}
+body.js .chart .b{transform:scaleY(0)}
+body.js .chart.in .b{transform:scaleY(1)}
 .chart .b.hi{background:linear-gradient(180deg,var(--warm),rgba(240,197,138,.16))}
 .months{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;margin-top:8px;
   font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted);text-align:center}
@@ -89,7 +102,13 @@ blockquote span{color:var(--accent);font-style:italic}
 .reg b small{font-size:12px;color:var(--muted);margin-left:3px;letter-spacing:0;font-weight:500}
 .reg .lat{display:block;margin-top:7px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 .reg i{position:relative;display:block;height:3px;margin-top:12px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
-.reg i::after{content:"";position:absolute;inset:0;width:var(--w);border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+.reg i::after{content:"";position:absolute;inset:0;width:var(--w);border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  transform-origin:left;transition:transform .9s cubic-bezier(.16,.84,.3,1)}
+body.js .reg-grid .reg i::after{transform:scaleX(0)}
+body.js .reg-grid.in .reg i::after{transform:scaleX(1)}
+.reg:nth-child(2) i::after{transition-delay:.08s}
+.reg:nth-child(3) i::after{transition-delay:.16s}
+.reg:nth-child(4) i::after{transition-delay:.24s}
 .band{max-width:1080px;margin:clamp(48px,8vw,92px) auto 0;padding:0 22px}
 .band .inner{display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;
   border:1px solid var(--line);border-radius:22px;padding:clamp(24px,4vw,40px);
@@ -102,6 +121,10 @@ blockquote span{color:var(--accent);font-style:italic}
 footer{max-width:1080px;margin:56px auto 0;padding:22px 22px 56px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
   font:600 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 footer span:last-child{margin-left:auto}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;
   font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;
   background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
@@ -173,6 +196,9 @@ footer span:last-child{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important}
+  .hero::before{animation:none}
+  .chart .b,.reg-grid .reg i::after{transform:none!important}
+  .io{opacity:1;transform:none}
 }
 </style>
 </head>
@@ -347,6 +373,43 @@ footer span:last-child{margin-left:auto}
       if (es[0].isIntersecting) run();
     }, { threshold: .3 }).observe(box);
   } else { run(); }
+})();
+</script>
+<script>
+/* 次级动效：柱形与区域条在进入视口时生长 */
+(function () {
+  document.body.classList.add('js');
+  var chart = document.querySelector('.chart'), regs = document.querySelector('.reg-grid');
+  var reveal = [].slice.call(document.querySelectorAll('.curve, .notes, .regions, .band .inner'));
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce) {
+    if (chart) chart.classList.add('in');
+    if (regs) regs.classList.add('in');
+    return;
+  }
+  [].slice.call(document.querySelectorAll('.chart .b')).forEach(function (b, i) {
+    b.style.setProperty('--i', i);
+  });
+  if (!('IntersectionObserver' in window)) {
+    if (chart) chart.classList.add('in');
+    if (regs) regs.classList.add('in');
+    reveal.forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .2 });
+  if (chart) io.observe(chart);
+  if (regs) io.observe(regs);
+  reveal.forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
+  });
 })();
 </script>
 <script>

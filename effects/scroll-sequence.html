@@ -13,12 +13,17 @@ a{color:inherit;text-decoration:none}
 .nav{position:fixed;inset:0 0 auto;z-index:8;height:68px;display:flex;align-items:center;gap:26px;
   padding:0 max(22px,calc((100vw - 1120px)/2));background:rgba(8,10,14,.6);
   border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.nav-progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;overflow:hidden}
+.nav-progress i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
 .brand{display:flex;align-items:baseline;gap:10px;font:600 15px/1.1 Georgia,"Songti SC",serif;letter-spacing:.08em;white-space:nowrap}
 .brand .mark{width:24px;height:24px;display:grid;place-items:center;border:1px solid rgba(255,207,110,.55);border-radius:50%;
   color:var(--accent);font:600 9px/1 ui-monospace,Consolas,monospace}
 .brand i{font:400 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);font-style:normal}
 .nav-links{display:flex;gap:24px;margin-left:12px}
-.nav-links a{font-size:12.5px;color:rgba(244,241,232,.62)}
+.nav-links a{position:relative;font-size:12.5px;color:rgba(244,241,232,.62)}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--accent)}
 .nav .cta{margin-left:auto;border:1px solid rgba(255,207,110,.5);border-radius:999px;padding:7px 14px;
   font-size:11.5px;font-weight:600;color:var(--accent);white-space:nowrap}
@@ -26,6 +31,7 @@ a{color:inherit;text-decoration:none}
 .sec{height:175vh;position:relative}
 .stick{position:sticky;top:0;height:100vh;overflow:hidden}
 .frame{position:absolute;inset:0;opacity:0;display:grid;place-items:center;padding:120px 24px 96px;will-change:opacity}
+.frame > div{will-change:transform}
 .frame:nth-child(1){opacity:1;background:radial-gradient(70% 60% at 30% 20%,#2a3c52,#0a0d12 72%)}
 .frame:nth-child(2){background:radial-gradient(70% 60% at 75% 25%,#4a2f3d,#120a10 72%)}
 .frame:nth-child(3){background:radial-gradient(70% 60% at 40% 80%,#2f4436,#0a120d 72%)}
@@ -49,6 +55,8 @@ a{color:inherit;text-decoration:none}
 .dots{display:flex;gap:7px;flex-shrink:0}
 .dots i{display:block;width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .25s,transform .25s}
 .dots i.on{background:var(--accent);transform:scale(1.45)}
+.count{text-align:right;white-space:nowrap;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.count b{display:block;margin-bottom:4px;font-size:22px;letter-spacing:-.03em;color:var(--accent)}
 .sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .credits{max-width:1120px;margin:0 auto;padding:10px 22px 46px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(26px,5vw,64px);align-items:start}
 .credits h2{margin:0 0 12px;font-size:clamp(24px,3.2vw,34px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
@@ -61,6 +69,14 @@ a{color:inherit;text-decoration:none}
 .screenings caption{text-align:left;margin-bottom:10px;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th,td{text-align:left;padding:13px 8px;border-bottom:1px solid var(--line)}
+tbody tr{transition:background-color .25s,transform .25s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){
+  tbody tr:hover{background:rgba(255,207,110,.05);transform:translateX(4px)}
+}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 90ms)}
+.io.in{opacity:1;transform:none}
 th{font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 td:first-child{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--accent)}
 td:last-child{text-align:right;color:var(--muted);font-size:11px}
@@ -138,6 +154,9 @@ footer span:last-child{margin-left:auto}
 @media (prefers-reduced-motion:reduce){
   .frame{opacity:0}
   .frame:nth-child(1){opacity:1}
+  .frame > div{transform:none!important}
+  tbody tr,.io,.nav-links a::after{transition:none}
+  .io{opacity:1;transform:none}
 }
 </style>
 </head>
@@ -151,6 +170,7 @@ footer span:last-child{margin-left:auto}
     <a href="#watch">观看</a>
   </nav>
   <a class="cta" href="#watch">观看短片</a>
+  <span class="nav-progress" aria-hidden="true"><i id="navBar"></i></span>
 </header>
 
 <section class="sec" id="top">
@@ -173,13 +193,14 @@ footer span:last-child{margin-left:auto}
     </div>
     <div class="hud">
       <p>四帧叠在同一块 sticky 里，滚动进度换算成 0–3 的浮点位置；相邻两帧按距离交叉淡化，所以不会出现硬切。</p>
+      <div class="count" aria-hidden="true"><b id="fno">01</b>/ 04</div>
       <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
     </div>
     <p class="sr">短片《四幕》分为起、承、转、合四个段落，滚动页面时依次交叉淡化。</p>
   </div>
 </section>
 
-<section class="credits" id="about">
+<section class="credits io" id="about">
   <div>
     <p class="kicker">ABOUT THE FILM</p>
     <h2>一个人，<br>一台摄影机。</h2>
@@ -193,7 +214,7 @@ footer span:last-child{margin-left:auto}
   </dl>
 </section>
 
-<section class="screenings" id="screenings">
+<section class="screenings io" id="screenings">
   <table>
     <caption>本月放映 · 杭州／上海</caption>
     <thead><tr><th>日期</th><th>场地</th><th>状态</th></tr></thead>
@@ -205,7 +226,7 @@ footer span:last-child{margin-left:auto}
   </table>
 </section>
 
-<section class="band" id="watch">
+<section class="band io" id="watch">
   <div class="inner-band">
     <div>
       <h2>完整短片，线上放映到 11 月底。</h2>
@@ -229,7 +250,8 @@ footer span:last-child{margin-left:auto}
   var sec = document.getElementById('sec') || document.querySelector('.sec');
   var frames = [].slice.call(document.querySelectorAll('.frame'));
   var dots = [].slice.call(document.querySelectorAll('.dots i'));
-  var raf = null;
+  var navBar = document.getElementById('navBar'), fno = document.getElementById('fno');
+  var raf = null, lastIdx = -1;
 
   function render() {
     raf = null;
@@ -238,14 +260,38 @@ footer span:last-child{margin-left:auto}
     var p = Math.max(0, Math.min(1, -r.top / total));
     var t = p * (frames.length - 1);
     frames.forEach(function (f, i) {
-      f.style.opacity = Math.max(0, 1 - Math.abs(i - t)).toFixed(3);
+      var dist = Math.abs(i - t);
+      var w = Math.max(0, 1 - dist);
+      f.style.opacity = (w * w * (3 - 2 * w)).toFixed(3);
+      var inner = f.firstElementChild;
+      if (inner) {
+        inner.style.transform = 'translate3d(0,' + ((i - t) * 10).toFixed(1) + 'px,0) scale(' +
+          (1 - Math.min(.03, dist * .016)).toFixed(3) + ')';
+      }
     });
     var idx = Math.round(t);
     dots.forEach(function (d, i) { d.classList.toggle('on', i === idx); });
+    if (idx !== lastIdx) {
+      fno.textContent = String(idx + 1).padStart(2, '0');
+      lastIdx = idx;
+    }
+    navBar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
   }
   addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
   addEventListener('resize', render);
   render();
+
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .2 });
+  [].slice.call(document.querySelectorAll('.io')).forEach(function (el, i) {
+    el.style.setProperty('--i', i);
+    io.observe(el);
+  });
 })();
 </script>
 <script>

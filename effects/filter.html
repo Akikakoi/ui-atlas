@@ -16,7 +16,10 @@ a{color:inherit}
 .brand{display:flex;align-items:baseline;gap:9px;font-size:12px;font-weight:700;letter-spacing:.26em;text-decoration:none;white-space:nowrap}
 .brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .nav-links{display:flex;gap:22px;margin-left:8px}
-.nav-links a{font-size:12.5px;color:#55565f;text-decoration:none}
+.nav-links a{position:relative;font-size:12.5px;color:#55565f;text-decoration:none}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--ink)}
 .commission{margin-left:auto;border:1px solid var(--ink);border-radius:999px;padding:8px 15px;font-size:11.5px;text-decoration:none;white-space:nowrap;background:var(--ink);color:#fff}
 .commission:hover{background:var(--accent);border-color:var(--accent)}
@@ -30,15 +33,26 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .archive{max-width:1080px;margin:0 auto;padding:16px 22px 10px}
 .bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 0 16px;border-top:1px solid var(--line)}
 .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel);border-radius:999px;
-  padding:6px 12px;font:inherit;font-size:12px;color:#4b4c55;cursor:pointer;transition:background .18s,border-color .18s,color .18s}
+  padding:6px 12px;font:inherit;font-size:12px;color:#4b4c55;cursor:pointer;transition:background .18s,border-color .18s,color .18s,transform .2s}
+.chip:active{transform:scale(.96)}
 .chip:hover{border-color:#bcb7a8}
 .chip small{font:500 10px ui-monospace,Consolas,monospace;opacity:.55}
 .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
 .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .status{margin:0 0 0 auto;font:10px ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+.status.flash{animation:statusFlash .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes statusFlash{0%{opacity:.3}100%{opacity:1}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
 .item{position:relative;aspect-ratio:4/3;border-radius:13px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;
-  padding:14px;color:#fff;text-decoration:none;background:linear-gradient(150deg,var(--c1),var(--c2));will-change:transform}
+  padding:14px;color:#fff;text-decoration:none;background:linear-gradient(150deg,var(--c1),var(--c2));will-change:transform;
+  transition:translate .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+@media (hover:hover) and (pointer:fine){.item:hover{translate:0 -4px;box-shadow:0 20px 34px -26px rgba(20,22,28,.55)}}
+.item .art{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.item:hover .art{transform:scale(1.04)}
 .item .art{position:absolute;inset:0;opacity:.9}
 .item .art::before{content:"";position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.3);width:62%;aspect-ratio:1;right:-12%;top:-22%}
 .item[data-art="ring"] .art::before{width:84%;right:-28%;top:-34%;box-shadow:0 0 0 18px rgba(255,255,255,.05)}
@@ -118,6 +132,9 @@ footer{max-width:1080px;margin:0 auto;padding:0 22px 28px}
 }
 @media (prefers-reduced-motion:reduce){
   .item{will-change:auto}
+  .item,.item .art,.chip,.nav-links a::after{transition:none}
+  .status.flash{animation:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -230,6 +247,9 @@ footer{max-width:1080px;margin:0 auto;padding:0 22px 28px}
     var shown = items.filter(function (it) { return !it.hidden; }).length;
     var label = cat === 'all' ? '全部' : { brand: '品牌', ui: '界面', print: '印刷' }[cat];
     status.textContent = label + ' · 显示 ' + shown + ' / ' + items.length + ' 件作品';
+    status.classList.remove('flash');
+    void status.offsetWidth;
+    status.classList.add('flash');
 
     if (reduce) return;
     items.forEach(function (it) {
@@ -259,6 +279,21 @@ footer{max-width:1080px;margin:0 auto;padding:0 22px 28px}
       apply(c.dataset.cat);
     });
   });
+})();
+</script>
+<script>
+/* 次级动效：方法说明进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  var note = document.querySelector('.note');
+  if (note) { note.classList.add('io'); io.observe(note); }
 })();
 </script>
 <script>

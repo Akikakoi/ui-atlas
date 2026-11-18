@@ -36,16 +36,24 @@ button{font:inherit;color:inherit}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex:0 0 auto}
 .streak{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
 .streak b{color:var(--accent);font-size:10px}
-.toggle{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 11px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);font-size:11px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s}
-.toggle:hover{border-color:var(--accent);color:var(--accent)}
+.toggle{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 11px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);font-size:11px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s,translate .15s,scale .15s}
+.toggle:hover{border-color:var(--accent);color:var(--accent);translate:0 -1px}
+.toggle:active{translate:0 1px;scale:.97}
 .toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .toggle .ico{font-size:12px;line-height:1;color:var(--accent)}
+.toggle.swap .ico{animation:icoTurn .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes icoTurn{from{rotate:0}to{rotate:180deg}}
 .read{flex:1;width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:clamp(26px,5vw,64px);padding:clamp(26px,4vw,54px) clamp(18px,4vw,44px) 34px;align-items:start}
 .essay{min-width:0;max-width:44em}
 .kicker{margin:0 0 15px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
 .essay h1{margin:0 0 14px;font-size:clamp(34px,4.5vw,54px);line-height:1.05;letter-spacing:-.045em;font-weight:640}
 .essay h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
 .byline{margin:0 0 22px;display:flex;gap:14px;flex-wrap:wrap;font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
+.essay .kicker{animation:rise .5s both}
+.essay h1{animation:rise .6s .06s both}
+.essay .byline{animation:rise .6s .12s both}
+.essay .lede{animation:rise .6s .18s both}
+@keyframes rise{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
 .byline span{position:relative;padding-left:14px}
 .byline span::before{content:"";position:absolute;left:0;top:50%;width:6px;height:1px;background:var(--line)}
 .lede{margin:0 0 24px;font-size:16px;line-height:1.95;letter-spacing:-.005em;color:var(--ink)}
@@ -56,33 +64,41 @@ button{font:inherit;color:inherit}
 .win::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.035) 0 1px,transparent 1px 9px);mix-blend-mode:soft-light}
 .snowline{position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--sky2) 80%,transparent))}
 .roof{position:absolute;left:6%;right:6%;bottom:14%;height:34%;background:var(--roof);clip-path:polygon(0 72%,50% 0,100% 72%,100% 100%,0 100%)}
-.roof i{position:absolute;left:50%;top:46%;transform:translateX(-50%);width:44px;height:32px;border-radius:3px 3px 0 0;background:var(--lamp);box-shadow:0 0 34px 10px var(--glow);opacity:.92}
+.roof i{position:absolute;left:50%;top:46%;transform:translateX(-50%);width:44px;height:32px;border-radius:3px 3px 0 0;background:var(--lamp);box-shadow:0 0 34px 10px var(--glow);opacity:.92;animation:lampPulse 5s ease-in-out infinite}
+@keyframes lampPulse{0%,100%{box-shadow:0 0 34px 10px var(--glow)}50%{box-shadow:0 0 46px 16px var(--glow)}}
 .roof i::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:color-mix(in srgb,var(--roof) 65%,#000)}
 .roof i::after{content:"";position:absolute;left:0;right:0;top:46%;height:1px;background:color-mix(in srgb,var(--roof) 65%,#000)}
 .roof b{position:absolute;left:12%;right:12%;top:26%;height:2px;background:var(--roof-soft);opacity:.55;box-shadow:0 9px 0 var(--roof-soft),0 18px 0 var(--roof-soft)}
-.snow{position:absolute;inset:0;background-image:radial-gradient(1.5px 1.5px at 12% 18%,rgba(255,255,255,.7),transparent 100%),radial-gradient(1.5px 1.5px at 32% 42%,rgba(255,255,255,.55),transparent 100%),radial-gradient(1.5px 1.5px at 58% 22%,rgba(255,255,255,.6),transparent 100%),radial-gradient(1.5px 1.5px at 78% 38%,rgba(255,255,255,.5),transparent 100%),radial-gradient(1.5px 1.5px at 88% 12%,rgba(255,255,255,.6),transparent 100%),radial-gradient(1.5px 1.5px at 44% 8%,rgba(255,255,255,.45),transparent 100%);opacity:.8}
+.snow{position:absolute;inset:0;background-image:radial-gradient(1.5px 1.5px at 12% 18%,rgba(255,255,255,.7),transparent 100%),radial-gradient(1.5px 1.5px at 32% 42%,rgba(255,255,255,.55),transparent 100%),radial-gradient(1.5px 1.5px at 58% 22%,rgba(255,255,255,.6),transparent 100%),radial-gradient(1.5px 1.5px at 78% 38%,rgba(255,255,255,.5),transparent 100%),radial-gradient(1.5px 1.5px at 88% 12%,rgba(255,255,255,.6),transparent 100%),radial-gradient(1.5px 1.5px at 44% 8%,rgba(255,255,255,.45),transparent 100%);opacity:.8;animation:snowTwinkle 7s ease-in-out infinite}
+@keyframes snowTwinkle{0%,100%{opacity:.8}50%{opacity:.55}}
 .fig figcaption{margin-top:9px;display:flex;justify-content:space-between;gap:14px;font:500 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 .essay p.body{margin:0 0 17px;font-size:13.5px;line-height:1.95;color:color-mix(in srgb,var(--ink) 82%,var(--muted))}
 .essay p.body:first-of-type::first-letter{float:left;font:600 44px/.9 "Songti SC",Georgia,serif;padding:4px 8px 0 0;color:var(--accent)}
 .pull{margin:26px 0;padding:16px 20px;border-left:2px solid var(--accent);background:color-mix(in srgb,var(--paper) 72%,var(--bg));border-radius:0 10px 10px 0;font:italic 16px/1.8 Georgia,"Songti SC",serif;color:color-mix(in srgb,var(--ink) 88%,var(--muted))}
 .pull small{display:block;margin-top:7px;font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;font-style:normal;color:var(--muted)}
 .side{display:flex;flex-direction:column;gap:16px;position:sticky;top:80px}
-.box{border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--paper) 74%,var(--bg));padding:15px 16px}
+.box{border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--paper) 74%,var(--bg));padding:15px 16px;transition:border-color .25s,box-shadow .25s}
+.box:hover{border-color:color-mix(in srgb,var(--accent) 30%,var(--line));box-shadow:0 20px 34px -32px rgba(20,22,30,.45)}
 .box h2{margin:0 0 12px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
 .toc{list-style:none;margin:0;padding:0}
-.toc li{display:flex;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:12px}
+.toc li{display:flex;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:12px;transition:translate .18s}
+.toc li:hover{translate:2px 0}
 .toc li:first-child{border-top:0;padding-top:0}
 .toc li b{font:600 8.5px/1 ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.08em}
 .toc li.on{font-weight:700}
 .toc li.on b{color:var(--accent)}
 .toc li span{margin-left:auto;font:500 8px/1 ui-monospace,Consolas,monospace;color:var(--muted)}
 .mode-line{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11.5px}
+.mode-line.swap{animation:statIn .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes statIn{from{opacity:.2;translate:0 -3px}to{opacity:1;translate:0 0}}
 .mode-line b{font-weight:650}
 .dot{display:inline-flex;align-items:center;gap:6px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 .dot::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
 .box p{margin:9px 0 0;font-size:10.5px;line-height:1.8;color:var(--muted)}
-.next{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--paper)}
-.next .cover{display:block;height:88px;background:radial-gradient(ellipse 70% 90% at 20% 20%,var(--glow),transparent 62%),linear-gradient(135deg,var(--sky1),var(--roof))}
+.next{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--paper);transition:translate .2s,box-shadow .2s}
+.next:hover{translate:0 -2px;box-shadow:0 22px 36px -34px rgba(20,22,30,.45)}
+.next .cover{display:block;height:88px;background:radial-gradient(ellipse 70% 90% at 20% 20%,var(--glow),transparent 62%),linear-gradient(135deg,var(--sky1),var(--roof));transition:scale .35s}
+.next:hover .cover{scale:1.03}
 .next div{padding:11px 14px 13px}
 .next small{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .next b{display:block;margin:5px 0 3px;font-size:13px;letter-spacing:-.01em}
@@ -131,6 +147,10 @@ button{font:inherit;color:inherit}
 @media (prefers-reduced-motion:reduce){
   body,.toggle,.win{transition:none}
   .wipe{display:none}
+  .essay .kicker,.essay h1,.essay .byline,.essay .lede,.toggle.swap .ico,.roof i,.snow,.mode-line.swap{animation:none}
+  .box,.toc li,.next,.next .cover{transition:none}
+  .toggle:hover,.toc li:hover,.next:hover{translate:none}
+  .next:hover .cover{scale:none}
 }
 </style>
 </head>
@@ -204,12 +224,19 @@ button{font:inherit;color:inherit}
   var label = document.getElementById('themeLabel'), wipe = document.getElementById('wipe');
   var modeName = document.getElementById('modeName'), modeDot = document.getElementById('modeDot');
   var modeNote = document.getElementById('modeNote');
+  var modeLine = document.querySelector('.mode-line');
   var meta = document.querySelector('meta[name="theme-color"]');
   var reduce = matchMedia('(prefers-reduced-motion: reduce)');
   var busy = false;
 
   function setTheme(t) {
     var dark = t === 'dark';
+    btn.classList.remove('swap');
+    void btn.offsetWidth;
+    btn.classList.add('swap');
+    modeLine.classList.remove('swap');
+    void modeLine.offsetWidth;
+    modeLine.classList.add('swap');
     if (dark) root.setAttribute('data-theme', 'dark');
     else root.removeAttribute('data-theme');
     btn.setAttribute('aria-pressed', dark ? 'true' : 'false');

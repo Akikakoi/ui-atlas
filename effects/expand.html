@@ -27,9 +27,15 @@ button{font:inherit;color:inherit}
 .kicker{margin:0 0 8px;font:600 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted)}
 .intro h1{margin:0 0 12px;font-family:Georgia,"Songti SC",serif;font-weight:500;font-size:clamp(30px,4.4vw,52px);line-height:1.1;letter-spacing:-.03em}
 .intro h1 em{font-style:italic;color:var(--moss)}
+.intro .kicker{animation:rise .5s both}
+.intro h1{animation:rise .6s .06s both}
+.intro .lede{animation:rise .6s .12s both}
+.intro .factsline{animation:rise .6s .18s both}
+@keyframes rise{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
 .lede{margin:0;font-size:13.5px;line-height:1.9;color:#4a4d48;max-width:36em}
 .factsline{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px 18px;font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
-.meta{justify-self:end;display:flex;flex-direction:column;gap:9px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(255,253,246,.72);min-width:200px}
+.meta{justify-self:end;display:flex;flex-direction:column;gap:9px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(255,253,246,.72);min-width:200px;transition:translate .2s,box-shadow .2s}
+.meta:hover{translate:0 -2px;box-shadow:0 20px 34px -32px rgba(30,30,20,.5)}
 .meta div{display:flex;justify-content:space-between;gap:18px;font-size:11.5px}
 .meta span{color:var(--muted)}
 .meta b{font-weight:600;white-space:nowrap}
@@ -37,12 +43,14 @@ button{font:inherit;color:inherit}
 .sheet-head p{margin:0;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
 .sheet-head span{font-size:10.5px;color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.card{position:relative;display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:14px;background:var(--paper);overflow:hidden;box-shadow:0 12px 26px -22px rgba(30,30,20,.5);transform-origin:top left}
+.card{position:relative;display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:14px;background:var(--paper);overflow:hidden;box-shadow:0 12px 26px -22px rgba(30,30,20,.5);transform-origin:top left;transition:translate .22s,box-shadow .22s}
+.card:hover:not(.open){translate:0 -3px;box-shadow:0 22px 38px -30px rgba(30,30,20,.55)}
 .card.lift{position:relative;z-index:60}
 .cover{position:relative;flex:0 0 auto;height:108px;overflow:hidden;background:radial-gradient(circle at 24% 22%,var(--c1,transparent),transparent 60%),linear-gradient(135deg,var(--c2,#c9c2a8),var(--c3,#6d7358))}
 .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(20,22,18,.14))}
 .cover em{position:absolute;left:11px;top:9px;z-index:1;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(20,24,20,.55);font-style:normal}
-.art{position:absolute;right:8px;bottom:-6px;width:76px;height:76px;color:rgba(255,255,255,.62);fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.art{position:absolute;right:8px;bottom:-6px;width:76px;height:76px;color:rgba(255,255,255,.62);fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;animation:artSway 7s ease-in-out infinite}
+@keyframes artSway{0%,100%{rotate:0}50%{rotate:3deg}}
 .body{padding:11px 13px 13px}
 .tag{margin:0 0 3px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--rust)}
 .body h2{margin:0 0 1px;font-family:Georgia,"Songti SC",serif;font-size:19px;font-weight:600;letter-spacing:-.01em}
@@ -54,19 +62,22 @@ button{font:inherit;color:inherit}
 .facts b{font-weight:600}
 .hit{position:absolute;inset:0;z-index:1;border:0;padding:0;border-radius:inherit;background:transparent;cursor:pointer}
 .hit:focus-visible{outline:2px solid var(--moss);outline-offset:-3px}
-.x{display:none;position:absolute;right:9px;top:9px;z-index:3;width:28px;height:28px;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:rgba(20,24,20,.32);color:#fff;font:16px/1 system-ui;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.x{display:none;position:absolute;right:9px;top:9px;z-index:3;width:28px;height:28px;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:rgba(20,24,20,.32);color:#fff;font:16px/1 system-ui;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:rotate .2s,background .2s}
+.x:hover{rotate:90deg;background:rgba(20,24,20,.5)}
 .card.open{position:fixed;z-index:60;max-width:none;margin:0;overflow:auto;border-radius:16px;box-shadow:0 40px 90px -30px rgba(20,22,18,.45);cursor:default}
 .card.open .cover{height:132px}
 .card.open .body{padding:14px 16px 18px}
 .card.open .body h2{font-size:24px}
-.card.open .more{display:block}
-.card.open .facts{display:grid}
+.card.open .more{display:block;animation:rise .4s .06s both}
+.card.open .facts{display:grid;animation:rise .4s .12s both}
 .card.open .hit{display:none}
 .card.open .x{display:grid;place-items:center}
 .backdrop{position:fixed;inset:0;z-index:50;background:rgba(20,22,18,.38);opacity:0;pointer-events:none;transition:opacity .3s}
 .backdrop.on{opacity:1;pointer-events:auto}
 .ghost{border:1px dashed #cfc9b8;border-radius:14px;background:rgba(255,255,255,.32)}
 .field{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2.4vw,28px);margin-top:clamp(26px,4vw,44px);padding-top:22px;border-top:1px solid var(--line)}
+.field div{transition:translate .18s}
+.field div:hover{translate:0 -2px}
 .field p{margin:0;font-size:12px;line-height:1.85;color:#4a4d48}
 .field .kicker{margin-bottom:4px;color:var(--rust)}
 .foot{flex:0 0 auto;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding:13px clamp(16px,4vw,44px);font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
@@ -116,7 +127,13 @@ button{font:inherit;color:inherit}
   .foot{padding:12px 14px;font-size:8px}
   .foot span:nth-child(2){display:none}
 }
-@media (prefers-reduced-motion:reduce){.backdrop{transition:none}}
+@media (prefers-reduced-motion:reduce){
+  .backdrop{transition:none}
+  .intro .kicker,.intro h1,.intro .lede,.intro .factsline,.art,.card.open .more,.card.open .facts{animation:none}
+  .meta,.card,.x,.field div{transition:none}
+  .meta:hover,.card:hover:not(.open),.field div:hover{translate:none}
+  .x:hover{rotate:none}
+}
 </style>
 </head>
 <body>

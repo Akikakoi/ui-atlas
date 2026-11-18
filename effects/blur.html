@@ -16,6 +16,10 @@ a{color:inherit;text-decoration:none}
 .brand .ring::before{content:"";position:absolute;inset:4px;border-radius:50%;border:1.5px solid var(--accent)}
 .brand i{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted);font-style:normal;margin-left:2px}
 .nav{display:flex;gap:26px;font-size:12.5px;color:var(--muted)}
+.nav a{position:relative}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav a:hover{color:var(--ink)}
 .hint{margin:0 0 0 auto;display:inline-flex;align-items:center;gap:7px;font:400 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 12px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
@@ -35,10 +39,13 @@ a{color:inherit;text-decoration:none}
 .btn:hover{background:var(--accent)}
 .replay{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font:inherit;font-size:11.5px;color:var(--muted);cursor:pointer}
 .replay:hover{border-color:var(--accent);color:var(--accent)}
+.replay:active{transform:scale(.96)}
 .meta{display:flex;align-items:center;gap:10px;margin-top:32px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .meta b{color:var(--accent);font-weight:600}
 .meta i{width:1px;height:10px;background:var(--line)}
-.book{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 26px 22px;box-shadow:0 36px 70px -50px rgba(38,32,90,.4);position:relative}
+.book{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 26px 22px;box-shadow:0 36px 70px -50px rgba(38,32,90,.4);position:relative;
+  transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s}
+@media (hover:hover) and (pointer:fine){.book:hover{transform:translateY(-3px);box-shadow:0 44px 78px -50px rgba(38,32,90,.5)}}
 .book-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid #eae8f4}
 .book-top span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
 .book-top b{display:inline-flex;align-items:center;gap:6px;font-size:9.5px;color:#2f8f5b;font-weight:600}
@@ -60,7 +67,12 @@ a{color:inherit;text-decoration:none}
 .book-foot p b{display:block;color:var(--ink);font-size:11.5px;margin-bottom:2px}
 .book .btn{padding:9px 14px;font-size:11px;background:var(--accent)}
 .services{max-width:1200px;margin:0 auto;padding:0 40px 64px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.svc{border-top:1px solid var(--line);padding:26px 0 0}
+.svc{border-top:1px solid var(--line);padding:26px 0 0;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){.svc:hover{transform:translateY(-3px)}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .svc .no{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent)}
 .svc h3{margin:12px 0 8px;font-size:16px;letter-spacing:.01em}
 .svc p{margin:0 0 14px;font-size:12px;line-height:1.8;color:var(--muted)}
@@ -160,6 +172,8 @@ footer{max-width:1200px;margin:0 auto;padding:20px 40px 26px;border-top:1px soli
 @media (prefers-reduced-motion:reduce){
   .word{filter:none;opacity:1;letter-spacing:inherit}
   .btn,.replay{transition:none}
+  .book,.svc,.nav a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -277,6 +291,24 @@ footer{max-width:1200px;margin:0 auto;padding:20px 40px 26px;border-top:1px soli
   }
   if (replay) replay.addEventListener('click', play);
   setTimeout(play, 180);
+})();
+</script>
+<script>
+/* 次级动效：服务、流程与到店区进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.services, .steps, .visit')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
+  });
 })();
 </script>
 <script>

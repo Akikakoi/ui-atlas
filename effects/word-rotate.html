@@ -22,7 +22,10 @@ button{font:inherit}
   font:700 12px/1 Georgia,"Songti SC",serif;color:var(--ember)}
 .brand i{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);font-style:normal}
 .nav-links{display:flex;gap:24px;margin-left:12px}
-.nav-links a{font-size:12.5px;color:#5f564a;text-decoration:none}
+.nav-links a{position:relative;font-size:12.5px;color:#5f564a;text-decoration:none}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--ember);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--ember)}
 .cta{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ink);background:var(--ink);color:var(--cream);
   border-radius:999px;padding:9px 17px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap;
@@ -44,7 +47,9 @@ h1{margin:0;font-size:clamp(40px,5.6vw,70px);line-height:1.16;letter-spacing:-.0
   font:600 9.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 .meta-row i{width:1px;height:10px;background:var(--line)}
 .bag{position:relative;overflow:hidden;background:var(--paper);border:1px solid var(--line);border-radius:18px;
-  padding:18px 22px 16px;box-shadow:0 40px 80px -58px rgba(33,26,19,.85)}
+  padding:18px 22px 16px;box-shadow:0 40px 80px -58px rgba(33,26,19,.85);
+  transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s}
+@media (hover:hover) and (pointer:fine){.bag:hover{transform:translateY(-3px);box-shadow:0 46px 88px -58px rgba(33,26,19,.95)}}
 .bag::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.4;
   background-image:radial-gradient(rgba(33,26,19,.09) .7px,transparent .7px);background-size:5px 5px}
 .bag-top{position:relative;display:flex;justify-content:space-between;gap:12px;
@@ -113,7 +118,12 @@ h2{margin:0;font:650 clamp(23px,2.8vw,34px)/1.18 Georgia,"Songti SC","SimSun",se
 .stage span{font:600 9px/1.4 ui-monospace,Consolas,monospace;color:var(--muted);white-space:nowrap}
 .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .plan{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;padding:18px 20px 16px;
-  background:rgba(250,246,236,.55);min-width:0}
+  background:rgba(250,246,236,.55);min-width:0;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s}
+@media (hover:hover) and (pointer:fine){.plan:hover{transform:translateY(-3px);border-color:rgba(191,68,35,.3)}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .plan.hot{border-color:rgba(191,68,35,.42);background:linear-gradient(150deg,rgba(191,68,35,.07),transparent 62%),rgba(250,246,236,.9)}
 .pname{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .price{margin-top:12px;font:600 clamp(24px,2.6vw,30px)/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em}
@@ -217,6 +227,8 @@ footer span:last-child{margin-left:auto}
 @media (prefers-reduced-motion:reduce){
   .slot .stack{transition:none}
   .cta,.link,.bean{transition:none}
+  .bag,.plan,.nav-links a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -416,6 +428,24 @@ footer span:last-child{margin-left:auto}
   start();
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) stop(); else start();
+  });
+})();
+</script>
+<script>
+/* 次级动效：豆单、曲线与订阅区进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.figures, .beans, .roast-grid, .plans, .band')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
   });
 })();
 </script>

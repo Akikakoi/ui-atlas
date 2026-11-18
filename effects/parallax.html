@@ -15,6 +15,8 @@ a{color:inherit;text-decoration:none}
   transition:background .35s ease,color .35s ease,border-color .35s ease}
 .nav.solid{background:rgba(245,240,227,.92);color:var(--ink);border-color:var(--line);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.nav-progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;overflow:hidden}
+.nav-progress i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
 .brand{display:flex;align-items:baseline;gap:9px;font:600 15px/1.1 Georgia,"Songti SC",serif;letter-spacing:.02em;white-space:nowrap}
 .brand span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;opacity:.62}
 .nav-links{display:flex;gap:24px;margin-left:12px}
@@ -31,9 +33,12 @@ a{color:inherit;text-decoration:none}
 .layer{position:absolute;left:-6%;right:-6%;will-change:transform}
 .sunlane{top:0;bottom:0}
 .sun{position:absolute;left:62%;top:23%;width:92px;height:92px;margin:-46px 0 0 -46px;border-radius:50%;
-  background:radial-gradient(circle at 42% 36%,#fff3d6,#f7c078 58%,rgba(247,192,120,0) 72%);filter:blur(.4px)}
+  background:radial-gradient(circle at 42% 36%,#fff3d6,#f7c078 58%,rgba(247,192,120,0) 72%);filter:blur(.4px);
+  animation:sunBreath 6s ease-in-out infinite}
+@keyframes sunBreath{0%,100%{transform:scale(1);opacity:.94}50%{transform:scale(1.06);opacity:1}}
 .ring{position:absolute;left:62%;top:23%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;
-  border:1px solid rgba(255,238,205,.28)}
+  border:1px solid rgba(255,238,205,.28);animation:ringBreath 7s ease-in-out infinite}
+@keyframes ringBreath{0%,100%{transform:scale(1);opacity:.72}50%{transform:scale(1.1);opacity:.32}}
 .hill-back{top:32%;height:44vh;background:linear-gradient(180deg,#3b5162,#283c4a 58%);opacity:.9;
   clip-path:polygon(0 58%,10% 42%,24% 54%,38% 30%,52% 48%,66% 28%,80% 46%,92% 36%,100% 50%,100% 100%,0 100%)}
 .hill-mid{top:48%;height:46vh;background:linear-gradient(180deg,#22343f,#16242d 70%);
@@ -54,11 +59,13 @@ a{color:inherit;text-decoration:none}
 .note{font:600 9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(255,240,220,.55)}
 .meta{position:absolute;left:max(22px,calc((100vw - 1120px)/2));right:22px;top:calc(100vh - 66px);z-index:3;
   display:flex;align-items:center;gap:20px;flex-wrap:wrap;font:600 9.5px/1.8 ui-monospace,Consolas,monospace;
-  letter-spacing:.14em;color:rgba(248,238,222,.6)}
+  letter-spacing:.14em;color:rgba(248,238,222,.6);transition:opacity .4s,transform .4s}
 .meta b{font-weight:600;color:rgba(255,217,168,.9)}
 .cue{position:absolute;right:max(22px,calc((100vw - 1120px)/2));top:calc(100vh - 60px);z-index:3;display:flex;align-items:center;gap:8px;
-  font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:rgba(248,238,222,.5)}
+  font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:rgba(248,238,222,.5);
+  transition:opacity .4s,transform .4s}
 .cue::after{content:"";width:1px;height:20px;background:linear-gradient(rgba(248,238,222,.6),transparent)}
+.hero.scrolled .meta,.hero.scrolled .cue{opacity:0;transform:translateY(8px)}
 
 /* 正文 */
 .intro{max-width:1120px;margin:0 auto;padding:clamp(54px,8vw,92px) 22px 54px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(28px,5vw,72px);align-items:start}
@@ -72,8 +79,21 @@ h2{margin:0;font-size:clamp(28px,3.6vw,44px);line-height:1.1;letter-spacing:-.04
 .spots{max-width:1120px;margin:0 auto;padding:26px 22px 58px}
 .spots-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:22px;flex-wrap:wrap}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#faf6ec}
+.card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#faf6ec;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,box-shadow .35s}
 .card .art{height:158px;position:relative;overflow:hidden;background:linear-gradient(165deg,#3a4f5f,#16232d)}
+.card .art::after{content:"";position:absolute;left:26px;top:26px;width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle,#ffe4b4,rgba(255,228,180,.12) 70%);transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){
+  .card:hover{transform:translateY(-4px);border-color:#cdbfa8;box-shadow:0 20px 38px -34px rgba(30,24,16,.55)}
+  .card:hover .art::after{transform:scale(1.18)}
+  tbody tr:hover{background:rgba(194,96,58,.05);transform:translateX(4px)}
+}
+tbody tr{transition:background-color .25s,transform .25s cubic-bezier(.2,.8,.2,1)}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 90ms)}
+.io.in{opacity:1;transform:none}
 .card .art::before{content:"";position:absolute;inset:34% -8% -16%;background:
   repeating-linear-gradient(98deg,rgba(255,255,255,.06) 0 2px,transparent 2px 13px),
   linear-gradient(180deg,transparent,rgba(5,10,14,.9));
@@ -82,8 +102,6 @@ h2{margin:0;font-size:clamp(28px,3.6vw,44px);line-height:1.1;letter-spacing:-.04
 .card.a2 .art::before{clip-path:polygon(0 52%,14% 36%,30% 58%,46% 22%,62% 50%,80% 30%,100% 54%,100% 100%,0 100%)}
 .card.a3 .art{background:linear-gradient(165deg,#4a5a4b,#17211b)}
 .card.a3 .art::before{clip-path:polygon(0 66%,18% 42%,34% 62%,52% 30%,70% 56%,86% 36%,100% 60%,100% 100%,0 100%)}
-.card .art::after{content:"";position:absolute;left:26px;top:26px;width:34px;height:34px;border-radius:50%;
-  background:radial-gradient(circle,#ffe4b4,rgba(255,228,180,.12) 70%)}
 .card .body{padding:17px 17px 19px}
 .card h3{margin:0 0 8px;font-size:16px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:8px;font-weight:620}
 .card h3 i{font:italic 400 11px Georgia,serif;color:var(--muted)}
@@ -183,6 +201,11 @@ footer span:last-child{margin-left:auto}
 @media (prefers-reduced-motion:reduce){
   .layer,.mast{transform:none!important}
   .nav{transition:none}
+  .sun,.ring{animation:none}
+  .meta,.cue{opacity:1;transform:none;transition:none}
+  .hero.scrolled .meta,.hero.scrolled .cue{opacity:1;transform:none}
+  .card,.card .art::after,tbody tr,.io,.nav-progress i{transition:none}
+  .io{opacity:1;transform:none}
 }
 </style>
 </head>
@@ -196,6 +219,7 @@ footer span:last-child{margin-left:auto}
     <a href="#times">日出</a>
   </nav>
   <a class="book" href="#book">预约明早</a>
+  <span class="nav-progress" aria-hidden="true"><i id="navBar"></i></span>
 </header>
 
 <section class="hero" id="top">
@@ -225,7 +249,7 @@ footer span:last-child{margin-left:auto}
 </section>
 
 <main>
-  <section class="intro" id="about">
+  <section class="intro io" id="about">
     <div>
       <p class="kicker2">ABOUT THE DECK</p>
       <h2>一座只在晴天<br>开放的山脊。</h2>
@@ -243,7 +267,7 @@ footer span:last-child{margin-left:auto}
   </section>
 
   <section class="spots" id="spots">
-    <div class="spots-head">
+    <div class="spots-head io">
       <div>
         <p class="kicker2">THREE DECKS</p>
         <h2>三个看台，三种云。</h2>
@@ -251,7 +275,7 @@ footer span:last-child{margin-left:auto}
       <span class="kicker2">01 — 03 / 步行均可到达</span>
     </div>
     <div class="cards">
-      <article class="card a1">
+      <article class="card a1 io">
         <div class="art" aria-hidden="true"></div>
         <div class="body">
           <h3>东台 <i>EAST DECK</i></h3>
@@ -259,7 +283,7 @@ footer span:last-child{margin-left:auto}
           <div class="line"><span>步行 40 分钟</span><span>正对日出</span></div>
         </div>
       </article>
-      <article class="card a2">
+      <article class="card a2 io">
         <div class="art" aria-hidden="true"></div>
         <div class="body">
           <h3>云台 <i>CLOUD DECK</i></h3>
@@ -267,7 +291,7 @@ footer span:last-child{margin-left:auto}
           <div class="line"><span>步行 52 分钟</span><span>看云海</span></div>
         </div>
       </article>
-      <article class="card a3">
+      <article class="card a3 io">
         <div class="art" aria-hidden="true"></div>
         <div class="body">
           <h3>风口台 <i>RIDGE DECK</i></h3>
@@ -278,7 +302,7 @@ footer span:last-child{margin-left:auto}
     </div>
   </section>
 
-  <section class="times" id="times">
+  <section class="times io" id="times">
     <div class="times-copy">
       <p class="kicker2">SUNRISE LOG</p>
       <h2>明天的日出，<br>比今天晚一分钟。</h2>
@@ -298,7 +322,7 @@ footer span:last-child{margin-left:auto}
     </table>
   </section>
 
-  <section class="band" id="book">
+  <section class="band io" id="book">
     <div class="inner-band">
       <div>
         <h2>明早还有 12 个位置。</h2>
@@ -318,25 +342,64 @@ footer span:last-child{margin-left:auto}
 <p class="hint">往下滚，四层山会错开</p>
 <script>
 (function () {
-  var nav = document.getElementById('nav');
+  var nav = document.getElementById('nav'), hero = document.getElementById('top');
+  var bar = document.getElementById('navBar');
   var layers = [].slice.call(document.querySelectorAll('.layer[data-k]'));
   var mast = document.getElementById('mast');
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var raf = null;
+  var fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+  var raf = null, tx = 0, ty = 0, px = 0, py = 0;
 
   function render() {
     raf = null;
     var y = scrollY || document.documentElement.scrollTop;
     nav.classList.toggle('solid', y > 120);
+    hero.classList.toggle('scrolled', y > 60);
+    var max = document.documentElement.scrollHeight - innerHeight;
+    if (bar) bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, Math.max(0, y / max)) : 0).toFixed(4) + ')';
     if (reduce) return;
+    px += (tx - px) * .08;
+    py += (ty - py) * .08;
     layers.forEach(function (l) {
-      l.style.transform = 'translate3d(0,' + (-y * parseFloat(l.dataset.k)).toFixed(1) + 'px,0)';
+      var k = parseFloat(l.dataset.k);
+      l.style.transform = 'translate3d(' + (px * 24 * k).toFixed(1) + 'px,' + (-y * k + py * 14 * k).toFixed(1) + 'px,0)';
     });
-    mast.style.transform = 'translate3d(0,' + (y * .16).toFixed(1) + 'px,0)';
+    mast.style.transform = 'translate3d(' + (px * -6).toFixed(1) + 'px,' + (y * .16 + py * -4).toFixed(1) + 'px,0)';
+    if (Math.abs(tx - px) > .002 || Math.abs(ty - py) > .002) raf = requestAnimationFrame(render);
   }
   addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
-  addEventListener('resize', render);
+  addEventListener('resize', function () { if (!raf) raf = requestAnimationFrame(render); });
+
+  if (fine && !reduce) {
+    hero.addEventListener('pointermove', function (e) {
+      var r = hero.getBoundingClientRect();
+      tx = ((e.clientX - r.left) / r.width - .5) * 2;
+      ty = ((e.clientY - r.top) / r.height - .5) * 2;
+      if (!raf) raf = requestAnimationFrame(render);
+    });
+    hero.addEventListener('pointerleave', function () {
+      tx = 0; ty = 0;
+      if (!raf) raf = requestAnimationFrame(render);
+    });
+  }
   render();
+
+  var io;
+  if (!('IntersectionObserver' in window)) {
+    [].slice.call(document.querySelectorAll('.io')).forEach(function (el) { el.classList.add('in'); });
+  } else {
+    io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      });
+    }, { threshold: .2 });
+    [].slice.call(document.querySelectorAll('.io')).forEach(function (el, i) {
+      el.style.setProperty('--i', i % 3);
+      io.observe(el);
+    });
+  }
 })();
 </script>
 <script>

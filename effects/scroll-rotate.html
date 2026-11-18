@@ -13,7 +13,9 @@ body{background:radial-gradient(80% 60% at 50% 30%,#1a1a24,#090b0f 72%);color:va
 a{color:inherit;text-decoration:none}
 .nav{position:fixed;inset:0 0 auto;z-index:8;height:68px;display:flex;align-items:center;gap:26px;
   padding:0 max(22px,calc((100vw - 1120px)/2));background:rgba(10,11,15,.72);
-  border-bottom:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  border-bottom:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.nav.hide{transform:translateY(-100%)}
 .brand{display:flex;align-items:baseline;gap:10px;font:600 15px/1.1 Georgia,"Songti SC",serif;letter-spacing:.06em;white-space:nowrap}
 .brand .mark{width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:#151006;
   font:600 11px/1 ui-monospace,Consolas,monospace}
@@ -32,12 +34,23 @@ a{color:inherit;text-decoration:none}
 .head h1{margin:0;font-size:clamp(24px,4vw,36px);line-height:1.12;letter-spacing:-.035em;font-weight:600}
 .head h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
 .deg{font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+.player{position:relative;width:min(360px,64vw);aspect-ratio:1;display:grid;place-items:center}
+.player .disc{width:100%;height:100%}
 .disc{position:relative;width:min(360px,64vw);aspect-ratio:1;border-radius:50%;
   background:
     repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.055) 0 1px,transparent 1px 5px),
     radial-gradient(circle at 50% 50%,#2a2c36 0 21%,#15161d 21.5% 100%);
   box-shadow:0 34px 80px -34px rgba(0,0,0,.95),inset 0 0 0 1px rgba(255,255,255,.08);
   display:grid;place-items:center;will-change:transform}
+.arm{position:absolute;inset:0;pointer-events:none;z-index:2}
+.arm i{position:absolute;right:1%;top:11%;width:54%;height:6px;border-radius:3px;
+  background:linear-gradient(90deg,rgba(244,241,232,.12),#d9d3c5 22%,#8f8a7c);
+  transform-origin:100% 50%;transform:rotate(-28deg);
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.55))}
+.arm i::before{content:"";position:absolute;right:-8px;top:50%;width:15px;height:15px;border-radius:50%;
+  transform:translateY(-50%);background:radial-gradient(circle at 34% 28%,#ffe2a0,#a4701c 62%,#5c3d0c);
+  box-shadow:0 0 12px rgba(255,207,110,.4)}
+.arm i::after{content:"";position:absolute;left:4%;top:50%;width:8px;height:2px;border-radius:1px;background:rgba(21,16,6,.6)}
 .label{width:33%;aspect-ratio:1;border-radius:50%;background:linear-gradient(140deg,#ffcf6e,#c2452d);display:grid;place-items:center;
   text-align:center;color:#1a1208;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
 .label b{display:block;font:600 14px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.1em}
@@ -54,7 +67,18 @@ a{color:inherit;text-decoration:none}
 .bar{flex:0 0 140px;height:2px;background:rgba(255,255,255,.14);position:relative;overflow:hidden}
 .bar i{position:absolute;inset:0;background:var(--accent);transform-origin:left;transform:scaleX(0)}
 .picks{max-width:1120px;margin:0 auto;padding:6px 22px 48px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.pick{border:1px solid var(--line);border-radius:14px;padding:20px 20px 18px;background:rgba(255,255,255,.025)}
+.pick{position:relative;border:1px solid var(--line);border-radius:14px;padding:20px 20px 18px;background:rgba(255,255,255,.025);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,background-color .35s}
+.pick::after{content:"";position:absolute;left:20px;right:20px;bottom:0;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){
+  .pick:hover{transform:translateY(-4px);border-color:rgba(255,207,110,.32);background:rgba(255,255,255,.045)}
+  .pick:hover::after{transform:scaleX(1)}
+}
+.io{opacity:0;transform:translate3d(0,22px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 90ms)}
+.io.in{opacity:1;transform:none}
 .pick .no{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--accent);margin:0 0 14px}
 .pick h3{margin:0 0 7px;font-size:17px;letter-spacing:-.01em;font-weight:600}
 .pick p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
@@ -99,6 +123,7 @@ footer span:last-child{margin-left:auto}
   .head .kicker{font-size:8px;margin-bottom:7px}
   .head h1{font-size:clamp(24px,7.4vw,30px)}
   .deg{font-size:9px}
+  .player{width:min(260px,64vw)}
   .disc{width:min(260px,64vw)}
   .hud{left:16px;right:16px;bottom:24px;flex-direction:column;align-items:flex-start;gap:10px}
   .hud p{font-size:10.5px;line-height:1.7}
@@ -124,6 +149,7 @@ footer span:last-child{margin-left:auto}
   .head .kicker{font-size:7.5px;margin-bottom:5px}
   .head h1{font-size:19px;line-height:1.1}
   .deg{font-size:8.5px}
+  .player{width:min(210px,38vw)}
   .disc{width:min(210px,38vw)}
   .label b{font-size:10px}.label small{font-size:6px}
   .hud{left:20px;right:20px;bottom:14px}
@@ -137,6 +163,9 @@ footer span:last-child{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
   .disc{transform:none!important}
+  .nav,.pick,.pick::after,.io{transition:none}
+  .io{opacity:1;transform:none}
+  .arm i{transform:rotate(-28deg)!important}
 }
 </style>
 </head>
@@ -161,10 +190,13 @@ footer span:last-child{margin-left:auto}
       </div>
       <span class="deg" id="deg">0°</span>
     </div>
-    <div class="disc" id="disc">
-      <span class="marker" aria-hidden="true"></span>
-      <div class="label"><span><b>33⅓</b><small>GROOVE</small></span></div>
-      <span class="hole" aria-hidden="true"></span>
+    <div class="player">
+      <div class="disc" id="disc">
+        <span class="marker" aria-hidden="true"></span>
+        <div class="label"><span><b>33⅓</b><small>GROOVE</small></span></div>
+        <span class="hole" aria-hidden="true"></span>
+      </div>
+      <span class="arm" aria-hidden="true"><i id="arm"></i></span>
     </div>
     <span class="tag" aria-hidden="true">SIDE A · 33⅓ RPM</span>
     <div class="hud">
@@ -175,12 +207,12 @@ footer span:last-child{margin-left:auto}
 </section>
 
 <section class="picks" id="picks">
-  <article class="pick"><p class="no">STAFF PICK 01 · JAZZ</p><h3>Blue in Green</h3><p>深夜店里最常放的一张。铜管不亮，鼓刷很轻，适合在关店前听完一面。</p><div class="line"><span>Miles Davis</span><span>¥ 280</span></div></article>
-  <article class="pick"><p class="no">STAFF PICK 02 · AMBIENT</p><h3>Music for Airports</h3><p>机场候机厅的循环。听不出从哪儿开始，也不急着结束，像一条很长的走廊。</p><div class="line"><span>Brian Eno</span><span>¥ 320</span></div></article>
-  <article class="pick"><p class="no">STAFF PICK 03 · CITY POP</p><h3>Pacific</h3><p>夏天傍晚的沿海公路。合成器一响，店里所有灯都像晚了一小时才关。</p><div class="line"><span>細野晴臣</span><span>¥ 360</span></div></article>
+  <article class="pick io"><p class="no">STAFF PICK 01 · JAZZ</p><h3>Blue in Green</h3><p>深夜店里最常放的一张。铜管不亮，鼓刷很轻，适合在关店前听完一面。</p><div class="line"><span>Miles Davis</span><span>¥ 280</span></div></article>
+  <article class="pick io"><p class="no">STAFF PICK 02 · AMBIENT</p><h3>Music for Airports</h3><p>机场候机厅的循环。听不出从哪儿开始，也不急着结束，像一条很长的走廊。</p><div class="line"><span>Brian Eno</span><span>¥ 320</span></div></article>
+  <article class="pick io"><p class="no">STAFF PICK 03 · CITY POP</p><h3>Pacific</h3><p>夏天傍晚的沿海公路。合成器一响，店里所有灯都像晚了一小时才关。</p><div class="line"><span>細野晴臣</span><span>¥ 360</span></div></article>
 </section>
 
-<section class="info" id="info">
+<section class="info io" id="info">
   <div>
     <p class="kicker">THE STORE</p>
     <h2>一间不赶时间的<br>唱片店。</h2>
@@ -194,7 +226,7 @@ footer span:last-child{margin-left:auto}
   </dl>
 </section>
 
-<section class="band" id="join">
+<section class="band io" id="join">
   <div class="inner-band">
     <div>
       <h2>会员每月一张店选。</h2>
@@ -217,8 +249,10 @@ footer span:last-child{margin-left:auto}
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var sec = document.getElementById('sec') || document.querySelector('.sec');
   var disc = document.getElementById('disc');
+  var arm = document.getElementById('arm');
+  var nav = document.querySelector('.nav');
   var deg = document.getElementById('deg'), bar = document.getElementById('bar');
-  var raf = null;
+  var raf = null, lastY = scrollY;
 
   function render() {
     raf = null;
@@ -228,10 +262,28 @@ footer span:last-child{margin-left:auto}
     disc.style.transform = 'rotate(' + (p * 720).toFixed(2) + 'deg)';
     deg.textContent = Math.round(p * 720) + '°';
     bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+    if (arm) arm.style.transform = 'rotate(' + (-28 + p * 20).toFixed(2) + 'deg)';
+    var dy = scrollY - lastY;
+    if (Math.abs(dy) > 8) {
+      nav.classList.toggle('hide', dy > 0 && scrollY > 160);
+      lastY = scrollY;
+    }
   }
   addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
   addEventListener('resize', render);
   render();
+
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .2 });
+  [].slice.call(document.querySelectorAll('.io')).forEach(function (el, i) {
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
+  });
 })();
 </script>
 <script>

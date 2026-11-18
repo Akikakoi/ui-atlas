@@ -16,7 +16,10 @@ a{color:inherit}
 .brand{display:flex;align-items:baseline;gap:9px;font-size:12px;font-weight:700;letter-spacing:.2em;text-decoration:none;white-space:nowrap}
 .brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .nav-links{display:flex;gap:24px;margin-left:8px}
-.nav-links a{font-size:12.5px;color:#55585f;text-decoration:none}
+.nav-links a{position:relative;font-size:12.5px;color:#55585f;text-decoration:none}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--ink)}
 .nav .mag{margin-left:auto}
 .mag{position:relative;height:50px;padding:0 24px;border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:#fff;
@@ -47,7 +50,10 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   color:#f2f5ff;font:650 12px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;
   box-shadow:0 22px 50px -22px rgba(47,95,208,.7),inset 0 1px 0 rgba(255,255,255,.5)}
 .sat{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--accent);
-  box-shadow:0 0 0 5px rgba(47,95,208,.1)}
+  box-shadow:0 0 0 5px rgba(47,95,208,.1);animation:satPulse 4.2s ease-in-out infinite}
+.sat.b{animation-delay:1.2s}
+.sat.c{animation-delay:2.1s}
+@keyframes satPulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.35);opacity:.55}}
 .sat.a{top:9%;left:57%}
 .sat.b{top:58%;left:7%}
 .sat.c{bottom:11%;right:16%;width:6px;height:6px;opacity:.6}
@@ -64,8 +70,18 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 h2{margin:0 0 24px;font-size:clamp(24px,3.2vw,36px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
 .rows{border-top:1px solid var(--line)}
 .row{display:grid;grid-template-columns:56px minmax(0,1fr) 140px 58px;gap:16px;align-items:center;
-  padding:20px 2px;border-bottom:1px solid var(--line);text-decoration:none;transition:padding-left .3s cubic-bezier(.2,.8,.2,1)}
-.row:hover{padding-left:10px}
+  padding:20px 2px;border-bottom:1px solid var(--line);text-decoration:none;transition:padding-left .3s cubic-bezier(.2,.8,.2,1),background-color .25s}
+.row:hover{padding-left:10px;background:rgba(47,95,208,.03)}
+.mag.press{animation:magPress .32s ease}
+@keyframes magPress{0%,100%{filter:brightness(1)}40%{filter:brightness(1.15)}}
+.svc article{transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,background-color .35s}
+@media (hover:hover) and (pointer:fine){
+  .svc article:hover{transform:translateY(-3px);border-color:rgba(47,95,208,.28);background:#fff}
+}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .row i{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);font-style:normal}
 .row b{font-size:17px;letter-spacing:-.015em;font-weight:560}
 .row small{font-size:11px;color:var(--muted);line-height:1.6}
@@ -134,6 +150,8 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 30px}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
+  .sat{opacity:.9}
+  .io{opacity:1;transform:none}
 }
 </style>
 </head>
@@ -176,10 +194,10 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 30px}
   </section>
 
   <div class="stats" aria-label="工作室数据">
-    <div class="stat"><b>38</b><span>已交付项目</span></div>
-    <div class="stat"><b>11</b><span>合作品牌</span></div>
-    <div class="stat"><b>6 年</b><span>独立执业</span></div>
-    <div class="stat"><b>4</b><span>常驻成员</span></div>
+    <div class="stat"><b data-to="38">38</b><span>已交付项目</span></div>
+    <div class="stat"><b data-to="11">11</b><span>合作品牌</span></div>
+    <div class="stat"><b data-to="6" data-suffix=" 年">6 年</b><span>独立执业</span></div>
+    <div class="stat"><b data-to="4">4</b><span>常驻成员</span></div>
   </div>
 
   <section class="work" id="work">
@@ -227,6 +245,10 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 30px}
   var st = els.map(function (el) {
     return { el: el, s: parseFloat(el.dataset.s) || .3, x: 0, y: 0, tx: 0, ty: 0, label: el.querySelector('span') };
   });
+  els.forEach(function (el) {
+    el.addEventListener('pointerdown', function () { el.classList.remove('press'); void el.offsetWidth; el.classList.add('press'); });
+    el.addEventListener('animationend', function () { el.classList.remove('press'); });
+  });
   var raf = null;
   function tick() {
     var busy = false;
@@ -253,6 +275,52 @@ footer{max-width:1160px;margin:0 auto;padding:0 22px 30px}
     st.forEach(function (o) { o.tx = 0; o.ty = 0; });
     if (!raf) raf = requestAnimationFrame(tick);
   });
+})();
+</script>
+<script>
+/* 次级动效：数据计数与下方内容入场 */
+(function () {
+  var stats = [].slice.call(document.querySelectorAll('.stat b[data-to]'));
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+
+  function paint(el, n) {
+    el.textContent = Math.round(n) + (el.dataset.suffix || '');
+  }
+  if (stats.length && 'IntersectionObserver' in window) {
+    var box = document.querySelector('.stats');
+    if (box) {
+      var sio = new IntersectionObserver(function (es) {
+        if (!es[0].isIntersecting) return;
+        sio.disconnect();
+        var t0 = 0;
+        function frame(now) {
+          if (!t0) t0 = now;
+          var t = Math.min(1, (now - t0) / 1000);
+          var e = 1 - Math.pow(1 - t, 3);
+          stats.forEach(function (el) { paint(el, +el.dataset.to * e); });
+          if (t < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }, { threshold: .3 });
+      sio.observe(box);
+    }
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      });
+    }, { threshold: .18 });
+    [].slice.call(document.querySelectorAll('.work, .services, .contact')).forEach(function (el, i) {
+      el.classList.add('io');
+      el.style.setProperty('--i', i % 3);
+      io.observe(el);
+    });
+  }
 })();
 </script>
 <script>

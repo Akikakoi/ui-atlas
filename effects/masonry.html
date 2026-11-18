@@ -17,7 +17,10 @@ a{color:inherit}
 .brand::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--accent);transform:translateY(-1px)}
 .brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
 .nav-links{display:flex;gap:20px}
-.nav-links a{font-size:12px;color:#5f5a4f;text-decoration:none}
+.nav-links a{position:relative;font-size:12px;color:#5f5a4f;text-decoration:none}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--ink)}
 .nav-links a[aria-current="page"]{color:var(--ink);font-weight:600}
 .cta{margin-left:auto;border:1px solid var(--ink);border-radius:999px;padding:7px 14px;font-size:11.5px;
@@ -40,6 +43,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .tools button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .tools button svg{width:14px;height:14px}
 .status{font:500 10.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted)}
+.status.flash{animation:statusFlash .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes statusFlash{0%{opacity:.3}100%{opacity:1}}
 .board{position:relative;padding-top:6px}
 .masonry{position:relative;transition:height .45s cubic-bezier(.2,.8,.2,1)}
 .card{position:absolute;top:0;left:0;border-radius:14px;overflow:hidden;padding:15px;color:#fff;
@@ -47,7 +52,7 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   opacity:0;box-shadow:0 18px 26px -26px rgba(28,22,14,.55);
   transition:transform .5s cubic-bezier(.2,.8,.2,1),opacity .3s ease,box-shadow .3s ease;will-change:transform}
 .masonry.ready .card{opacity:1}
-.card:hover{box-shadow:0 22px 34px -24px rgba(28,22,14,.6)}
+.card:hover{box-shadow:0 22px 34px -24px rgba(28,22,14,.6);translate:0 -3px}
 .card::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
   background:linear-gradient(180deg,rgba(20,16,11,.16),transparent 34%,rgba(20,15,10,.56) 100%)}
 .card::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.34;mix-blend-mode:overlay}
@@ -84,6 +89,10 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   background:rgba(250,248,243,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border:1px solid rgba(20,22,28,.14);border-radius:999px;padding:4px 9px;box-shadow:0 8px 18px -16px rgba(0,0,0,.55)}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 @media (max-width:860px){
   .intro{grid-template-columns:1fr;gap:18px;padding:30px 0 20px}
   .sub{margin-bottom:14px}
@@ -120,6 +129,9 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 }
 @media (prefers-reduced-motion:reduce){
   .masonry,.card,.tools button{transition:none}
+  .status.flash{animation:none}
+  .nav-links a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -314,7 +326,25 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
     layout();
     rounds++;
     status.textContent = '已重排 ' + cards.length + ' 件 · 第 ' + rounds + ' 次';
+    status.classList.remove('flash');
+    void status.offsetWidth;
+    status.classList.add('flash');
   });
+})();
+</script>
+<script>
+/* 次级动效：排版说明进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  var notes = document.querySelector('.notes');
+  if (notes) { notes.classList.add('io'); io.observe(notes); }
 })();
 </script>
 <script>

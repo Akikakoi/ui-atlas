@@ -25,16 +25,24 @@ button{font:inherit;color:inherit}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex:0 0 auto}
 .dates{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
 .live{display:flex;align-items:center;gap:5px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);border:1px solid #c7d6ca;border-radius:999px;padding:5px 9px;white-space:nowrap}
-.live::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.live::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);animation:livePulse 2.4s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:.5;scale:1}50%{opacity:1;scale:1.35}}
 .view{flex:1;display:flex;flex-direction:column;min-height:0}
 .exhibit{flex:1;width:100%;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:minmax(250px,.72fr) minmax(0,1.5fr);gap:clamp(26px,4.5vw,64px);padding:clamp(26px,4vw,54px) clamp(18px,4vw,44px) 38px;align-items:start}
 .intro{position:sticky;top:84px}
 .kicker{margin:0 0 14px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
 .intro h1{margin:0 0 18px;font-size:clamp(30px,3.9vw,48px);line-height:1.06;letter-spacing:-.044em;font-weight:640}
 .intro h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--warm)}
+.intro .kicker{animation:rise .5s both}
+.intro h1{animation:rise .6s .06s both}
+.intro .lede{animation:rise .6s .12s both}
+.intro .facts{animation:rise .6s .18s both}
+.intro .venue{animation:rise .6s .22s both}
+@keyframes rise{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
 .lede{margin:0 0 22px;font-size:13.5px;line-height:1.9;color:#4a514a;max-width:26em}
 .facts{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--line);gap:1px;margin:0 0 20px}
-.facts div{background:var(--paper);padding:9px 11px}
+.facts div{background:var(--paper);padding:9px 11px;transition:background .18s}
+.facts div:hover{background:#fff}
 .facts span{display:block;font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);margin-bottom:5px}
 .facts b{font-size:12.5px;font-weight:650;letter-spacing:-.01em}
 .venue{margin:0;padding-top:16px;border-top:1px solid var(--line);font:500 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
@@ -51,7 +59,8 @@ button{font:inherit;color:inherit}
 .cover::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 7px);mix-blend-mode:soft-light;opacity:.7}
 .cover::after{content:"";position:absolute;left:0;right:0;top:61%;height:1px;background:rgba(255,255,255,.4);box-shadow:0 6px 20px rgba(255,255,255,.12)}
 .cover .no{position:absolute;left:10px;top:8px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(255,255,255,.78);font-style:normal}
-.cover .ring{position:absolute;right:12%;bottom:14%;width:34%;aspect-ratio:1;border:1px solid rgba(255,255,255,.34);border-radius:50%;box-shadow:0 0 0 9px rgba(255,255,255,.06),0 0 0 20px rgba(255,255,255,.04)}
+.cover .ring{position:absolute;right:12%;bottom:14%;width:34%;aspect-ratio:1;border:1px solid rgba(255,255,255,.34);border-radius:50%;box-shadow:0 0 0 9px rgba(255,255,255,.06),0 0 0 20px rgba(255,255,255,.04);animation:ringBreath 6s ease-in-out infinite}
+@keyframes ringBreath{0%,100%{opacity:.8;scale:1}50%{opacity:1;scale:1.05}}
 .wmeta{display:flex;flex-direction:column;gap:2px;padding:11px 5px 0;min-width:0}
 .wno{font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
 .wtitle{font-size:16px;font-weight:660;letter-spacing:-.015em;margin-top:1px}
@@ -62,8 +71,8 @@ button{font:inherit;color:inherit}
 .detail-view{background:var(--bg)}
 .dwrap{flex:1;width:100%;max-width:1240px;margin:0 auto;padding:18px clamp(18px,4vw,44px) 40px}
 .dbar{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-.back{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 14px;font-size:11.5px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s}
-.back:hover{border-color:var(--accent);color:var(--accent)}
+.back{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 14px;font-size:11.5px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s,translate .15s}
+.back:hover{border-color:var(--accent);color:var(--accent);translate:-2px 0}
 .back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .dno-tag{margin-left:auto;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
 .dgrid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.78fr);gap:clamp(24px,4vw,56px);align-items:start}
@@ -79,6 +88,12 @@ button{font:inherit;color:inherit}
 .dinfo{padding-top:4px}
 .dinfo .kicker{margin-bottom:12px}
 .dinfo h1{margin:0 0 6px;font-size:clamp(32px,4vw,50px);line-height:1.04;letter-spacing:-.045em;font-weight:650;view-transition-name:vt-title;outline:none}
+.detail-view:not([hidden]) .dinfo .kicker{animation:rise .5s both}
+.detail-view:not([hidden]) .dinfo .dsub{animation:rise .5s .05s both}
+.detail-view:not([hidden]) .dinfo .dlead{animation:rise .55s .1s both}
+.detail-view:not([hidden]) .dinfo .dbody{animation:rise .55s .14s both}
+.detail-view:not([hidden]) .dinfo .dstats{animation:rise .55s .18s both}
+.detail-view:not([hidden]) .dinfo .dnote{animation:rise .55s .22s both}
 .dsub{margin:0 0 20px;font:500 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 .dlead{margin:0 0 14px;font-size:14.5px;line-height:1.95;letter-spacing:-.005em}
 .dbody{margin:0 0 22px;font-size:12.5px;line-height:1.95;color:#565d55;max-width:34em}
@@ -88,8 +103,8 @@ button{font:inherit;color:inherit}
 .dstats dd{margin:0;font-size:12px;font-weight:600}
 .dnote{margin:0 0 24px;padding:14px 16px;border-left:2px solid var(--warm);background:#f4f2e9;border-radius:0 10px 10px 0;font:italic 15px/1.7 Georgia,"Songti SC",serif;color:#3d423c}
 .dnote small{display:block;margin-top:6px;font:500 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);font-style:normal}
-.back2{border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 16px;font-size:11.5px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s}
-.back2:hover{border-color:var(--accent);color:var(--accent)}
+.back2{border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 16px;font-size:11.5px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s,translate .15s}
+.back2:hover{border-color:var(--accent);color:var(--accent);translate:-2px 0}
 .dfoot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:20px;padding-top:14px;border-top:1px solid var(--line);font:500 8.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 ::view-transition-group(vt-hero),::view-transition-group(vt-title){animation-duration:.58s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
 ::view-transition-old(vt-hero),::view-transition-new(vt-hero),
@@ -175,7 +190,9 @@ button{font:inherit;color:inherit}
   .dfoot{font-size:7.5px}
 }
 @media (prefers-reduced-motion:reduce){
-  .work,.go,.back{transition:none}
+  .work,.go,.back,.facts div,.back2{transition:none}
+  .live::before,.intro .kicker,.intro h1,.intro .lede,.intro .facts,.intro .venue,.cover .ring,.detail-view:not([hidden]) .dinfo .kicker,.detail-view:not([hidden]) .dinfo .dsub,.detail-view:not([hidden]) .dinfo .dlead,.detail-view:not([hidden]) .dinfo .dbody,.detail-view:not([hidden]) .dinfo .dstats,.detail-view:not([hidden]) .dinfo .dnote{animation:none}
+  .back:hover,.back2:hover{translate:none}
   ::view-transition-group(vt-hero),::view-transition-group(vt-title),
   ::view-transition-old(vt-hero),::view-transition-new(vt-hero),
   ::view-transition-old(vt-title),::view-transition-new(vt-title){animation-duration:.01s}

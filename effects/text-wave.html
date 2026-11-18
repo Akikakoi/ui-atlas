@@ -15,6 +15,10 @@ a{color:inherit;text-decoration:none}
 .brand .bub{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#fff,#f0a35e 58%,#b45f2a);box-shadow:0 0 12px rgba(240,163,94,.5);display:inline-block}
 .brand i{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted);font-style:normal}
 .nav{display:flex;gap:26px;font-size:12.5px;color:var(--muted)}
+.nav a{position:relative}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav a:hover{color:var(--ink)}
 .hint{margin:0 0 0 auto;display:inline-flex;align-items:center;gap:7px;font:400 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);background:rgba(245,242,233,.05);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
@@ -27,9 +31,13 @@ a{color:inherit;text-decoration:none}
 .ch{display:inline-block;will-change:transform}
 .line .accent{color:var(--accent)}
 .sub{margin:18px auto 0;max-width:32em;font-size:12.5px;line-height:1.85;color:var(--muted)}
-.readout{margin:14px 0 0;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(240,163,94,.85)}
+.readout{margin:14px 0 0;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(240,163,94,.85);display:inline-flex;align-items:center;gap:8px}
+.ampbar{display:inline-block;width:64px;height:3px;border-radius:2px;background:rgba(245,242,233,.14);overflow:hidden}
+.ampbar i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(.53)}
 .cans{display:flex;align-items:flex-end;justify-content:center;gap:30px;padding:8px 20px 34px}
-.can{width:112px;height:190px;border-radius:13px 13px 15px 15px;background:linear-gradient(158deg,var(--c1),var(--c2) 58%,var(--c3));position:relative;box-shadow:0 30px 46px -26px rgba(0,0,0,.9);flex:0 0 auto}
+.can{width:112px;height:190px;border-radius:13px 13px 15px 15px;background:linear-gradient(158deg,var(--c1),var(--c2) 58%,var(--c3));position:relative;box-shadow:0 30px 46px -26px rgba(0,0,0,.9);flex:0 0 auto;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+@media (hover:hover) and (pointer:fine){.can:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 36px 54px -26px rgba(0,0,0,.95)}}
 .can::before{content:"";position:absolute;top:-6px;left:7px;right:7px;height:12px;border-radius:50%;background:linear-gradient(#e6e0d2,#a9a293);box-shadow:inset 0 -2px 3px rgba(0,0,0,.25)}
 .can::after{content:"";position:absolute;top:2px;left:22px;right:22px;height:4px;border-radius:50%;border:1px solid rgba(0,0,0,.22)}
 .can .label{position:absolute;inset:24px 11px 14px;border-radius:7px;background:rgba(12,13,17,.86);border:1px solid rgba(245,242,233,.12);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:11px 6px 9px;text-align:center}
@@ -40,6 +48,12 @@ a{color:inherit;text-decoration:none}
 .c2{--c1:#ffd9a0;--c2:#f5a24a;--c3:#b45f24}
 .c3{--c1:#ffb59a;--c2:#ec7550;--c3:#a33d21}
 .facts{max-width:1040px;margin:0 auto 64px;padding:34px 40px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.fact{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){.fact:hover{transform:translateY(-3px)}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .fact b{display:block;font:600 20px/1.2 ui-monospace,Consolas,monospace;letter-spacing:-.02em;color:var(--accent);margin-bottom:7px}
 .fact b small{font-size:10px;color:var(--muted);margin-left:3px}
 .fact h3{margin:0 0 6px;font-size:13.5px;letter-spacing:.01em}
@@ -115,6 +129,8 @@ footer{max-width:1180px;margin:0 auto;padding:20px 40px 26px;border-top:1px soli
 @media (prefers-reduced-motion:reduce){
   .ch{will-change:auto}
   .cta{transition:none}
+  .can,.fact,.nav a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -137,7 +153,7 @@ footer{max-width:1180px;margin:0 auto;padding:20px 40px 26px;border-top:1px soli
     <h1 class="line" id="l1" aria-label="开罐之前，">开罐之前，</h1>
     <h1 class="line" id="l2" aria-label="先摇一摇。">先摇<span class="accent">一摇</span>。</h1>
     <p class="sub">零糖，4.2 倍气泡，冰到 4°C。气够足的时候，字会自己跳起来——不顺眼的话，把光标往左挪。</p>
-    <p class="readout" id="readout">BUBBLE FORCE · 9px</p>
+    <p class="readout" id="readout"><span id="ampText">BUBBLE FORCE · 9px</span> <span class="ampbar" aria-hidden="true"><i id="ampBar"></i></span></p>
   </section>
 
   <section class="cans" id="flavors" aria-label="三种口味">
@@ -173,6 +189,8 @@ footer{max-width:1180px;margin:0 auto;padding:20px 40px 26px;border-top:1px soli
 (function () {
   var lines = [document.getElementById('l1'), document.getElementById('l2')];
   var readout = document.getElementById('readout');
+  var ampText = document.getElementById('ampText');
+  var ampBar = document.getElementById('ampBar');
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var chars = [];
 
@@ -198,7 +216,8 @@ footer{max-width:1180px;margin:0 auto;padding:20px 40px 26px;border-top:1px soli
 
   function setAmp(v) {
     targetAmp = v;
-    readout.textContent = 'BUBBLE FORCE · ' + Math.round(v) + 'px';
+    if (ampText) ampText.textContent = 'BUBBLE FORCE · ' + Math.round(v) + 'px';
+    if (ampBar) ampBar.style.transform = 'scaleX(' + Math.max(.1, Math.min(1, v / 17)).toFixed(3) + ')';
   }
 
   if (reduce) {
@@ -231,6 +250,24 @@ footer{max-width:1180px;margin:0 auto;padding:20px 40px 26px;border-top:1px soli
   });
 
   raf = requestAnimationFrame(loop);
+})();
+</script>
+<script>
+/* 次级动效：配方与购买区进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.facts, .band')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i);
+    io.observe(el);
+  });
 })();
 </script>
 <script>

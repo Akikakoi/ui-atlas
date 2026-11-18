@@ -19,7 +19,10 @@ a{color:inherit}
 .brand b{font:600 13px/1 Georgia,"Songti SC",serif;letter-spacing:.14em}
 .brand span{font:400 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .head nav{display:flex;gap:22px;margin-left:auto;font-size:12px;color:var(--muted)}
-.head nav a{text-decoration:none}
+.head nav a{position:relative;text-decoration:none}
+.head nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.head nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .head nav a:hover{color:var(--ink)}
 .book{font:600 11.5px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;text-decoration:none;color:var(--paper);background:var(--accent);border-radius:999px;
   padding:10px 16px;white-space:nowrap;margin-left:6px}
@@ -43,6 +46,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   radial-gradient(120% 90% at 50% 0%,#203129,#101915 68%);
   border:1px solid rgba(21,33,27,.22);box-shadow:0 40px 80px -46px rgba(21,33,27,.75),inset 0 0 0 1px rgba(255,255,255,.04);
   height:clamp(350px,48vw,430px);display:flex;flex-direction:column;color:#eef1e6}
+.board.hit{animation:edgeHit .35s ease}
+@keyframes edgeHit{0%,100%{box-shadow:0 40px 80px -46px rgba(21,33,27,.75),inset 0 0 0 1px rgba(255,255,255,.04)}40%{box-shadow:0 40px 80px -46px rgba(21,33,27,.75),inset 0 0 22px rgba(216,185,140,.28)}}
 .board::before{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
   background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
   background-size:38px 38px}
@@ -56,8 +61,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .card{position:absolute;left:0;top:0;width:clamp(178px,30%,214px);padding:18px 18px 16px;border-radius:4px;touch-action:none;cursor:grab;
   background:linear-gradient(155deg,#fbf7ec,#e9e1ce);color:#1b1a14;will-change:transform;user-select:none;
   box-shadow:0 24px 44px -22px rgba(0,0,0,.8),0 2px 0 rgba(255,255,255,.5) inset;
-  border:1px solid rgba(255,255,255,.55);outline:none}
-.card:active{cursor:grabbing}
+  border:1px solid rgba(255,255,255,.55);outline:none;transition:scale .18s ease,box-shadow .2s}
+.card:active{scale:.985;cursor:grabbing}
 .card:focus-visible{box-shadow:0 0 0 3px rgba(216,185,140,.75),0 24px 44px -22px rgba(0,0,0,.8)}
 .card .tag{display:block;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:#8a6a4a}
 .card b{display:block;margin:14px 0 10px;font:600 30px/1.05 Georgia,"Songti SC",serif;letter-spacing:-.03em}
@@ -74,20 +79,25 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;padding:5px 10px;cursor:pointer}
 .board-foot button:hover{border-color:#d8b98c;color:#f4dfb8}
 .board-foot button:focus-visible{outline:2px solid #d8b98c;outline-offset:2px}
+.board-foot .pos{font-variant-numeric:tabular-nums;color:#d8b98c;letter-spacing:.1em}
 .craft{max-width:1160px;margin:0 auto;padding:44px 22px 24px;border-top:1px solid var(--line)}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:24px;flex-wrap:wrap}
 .sec-head h2{margin:0;font-size:clamp(24px,3.2vw,36px);line-height:1.12;letter-spacing:-.04em;font-weight:620}
 .sec-head h2 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
 .sec-head p{margin:0;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.three article{border:1px solid var(--line);border-radius:12px;padding:20px 18px;background:rgba(255,255,255,.4)}
+.three article{border:1px solid var(--line);border-radius:12px;padding:20px 18px;background:rgba(255,255,255,.4);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,background-color .35s}
+@media (hover:hover) and (pointer:fine){.three article:hover{transform:translateY(-3px);border-color:rgba(181,67,42,.28);background:rgba(255,255,255,.7)}}
 .three span{display:block;margin-bottom:12px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent)}
 .three h3{margin:0 0 7px;font-size:14.5px;letter-spacing:-.01em}
 .three p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
 .ledger{max-width:1160px;margin:0 auto;padding:14px 22px 44px}
 .ledger .kicker{margin-bottom:12px}
 .ledger .row{display:grid;grid-template-columns:64px minmax(0,1fr) 170px 80px;gap:16px;align-items:baseline;
-  padding:13px 2px;border-top:1px solid var(--line);font-size:12px;text-decoration:none}
+  padding:13px 2px;border-top:1px solid var(--line);font-size:12px;text-decoration:none;
+  transition:background-color .25s,padding-left .25s}
+@media (hover:hover) and (pointer:fine){.ledger .row:hover{background:rgba(181,67,42,.035);padding-left:6px}}
 .ledger .row:last-child{border-bottom:1px solid var(--line)}
 .ledger .row i{font:600 9.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--accent);font-style:normal}
 .ledger .row b{font-weight:600;letter-spacing:-.01em}
@@ -105,6 +115,10 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   pointer-events:none;z-index:9;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .sr{position:absolute;top:0;left:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:920px){
   .hero{grid-template-columns:1fr;min-height:0}
@@ -156,6 +170,7 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 @media (prefers-reduced-motion:reduce){
   .card,.three article{box-shadow:0 10px 24px -18px rgba(0,0,0,.8)}
   *{animation:none!important;transition:none!important}
+  .io{opacity:1;transform:none}
 }
 </style>
 </head>
@@ -201,6 +216,7 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
         </div>
         <div class="board-foot">
           <span>按住样张拖动，松手会顺着速度滑出去</span>
+          <span class="pos" id="pos" aria-hidden="true">X 0 · Y 0</span>
           <button type="button" id="reset">归位</button>
         </div>
       </div>
@@ -248,15 +264,28 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 <script>
 (function () {
   var board = document.getElementById('table'), card = document.getElementById('card');
-  var reset = document.getElementById('reset');
+  var reset = document.getElementById('reset'), pos = document.getElementById('pos');
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var x = 0, y = 0, vx = 0, vy = 0, raf = null;
+  var x = 0, y = 0, vx = 0, vy = 0, raf = null, lastHit = 0;
   var drag = false, lastX = 0, lastY = 0, lastT = 0;
 
   function maxX() { return Math.max(0, board.clientWidth - card.offsetWidth); }
   function maxY() { return Math.max(0, board.clientHeight - card.offsetHeight); }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-  function paint() { card.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0)'; }
+  function paint() {
+    var rot = reduce ? 0 : clamp(vx * .55, -8, 8);
+    card.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) rotate(' + rot.toFixed(2) + 'deg)';
+    if (pos) pos.textContent = 'X ' + Math.round(x) + ' · Y ' + Math.round(y);
+  }
+  function hit() {
+    var now = performance.now();
+    if (now - lastHit < 180) return;
+    lastHit = now;
+    board.classList.remove('hit');
+    void board.offsetWidth;
+    board.classList.add('hit');
+  }
+  board.addEventListener('animationend', function () { board.classList.remove('hit'); });
 
   function center() {
     x = Math.max(0, (board.clientWidth - card.offsetWidth) / 2);
@@ -299,10 +328,10 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   function tick() {
     raf = null;
     x += vx; y += vy;
-    if (x < 0) { x = 0; vx = -vx * .7; }
-    if (x > maxX()) { x = maxX(); vx = -vx * .7; }
-    if (y < 0) { y = 0; vy = -vy * .7; }
-    if (y > maxY()) { y = maxY(); vy = -vy * .7; }
+    if (x < 0) { x = 0; vx = -vx * .7; hit(); }
+    if (x > maxX()) { x = maxX(); vx = -vx * .7; hit(); }
+    if (y < 0) { y = 0; vy = -vy * .7; hit(); }
+    if (y > maxY()) { y = maxY(); vy = -vy * .7; hit(); }
     vx *= .94; vy *= .94;
     paint();
     if (Math.abs(vx) > .15 || Math.abs(vy) > .15) raf = requestAnimationFrame(tick);
@@ -323,6 +352,24 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
     vx = vy = 0;
     center();
     card.focus();
+  });
+})();
+</script>
+<script>
+/* 次级动效：工艺、样张与预约区进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.craft, .ledger, .band')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
   });
 })();
 </script>

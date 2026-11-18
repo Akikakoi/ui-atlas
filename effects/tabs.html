@@ -39,7 +39,8 @@ h1{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.1;letter-spacing:-.03
 .panel.on{display:block;animation:in .4s cubic-bezier(.2,.8,.2,1)}
 @keyframes in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-.kpi{border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#fbf9f3}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#fbf9f3;transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .3s}
+@media (hover:hover) and (pointer:fine){.kpi:hover{transform:translateY(-2px);border-color:#cfc9b9}}
 .kpi small{display:block;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);margin-bottom:9px}
 .kpi b{display:block;font:600 21px/1 ui-monospace,Consolas,monospace;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
 .kpi em{display:block;margin-top:6px;font-style:normal;font-size:9.5px;color:var(--green)}
@@ -51,7 +52,15 @@ h1{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.1;letter-spacing:-.03
 .chart{height:128px;display:flex;align-items:flex-end;gap:7px;border-bottom:1px solid var(--line);padding-bottom:0}
 .chart .col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px}
 .chart .col i{display:block;width:100%;max-width:42px;border-radius:4px 4px 0 0;
-  background:linear-gradient(180deg,rgba(75,83,201,.82),rgba(75,83,201,.22));transition:filter .2s}
+  background:linear-gradient(180deg,rgba(75,83,201,.82),rgba(75,83,201,.22));transition:filter .2s;transform-origin:bottom}
+.panel.on .chart .col i{animation:barIn .6s cubic-bezier(.2,.8,.2,1) both}
+.panel.on .chart .col:nth-child(2) i{animation-delay:.05s}
+.panel.on .chart .col:nth-child(3) i{animation-delay:.1s}
+.panel.on .chart .col:nth-child(4) i{animation-delay:.15s}
+.panel.on .chart .col:nth-child(5) i{animation-delay:.2s}
+.panel.on .chart .col:nth-child(6) i{animation-delay:.25s}
+.panel.on .chart .col:nth-child(7) i{animation-delay:.3s}
+@keyframes barIn{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 .chart .col:nth-child(5) i{background:linear-gradient(180deg,#4b53c9,#7d84e6)}
 .chart .col:hover i{filter:brightness(1.12)}
 .chart .col span{font:8px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);padding-bottom:5px}
@@ -60,13 +69,20 @@ table{width:100%;border-collapse:collapse;font-size:11.5px;background:#fbf9f3}
 th{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.015)}
 td{padding:8px 12px;border-bottom:1px solid rgba(0,0,0,.045);color:#55575e}
 tr:last-child td{border-bottom:0}
+tbody tr{transition:background-color .2s}
+tbody tr:hover td{background:rgba(75,83,201,.035)}
 td b{color:var(--ink);font-weight:550}
 td.num{font-family:ui-monospace,Consolas,monospace;font-size:10.5px;text-align:right;color:#55575e}
 th.num{text-align:right}
 .sources{display:grid;gap:12px;max-width:640px}
 .source{display:grid;grid-template-columns:120px minmax(0,1fr) 52px;align-items:center;gap:12px;font-size:12px}
 .source .track{height:7px;border-radius:4px;background:#ece9df;overflow:hidden}
-.source .track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#4b53c9,#8a90ea);width:var(--w)}
+.source .track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#4b53c9,#8a90ea);width:var(--w);transform-origin:left}
+.panel.on .source .track i{animation:barInX .7s cubic-bezier(.2,.8,.2,1) both}
+.panel.on .source:nth-child(2) .track i{animation-delay:.08s}
+.panel.on .source:nth-child(3) .track i{animation-delay:.16s}
+.panel.on .source:nth-child(4) .track i{animation-delay:.24s}
+@keyframes barInX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .source em{font-style:normal;font:10.5px ui-monospace,Consolas,monospace;color:var(--muted);text-align:right}
 .source-note{margin:16px 0 0;padding:12px 13px;border:1px dashed var(--line);border-radius:10px;font-size:11.5px;line-height:1.8;color:#5d5f66;background:rgba(75,83,201,.035)}
 .source-note b{color:var(--ink);font-weight:600}
@@ -141,6 +157,8 @@ th.num{text-align:right}
 }
 @media (prefers-reduced-motion:reduce){
   .ind,.panel.on{transition:none;animation:none}
+  .kpi,tbody tr{transition:none}
+  .panel.on .chart .col i,.panel.on .source .track i{animation:none}
 }
 </style>
 </head>

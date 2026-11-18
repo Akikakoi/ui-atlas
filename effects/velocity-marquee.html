@@ -18,7 +18,10 @@ a{color:inherit;text-decoration:none}
   font:600 12px/1 ui-monospace,Consolas,monospace}
 .brand i{font:400 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);font-style:normal}
 .nav-links{display:flex;gap:24px;margin-left:12px}
-.nav-links a{font-size:12.5px;color:rgba(242,243,236,.6)}
+.nav-links a{position:relative;font-size:12.5px;color:rgba(242,243,236,.6)}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--accent)}
 .nav .cta{margin-left:auto;border:1px solid var(--accent);border-radius:999px;padding:7px 14px;font-size:11.5px;
   font-weight:600;color:var(--accent);white-space:nowrap}
@@ -30,22 +33,32 @@ a{color:inherit;text-decoration:none}
 h1{margin:0;font-size:clamp(30px,5.4vw,52px);line-height:1.06;letter-spacing:-.045em;font-weight:600}
 h1 em{font-style:normal;color:var(--accent)}
 .sub{margin:14px 0 0;font:600 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
-.rows{display:grid;gap:6px}
-.row{overflow:hidden;white-space:nowrap}
+.rows{display:grid;gap:6px;--vskew:0}
+.row{overflow:hidden;white-space:nowrap;transform:skewX(calc(var(--vskew) * 1deg));transition:transform .18s linear}
 .track{display:flex;width:max-content;will-change:transform}
 .chunk{display:block;padding-right:.3em;font-size:clamp(52px,11vw,110px);line-height:1.02;letter-spacing:-.045em;font-weight:620}
 .row:nth-child(2) .chunk{color:transparent;-webkit-text-stroke:1.2px rgba(242,243,236,.34);font-weight:600}
 .row:nth-child(3) .chunk{font-family:Georgia,"Songti SC",serif;font-style:italic;font-weight:400;color:#c9c5b4;letter-spacing:-.02em}
-.hud{position:absolute;right:max(24px,calc((100vw - 1120px)/2));bottom:44px;display:flex;align-items:baseline;gap:7px;
+.hud{position:absolute;right:max(24px,calc((100vw - 1120px)/2));bottom:44px;display:flex;align-items:center;gap:7px;
   font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .hud b{font-size:22px;letter-spacing:-.02em;color:var(--accent)}
+.hud .vbar{width:64px;height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden;margin-left:6px}
+.hud .vbar i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
 .program{max-width:1120px;margin:0 auto;padding:8px 22px 48px;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);
   gap:clamp(26px,5vw,64px);align-items:start}
 .program h2{margin:0 0 10px;font-size:clamp(24px,3.2vw,34px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
 .program .intro p{margin:0;font-size:12.5px;line-height:1.9;color:var(--muted);max-width:28em}
 .program .note{margin-top:18px;font:600 8.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(242,243,236,.38)}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 90ms)}
+.io.in{opacity:1;transform:none}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th,td{text-align:left;padding:14px 8px;border-bottom:1px solid var(--line)}
+tbody tr{transition:background-color .25s,transform .25s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){
+  tbody tr:hover{background:rgba(142,240,200,.05);transform:translateX(4px)}
+}
 th{font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 td:first-child{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--accent);white-space:nowrap}
 td:nth-child(2){font-weight:600}
@@ -119,6 +132,9 @@ footer span:last-child{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
   .track{transform:none!important}
+  .row{transform:none!important;transition:none}
+  .io{opacity:1;transform:none;transition:none}
+  tbody tr,.nav-links a::after{transition:none}
 }
 </style>
 </head>
@@ -146,12 +162,12 @@ footer span:last-child{margin-left:auto}
       <div class="row"><div class="track"><span class="chunk">Type in motion, scroll in time.</span><span class="chunk">Type in motion, scroll in time.</span></div></div>
       <div class="row"><div class="track"><span class="chunk">速度不是常量，节奏才是。</span><span class="chunk">速度不是常量，节奏才是。</span></div></div>
     </div>
-    <div class="hud">SCROLL VELOCITY <b id="vel">0</b></div>
+    <div class="hud"><span>SCROLL VELOCITY</span> <b id="vel">0</b><span class="vbar" aria-hidden="true"><i id="vbar"></i></span></div>
     <p class="sr">三行滚动字幕：动态字体、排版节奏与速度。滚动越快，字幕跑得越快；停止滚动后逐渐回到常速。</p>
   </div>
 </section>
 
-<section class="program" id="program">
+<section class="program io" id="program">
   <div class="intro">
     <p class="kicker">PROGRAM / 03 DAYS</p>
     <h2>三天，<br>把速度拆开看。</h2>
@@ -170,7 +186,7 @@ footer span:last-child{margin-left:auto}
   </table>
 </section>
 
-<section class="band" id="tickets">
+<section class="band io" id="tickets">
   <div class="inner-band">
     <div>
       <h2>三日通票，还剩 80 张。</h2>
@@ -202,7 +218,7 @@ footer span:last-child{margin-left:auto}
     };
   });
   var vel = 0, last = scrollY, raf = null, running = true;
-  var out = document.getElementById('vel');
+  var out = document.getElementById('vel'), vbar = document.getElementById('vbar'), rowsEl = document.getElementById('rows');
 
   function measure() {
     rows.forEach(function (r) { r.w = r.chunk.offsetWidth; });
@@ -226,9 +242,26 @@ footer span:last-child{margin-left:auto}
       r.track.style.transform = 'translate3d(' + (-r.x).toFixed(2) + 'px,0,0)';
     });
     out.textContent = Math.round(Math.abs(vel));
+    if (vbar) vbar.style.transform = 'scaleX(' + Math.min(1, Math.abs(vel) / 28).toFixed(3) + ')';
+    if (rowsEl) {
+      var sk = Math.max(-2.4, Math.min(2.4, vel * .06));
+      rowsEl.style.setProperty('--vskew', sk.toFixed(2));
+    }
     if (running) raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);
+
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .2 });
+  [].slice.call(document.querySelectorAll('.io')).forEach(function (el, i) {
+    el.style.setProperty('--i', i);
+    io.observe(el);
+  });
 
   document.addEventListener('visibilitychange', function () {
     running = !document.hidden;

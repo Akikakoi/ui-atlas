@@ -14,6 +14,10 @@ a{color:inherit;text-decoration:none}
 .brand{display:flex;align-items:baseline;gap:9px;font-weight:750;font-size:14px;letter-spacing:.12em}
 .brand span{font-size:10px;font-weight:500;letter-spacing:.06em;color:var(--muted)}
 .head nav{display:flex;gap:20px;margin-left:auto;font-size:12px;color:var(--muted)}
+.head nav span{position:relative;cursor:default}
+.head nav span::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.head nav span:hover::after{transform:scaleX(1);transform-origin:left}
 .head nav span:hover{color:var(--ink)}
 .sys{display:flex;align-items:center;gap:6px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);padding-left:20px;border-left:1px solid var(--line)}
 .sys::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green)}
@@ -36,10 +40,12 @@ input::placeholder{color:#a3a6ac}
 .bar.open .go{opacity:1;transform:none;pointer-events:auto}
 .go:hover{background:var(--accent)}
 .result{min-height:1.7em;margin:14px 0 0;font-size:12.5px;line-height:1.7;color:var(--muted)}
+.result.flash{animation:resultFlash .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes resultFlash{0%{opacity:.25;transform:translateY(4px)}100%{opacity:1;transform:none}}
 .cats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:clamp(44px,6vw,72px);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.cat{display:flex;flex-direction:column;padding:22px 18px 24px;border-left:1px solid var(--line);transition:background .2s}
+.cat{display:flex;flex-direction:column;padding:22px 18px 24px;border-left:1px solid var(--line);transition:background .2s,transform .3s cubic-bezier(.2,.8,.2,1)}
 .cat:first-child{border-left:0}
-.cat:hover{background:rgba(255,255,255,.55)}
+.cat:hover{background:rgba(255,255,255,.55);transform:translateY(-2px)}
 .cat .cno{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .cat b{margin-top:14px;font-size:17px;letter-spacing:-.01em}
 .cat small{margin-top:6px;font-size:11px;line-height:1.6;color:var(--muted)}
@@ -48,7 +54,13 @@ input::placeholder{color:#a3a6ac}
 .pop-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:8px}
 .pop-head b{font-size:15px;letter-spacing:-.01em}
 .pop-head span{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
-.pop{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:16px;padding:15px 4px;border-top:1px solid var(--line)}
+.pop{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:16px;padding:15px 4px;border-top:1px solid var(--line);
+  transition:background-color .2s,padding-left .25s}
+@media (hover:hover) and (pointer:fine){.pop:hover{background:rgba(255,255,255,.5);padding-left:10px}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .pop:last-of-type{border-bottom:1px solid var(--line)}
 .pop span{font:600 10px/1 ui-monospace,Consolas,monospace;color:var(--muted)}
 .pop b{font-size:14px;font-weight:600;letter-spacing:-.01em}
@@ -96,6 +108,9 @@ input::placeholder{color:#a3a6ac}
 }
 @media (prefers-reduced-motion:reduce){
   .bar,.icon svg,input,.go{transition:none}
+  .cat,.pop,.head nav span::after{transition:none}
+  .result.flash{animation:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -179,6 +194,27 @@ input::placeholder{color:#a3a6ac}
     }
     setOpen(false);
     toggle.focus();
+    result.classList.remove('flash');
+    void result.offsetWidth;
+    result.classList.add('flash');
+  });
+})();
+</script>
+<script>
+/* 次级动效：分类与热门条目进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.cats, .popular')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i);
+    io.observe(el);
   });
 })();
 </script>

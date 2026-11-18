@@ -31,7 +31,8 @@ button{font:inherit;color:inherit}
 .side{padding:24px 16px 30px 24px;border-right:1px solid var(--line);position:sticky;top:54px;max-height:calc(100svh - 54px);overflow:auto}
 .side-head{margin:0 0 8px;font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:#5f6670}
 .side ul{list-style:none;margin:0 0 20px;padding:0}
-.side li{display:flex;align-items:center;padding:5px 8px;margin-left:-8px;border-radius:6px;font-size:10.5px;color:var(--muted)}
+.side li{display:flex;align-items:center;padding:5px 8px;margin-left:-8px;border-radius:6px;font-size:10.5px;color:var(--muted);transition:background .16s,color .16s,translate .16s}
+.side li:hover{background:rgba(255,255,255,.045);color:var(--ink);translate:2px 0}
 .side li.on{background:rgba(142,240,200,.07);color:var(--ink);font-weight:600}
 .side li.on::before{content:"";width:2px;height:11px;border-radius:2px;background:var(--accent);margin-right:7px}
 .side li em{margin-left:auto;font:600 7px/1 ui-monospace,Consolas,monospace;font-style:normal;color:#5f6670}
@@ -43,7 +44,10 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .lede{margin:13px 0 0;font-size:11.5px;line-height:1.9;color:var(--muted);max-width:38em}
 .meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:14px;font:500 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.03em;color:#6d7480}
 .meta i{font-style:normal;color:#3f4650}
-.codecard{margin-top:20px;border:1px solid var(--line);border-radius:13px;background:#0d1116;overflow:hidden;box-shadow:0 46px 80px -70px rgba(0,0,0,.95)}
+.codecard{margin-top:20px;border:1px solid var(--line);border-radius:13px;background:#0d1116;overflow:hidden;box-shadow:0 46px 80px -70px rgba(0,0,0,.95);animation:rise .55s .05s both}
+.codecard.flash{animation:flashBorder .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+@keyframes flashBorder{0%{border-color:rgba(142,240,200,.75);box-shadow:0 0 0 3px rgba(142,240,200,.12)}100%{border-color:var(--line);box-shadow:0 46px 80px -70px rgba(0,0,0,.95)}}
 .codehead{display:flex;align-items:center;gap:9px;padding:8px 10px 8px 12px;border-bottom:1px solid var(--line);background:var(--panel-2)}
 .tl{display:flex;gap:4px;margin-right:2px}
 .tl i{width:7px;height:7px;border-radius:50%;background:#2b323d}
@@ -55,11 +59,14 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .copy{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#1b202b;color:var(--ink);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s,color .2s,transform .2s}
 .copy:hover{border-color:rgba(255,255,255,.24);background:#222836}
 .copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.copy svg{width:13px;height:13px;display:block}
+.copy svg{width:13px;height:13px;display:block;transition:scale .18s}
+.copy:hover svg{scale:1.1}
 .copy .ic-check{display:none}
 .copy.done{background:rgba(142,240,200,.12);border-color:rgba(142,240,200,.45);color:var(--accent);animation:pop .32s cubic-bezier(.2,.8,.2,1)}
 .copy.done .ic-copy{display:none}
 .copy.done .ic-check{display:block}
+.copy.done .ic-check path{stroke-dasharray:22;stroke-dashoffset:22;animation:draw .3s .04s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
 @keyframes pop{0%{transform:scale(.94)}55%{transform:scale(1.06)}100%{transform:scale(1)}}
 pre{margin:0;padding:14px 16px;overflow:auto;font:12px/1.95 ui-monospace,Consolas,monospace;color:#c8cedc;tab-size:2}
 pre .v{color:var(--warm)}
@@ -74,6 +81,8 @@ table{width:100%;border-collapse:collapse;font-size:10px;min-width:420px}
 th{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);background:var(--panel-2);font:600 7px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--muted);line-height:1.6;vertical-align:top}
 tr:last-child td{border-bottom:0}
+tbody tr{transition:background .16s}
+tbody tr:hover{background:rgba(255,255,255,.035)}
 td:first-child{font:600 9px/1.6 ui-monospace,Consolas,monospace;color:var(--accent);white-space:nowrap}
 td:nth-child(2){font:500 9px/1.6 ui-monospace,Consolas,monospace;color:#c8cedc;white-space:nowrap}
 .note-card{margin-top:18px;padding:11px 13px;border-left:2px solid var(--accent);border-radius:0 8px 8px 0;background:rgba(142,240,200,.05);font-size:10px;line-height:1.8;color:var(--muted)}
@@ -81,7 +90,8 @@ td:nth-child(2){font:500 9px/1.6 ui-monospace,Consolas,monospace;color:#c8cedc;w
 .toc{padding:24px 16px;border-left:1px solid var(--line);position:sticky;top:54px;max-height:calc(100svh - 54px);overflow:auto}
 .toc .side-head{margin-bottom:10px}
 .toc ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
-.toc a{display:block;padding:4px 8px;margin-left:-8px;border-radius:5px;font-size:9.5px;color:var(--muted)}
+.toc a{display:block;padding:4px 8px;margin-left:-8px;border-radius:5px;font-size:9.5px;color:var(--muted);transition:color .16s,background .16s,translate .16s}
+.toc a:hover{color:var(--ink);translate:2px 0}
 .toc a.on{color:var(--accent);background:rgba(142,240,200,.06)}
 .sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:1080px){
@@ -130,7 +140,11 @@ td:nth-child(2){font:500 9px/1.6 ui-monospace,Consolas,monospace;color:#c8cedc;w
 }
 @media (prefers-reduced-motion:reduce){
   .copy,.copy.done{animation:none;transition:none}
-  .topnav a{transition:none}
+  .topnav a,.side li,.toc a,.copy svg,tbody tr{transition:none}
+  .codecard,.codecard.flash,.copy.done .ic-check path{animation:none}
+  .copy.done .ic-check path{stroke-dashoffset:0}
+  .side li:hover,.toc a:hover{translate:none}
+  .copy:hover svg{scale:none}
 }
 </style>
 </head>
@@ -240,6 +254,7 @@ td:nth-child(2){font:500 9px/1.6 ui-monospace,Consolas,monospace;color:#c8cedc;w
 (function () {
   var btn = document.getElementById('copy'), label = document.getElementById('label');
   var code = document.getElementById('code'), live = document.getElementById('live');
+  var card = document.querySelector('.codecard');
   var timer = null;
 
   function fallback(text) {
@@ -257,6 +272,11 @@ td:nth-child(2){font:500 9px/1.6 ui-monospace,Consolas,monospace;color:#c8cedc;w
     label.textContent = ok ? '已复制' : '复制失败';
     btn.setAttribute('aria-label', ok ? '已复制动效令牌' : '复制失败，请重试');
     live.textContent = ok ? '动效令牌已复制到剪贴板' : '复制失败，请手动选择代码';
+    if (ok) {
+      card.classList.remove('flash');
+      void card.offsetWidth;
+      card.classList.add('flash');
+    }
     clearTimeout(timer);
     timer = setTimeout(function () {
       btn.classList.remove('done');

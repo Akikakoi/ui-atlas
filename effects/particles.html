@@ -21,11 +21,17 @@ a{color:inherit}
 .brand svg{width:18px;height:18px;flex:0 0 18px}
 .brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .nav-links{display:flex;gap:24px;margin-left:8px}
-.nav-links a{font-size:12.5px;color:rgba(238,241,247,.62);text-decoration:none}
+.nav-links a{font-size:12.5px;color:rgba(238,241,247,.62);text-decoration:none;position:relative;transition:color .18s}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
 .nav-links a:hover{color:var(--ink)}
+.nav-links a:hover::after{transform:scaleX(1)}
 .cta{margin-left:auto;height:36px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;
-  background:var(--accent);color:#081326;font-size:12px;font-weight:650;text-decoration:none;white-space:nowrap}
-.cta:hover{filter:brightness(1.08)}
+  background:var(--accent);color:#081326;font-size:12px;font-weight:650;text-decoration:none;white-space:nowrap;
+  transition:filter .2s,translate .16s,box-shadow .2s}
+.cta:hover{filter:brightness(1.08);translate:0 -1px;box-shadow:0 12px 26px -16px rgba(127,168,255,.85)}
+.cta:active{translate:0 1px}
+.brand svg{animation:markFloat 6s ease-in-out infinite}
+@keyframes markFloat{0%,100%{translate:0 0}50%{translate:0 -2px}}
 .hero{max-width:1160px;margin:0 auto;min-height:calc(100vh - 68px);padding:clamp(22px,3.6vw,48px) 22px 26px;
   display:grid;grid-template-rows:1fr auto;gap:32px}
 .hero-copy{align-self:center;max-width:600px}
@@ -46,7 +52,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   letter-spacing:.18em;color:var(--accent);border-right:1px solid var(--line);white-space:nowrap}
 .live i{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(127,168,255,.16);animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.45;box-shadow:0 0 0 5px rgba(127,168,255,.06)}}
-.hud .stat{flex:1;padding:13px 18px;border-right:1px solid var(--line);min-width:0}
+.hud .stat{flex:1;padding:13px 18px;border-right:1px solid var(--line);min-width:0;transition:background .2s,translate .2s}
+.hud .stat:hover{background:rgba(127,168,255,.06);translate:0 -1px}
 .hud .stat:last-child{border-right:0}
 .hud b{display:block;font:500 20px/1.1 ui-monospace,Consolas,monospace;letter-spacing:-.03em;color:#f2f6ff}
 .hud span{display:block;margin-top:5px;font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(238,241,247,.46)}
@@ -62,7 +69,13 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 h2{margin:0;font-size:clamp(24px,3.2vw,38px);line-height:1.12;letter-spacing:-.04em;font-weight:600}
 .sec-head p{margin:0;justify-self:end;font-size:12px;line-height:1.85;color:var(--muted);max-width:25em}
 .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.fgrid article{border:1px solid var(--line);border-radius:14px;padding:22px 20px;background:rgba(14,21,35,.55)}
+.fgrid article{border:1px solid var(--line);border-radius:14px;padding:22px 20px;background:rgba(14,21,35,.55);transition:translate .22s,border-color .22s,background .22s,box-shadow .22s}
+.fgrid article:hover{translate:0 -3px;border-color:rgba(127,168,255,.3);background:rgba(20,30,50,.72);box-shadow:0 26px 46px -40px rgba(127,168,255,.5)}
+.hero .kicker{animation:rise .5s both}
+.hero h1{animation:rise .6s .06s both}
+.hero .lede{animation:rise .6s .12s both}
+.hero .actions{animation:rise .6s .18s both}
+@keyframes rise{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
 .fgrid span{display:block;margin-bottom:14px;font:600 9.5px ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent)}
 .fgrid h3{margin:0 0 8px;font-size:15px;letter-spacing:-.01em;font-weight:560}
 .fgrid p{margin:0;font-size:11.5px;line-height:1.8;color:var(--muted)}
@@ -131,7 +144,9 @@ h2{margin:0;font-size:clamp(24px,3.2vw,38px);line-height:1.12;letter-spacing:-.0
   .hint{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .live i{animation:none}
+  .live i,.brand svg,.hero .kicker,.hero h1,.hero .lede,.hero .actions{animation:none}
+  .nav-links a::after,.cta,.hud .stat,.fgrid article{transition:none}
+  .cta:hover,.hud .stat:hover,.fgrid article:hover{translate:none}
 }
 </style>
 </head>

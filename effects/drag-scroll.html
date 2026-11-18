@@ -15,6 +15,10 @@ a{color:inherit;text-decoration:none}
 .brand .mark{width:22px;height:22px;border-radius:50%;background:var(--sea);color:#fbf8f0;display:grid;place-items:center;font:700 10px/1 ui-monospace,Consolas,monospace}
 .brand-sub{font-size:10px;letter-spacing:.08em;color:var(--muted);font-weight:500;margin-left:2px}
 .head nav{display:flex;gap:20px;margin-left:auto;font-size:12px;color:var(--muted)}
+.head nav a{position:relative}
+.head nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.head nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .head nav a:hover{color:var(--ink)}
 .season{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);padding-left:18px;border-left:1px solid var(--line)}
 .stage{max-width:1160px;margin:0 auto;padding:clamp(30px,4.6vw,58px) clamp(20px,4vw,48px) 0}
@@ -31,7 +35,9 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .viewport:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .track{display:flex;gap:12px;will-change:transform;transition:transform .46s cubic-bezier(.22,.8,.2,1)}
 .track.drag{transition:none}
-.card{flex:0 0 clamp(210px,22vw,286px);height:clamp(230px,30vw,320px);border-radius:13px;padding:16px;color:#fff;display:flex;flex-direction:column;justify-content:flex-start;background:linear-gradient(155deg,var(--c1),var(--c2));position:relative;overflow:hidden;user-select:none}
+.card{flex:0 0 clamp(210px,22vw,286px);height:clamp(230px,30vw,320px);border-radius:13px;padding:16px;color:#fff;display:flex;flex-direction:column;justify-content:flex-start;background:linear-gradient(155deg,var(--c1),var(--c2));position:relative;overflow:hidden;user-select:none;
+  transition:translate .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+@media (hover:hover) and (pointer:fine){.card:hover{translate:0 -4px;box-shadow:0 22px 36px -24px rgba(30,24,16,.5)}}
 .card::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.38),transparent 56%)}
 .card span,.card b,.card small,.card em{position:relative;z-index:1}
 .card span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;opacity:.62}
@@ -53,7 +59,13 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .route h2{margin:0;font-size:clamp(24px,3.2vw,36px);line-height:1.12;letter-spacing:-.035em;font-weight:640}
 .route h2 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--sea)}
 .days{display:flex;flex-direction:column}
-.day{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line)}
+.day{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line);
+  transition:padding-left .25s,background-color .25s}
+@media (hover:hover) and (pointer:fine){.day:hover{padding-left:6px;background:rgba(47,95,208,.03)}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .day:first-child{padding-top:0}
 .day .n{font:600 9px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--sea)}
 .day b{font-size:13.5px;font-weight:640;letter-spacing:-.01em}
@@ -101,7 +113,11 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   .before{padding:18px;gap:16px}
   .foot{flex-direction:column;gap:4px;padding-left:18px;padding-right:18px}
 }
-@media (prefers-reduced-motion:reduce){.track{transition:none}}
+@media (prefers-reduced-motion:reduce){
+  .track{transition:none}
+  .card,.day,.head nav a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
+}
 </style>
 </head>
 <body>
@@ -239,6 +255,24 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 
   addEventListener('resize', measure);
   measure();
+})();
+</script>
+<script>
+/* 次级动效：路线与行前笔记进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.route, .before')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i);
+    io.observe(el);
+  });
 })();
 </script>
 <script>

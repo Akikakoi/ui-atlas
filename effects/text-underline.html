@@ -22,7 +22,10 @@ a{color:inherit}
   font:600 13px/1 var(--serif);border-radius:50% 50% 4px 4px;transform:rotate(-3deg)}
 .brand i{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);font-style:normal}
 .nav-links{display:flex;gap:24px;margin-left:12px}
-.nav-links a{font-size:12.5px;color:#5d5347;text-decoration:none}
+.nav-links a{position:relative;font-size:12.5px;color:#5d5347;text-decoration:none}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--accent)}
 .cta{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);background:var(--ink);color:#faf3e4;
   border-radius:999px;padding:9px 17px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap}
@@ -70,13 +73,16 @@ h1 em{font-style:italic;color:var(--accent);font-weight:400}
 h2{margin:0;font-family:var(--serif);font-size:clamp(23px,2.8vw,34px);line-height:1.18;letter-spacing:-.01em;font-weight:600}
 .sec-head p{margin:0 0 3px auto;max-width:26em;font-size:11.5px;line-height:1.8;color:var(--muted)}
 .courses{display:grid;border-top:1px solid var(--line)}
-.course{font-size:15px;padding:13px 2px 14px}
+.course{font-size:15px;padding:13px 2px 14px;transition:padding-left .25s,background-color .25s}
+@media (hover:hover) and (pointer:fine){.course:hover{padding-left:8px;background:rgba(168,68,44,.03)}}
 .course .nm{font-weight:600;letter-spacing:-.01em}
 .course .dt{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
 .course .seat{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--olive);white-space:nowrap;margin-left:auto}
 .course .price{margin-left:0;font:600 11px/1 ui-monospace,Consolas,monospace;color:var(--ink);letter-spacing:0}
 .works{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.work{border:1px solid var(--line);border-radius:6px;background:var(--paper);padding:10px 10px 12px;min-width:0}
+.work{border:1px solid var(--line);border-radius:6px;background:var(--paper);padding:10px 10px 12px;min-width:0;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .3s}
+@media (hover:hover) and (pointer:fine){.work:hover{transform:translateY(-3px);border-color:#cbbca6;box-shadow:0 18px 30px -26px rgba(60,40,20,.55)}}
 .work .im{height:128px;display:grid;place-items:center;border-radius:4px;overflow:hidden;
   background:radial-gradient(70% 70% at 58% 24%,#fbf5e8,#e7dac4)}
 .work svg{display:block;height:100%;width:auto;max-width:100%}
@@ -102,6 +108,10 @@ h2{margin:0;font-family:var(--serif);font-size:clamp(23px,2.8vw,34px);line-heigh
 footer{max-width:1180px;margin:44px auto 0;padding:20px 24px 30px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
   font:600 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 footer span:last-child{margin-left:auto}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;z-index:9;
   font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;
   background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
@@ -173,6 +183,8 @@ footer span:last-child{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
   .ln,.ln::after{transition:none}
+  .course,.work,.nav-links a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -314,6 +326,24 @@ footer span:last-child{margin-left:auto}
 
 <p class="hint">悬停链接，看下划线从中间展开</p>
 
+<script>
+/* 次级动效：作品、工作室与预约区进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.works, .studio, .band')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
+  });
+})();
+</script>
 <script>
 /* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
 (function () {

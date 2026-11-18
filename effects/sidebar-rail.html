@@ -108,7 +108,9 @@ a{color:inherit}
 .btn.primary:hover{background:var(--accent);border-color:var(--accent)}
 
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:20px}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 13px;min-width:0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 13px;min-width:0;
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .3s}
+@media (hover:hover) and (pointer:fine){.stat:hover{transform:translateY(-2px);border-color:#cfcabe}}
 .stat .lbl{display:block;margin-bottom:10px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.13em;color:var(--muted);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat b{display:block;font-size:23px;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
@@ -124,7 +126,8 @@ a{color:inherit}
 .panel-head a:hover{color:var(--accent)}
 .projects{list-style:none;margin:0;padding:0}
 .projects li{display:grid;grid-template-columns:32px minmax(0,1fr) 78px 34px 64px;gap:11px;align-items:center;
-  padding:11px 0;border-top:1px solid #f1efe8}
+  padding:11px 0;border-top:1px solid #f1efe8;transition:background-color .2s,padding-left .25s}
+@media (hover:hover) and (pointer:fine){.projects li:hover{background:#fbfaf7;padding-left:6px}}
 .projects li:first-child{border-top:0}
 .thumb{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:650;
   background:linear-gradient(150deg,var(--a),var(--b))}
@@ -149,6 +152,12 @@ a{color:inherit}
 .agenda b{display:block;font-size:11.5px;font-weight:600;line-height:1.4}
 .agenda span{display:block;margin-top:2px;font-size:9.5px;color:var(--muted)}
 .agenda li.now b,.agenda li.now time{color:var(--accent)}
+.agenda li.now .badge{animation:badgePulse 2.4s ease-in-out infinite}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(47,99,233,.18)}50%{box-shadow:0 0 0 4px rgba(47,99,233,0)}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .agenda .badge{margin-left:auto;font-size:8.5px;color:var(--accent);border:1px solid rgba(47,99,233,.3);
   border-radius:999px;padding:2px 6px;white-space:nowrap}
 .brief dl{margin:8px 0 6px;display:grid;gap:0}
@@ -228,6 +237,9 @@ a{color:inherit}
 }
 @media (prefers-reduced-motion:reduce){
   .app,.brand b,.nav .txt,.nav a,.me,.me span,.toggle,.toggle span,.toggle svg,.btn,.search,.icon-btn{transition:none}
+  .projects li,.stat{transition:none}
+  .agenda li.now .badge{animation:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -405,6 +417,24 @@ a{color:inherit}
   });
 
   if (mq.matches) setRail(true);
+})();
+</script>
+<script>
+/* 次级动效：数据与内容区进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.stats, .cols, .content-foot')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
+  });
 })();
 </script>
 <script>

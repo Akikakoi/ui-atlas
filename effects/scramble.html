@@ -16,7 +16,10 @@ a{color:inherit}
 .brand .mark{width:23px;height:23px;display:grid;place-items:center;border-radius:5px;background:var(--accent);color:#06120b;font-size:12px;letter-spacing:0}
 .brand i{font:400 9px var(--mono);letter-spacing:.12em;color:var(--muted);font-style:normal}
 .head nav{display:flex;gap:22px;margin-left:10px}
-.head nav a{font-size:12px;color:var(--muted);text-decoration:none}
+.head nav a{position:relative;font-size:12px;color:var(--muted);text-decoration:none}
+.head nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.head nav a:hover::after{transform:scaleX(1);transform-origin:left}
 .head nav a:hover{color:var(--ink)}
 .head .hint{margin-left:auto;margin-right:2px}
 .status{display:flex;align-items:center;gap:7px;font:600 8.5px/1 var(--mono);letter-spacing:.14em;color:var(--muted);white-space:nowrap}
@@ -45,7 +48,9 @@ h1 .ac{color:var(--accent);text-shadow:0 0 32px rgba(126,240,168,.28)}
 .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:24px}
 .note{margin:12px 0 0;font:500 9px/1.6 var(--mono);letter-spacing:.08em;color:var(--muted)}
 .term{position:relative;z-index:1;background:linear-gradient(180deg,#0d141a,#090f14);border:1px solid rgba(126,240,168,.2);border-radius:12px;
-  box-shadow:0 44px 90px -46px rgba(0,0,0,.9),0 0 0 1px rgba(0,0,0,.4);overflow:hidden}
+  box-shadow:0 44px 90px -46px rgba(0,0,0,.9),0 0 0 1px rgba(0,0,0,.4);overflow:hidden;
+  transition:box-shadow .4s,border-color .4s}
+@media (hover:hover) and (pointer:fine){.term:hover{border-color:rgba(126,240,168,.36);box-shadow:0 44px 90px -46px rgba(0,0,0,.95),0 0 30px -8px rgba(126,240,168,.18)}}
 .term-top{display:flex;align-items:center;gap:10px;padding:10px 13px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--line);
   font:600 8.5px/1 var(--mono);letter-spacing:.1em;color:var(--muted)}
 .dots{display:flex;gap:5px;margin-right:2px}
@@ -73,8 +78,9 @@ h1 .ac{color:var(--accent);text-shadow:0 0 32px rgba(126,240,168,.28)}
   font:600 9px/1 var(--mono);letter-spacing:.16em;color:#5a6862}
 .marks span:first-child{color:#43504a;letter-spacing:.1em}
 .features{max-width:1180px;margin:0 auto;padding:38px clamp(20px,4vw,44px) 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.feature{border:1px solid var(--line);border-radius:10px;padding:20px 18px;background:rgba(255,255,255,.018)}
-.feature:hover{border-color:rgba(126,240,168,.3);background:rgba(126,240,168,.035)}
+.feature{border:1px solid var(--line);border-radius:10px;padding:20px 18px;background:rgba(255,255,255,.018);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s,background-color .3s}
+.feature:hover{border-color:rgba(126,240,168,.3);background:rgba(126,240,168,.035);transform:translateY(-3px)}
 .feature span{font:600 8.5px/1 var(--mono);letter-spacing:.14em;color:var(--accent)}
 .feature h3{margin:10px 0 8px;font-size:15px;letter-spacing:-.01em}
 .feature p{margin:0 0 14px;font-size:11.5px;line-height:1.75;color:var(--muted)}
@@ -90,6 +96,10 @@ h1 .ac{color:var(--accent);text-shadow:0 0 32px rgba(126,240,168,.28)}
 footer{max-width:1180px;margin:0 auto;padding:16px clamp(20px,4vw,44px) 28px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;
   font:500 9px/1.7 var(--mono);letter-spacing:.08em;color:var(--muted)}
 footer span:last-child{margin-left:auto}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .hint{display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.04em;color:var(--muted);pointer-events:none;white-space:nowrap;
   background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
@@ -149,6 +159,8 @@ footer span:last-child{margin-left:auto}
 @media (prefers-reduced-motion:reduce){
   .status i{animation:none}
   .feature,.ghost{transition:none}
+  .term,.head nav a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -298,6 +310,24 @@ footer span:last-child{margin-left:auto}
   setInterval(loop, 4000);
   document.addEventListener('visibilitychange', function () {
     if (!document.hidden) loop();
+  });
+})();
+</script>
+<script>
+/* 次级动效：能力卡与部署区进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.features, .band')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i);
+    io.observe(el);
   });
 })();
 </script>

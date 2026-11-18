@@ -17,7 +17,10 @@ button{font:inherit}
 .brand .mark{width:27px;height:27px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:700 12px/1 Georgia,serif}
 .brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .top nav{display:flex;gap:20px;font-size:11.5px;color:var(--muted)}
+.top nav a{position:relative;transition:color .18s}
+.top nav a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
 .top nav a:hover{color:var(--ink)}
+.top nav a:hover::after{transform:scaleX(1)}
 .top .venue{margin-left:auto;font:600 8.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);text-align:right}
 .hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:var(--muted);pointer-events:none;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.2);border-radius:999px;padding:4px 9px;white-space:nowrap}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
@@ -29,8 +32,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
 .meta span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 10px}
 .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
-.btn{position:relative;overflow:hidden;isolation:isolate;height:48px;padding:0 24px;border-radius:11px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:inherit;font-size:13.5px;font-weight:650;letter-spacing:.02em;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:transform .15s,background .2s,border-color .2s}
-.btn:hover{background:#eec07a}
+.btn{position:relative;overflow:hidden;isolation:isolate;height:48px;padding:0 24px;border-radius:11px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:inherit;font-size:13.5px;font-weight:650;letter-spacing:.02em;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:transform .15s,background .2s,border-color .2s,translate .15s}
+.btn:hover{background:#eec07a;translate:0 -1px}
 .btn:active{transform:translateY(1px)}
 .btn.ghost{background:transparent;color:var(--ink);border-color:rgba(255,255,255,.22)}
 .btn.ghost:hover{background:rgba(255,255,255,.05)}
@@ -40,23 +43,36 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .ghost .rp{background:radial-gradient(circle,rgba(227,178,100,.36),rgba(227,178,100,0) 70%)}
 @keyframes rp{to{transform:translate(-50%,-50%) scale(1);opacity:0}}
 .feedback{min-height:1.7em;margin:12px 0 0;font-size:11.5px;color:var(--accent);letter-spacing:.02em}
+.feedback.say{animation:sayIn .34s cubic-bezier(.2,.8,.2,1)}
+@keyframes sayIn{from{opacity:0;translate:0 4px}to{opacity:1;translate:0 0}}
+@keyframes rise{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+.stage section{animation:rise .6s both}
+.stage .poster{animation:rise .68s .1s both}
 .note{margin:16px 0 0;font-size:11px;line-height:1.8;color:var(--muted);max-width:32em;border-top:1px solid var(--line);padding-top:12px}
 .poster{border:1px solid var(--line);border-radius:16px;background:var(--paper);padding:14px;box-shadow:0 50px 90px -70px rgba(0,0,0,.9)}
 .art{position:relative;height:238px;border-radius:10px;overflow:hidden;background:radial-gradient(120% 90% at 72% 18%,#e8bb72 0%,#b0713c 32%,#4c3430 62%,#191c25 100%)}
 .art::before{content:"";position:absolute;left:18%;right:18%;bottom:0;height:46%;background:linear-gradient(to top,rgba(9,11,16,.92),rgba(9,11,16,0));}
-.art .sun{position:absolute;left:50%;top:30%;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle,#fff4d8,#f0c377 60%,rgba(240,195,119,0) 72%);transform:translate(-50%,-50%);filter:blur(.4px)}
+.art .sun{position:absolute;left:50%;top:30%;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle,#fff4d8,#f0c377 60%,rgba(240,195,119,0) 72%);transform:translate(-50%,-50%);filter:blur(.4px);animation:sunBreath 7s ease-in-out infinite}
+@keyframes sunBreath{0%,100%{opacity:.85;scale:1}50%{opacity:1;scale:1.07}}
 .art .title{position:absolute;left:18px;bottom:16px;z-index:1;font:italic 400 25px/1.05 Georgia,"Songti SC",serif;letter-spacing:-.02em}
 .art .title small{display:block;margin-top:5px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;font-style:normal;color:rgba(243,240,233,.66)}
 .art .no{position:absolute;right:16px;top:14px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:rgba(243,240,233,.6)}
 .times{display:grid;gap:6px;margin-top:12px}
-.time{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 11px;border:1px solid transparent;border-radius:9px;background:rgba(255,255,255,.03);font-size:11.5px;color:#c6c9d3}
+.time{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 11px;border:1px solid transparent;border-radius:9px;background:rgba(255,255,255,.03);font-size:11.5px;color:#c6c9d3;transition:translate .18s,border-color .18s,background .18s}
+.time:hover{translate:-2px 0;border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.055)}
 .time b{font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.05em;color:var(--ink)}
 .time small{color:var(--muted);font-size:10.5px}
 .time .tag{font:600 7.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;border:1px solid rgba(227,178,100,.34);color:var(--accent);border-radius:999px;padding:4px 7px}
 .time.now{border-color:rgba(227,178,100,.34);background:rgba(227,178,100,.07)}
+.time.now .tag{animation:tagBreath 3.2s ease-in-out infinite}
+@keyframes tagBreath{0%,100%{box-shadow:0 0 0 0 rgba(227,178,100,0)}50%{box-shadow:0 0 0 3px rgba(227,178,100,.12)}}
 .caption{margin:10px 2px 0;font:500 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:10px}
 .lower{flex:0 0 auto;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,4vw,48px);padding:18px clamp(20px,4vw,46px);max-width:1160px;margin:0 auto;width:100%}
-.film{display:flex;gap:12px;align-items:baseline}
+.film{display:flex;gap:12px;align-items:baseline;transition:translate .2s}
+.lower .film:hover{translate:0 -2px}
+.lower .film:nth-child(2){animation:rise .5s .06s both}
+.lower .film:nth-child(3){animation:rise .5s .12s both}
+.lower .film:first-child{animation:rise .5s both}
 .film .yr{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);flex:0 0 auto}
 .film b{display:block;font-size:12px;font-weight:600}
 .film span{display:block;margin-top:2px;font-size:10.5px;color:var(--muted)}
@@ -105,7 +121,10 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 }
 @media (prefers-reduced-motion:reduce){
   .rp{display:none}
-  .btn{transition:none}
+  .btn,.time,.film{transition:none}
+  .stage section,.stage .poster,.art .sun,.time.now .tag,.feedback.say,.lower .film{animation:none}
+  .top nav a::after{transition:none}
+  .btn:hover,.time:hover,.lower .film:hover{translate:none}
 }
 </style>
 </head>
@@ -192,15 +211,22 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
     });
   });
 
+  function say(text) {
+    feedback.textContent = text;
+    feedback.classList.remove('say');
+    void feedback.offsetWidth;
+    feedback.classList.add('say');
+  }
+
   document.getElementById('buy').addEventListener('click', function () {
-    feedback.textContent = '已锁定 22:00 场 · 到店凭手机号取票';
+    say('已锁定 22:00 场 · 到店凭手机号取票');
   });
 
   save.addEventListener('click', function () {
     var on = save.getAttribute('aria-pressed') !== 'true';
     save.setAttribute('aria-pressed', on ? 'true' : 'false');
     save.textContent = on ? '已加入片单' : '加入片单';
-    feedback.textContent = on ? '《雾港》已加入片单' : '已从片单移除';
+    say(on ? '《雾港》已加入片单' : '已从片单移除');
   });
 })();
 </script>

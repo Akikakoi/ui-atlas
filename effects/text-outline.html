@@ -22,7 +22,10 @@ button{font:inherit}
   font:600 12px/1 "Songti SC","SimSun",Georgia,serif;color:transparent;-webkit-text-stroke:.8px var(--ink)}
 .brand i{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);font-style:normal}
 .nav-links{display:flex;gap:24px;margin-left:12px}
-.nav-links a{font-size:12.5px;color:#57554d;text-decoration:none}
+.nav-links a{position:relative;font-size:12.5px;color:#57554d;text-decoration:none}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--fill);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--fill)}
 .cta{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ink);background:var(--ink);color:#f7f4ea;
   border-radius:999px;padding:9px 17px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
@@ -72,7 +75,9 @@ h1 em{font-style:normal;color:var(--fill)}
 h2{margin:0;font:600 clamp(23px,2.8vw,34px)/1.18 Georgia,"Songti SC","SimSun",serif;letter-spacing:-.02em}
 .sec-head p{margin:0 0 3px auto;max-width:26em;font-size:11.5px;line-height:1.8;color:var(--muted)}
 .weights{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.weight{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:16px 18px 15px;min-width:0;overflow:hidden}
+.weight{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:16px 18px 15px;min-width:0;overflow:hidden;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s}
+@media (hover:hover) and (pointer:fine){.weight:hover{transform:translateY(-3px);border-color:rgba(47,71,224,.3)}}
 .weight .tag{display:flex;justify-content:space-between;gap:10px;
   font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .weight .glyph{margin:4px 0 2px;text-align:center;font:600 clamp(56px,7vw,84px)/1.12 "Songti SC","SimSun",Georgia,serif;
@@ -89,11 +94,18 @@ h2{margin:0;font:600 clamp(23px,2.8vw,34px)/1.18 Georgia,"Songti SC","SimSun",se
 .spec-note{margin:18px 0 0;padding-top:14px;border-top:1px solid var(--line);max-width:32em;font-size:11.5px;line-height:1.95;color:#5f5d55}
 .glyphs{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
 .glyphs span{display:grid;place-items:center;aspect-ratio:1;border-right:1px solid var(--line);border-bottom:1px solid var(--line);
-  font:600 22px/1 "Songti SC","SimSun",Georgia,serif;color:transparent;-webkit-text-stroke:.9px rgba(23,24,27,.55)}
+  font:600 22px/1 "Songti SC","SimSun",Georgia,serif;color:transparent;-webkit-text-stroke:.9px rgba(23,24,27,.55);
+  transition:color .3s,-webkit-text-stroke-color .3s}
+.glyphs span:hover{color:var(--fill);-webkit-text-stroke-color:var(--fill)}
 .glyphs span.on{color:var(--fill);-webkit-text-stroke:0}
 .lics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .lic{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;padding:18px 20px 16px;
-  background:rgba(246,243,234,.55);min-width:0}
+  background:rgba(246,243,234,.55);min-width:0;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s}
+@media (hover:hover) and (pointer:fine){.lic:hover{transform:translateY(-3px);border-color:rgba(47,71,224,.3)}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .lic.hot{border-color:rgba(47,71,224,.42);background:linear-gradient(150deg,rgba(47,71,224,.07),transparent 62%),rgba(246,243,234,.85)}
 .lname{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .price{margin-top:12px;font:600 clamp(24px,2.6vw,30px)/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em}
@@ -194,6 +206,8 @@ footer span:last-child{margin-left:auto}
 @media (prefers-reduced-motion:reduce){
   .word::after{transition:none}
   .cta,.link{transition:none}
+  .weight,.glyphs span,.lic,.nav-links a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -344,6 +358,24 @@ footer span:last-child{margin-left:auto}
     var on = !word.classList.contains('filled');
     word.classList.toggle('filled', on);
     word.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+})();
+</script>
+<script>
+/* 次级动效：字重、字样与授权区进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.weights, .specimen-grid, .lics, .band')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
   });
 })();
 </script>

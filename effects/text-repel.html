@@ -24,7 +24,10 @@ button{font:inherit}
   font:700 11px/1 ui-monospace,Consolas,monospace;color:var(--accent);background:var(--paper)}
 .brand i{font:400 9.5px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);font-style:normal}
 .nav-links{display:flex;gap:24px;margin-left:12px}
-.nav-links a{font-size:12.5px;color:#48534b;text-decoration:none}
+.nav-links a{position:relative;font-size:12.5px;color:#48534b;text-decoration:none}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--accent)}
 .cta{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ink);background:var(--ink);color:var(--cream);
   border-radius:999px;padding:9px 17px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap;
@@ -44,7 +47,9 @@ h1 .ch{display:inline-block;will-change:transform}
   font:600 9.5px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 .meta-row i{width:1px;height:10px;background:var(--line)}
 .panel{position:relative;overflow:hidden;background:var(--paper);border:1px solid var(--line);border-radius:18px;
-  padding:18px 22px 16px;box-shadow:0 40px 80px -58px rgba(16,22,17,.75)}
+  padding:18px 22px 16px;box-shadow:0 40px 80px -58px rgba(16,22,17,.75);
+  transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s}
+@media (hover:hover) and (pointer:fine){.panel:hover{transform:translateY(-3px);box-shadow:0 46px 88px -58px rgba(16,22,17,.85)}}
 .panel::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
   background-image:radial-gradient(rgba(16,22,17,.08) .7px,transparent .7px);background-size:5px 5px}
 .panel-top{position:relative;display:flex;justify-content:space-between;gap:12px;
@@ -100,7 +105,12 @@ h2{margin:0;font:650 clamp(23px,2.8vw,34px)/1.18 -apple-system,"Segoe UI","PingF
 .compare-note{margin:12px 0 0;font-size:10px;line-height:1.8;color:var(--muted)}
 .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .plan{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;padding:18px 20px 16px;
-  background:rgba(249,251,245,.55);min-width:0}
+  background:rgba(249,251,245,.55);min-width:0;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s}
+@media (hover:hover) and (pointer:fine){.plan:hover{transform:translateY(-3px);border-color:rgba(24,122,76,.3)}}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 80ms)}
+.io.in{opacity:1;transform:none}
 .plan.hot{border-color:rgba(24,122,76,.42);background:linear-gradient(150deg,rgba(24,122,76,.08),transparent 62%),rgba(249,251,245,.9)}
 .pname{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .price{margin-top:12px;font:600 clamp(24px,2.6vw,30px)/1 ui-monospace,Consolas,monospace;letter-spacing:-.03em}
@@ -197,6 +207,8 @@ footer span:last-child{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
   .cta,.link,.shield{transition:none}
+  .panel,.plan,.nav-links a::after{transition:none}
+  .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -415,6 +427,24 @@ footer span:last-child{margin-left:auto}
   hero.addEventListener('pointerleave', reset);
   hero.addEventListener('pointerup', reset);
   hero.addEventListener('pointercancel', reset);
+})();
+</script>
+<script>
+/* 次级动效：防护、对比与定价区进入视口时上浮 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .18 });
+  [].slice.call(document.querySelectorAll('.figures, .shields, .compare, .plans, .band')).forEach(function (el, i) {
+    el.classList.add('io');
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
+  });
 })();
 </script>
 <script>

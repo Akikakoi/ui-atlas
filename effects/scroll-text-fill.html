@@ -18,7 +18,10 @@ a{color:inherit;text-decoration:none}
   font:600 11px/1 ui-monospace,Consolas,monospace}
 .brand i{font:400 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);font-style:normal}
 .nav-links{display:flex;gap:24px;margin-left:12px}
-.nav-links a{font-size:12.5px;color:#615d52}
+.nav-links a{position:relative;font-size:12.5px;color:#615d52}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--accent)}
 .cta{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ink);background:var(--ink);color:#fbf6ea;
   border-radius:999px;padding:9px 17px;font-size:12px;font-weight:600;white-space:nowrap}
@@ -49,14 +52,27 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .copy{width:100%;max-width:720px}
 .copy .kicker{margin-bottom:18px}
 p.body{margin:0;font-size:clamp(24px,3.5vw,37px);line-height:1.58;letter-spacing:-.025em;font-weight:560}
-p.body span{color:var(--muted);transition:color .22s ease}
-p.body span.on{color:var(--accent)}
+p.body span{color:var(--muted);transition:color .22s ease,text-shadow .22s ease}
+p.body span.on{color:var(--accent);text-shadow:0 0 16px rgba(185,67,44,.18)}
+.beam{display:block;height:2px;margin-top:20px;border-radius:1px;background:linear-gradient(90deg,var(--accent),rgba(185,67,44,.18));
+  transform-origin:left;transform:scaleX(0);will-change:transform}
 .meta{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:30px;padding-top:15px;border-top:1px solid var(--line)}
 .meta p{margin:0;font-size:12px;line-height:1.8;color:var(--muted);max-width:32em}
 .meta b{font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
 .sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .picks{max-width:1120px;margin:0 auto;padding:6px 22px 48px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.pick{border-top:1px solid var(--line);padding-top:18px}
+.pick{position:relative;border-top:1px solid var(--line);padding-top:18px;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.pick::before{content:"";position:absolute;left:0;top:-1px;height:1px;width:100%;background:var(--accent);
+  transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){
+  .pick:hover{transform:translateY(-3px)}
+  .pick:hover::before{transform:scaleX(1)}
+}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 90ms)}
+.io.in{opacity:1;transform:none}
 .pick .no{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent);margin:0 0 12px}
 .pick h3{margin:0 0 8px;font-size:17px;letter-spacing:-.01em;font-weight:620}
 .pick p{margin:0;font-size:12px;line-height:1.85;color:#6b675b}
@@ -126,6 +142,9 @@ footer span:last-child{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
   p.body span{transition:none}
+  .beam{transform:scaleX(1)}
+  .pick,.pick::before,.io,.nav-links a::after{transition:none}
+  .io{opacity:1;transform:none}
 }
 </style>
 </head>
@@ -164,6 +183,7 @@ footer span:last-child{margin-left:auto}
     <div class="copy">
       <p class="kicker">SCROLL / 12 · 本期发刊词</p>
       <p class="body" id="body" aria-hidden="true">夜读不是把书读完。是留下一段话，让它在第二天早上还亮着。我们不追新书，只把值得重读的段落，一字一句地交给你。</p>
+      <span class="beam" id="beam" aria-hidden="true"></span>
       <p class="sr" id="bodySr">夜读不是把书读完。是留下一段话，让它在第二天早上还亮着。我们不追新书，只把值得重读的段落，一字一句地交给你。</p>
       <div class="meta">
         <p>只给「刚跨过边界」的那几个字改颜色，不逐帧遍历整段文字；往回滚时同样按索引撤销。</p>
@@ -174,12 +194,12 @@ footer span:last-child{margin-left:auto}
 </section>
 
 <section class="picks" id="picks">
-  <article class="pick"><p class="no">01 / 慢</p><h3>慢，是一种抵抗</h3><p>「我们不是没有时间，而是把时间切得太碎。读书是少数几件不能加速的事。」</p><div class="by"><span>本期选段</span><span>P. 14</span></div></article>
-  <article class="pick"><p class="no">02 / 信</p><h3>在山里读一封旧信</h3><p>「信纸边上有雨痕。写信的人没有说想我，只说今年的栗子结得晚。」</p><div class="by"><span>本期选段</span><span>P. 22</span></div></article>
-  <article class="pick"><p class="no">03 / 折角</p><h3>把书翻到折角那页</h3><p>「重读不是为了记住，是为了看看三年前的自己，为什么在这一页停下来。」</p><div class="by"><span>本期选段</span><span>P. 31</span></div></article>
+  <article class="pick io"><p class="no">01 / 慢</p><h3>慢，是一种抵抗</h3><p>「我们不是没有时间，而是把时间切得太碎。读书是少数几件不能加速的事。」</p><div class="by"><span>本期选段</span><span>P. 14</span></div></article>
+  <article class="pick io"><p class="no">02 / 信</p><h3>在山里读一封旧信</h3><p>「信纸边上有雨痕。写信的人没有说想我，只说今年的栗子结得晚。」</p><div class="by"><span>本期选段</span><span>P. 22</span></div></article>
+  <article class="pick io"><p class="no">03 / 折角</p><h3>把书翻到折角那页</h3><p>「重读不是为了记住，是为了看看三年前的自己，为什么在这一页停下来。」</p><div class="by"><span>本期选段</span><span>P. 31</span></div></article>
 </section>
 
-<section class="band" id="join">
+<section class="band io" id="join">
   <div class="inner-band">
     <div>
       <h2>下周三，读一封没有寄出的信。</h2>
@@ -200,7 +220,7 @@ footer span:last-child{margin-left:auto}
 <script>
 (function () {
   var sec = document.getElementById('read'), body = document.getElementById('body');
-  var pct = document.getElementById('pct');
+  var pct = document.getElementById('pct'), beam = document.getElementById('beam');
   var text = body.textContent;
   body.textContent = '';
   var spans = [];
@@ -214,6 +234,7 @@ footer span:last-child{margin-left:auto}
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
     spans.forEach(function (s) { s.classList.add('on'); });
     pct.textContent = '100%';
+    beam.style.transform = 'scaleX(1)';
     return;
   }
 
@@ -231,10 +252,23 @@ footer span:last-child{margin-left:auto}
     }
     filled = n;
     pct.textContent = Math.round(p * 100) + '%';
+    beam.style.transform = 'scaleX(' + p.toFixed(4) + ')';
   }
   addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
   addEventListener('resize', render);
   render();
+
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .2 });
+  [].slice.call(document.querySelectorAll('.io')).forEach(function (el, i) {
+    el.style.setProperty('--i', i % 3);
+    io.observe(el);
+  });
 })();
 </script>
 <script>

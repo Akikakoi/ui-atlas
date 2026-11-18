@@ -23,12 +23,14 @@ button{font:inherit;color:inherit}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex:0 0 auto}
 .cta-line{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
-.menu-btn{display:inline-flex;align-items:center;gap:9px;height:32px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);font-size:11px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s}
-.menu-btn:hover{border-color:var(--accent);color:var(--accent)}
+.menu-btn{display:inline-flex;align-items:center;gap:9px;height:32px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);font-size:11px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s,translate .15s,scale .15s}
+.menu-btn:hover{border-color:var(--accent);color:var(--accent);translate:0 -1px}
+.menu-btn:active{translate:0 1px;scale:.97}
 .menu-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .menu-btn i{display:grid;gap:4px;width:13px}
 .menu-btn i::before,.menu-btn i::after{content:"";display:block;height:1.5px;background:currentColor}
-.menu-btn i::after{width:9px;justify-self:end}
+.menu-btn i::after{width:9px;justify-self:end;transition:width .2s}
+.menu-btn:hover i::after{width:13px}
 main{flex:1;display:flex;flex-direction:column}
 .hero{width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:clamp(28px,5vw,64px);align-items:center;padding:clamp(26px,4.4vw,58px) clamp(18px,4vw,44px) clamp(20px,3.4vw,40px)}
 .kicker{margin:0 0 16px;font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
@@ -39,6 +41,12 @@ main{flex:1;display:flex;flex-direction:column}
 .stats b{display:block;font:600 26px/1 "Songti SC",Georgia,serif;letter-spacing:-.03em}
 .stats small{display:block;margin-top:4px;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
 .actions{display:flex;gap:9px;flex-wrap:wrap}
+.hero .kicker{animation:rise .5s both}
+.hero h1{animation:rise .6s .06s both}
+.hero .lede{animation:rise .6s .12s both}
+.hero .stats{animation:rise .6s .18s both}
+.hero .actions{animation:rise .6s .24s both}
+@keyframes rise{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
 .actions a{padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--paper);font-size:11.5px;font-weight:600;transition:border-color .2s,color .2s}
 .actions a:first-child{background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .actions a:hover{border-color:var(--accent);color:var(--accent)}
@@ -47,13 +55,15 @@ main{flex:1;display:flex;flex-direction:column}
 .arch{position:relative;margin:0;height:clamp(240px,38vh,340px);border-radius:16px;overflow:hidden;border:1px solid var(--line);
   background:radial-gradient(ellipse 60% 70% at 68% 24%,#e9d3ac,transparent 62%),linear-gradient(160deg,#d9cdb8,#8f8a78 58%,#5d5a4d)}
 .arch::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 8px);mix-blend-mode:soft-light}
-.arch .sun{position:absolute;right:16%;top:14%;width:72px;height:72px;border-radius:50%;background:#f4dcab;box-shadow:0 0 50px 14px rgba(244,220,171,.45)}
+.arch .sun{position:absolute;right:16%;top:14%;width:72px;height:72px;border-radius:50%;background:#f4dcab;box-shadow:0 0 50px 14px rgba(244,220,171,.45);animation:sunBreath 6s ease-in-out infinite}
+@keyframes sunBreath{0%,100%{opacity:.85;scale:1}50%{opacity:1;scale:1.08}}
 .arch .floor{position:absolute;left:0;right:0;bottom:0;height:32%;background:#6e6a5c}
 .arch .col{position:absolute;bottom:26%;width:28px;background:#3f3d34}
 .arch .col.a{left:14%;height:52%}
 .arch .col.b{left:34%;height:44%;width:20px;background:#4a473c}
 .arch .beam{position:absolute;left:8%;right:8%;top:22%;height:8px;background:#3a382f;box-shadow:0 46px 0 rgba(58,56,47,.55)}
-.arch .light{position:absolute;left:18%;bottom:9%;width:54%;height:20%;background:linear-gradient(100deg,rgba(244,220,171,.5),transparent 72%);clip-path:polygon(0 100%,28% 0,100% 0,82% 100%)}
+.arch .light{position:absolute;left:18%;bottom:9%;width:54%;height:20%;background:linear-gradient(100deg,rgba(244,220,171,.5),transparent 72%);clip-path:polygon(0 100%,28% 0,100% 0,82% 100%);animation:beamSway 8s ease-in-out infinite alternate}
+@keyframes beamSway{from{translate:-6px 0}to{translate:6px 0}}
 .arch figcaption{position:absolute;left:14px;bottom:11px;font:600 8px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:rgba(255,255,255,.72)}
 .arch-cap{margin-top:9px;display:flex;justify-content:space-between;gap:12px;font:500 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 .projects{width:100%;max-width:1180px;margin:0 auto;padding:0 clamp(18px,4vw,44px) clamp(24px,4vw,44px)}
@@ -71,7 +81,8 @@ main{flex:1;display:flex;flex-direction:column}
 .prow .arrow{font-style:normal;color:#b0a692;font-size:15px;transition:transform .2s,color .2s}
 .prow:hover .arrow{transform:translateX(3px);color:var(--accent)}
 .notes{width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,3vw,34px);padding:clamp(22px,3.6vw,40px) clamp(18px,4vw,44px)}
-.note{padding-top:16px;border-top:2px solid var(--ink)}
+.note{padding-top:16px;border-top:2px solid var(--ink);transition:translate .2s}
+.note:hover{translate:0 -2px}
 .note small{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--accent)}
 .note h3{margin:9px 0 7px;font-size:15px;letter-spacing:-.02em}
 .note p{margin:0;font-size:11.5px;line-height:1.85;color:#5a5347}
@@ -88,20 +99,24 @@ main{flex:1;display:flex;flex-direction:column}
 .menu-top{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .menu-brand{display:flex;align-items:center;gap:9px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:rgba(240,234,220,.62)}
 .menu-brand i{width:22px;height:22px;border-radius:5px;background:var(--cream);color:var(--deep);display:grid;place-items:center;font:700 8px/1 ui-monospace,Consolas,monospace;font-style:normal}
-.mclose{width:36px;height:36px;border:1px solid rgba(240,234,220,.28);border-radius:50%;background:transparent;color:var(--cream);font:18px/1 system-ui;cursor:pointer;display:grid;place-items:center;transition:border-color .2s,color .2s}
-.mclose:hover{border-color:#d98a63;color:#d98a63}
+.mclose{width:36px;height:36px;border:1px solid rgba(240,234,220,.28);border-radius:50%;background:transparent;color:var(--cream);font:18px/1 system-ui;cursor:pointer;display:grid;place-items:center;transition:border-color .2s,color .2s,rotate .2s}
+.mclose:hover{border-color:#d98a63;color:#d98a63;rotate:90deg}
 .mclose:focus-visible{outline:2px solid #d98a63;outline-offset:2px}
 .menu nav{margin:auto 0;display:grid;width:100%}
 .menu nav a{display:grid;grid-template-columns:46px minmax(0,1fr) auto;align-items:baseline;gap:16px;padding:clamp(11px,1.8vw,17px) 0;border-top:1px solid rgba(240,234,220,.16);color:var(--cream)}
 .menu nav a:last-child{border-bottom:1px solid rgba(240,234,220,.16)}
 .menu nav a:hover .txt{color:#e9a17d}
 .menu nav a:focus-visible{outline:2px solid #d98a63;outline-offset:4px}
-.menu .idx{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:#d98a63}
+.menu .idx{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:#d98a63;opacity:0;transition:opacity .3s .18s}
+.menu.open .idx{opacity:1}
+.menu:not(.open) .idx{transition-delay:0s}
 .mask{display:block;overflow:hidden;min-width:0}
 .txt{display:block;font-size:clamp(34px,6vw,58px);line-height:1.06;letter-spacing:-.045em;font-weight:620;transform:translateY(115%);transition:transform .5s cubic-bezier(.2,.8,.2,1),color .2s;transition-delay:calc(var(--i,0) * 70ms + 90ms)}
 .menu.open .txt{transform:none}
 .menu:not(.open) .txt{transition-delay:0s;transition-duration:.2s}
-.menu .sub{font:500 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:rgba(240,234,220,.48);text-align:right;white-space:nowrap}
+.menu .sub{font:500 9px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:rgba(240,234,220,.48);text-align:right;white-space:nowrap;opacity:0;transition:opacity .3s .22s}
+.menu.open .sub{opacity:1}
+.menu:not(.open) .sub{transition-delay:0s}
 .menu-foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:18px;font:500 9px/1.8 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:rgba(240,234,220,.45)}
 .menu-foot b{color:rgba(240,234,220,.72);font-weight:600}
 .esc-note{margin:10px 0 0;font:500 8px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(240,234,220,.3)}
@@ -179,6 +194,10 @@ main{flex:1;display:flex;flex-direction:column}
 }
 @media (prefers-reduced-motion:reduce){
   .menu,.txt,.prow,.arrow,.actions a,.menu-btn,.mclose{transition:none}
+  .hero .kicker,.hero h1,.hero .lede,.hero .stats,.hero .actions,.arch .sun,.arch .light{animation:none}
+  .note,.menu .idx,.menu .sub{transition:none}
+  .menu-btn:hover,.note:hover{translate:none}
+  .mclose:hover{rotate:none}
 }
 </style>
 </head>

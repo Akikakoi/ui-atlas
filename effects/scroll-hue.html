@@ -17,6 +17,9 @@ a{color:inherit;text-decoration:none}
     radial-gradient(60% 50% at 48% 82%,rgba(60,200,150,.45),transparent 66%),
     linear-gradient(160deg,#171a22,#0a0c11 66%)}
 .veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(5,7,10,.55),transparent 40%,rgba(5,7,10,.7))}
+.orbit{position:fixed;inset:-22% -12%;z-index:1;pointer-events:none;opacity:.5;
+  background:conic-gradient(from 210deg at 50% 50%,rgba(255,190,120,.4),transparent 22%,rgba(120,160,255,.34) 45%,transparent 64%,rgba(120,255,200,.3) 84%,transparent);
+  filter:blur(80px) saturate(1.15);transform:translate3d(0,var(--oy,0px),0) rotate(var(--or,0deg));will-change:transform}
 .nav{position:fixed;inset:0 0 auto;z-index:4;height:68px;display:flex;align-items:center;gap:26px;
   padding:0 max(22px,calc((100vw - 1120px)/2));background:rgba(8,10,14,.36);
   border-bottom:1px solid rgba(255,255,255,.1);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
@@ -25,7 +28,10 @@ a{color:inherit;text-decoration:none}
   font:600 9px/1 ui-monospace,Consolas,monospace;transform:rotate(-3deg)}
 .brand i{font:400 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);font-style:normal}
 .nav-links{display:flex;gap:24px;margin-left:12px}
-.nav-links a{font-size:12.5px;color:rgba(245,242,234,.66)}
+.nav-links a{position:relative;font-size:12.5px;color:rgba(245,242,234,.66)}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
 .nav-links a:hover{color:var(--accent)}
 .nav .cta{margin-left:auto;border:1px solid rgba(255,207,110,.55);border-radius:999px;padding:7px 14px;
   font-size:11.5px;font-weight:600;color:var(--accent);white-space:nowrap}
@@ -41,14 +47,27 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .hud p{margin:0;max-width:30em;font-size:12px;line-height:1.8;color:var(--muted)}
 .read{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);text-align:right;white-space:nowrap}
 .read b{display:block;margin-top:6px;font-size:22px;letter-spacing:-.03em;color:#ffe1a8}
+.read .mood{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-style:normal;font-size:8.5px;letter-spacing:.14em;color:var(--muted)}
+.read .mood::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mk,#ffcf6e);box-shadow:0 0 8px var(--mk,#ffcf6e);
+  transition:background-color .45s,box-shadow .45s}
 .works{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:10px 22px 48px}
 .works-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:22px;flex-wrap:wrap}
 .works-head h2{margin:0;font-size:clamp(24px,3.2vw,34px);line-height:1.1;letter-spacing:-.04em;font-weight:600}
 .works-head span{font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);white-space:nowrap}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .work{border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;background:rgba(10,12,16,.62);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.work .chip{height:150px;position:relative;background:radial-gradient(circle at 32% 30%,#ffb27a,#7b4fd0 62%,#16203a)}
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:transform .4s cubic-bezier(.2,.8,.2,1),border-color .4s}
+.work .chip{height:150px;position:relative;background:radial-gradient(circle at 32% 30%,#ffb27a,#7b4fd0 62%,#16203a);
+  transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover) and (pointer:fine){
+  .work:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.26)}
+  .work:hover .chip{transform:scale(1.045)}
+}
+.io{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
+  transition-delay:calc(var(--i,0) * 90ms)}
+.io.in{opacity:1;transform:none}
 .work .chip::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.10) 0 2px,transparent 2px 14px)}
 .work.w2 .chip{background:radial-gradient(circle at 68% 36%,#9fd8ff,#3b64b8 58%,#101a2c)}
 .work.w3 .chip{background:radial-gradient(circle at 42% 70%,#b9f0c8,#2f8f6a 58%,#0e1a16)}
@@ -136,12 +155,16 @@ footer span:last-child{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
   .hue{filter:none!important}
+  .orbit{transform:none;opacity:.35}
+  .work,.work .chip,.io,.nav-links a::after,.read .mood::before{transition:none}
+  .io{opacity:1;transform:none}
 }
 </style>
 </head>
 <body>
 
 <div class="hue" id="hue" aria-hidden="true"></div>
+<div class="orbit" id="orbit" aria-hidden="true"></div>
 <div class="veil" aria-hidden="true"></div>
 
 <header class="nav">
@@ -161,12 +184,12 @@ footer span:last-child{margin-left:auto}
     <p class="sub">三组光色装置悬在暗房里。不换整张背景，只给固定层加 hue-rotate；滚动进度映射到 0–140°，文字与内容完全不受影响。</p>
     <div class="hud">
       <p>颜色不是装饰，是时间的刻度。滚到底，暖橙会走成青绿，再走回一点金。</p>
-      <span class="read">HUE ROTATE<b id="deg">0°</b></span>
+      <span class="read">HUE ROTATE<b id="deg">0°</b><em class="mood" id="mood">暖橙</em></span>
     </div>
   </div>
 </section>
 
-<section class="works" id="works">
+<section class="works io" id="works">
   <div class="works-head">
     <h2>三组光，<br>三种温度。</h2>
     <span>FLOOR 2 · 10:00–20:00</span>
@@ -187,7 +210,7 @@ footer span:last-child{margin-left:auto}
   </div>
 </section>
 
-<section class="info" id="info">
+<section class="info io" id="info">
   <div>
     <p class="kicker">VISIT</p>
     <h2>暗房里，<br>请慢一点走。</h2>
@@ -201,7 +224,7 @@ footer span:last-child{margin-left:auto}
   </dl>
 </section>
 
-<section class="band" id="ticket">
+<section class="band io" id="ticket">
   <div class="inner-band">
     <div>
       <h2>本周末的夜场还有票。</h2>
@@ -224,7 +247,8 @@ footer span:last-child{margin-left:auto}
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var sec = document.getElementById('sec') || document.querySelector('.sec');
   var hue = document.getElementById('hue'), deg = document.getElementById('deg');
-  var raf = null;
+  var orbit = document.getElementById('orbit'), mood = document.getElementById('mood');
+  var raf = null, lastMood = '';
 
   function render() {
     raf = null;
@@ -234,10 +258,32 @@ footer span:last-child{margin-left:auto}
     var d = Math.round(p * 140);
     hue.style.filter = 'hue-rotate(' + d + 'deg)';
     deg.textContent = d + '°';
+    if (orbit) {
+      orbit.style.setProperty('--oy', (p * 90).toFixed(1) + 'px');
+      orbit.style.setProperty('--or', (p * 38).toFixed(1) + 'deg');
+    }
+    var m = d < 35 ? ['暖橙', '#ffb27a'] : d < 70 ? ['琥珀', '#ffcf6e'] : d < 105 ? ['青绿', '#8ef0c8'] : ['冷青', '#8fd8ff'];
+    if (mood && m[0] !== lastMood) {
+      mood.textContent = m[0];
+      mood.style.setProperty('--mk', m[1]);
+      lastMood = m[0];
+    }
   }
   addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
   addEventListener('resize', render);
   render();
+
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .2 });
+  [].slice.call(document.querySelectorAll('.io')).forEach(function (el, i) {
+    el.style.setProperty('--i', i);
+    io.observe(el);
+  });
 })();
 </script>
 <script>
