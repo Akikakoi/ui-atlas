@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>视差分层 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #0d1118; color: #f4f1e8;
+    font: 15px/1.6 system-ui, "PingFang SC", sans-serif;
+  }
+  .hero { position: relative; height: 100vh; overflow: hidden; background: linear-gradient(#1b2740, #0d1118); }
+  .layer { position: absolute; inset: -14%; will-change: transform; }
+  .layer.bg {
+    background:
+      radial-gradient(52% 42% at 70% 28%, rgba(247, 192, 120, .38), transparent 64%),
+      radial-gradient(40% 36% at 26% 68%, rgba(90, 120, 210, .3), transparent 68%);
+  }
+  .layer.orb {
+    inset: auto; width: 150px; height: 150px; left: 64%; top: 24%; margin: -75px 0 0 -75px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe4b4, rgba(255, 228, 180, .08) 70%);
+    filter: blur(.4px);
+  }
+  .layer.text {
+    inset: 0; display: grid; place-items: center; text-align: center;
+  }
+  .layer.text h1 { margin: 0; font-size: clamp(32px, 7vw, 64px); letter-spacing: -.03em; }
+  .layer.text p { margin: 8px 0 0; color: #b9c0d0; }
+  .spacer {
+    height: 120vh; display: grid; place-items: center;
+    color: #7e879b; font-size: 14px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .layer { will-change: auto; }
+  }
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="layer bg" data-speed=".08"></div>
+  <div class="layer orb" data-speed=".3"></div>
+  <div class="layer text" data-speed=".16">
+    <div>
+      <h1>往深处走</h1>
+      <p>三层用不同速度跟随滚动</p>
+    </div>
+  </div>
+</section>
+<section class="spacer">继续往下滚 ↑</section>
+<script>
+  const layers = [...document.querySelectorAll('.layer')];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let raf = 0;
+
+  function render() {
+    const y = scrollY;
+    layers.forEach((l) => {
+      l.style.transform = `translate3d(0,${y * parseFloat(l.dataset.speed)}px,0)`;
+    });
+    raf = 0;
+  }
+
+  if (!reduce) {
+    addEventListener('scroll', () => {
+      if (!raf) raf = requestAnimationFrame(render);
+    }, { passive: true });
+    render();
+  }
+</script>
+</body>
+</html>

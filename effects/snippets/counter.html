@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数字滚动 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    min-height: 100vh; margin: 0; display: grid; place-items: center; gap: 18px;
+    background: #0e1116; color: #f4f1e8; text-align: center;
+    font: 15px/1.6 system-ui, "PingFang SC", sans-serif;
+  }
+  .num {
+    font-size: clamp(42px, 10vw, 72px); font-weight: 700; letter-spacing: -.03em;
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .label { margin-top: 6px; color: #8b93a7; font-size: 13px; letter-spacing: .12em; }
+  .again {
+    border: 1px solid #3a3f4b; background: #1a1e26; color: inherit;
+    border-radius: 999px; padding: 7px 15px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .again:hover { border-color: #6d7890; }
+</style>
+</head>
+<body>
+<div>
+  <div class="num" data-to="128000">0</div>
+  <div class="label">本月安装</div>
+</div>
+<button class="again" id="again" type="button">再数一次</button>
+<script>
+  const el = document.querySelector('.num');
+  const to = Number(el.dataset.to);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let raf = 0;
+
+  function run() {
+    cancelAnimationFrame(raf);
+    if (reduce) {
+      el.textContent = to.toLocaleString('zh-CN');
+      return;
+    }
+    const t0 = performance.now();
+    const dur = 1400;
+    function frame(t) {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(to * e).toLocaleString('zh-CN');
+      if (p < 1) raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        run();
+        io.disconnect();
+      });
+    }, { threshold: .5 });
+    io.observe(el);
+  } else {
+    run();
+  }
+
+  document.getElementById('again').addEventListener('click', () => {
+    el.textContent = '0';
+    run();
+  });
+</script>
+</body>
+</html>

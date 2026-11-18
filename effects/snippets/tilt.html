@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D 倾斜卡片 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    min-height: 100vh; margin: 0; display: grid; place-items: center;
+    background: #0b0e14; font: 15px/1.6 system-ui, "PingFang SC", sans-serif;
+  }
+  .stage { perspective: 900px; }
+  .tilt {
+    width: min(320px, 84vw); aspect-ratio: 4 / 3; border-radius: 18px;
+    display: grid; place-items: center; color: #fff;
+    background: linear-gradient(150deg, #1b2338, #0c1019 65%);
+    border: 1px solid #2a3142;
+    transform-style: preserve-3d; transition: transform .18s ease;
+    will-change: transform;
+  }
+  .tilt .face {
+    transform: translateZ(30px);
+    text-align: center;
+  }
+  .tilt b { display: block; font-size: 22px; }
+  .tilt small { color: #9aa7c2; }
+  @media (prefers-reduced-motion: reduce) {
+    .tilt { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <article class="tilt">
+    <div class="face">
+      <b>3D 倾斜</b>
+      <small>光标移动时改变透视角度</small>
+    </div>
+  </article>
+</div>
+<script>
+  const card = document.querySelector('.tilt');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  card.addEventListener('pointermove', (e) => {
+    if (reduce) return;
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    card.style.transform =
+      `rotateX(${((.5 - py) * 16).toFixed(2)}deg) rotateY(${((px - .5) * 18).toFixed(2)}deg)`;
+  });
+  card.addEventListener('pointerleave', () => {
+    card.style.transform = '';
+  });
+</script>
+</body>
+</html>

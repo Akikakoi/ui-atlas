@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>滑动下划线标签页 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    min-height: 100vh; margin: 0; display: grid; place-items: center;
+    background: #f5f4ef; color: #191b1f;
+    font: 15px/1.6 system-ui, "PingFang SC", sans-serif;
+  }
+  .box { width: min(420px, 88vw); }
+  .tabs {
+    position: relative; display: flex; gap: 6px;
+    border-bottom: 1px solid #ddd8cc;
+  }
+  .tabs button {
+    border: 0; background: none; padding: 10px 12px;
+    font: inherit; color: #6b6f78; cursor: pointer;
+  }
+  .tabs button[aria-selected="true"] { color: #191b1f; font-weight: 600; }
+  .ind {
+    position: absolute; left: 0; bottom: -1px; height: 2px;
+    background: #2f5fd0; border-radius: 2px;
+    transition: transform .28s ease, width .28s ease;
+  }
+  .panel { display: none; padding: 18px 2px; color: #44474e; font-size: 14px; }
+  .panel.on { display: block; }
+  @media (prefers-reduced-motion: reduce) {
+    .ind { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="tabs" role="tablist" aria-label="示例标签">
+    <button role="tab" type="button" id="t1" aria-selected="true" aria-controls="p1">概览</button>
+    <button role="tab" type="button" id="t2" aria-selected="false" aria-controls="p2" tabindex="-1">细节</button>
+    <button role="tab" type="button" id="t3" aria-selected="false" aria-controls="p3" tabindex="-1">设置</button>
+    <span class="ind" aria-hidden="true"></span>
+  </div>
+  <section class="panel on" role="tabpanel" id="p1" aria-labelledby="t1">下划线跟着当前标签移动，宽度取按钮自身的宽度。</section>
+  <section class="panel" role="tabpanel" id="p2" aria-labelledby="t2">用 offsetLeft 和 offsetWidth 定位，不需要知道每个标签的具体尺寸。</section>
+  <section class="panel" role="tabpanel" id="p3" aria-labelledby="t3">窗口变化时重新量一次；支持左右方向键切换。</section>
+</div>
+<script>
+  const tabs = [...document.querySelectorAll('.tabs button')];
+  const panels = [...document.querySelectorAll('.panel')];
+  const ind = document.querySelector('.ind');
+
+  function place(btn) {
+    ind.style.width = btn.offsetWidth + 'px';
+    ind.style.transform = 'translateX(' + btn.offsetLeft + 'px)';
+  }
+
+  function select(btn) {
+    const active = tabs.indexOf(btn);
+    tabs.forEach((t, i) => {
+      const on = i === active;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      panels[i].classList.toggle('on', on);
+    });
+    place(btn);
+  }
+
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(t));
+    t.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      next.focus();
+      select(next);
+    });
+  });
+
+  addEventListener('resize', () => {
+    const on = tabs.find((t) => t.getAttribute('aria-selected') === 'true');
+    if (on) place(on);
+  });
+
+  requestAnimationFrame(() => place(tabs[0]));
+</script>
+</body>
+</html>

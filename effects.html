@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="description" content="100 个可交互的前端 UI 动效：指针跟随、滚动叙事、文字动画、布局过渡、反馈、背景与页面转场。全部为零依赖单文件 HTML，可直接预览、查看源码、复制使用。">
 <link rel="stylesheet" href="site.css?v=16">
-<link rel="stylesheet" href="effects.css?v=6">
+<link rel="stylesheet" href="effects.css?v=9">
 </head>
 <body>
 <a class="skip" href="#fx-grid">跳到效果</a>
@@ -42,69 +42,61 @@
 
 <footer class="foot">
   <p>每个效果都是零依赖单文件 HTML：CSS 与 JS 内联，复制一个文件就能跑。全部为本站自行实现，未复制第三方站点的代码或素材。</p>
-  <p>预览可直接交互；点预览右下角「放大」会按 600 × 450 的同一构图等比铺到全屏，「原页」在新标签打开真实页面（全部 100 条已是完整产品页，页内可切「画板 600×450」对照构图），想拿走源码点「代码」。</p>
+  <p>预览可直接交互；点「看效果 →」打开工作台：左边 600 × 450 等比预览，右边源码与说明，常用效果另附「最小用法」。卡片上的「⋯」可就地重播、复制 CSS、下载单文件、在新标签打开「原页」。</p>
 </footer>
 
-<div class="overlay" id="codeModal" hidden>
-  <div class="fx-code-box" role="dialog" aria-modal="true" aria-labelledby="cm-title">
-    <header class="code-head">
-      <div class="code-title">
-        <h2 id="cm-title">效果</h2>
-        <p id="cm-sub"></p>
+<div class="overlay fx-wb-modal" id="fxWorkbench" hidden>
+  <div class="fx-wb-box" role="dialog" aria-modal="true" aria-labelledby="wb-title">
+    <header class="wb-head">
+      <div class="wb-title">
+        <h2 id="wb-title">效果</h2>
+        <p id="wb-sub"></p>
       </div>
-      <div class="code-actions">
-        <button class="btn small" id="cm-notes" type="button" aria-expanded="false" aria-controls="code-notes">深度</button>
-        <a class="btn small" id="cm-open" href="#" target="_blank" rel="noopener">新标签打开 ↗</a>
-        <button class="btn small primary" id="cm-copy" type="button">复制当前标签</button>
-        <button class="btn small" id="cm-close" type="button">关闭</button>
+      <div class="wb-actions">
+        <button class="btn small" id="wb-notes-btn" type="button" aria-expanded="false" aria-controls="wb-notes">说明</button>
+        <button class="btn small" id="wb-replay" type="button">重播</button>
+        <a class="btn small" id="wb-open" href="#" target="_blank" rel="noopener">原页 ↗</a>
+        <button class="btn small" id="wb-copy" type="button">复制当前标签</button>
+        <button class="btn small" id="wb-download" type="button">下载 .html</button>
+        <button class="btn small primary" id="wb-close" type="button">关闭</button>
       </div>
     </header>
-    <div class="code-body">
-      <aside class="code-notes" id="code-notes">
-        <section><h3>做法</h3><p id="cm-how"></p></section>
-        <section><h3>解剖</h3><ol class="code-steps" id="cm-anatomy"></ol></section>
-        <section><h3>参数</h3><dl class="code-params" id="cm-params"></dl></section>
-        <section><h3>变体</h3><ul class="code-variants" id="cm-variants"></ul></section>
-        <section id="cm-same-wrap" hidden><h3>同源</h3><p id="cm-same"></p><button class="btn small" id="cm-same-open" type="button"></button></section>
-        <section><h3>注意</h3><p id="cm-watch"></p></section>
-        <section><h3>成本</h3><p class="code-cost"><b id="cm-cost-tier"></b><span id="cm-cost-note"></span></p></section>
-        <section><h3>什么时候别用</h3><p id="cm-avoid"></p></section>
-        <section><h3>关键点</h3><ul id="cm-features"></ul></section>
-        <section><h3>用到的</h3><div class="code-tags" id="cm-tech"></div></section>
-        <p class="code-lines" id="cm-lines"></p>
-      </aside>
-      <div class="code-pane">
-        <div class="code-tabs" role="tablist" aria-label="源码分段">
+    <div class="wb-body">
+      <section class="wb-preview" aria-label="交互预览">
+        <div class="wb-stage" id="wb-stage">
+          <span class="wb-loading" id="wb-loading">加载预览…</span>
+          <iframe id="wb-frame" title="效果预览"></iframe>
+        </div>
+        <p class="wb-tip">600 × 450 等比缩放 · 可直接交互 · 需要时点「重播」</p>
+      </section>
+      <section class="wb-code" aria-label="源码">
+        <div class="code-tabs" role="tablist" aria-label="代码视图">
           <button role="tab" type="button" data-tab="all" aria-selected="true">全部</button>
           <button role="tab" type="button" data-tab="css" aria-selected="false">CSS</button>
           <button role="tab" type="button" data-tab="js" aria-selected="false">JS</button>
+          <button role="tab" type="button" data-tab="snippet" aria-selected="false" hidden>最小用法</button>
         </div>
-        <pre id="cm-pre"><code id="cm-code"></code></pre>
-      </div>
+        <pre id="wb-pre"><code id="wb-code"></code></pre>
+        <p class="code-lines" id="wb-lines"></p>
+      </section>
+      <aside class="code-notes wb-notes" id="wb-notes" aria-label="深度说明">
+        <section><h3>做法</h3><p id="wb-how"></p></section>
+        <section><h3>解剖</h3><ol class="code-steps" id="wb-anatomy"></ol></section>
+        <section><h3>参数</h3><dl class="code-params" id="wb-params"></dl></section>
+        <section><h3>变体</h3><ul class="code-variants" id="wb-variants"></ul></section>
+        <section id="wb-same-wrap" hidden><h3>同源</h3><p id="wb-same"></p><button class="btn small" id="wb-same-open" type="button"></button></section>
+        <section><h3>注意</h3><p id="wb-watch"></p></section>
+        <section><h3>成本</h3><p class="code-cost"><b id="wb-cost-tier"></b><span id="wb-cost-note"></span></p></section>
+        <section><h3>什么时候别用</h3><p id="wb-avoid"></p></section>
+        <section><h3>关键点</h3><ul id="wb-features"></ul></section>
+        <section><h3>用到的</h3><div class="code-tags" id="wb-tech"></div></section>
+      </aside>
     </div>
   </div>
 </div>
 
-<div class="overlay fx-zoom-modal" id="zoomModal" hidden>
-  <div class="fx-zoom-box" role="dialog" aria-modal="true" aria-labelledby="zm-title">
-    <header class="fx-zoom-head">
-      <div class="fx-zoom-title">
-        <h2 id="zm-title">效果</h2>
-        <p id="zm-sub"></p>
-      </div>
-      <div class="fx-zoom-actions">
-        <a class="btn small" id="zm-open" href="#" target="_blank" rel="noopener">新标签打开 ↗</a>
-        <button class="btn small" id="zm-code" type="button">看代码</button>
-        <button class="btn small primary" id="zm-close" type="button">关闭</button>
-      </div>
-    </header>
-    <div class="fx-zoom-stage" id="zm-stage">
-      <span class="fx-zoom-loading">加载预览…</span>
-      <iframe id="zm-frame" title="放大预览"></iframe>
-    </div>
-  </div>
-</div>
+<div class="fx-toast" id="fxToast" role="status" aria-live="polite"></div>
 
-<script src="effects.js?v=11"></script>
+<script src="effects.js?v=14"></script>
 </body>
 </html>

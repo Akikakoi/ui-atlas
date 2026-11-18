@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>点击涟漪 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    min-height: 100vh; margin: 0; display: grid; place-items: center;
+    background: #0b0d11; font: 15px/1.6 system-ui, "PingFang SC", sans-serif;
+  }
+  .btn {
+    position: relative; overflow: hidden; isolation: isolate;
+    border: 0; border-radius: 12px; padding: 14px 30px;
+    font: inherit; font-weight: 600; color: #10131a;
+    background: #e3b164; cursor: pointer;
+  }
+  .btn > span { position: relative; z-index: 1; }
+  .rp {
+    position: absolute; z-index: 0; border-radius: 50%;
+    background: rgba(255, 255, 255, .55);
+    transform: translate(-50%, -50%) scale(0);
+    animation: rp .62s cubic-bezier(.2, .6, .2, 1) forwards;
+    pointer-events: none;
+  }
+  @keyframes rp {
+    to { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rp { display: none; }
+  }
+</style>
+</head>
+<body>
+<button class="btn" type="button"><span>点我一下</span></button>
+<script>
+  const btn = document.querySelector('.btn');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  btn.addEventListener('pointerdown', (e) => {
+    if (reduce) return;
+    const r = btn.getBoundingClientRect();
+    const size = Math.max(r.width, r.height) * 2;
+    const s = document.createElement('span');
+    s.className = 'rp';
+    s.style.width = s.style.height = size + 'px';
+    s.style.left = (e.clientX - r.left) + 'px';
+    s.style.top = (e.clientY - r.top) + 'px';
+    btn.appendChild(s);
+    s.addEventListener('animationend', () => s.remove());
+    setTimeout(() => s.remove(), 900);
+  });
+</script>
+</body>
+</html>

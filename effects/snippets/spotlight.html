@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>光斑跟随卡片 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    min-height: 100vh; margin: 0; display: grid; place-items: center;
+    background: #0b0e14; font: 15px/1.7 system-ui, "PingFang SC", sans-serif;
+  }
+  .spot {
+    position: relative; width: min(360px, 86vw); padding: 28px; border-radius: 18px;
+    overflow: hidden; background: #151922; color: #eef2ff; border: 1px solid #2a3142;
+  }
+  .spot::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(120, 160, 255, .3), transparent 68%);
+    opacity: 0; transition: opacity .2s ease;
+  }
+  .spot:hover::before { opacity: 1; }
+  .spot > * { position: relative; }
+  .spot h2 { margin: 0 0 8px; font-size: 22px; }
+  .spot p { margin: 0; color: #a9b2c7; font-size: 14px; }
+  @media (prefers-reduced-motion: reduce) {
+    .spot::before { transition: none; }
+  }
+</style>
+</head>
+<body>
+<article class="spot">
+  <h2>光跟到这里</h2>
+  <p>光标在卡片上移动时，一小块光斑跟着走；离开后光斑淡出。</p>
+</article>
+<script>
+  const card = document.querySelector('.spot');
+  card.addEventListener('pointermove', (e) => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  });
+  card.addEventListener('pointerleave', () => {
+    card.style.setProperty('--mx', '50%');
+    card.style.setProperty('--my', '50%');
+  });
+</script>
+</body>
+</html>

@@ -1,34 +1,40 @@
-/* UI Atlas · 动效图鉴：读 effects.json 渲染画廊 / 源码弹层。
+/* UI Atlas · 动效图鉴：读 effects.json 渲染画廊 / 工作台预览与源码。
    与 app.js 同一套约定：无依赖、无构建，hash 直达某个效果。 */
 (function () {
   'use strict';
 
   var DATA = null,
+      SNIPPETS = null,
       grid = document.getElementById('fx-grid'),
-      modal = document.getElementById('codeModal'),
+      modal = document.getElementById('fxWorkbench'),
+      wbBox = document.querySelector('.fx-wb-box'),
+      wbFrame = document.getElementById('wb-frame'),
+      wbStage = document.getElementById('wb-stage'),
+      wbLoading = document.getElementById('wb-loading'),
+      notesBtn = document.getElementById('wb-notes-btn'),
+      qInput = document.getElementById('q'),
       state = { q: '', cat: '', fav: false },
       openId = null,
       lastFocus = null,
       curSrc = '',
       curTab = 'all',
       cache = {},
+      snippetCache = {},
       io = null,
       ioAway = null,
       mountedShots = [],
-      notesBtn = document.getElementById('cm-notes'),
-      codeBox = document.querySelector('.fx-code-box'),
-      zoomModal = document.getElementById('zoomModal'),
-      zoomFrame = document.getElementById('zm-frame'),
-      zoomStage = document.getElementById('zm-stage'),
-      zoomOpenId = null,
-      zoomLastFocus = null;
-
-  var zoomRegions = [
-    document.querySelector('header.top'),
-    document.getElementById('fx-grid'),
-    document.querySelector('.foot'),
-    document.querySelector('.skip')
-  ];
+      moreMenu = null,
+      moreTrigger = null,
+      moreOwner = null,
+      toastEl = document.getElementById('fxToast'),
+      toastTimer = null,
+      uiReady = false,
+      pageRegions = [
+        document.querySelector('header.top'),
+        document.getElementById('fx-grid'),
+        document.querySelector('.foot'),
+        document.querySelector('.skip')
+      ];
 
   /* 锁滚动时把滚动条宽度补成 body 右内边距，避免弹层打开瞬间的布局位移 */
   function lockScroll(on) {
@@ -40,8 +46,8 @@
     }
   }
 
-  function setZoomInert(on) {
-    zoomRegions.forEach(function (r) {
+  function setPageInert(on) {
+    pageRegions.forEach(function (r) {
       if (!r) return;
       if (on) r.setAttribute('inert', '');
       else r.removeAttribute('inert');
@@ -50,11 +56,11 @@
 
   /* 焦点从 iframe 内容 Tab 出来时，keydown 派发给子文档，父级 trap 收不到；
      用 focusout 兜底：焦点落到弹层外就立即拉回。 */
-  zoomModal.addEventListener('focusout', function () {
-    if (zoomModal.hidden) return;
+  modal.addEventListener('focusout', function () {
+    if (modal.hidden) return;
     setTimeout(function () {
-      if (!zoomModal.hidden && !zoomModal.contains(document.activeElement)) {
-        document.getElementById('zm-open').focus();
+      if (!modal.hidden && !modal.contains(document.activeElement)) {
+        document.getElementById('wb-close').focus();
       }
     }, 0);
   });
@@ -79,13 +85,15 @@
   function byId(id) {
     return DATA ? DATA.effects.filter(function (e) { return e.id === id; })[0] : null;
   }
-  /* 「原页」统一走 view.html：默认全宽打开真实页面，页内可切 600 × 450 画板对照 */
-  function viewHref(id) {
-    return 'view.html?id=' + encodeURIComponent(id);
-  }
   /* demo 文件名固定，加版本号避免浏览器沿用缓存里的旧页面 */
   function demoSrc(e) {
     return e.demo + '?v=' + ((DATA && DATA.demoV) || '1');
+  }
+  function snippetSrc(e) {
+    return 'effects/snippets/' + e.id + '.html?v=1';
+  }
+  function hasSnippet(e) {
+    return !!(e && SNIPPETS && SNIPPETS.has(e.id));
   }
   function load(k, dflt) {
     try { var v = JSON.parse(localStorage.getItem(k)); return v === null ? dflt : v; }
@@ -94,6 +102,64 @@
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
   var FAV = new Set(load('uiatlas.fx.fav', []));
+
+  function toast(msg) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('on'); }, 1900);
+  }
+
+  /* ------------------------------------------------------------ 筛选状态 */
+  function restoreUiState() {
+    var saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem('uiatlas.fx.ui') || 'null'); } catch (e) {}
+    if (saved) {
+      state.q = saved.q || '';
+      state.cat = saved.cat || '';
+      state.fav = !!saved.fav;
+      window.__fxRestoreY = saved.y || 0;
+    }
+    try {
+      var p = new URLSearchParams(location.search);
+      if (p.has('q') || p.has('cat')) {
+        var q = (p.get('q') || '').trim(), cat = p.get('cat') || '';
+        /* 链接里的筛选优先；和上次不一致时从头看，不沿用旧滚动位置 */
+        if (!(saved && q === saved.q && cat === saved.cat)) window.__fxRestoreY = 0;
+        state.q = q;
+        state.cat = cat;
+      }
+    } catch (e) {}
+  }
+  function saveUiState() {
+    if (!uiReady) return;
+    try {
+      sessionStorage.setItem('uiatlas.fx.ui', JSON.stringify({
+        q: state.q, cat: state.cat, fav: state.fav, y: window.scrollY
+      }));
+    } catch (e) {}
+  }
+  function syncUrl() {
+    try {
+      var p = new URLSearchParams();
+      if (state.q) p.set('q', state.q);
+      if (state.cat) p.set('cat', state.cat);
+      var qs = p.toString();
+      history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + (location.hash || ''));
+    } catch (e) {}
+  }
+  function applyUrlState() {
+    var p;
+    try { p = new URLSearchParams(location.search); } catch (e) { return; }
+    var q = (p.get('q') || '').trim(), cat = p.get('cat') || '';
+    if (cat && !CAT[cat]) cat = '';
+    if (q === state.q && cat === state.cat) return;
+    state.q = q;
+    state.cat = cat;
+    qInput.value = q;
+    render();
+  }
 
   /* ------------------------------------------------------------ 搜索同义词 */
   var SYN = [
@@ -288,6 +354,177 @@
     } catch (e) {}
   }
 
+  /* ------------------------------------------------------------ 源码读取 */
+  function fetchSource(e) {
+    if (cache[e.id]) return Promise.resolve(cache[e.id]);
+    return fetch(demoSrc(e)).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    }).then(function (t) { cache[e.id] = t; return t; });
+  }
+  function fetchSnippet(e) {
+    if (snippetCache[e.id]) return Promise.resolve(snippetCache[e.id]);
+    return fetch(snippetSrc(e)).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    }).then(function (t) {
+      snippetCache[e.id] = t;
+      return t;
+    });
+  }
+  function slices(src, snippet) {
+    var css = (src.match(/<style>([\s\S]*?)<\/style>/i) || [])[1] || '';
+    var js = (src.match(/<script>([\s\S]*?)<\/script>/i) || [])[1] || '';
+    return { all: src, css: css.trim(), js: js.trim(), snippet: (snippet || '').trim() };
+  }
+
+  /* 卡片「⋯」更多菜单：单个共享浮层，挂到 body 上避免被 .fx-card 的 overflow:hidden 裁掉 */
+  function ensureMoreMenu() {
+    if (moreMenu) return moreMenu;
+    var item = function (tag, act, text) {
+      var attrs = { class: 'fx-more-item', 'data-act': act, text: text };
+      if (tag === 'a') { attrs.href = '#'; attrs.target = '_blank'; attrs.rel = 'noopener'; }
+      else attrs.type = 'button';
+      return el(tag, attrs);
+    };
+    moreMenu = el('div', { class: 'fx-more-menu', role: 'menu', hidden: '' }, [
+      item('a', 'raw', '原页 ↗'),
+      item('button', 'replay', '重播预览'),
+      item('button', 'css', '复制 CSS'),
+      item('button', 'dl', '下载 .html')
+    ]);
+    document.body.appendChild(moreMenu);
+
+    moreMenu.addEventListener('click', function (ev) {
+      var it = ev.target.closest ? ev.target.closest('.fx-more-item') : null;
+      if (!it || !moreOwner) return;
+      var e = moreOwner.e, shot = moreOwner.shot, act = it.getAttribute('data-act');
+      if (act === 'raw') {
+        it.href = demoSrc(e);
+        closeMoreMenu();
+        return;
+      }
+      closeMoreMenu();
+      if (act === 'replay') replayShot(shot, null);
+      else if (act === 'css') copyCss(e, null);
+      else if (act === 'dl') downloadCard(e, null);
+    });
+    return moreMenu;
+  }
+
+  function closeMoreMenu() {
+    if (moreMenu) moreMenu.hidden = true;
+    if (moreTrigger) moreTrigger.setAttribute('aria-expanded', 'false');
+    moreTrigger = null;
+    moreOwner = null;
+  }
+
+  function openMoreMenu(btn, e, shot) {
+    ensureMoreMenu();
+    var wasOpen = !moreMenu.hidden && moreTrigger === btn;
+    closeMoreMenu();
+    if (wasOpen) return;
+    moreOwner = { e: e, shot: shot };
+    moreTrigger = btn;
+    btn.setAttribute('aria-expanded', 'true');
+    var raw = moreMenu.querySelector('[data-act="raw"]');
+    raw.href = demoSrc(e);
+    moreMenu.hidden = false;
+
+    var r = btn.getBoundingClientRect();
+    var menuW = moreMenu.offsetWidth, menuH = moreMenu.offsetHeight;
+    var left = Math.min(r.right - menuW, innerWidth - menuW - 8);
+    if (left < 8) left = 8;
+    var top = r.bottom + 6;
+    if (top + menuH > innerHeight - 8) top = r.top - menuH - 6;
+    if (top < 8) top = 8;
+    moreMenu.style.left = left + 'px';
+    moreMenu.style.top = top + 'px';
+  }
+
+  document.addEventListener('click', function (ev) {
+    if (!moreMenu || moreMenu.hidden) return;
+    if (moreMenu.contains(ev.target) || (moreTrigger && moreTrigger.contains(ev.target))) return;
+    closeMoreMenu();
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && moreMenu && !moreMenu.hidden) {
+      var t = moreTrigger;
+      closeMoreMenu();
+      if (t) t.focus();
+    }
+  });
+  addEventListener('scroll', function () { if (moreMenu && !moreMenu.hidden) closeMoreMenu(); }, true);
+  addEventListener('resize', closeMoreMenu);
+
+  function withSource(e, btn, fn) {
+    var old = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = '读取…'; }
+    fetchSource(e).then(function (src) {
+      if (btn) { btn.disabled = false; btn.textContent = old; }
+      fn(src);
+    }).catch(function (err) {
+      if (btn) { btn.disabled = false; btn.textContent = old; }
+      toast('读不到源码：' + err.message + '（请用 serve.py 打开本站）');
+    });
+  }
+
+  function writeClipboard(text, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(text); done(); });
+    } else { fallback(text); done(); }
+  }
+  function fallback(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+  function copy(text, btn) {
+    writeClipboard(text, function () {
+      if (!btn) return;
+      var old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(function () { btn.textContent = old; }, 1200);
+    });
+  }
+  function saveFile(e, src) {
+    var blob = new Blob([src], { type: 'text/html;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = e.id + '.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    toast('已下载 ' + e.id + '.html');
+  }
+  function copyCss(e, btn) {
+    withSource(e, btn, function (src) {
+      var css = slices(src).css;
+      if (!css) { toast('这条效果没有独立 CSS'); return; }
+      writeClipboard(css, function () { toast('已复制《' + e.name + '》的 CSS'); });
+    });
+  }
+  function downloadCard(e, btn) {
+    withSource(e, btn, function (src) { saveFile(e, src); });
+  }
+  function replayShot(shot, btn) {
+    var f = shot.querySelector('iframe');
+    if (!f) return;
+    if (f.dataset.mounted !== '1') { mount(shot); toast('已加载预览'); return; }
+    shot.classList.remove('ready');
+    f.src = f.dataset.src + '&r=' + Date.now();
+    if (shot.__fail) shot.__fail();
+    if (btn) {
+      btn.classList.add('on');
+      setTimeout(function () { btn.classList.remove('on'); }, 700);
+    }
+    toast('已重播');
+  }
+
   /* ------------------------------------------------------------ 卡片 */
   function card(e) {
     var failTimer = null;
@@ -333,12 +570,6 @@
       f
     ]);
 
-    var zoomBtn = el('button', {
-      class: 'fx-zoom-btn', type: 'button', text: '放大',
-      title: '等比例放大预览', 'aria-label': '放大《' + e.name + '》'
-    });
-    zoomBtn.addEventListener('click', function (ev) { ev.stopPropagation(); openZoom(e.id); });
-
     shot.__fail = function () { failTimer = setTimeout(function () { fail(shot); }, 8000); };
 
     shot.__unmount = function () {
@@ -371,8 +602,20 @@
     for (var i = 1; i <= 3; i++) dots.appendChild(el('i', { class: i <= e.level ? 'on' : '' }));
     dots.appendChild(el('em', { text: LEVEL[e.level] }));
 
-    var more = el('button', { class: 'linkish', type: 'button', text: '看代码 →' });
-    more.addEventListener('click', function () { openCode(e.id); });
+    var previewBtn = el('button', {
+      class: 'fx-preview-btn', type: 'button', text: '看效果 →',
+      title: '打开工作台：交互预览 + 源码 + 说明',
+      'aria-label': '查看《' + e.name + '》的效果与源码'
+    });
+    previewBtn.addEventListener('click', function () { openFx(e.id, 'preview'); });
+
+    var more = el('button', {
+      class: 'fx-more-btn', type: 'button', text: '⋯',
+      title: '更多：原页 / 重播 / 复制 CSS / 下载',
+      'aria-label': '《' + e.name + '》的更多操作',
+      'aria-haspopup': 'menu', 'aria-expanded': 'false'
+    });
+    more.addEventListener('click', function () { openMoreMenu(more, e, shot); });
 
     return el('article', { class: 'fx-card', 'data-id': e.id }, [
       shot,
@@ -391,11 +634,7 @@
           el('span', {}, [star]),
           dots,
           el('span', { class: 'spacer' }),
-          el('span', { class: 'fx-acts' }, [
-            el('a', { href: viewHref(e.id), target: '_blank', rel: 'noopener', text: '原页' }),
-            zoomBtn
-          ]),
-          more
+          el('span', { class: 'fx-acts' }, [previewBtn, more])
         ])
       ])
     ]);
@@ -415,7 +654,7 @@
       var b = el('button', { type: 'button', text: e.name + ' · ' + e._cat });
       b.addEventListener('click', function () {
         state.q = ''; state.cat = ''; state.fav = false;
-        document.getElementById('q').value = '';
+        qInput.value = '';
         render();
       });
       row.appendChild(b);
@@ -443,7 +682,12 @@
       if (exact.length) list = exact;
     }
     document.getElementById('count-info').textContent = list.length + ' / ' + DATA.total + ' 个';
-    if (!list.length) { grid.appendChild(emptyBlock()); return; }
+    if (!list.length) {
+      grid.appendChild(emptyBlock());
+      syncUrl();
+      saveUiState();
+      return;
+    }
 
     list.forEach(function (e) {
       var c = card(e);
@@ -452,225 +696,261 @@
       if (io) io.observe(shot); else mount(shot);
       if (ioAway) ioAway.observe(shot);
     });
+
+    syncUrl();
+    saveUiState();
   }
 
-  /* ------------------------------------------------------------ 等比例放大 */
-  function fitZoom() {
-    if (zoomModal.hidden) return;
-    var w = zoomStage.clientWidth, h = zoomStage.clientHeight;
+  /* ------------------------------------------------------------ 工作台 */
+  function fitStage() {
+    if (!wbStage || modal.hidden) return;
+    var w = wbStage.clientWidth, h = wbStage.clientHeight;
     if (w < 40 || h < 40) return;
-    var s = Math.min((w - 28) / 600, (h - 28) / 450);
+    var s = Math.min((w - 24) / 600, (h - 24) / 450);
     s = Math.max(.2, s);
-    zoomFrame.style.transform = 'translate(-50%,-50%) scale(' + s.toFixed(4) + ')';
+    wbFrame.style.transform = 'translate(-50%,-50%) scale(' + s.toFixed(4) + ')';
   }
 
-  function openZoom(id, push) {
-    var e = byId(id);
-    if (!e) return;
-    zoomOpenId = id;
-    zoomLastFocus = document.activeElement;
-    /* hash 直达 / popstate 恢复时 activeElement 是 body，关闭后应回到该卡片而非无处可去 */
-    if (!zoomLastFocus || zoomLastFocus === document.body) {
-      zoomLastFocus = grid.querySelector('.fx-card[data-id="' + id + '"] .fx-zoom-btn') || null;
-    }
-    document.getElementById('zm-title').textContent = e.name;
-    document.getElementById('zm-sub').textContent = e.name_en + ' · ' + e._cat + ' · 600 × 450 等比放大';
-    document.getElementById('zm-open').href = viewHref(e.id);
-    zoomFrame.title = '放大预览：' + e.name;
-    zoomStage.classList.remove('ready');
-    zoomModal.hidden = false;
-    document.body.classList.add('fx-lock');
-    lockScroll(true);
-    setZoomInert(true);
-    zoomFrame.src = demoSrc(e);
-    fitZoom();
-    if (push !== false) history.pushState({ z: id }, '', '#z=' + encodeURIComponent(id));
-    setTimeout(function () { document.getElementById('zm-close').focus(); }, 50);
+  function openEntry() {
+    return openId ? byId(openId) : null;
   }
-
-  function closeZoom(cleanHash) {
-    if (!zoomOpenId) return;
-    var id = zoomOpenId;
-    zoomOpenId = null;
-    zoomModal.hidden = true;
-    zoomStage.classList.remove('ready');
-    zoomFrame.src = 'about:blank';
-    document.body.classList.remove('fx-lock');
-    lockScroll(false);
-    setZoomInert(false);
-    if (cleanHash !== false && decodeURIComponent(location.hash.slice(1)) === 'z=' + id) {
-      history.replaceState(null, '', location.pathname + location.search);
-    }
-    if (zoomLastFocus && zoomLastFocus.focus) zoomLastFocus.focus();
+  function currentSnippet() {
+    var e = openEntry();
+    return e ? (snippetCache[e.id] || '') : '';
   }
-
-  /* ------------------------------------------------------------ 源码弹层 */
-  function getSource(e) {
-    if (cache[e.id]) return Promise.resolve(cache[e.id]);
-    return fetch(demoSrc(e)).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.text();
-    }).then(function (t) { cache[e.id] = t; return t; });
-  }
-
-  function slices(src) {
-    var css = (src.match(/<style>([\s\S]*?)<\/style>/i) || [])[1] || '';
-    var js = (src.match(/<script>([\s\S]*?)<\/script>/i) || [])[1] || '';
-    return { all: src, css: css.trim(), js: js.trim() };
-  }
-
   function currentText() {
     if (!curSrc) return '';
-    var s = slices(curSrc);
+    var s = slices(curSrc, currentSnippet());
     return (s[curTab] || '').trim();
   }
-
+  function resetTabs(e) {
+    var snip = document.querySelector('.code-tabs button[data-tab="snippet"]');
+    if (snip) snip.removeAttribute('title');
+    document.querySelectorAll('.code-tabs button').forEach(function (b) {
+      var t = b.dataset.tab;
+      b.hidden = t === 'snippet' && !hasSnippet(e);
+      b.disabled = t === 'snippet' ? !hasSnippet(e) : false;
+      b.setAttribute('aria-selected', t === 'all' ? 'true' : 'false');
+    });
+    document.getElementById('wb-copy').disabled = true;
+  }
   function paintTab() {
-    var s = slices(curSrc);
+    var s = slices(curSrc, currentSnippet());
     var txt = s[curTab] || '';
-    var code = document.getElementById('cm-code');
-    code.textContent = txt.trim();
-    document.getElementById('cm-lines').textContent =
-      txt.trim().split('\n').length + ' 行 · ' + (s.all.length / 1024).toFixed(1) + ' KB · 单文件';
+    var code = document.getElementById('wb-code');
+    if (curTab === 'snippet' && !s.snippet) {
+      code.textContent = '正在读取最小用法…';
+      document.getElementById('wb-lines').textContent = '';
+      document.getElementById('wb-copy').disabled = true;
+    } else {
+      code.textContent = txt.trim();
+      var lines = txt.trim() ? txt.trim().split('\n').length : 0;
+      document.getElementById('wb-lines').textContent =
+        lines + ' 行 · ' + (txt.length / 1024).toFixed(1) + ' KB' + (curTab === 'snippet' ? ' · 最小用法' : ' · 单文件');
+      document.getElementById('wb-copy').disabled = !txt.trim();
+    }
     document.querySelectorAll('.code-tabs button').forEach(function (b) {
       b.setAttribute('aria-selected', b.dataset.tab === curTab ? 'true' : 'false');
     });
   }
-
   function setTab(name) {
+    var e = openEntry();
+    if (!curSrc || !e) return;
+    var s = slices(curSrc, currentSnippet());
+    var ok = name === 'all' ? true : name === 'snippet' ? hasSnippet(e) : !!s[name];
+    if (!ok) name = 'all';
     curTab = name;
     document.querySelectorAll('.code-tabs button').forEach(function (b) {
-      b.disabled = !slices(curSrc)[b.dataset.tab];
+      var t = b.dataset.tab;
+      b.hidden = t === 'snippet' && !hasSnippet(e);
+      b.disabled = t === 'snippet' ? !hasSnippet(e) : !s[t];
     });
     paintTab();
   }
 
-  function openCode(id, push) {
-    var e = byId(id);
-    if (!e) return;
-    lastFocus = document.activeElement;
-    openId = id;
-    modal.hidden = false;
-    document.body.classList.add('fx-lock');
-    lockScroll(true);
-
-    document.getElementById('cm-title').textContent = e.name;
-    document.getElementById('cm-sub').textContent =
+  function renderNotes(e) {
+    document.getElementById('wb-title').textContent = e.name;
+    document.getElementById('wb-sub').textContent =
       e.name_en + ' · ' + e._cat + ' · ' + e._trig + (e._family ? ' · ' + e._family : '');
-    document.getElementById('cm-how').textContent = e.how;
-    document.getElementById('cm-watch').textContent = e.watch;
+    document.getElementById('wb-open').href = demoSrc(e);
+    document.getElementById('wb-how').textContent = e.how;
+    document.getElementById('wb-watch').textContent = e.watch;
 
     var d = e.depth || {};
-    var anatomy = document.getElementById('cm-anatomy');
+    var anatomy = document.getElementById('wb-anatomy');
     anatomy.textContent = '';
     (d.anatomy || []).forEach(function (t) { anatomy.appendChild(el('li', { text: t })); });
 
-    var params = document.getElementById('cm-params');
+    var params = document.getElementById('wb-params');
     params.textContent = '';
     (d.params || []).forEach(function (p) {
       params.appendChild(el('dt', { text: p[0] }));
       params.appendChild(el('dd', { text: p[1] }));
     });
 
-    var variants = document.getElementById('cm-variants');
+    var variants = document.getElementById('wb-variants');
     variants.textContent = '';
     (d.variants || []).forEach(function (v) {
       variants.appendChild(el('li', {}, [el('b', { text: v[0] }), el('span', { text: v[1] })]));
     });
 
-    var sameWrap = document.getElementById('cm-same-wrap');
-    var sameBtn = document.getElementById('cm-same-open');
+    var sameWrap = document.getElementById('wb-same-wrap');
+    var sameBtn = document.getElementById('wb-same-open');
     var base = e.variant_of ? byId(e.variant_of) : null;
     if (base) {
-      document.getElementById('cm-same').textContent =
+      document.getElementById('wb-same').textContent =
         '与《' + base.name + '》同属「' + e._family + '」，共用同一套内核；本条只换了载体、触发方式或参数。';
       sameBtn.textContent = '打开《' + base.name + '》→';
-      sameBtn.onclick = function () { openCode(base.id); };
+      sameBtn.onclick = function () { openFx(base.id, 'code'); };
       sameWrap.hidden = false;
     } else {
       sameWrap.hidden = true;
     }
 
     var cost = d.cost || {};
-    var tier = document.getElementById('cm-cost-tier');
+    var tier = document.getElementById('wb-cost-tier');
     tier.textContent = cost.tier || '—';
     tier.setAttribute('data-tier', cost.tier || '');
-    document.getElementById('cm-cost-note').textContent = cost.note || '';
-    document.getElementById('cm-avoid').textContent = d.avoid || '';
+    document.getElementById('wb-cost-note').textContent = cost.note || '';
+    document.getElementById('wb-avoid').textContent = d.avoid || '';
 
-    codeBox.classList.remove('notes-on');
-    notesBtn.setAttribute('aria-expanded', 'false');
-
-    var ul = document.getElementById('cm-features');
+    var ul = document.getElementById('wb-features');
     ul.textContent = '';
     e.features.forEach(function (f) { ul.appendChild(el('li', { text: f })); });
-    var tags = document.getElementById('cm-tech');
+    var tags = document.getElementById('wb-tech');
     tags.textContent = '';
     (e.tech || []).forEach(function (t) { tags.appendChild(el('span', { text: t })); });
-    document.getElementById('cm-open').href = viewHref(e.id);
-    document.getElementById('cm-code').textContent = '载入源码…';
-    document.getElementById('cm-lines').textContent = '';
+  }
 
+  function openFx(id, entry, push) {
+    var e = byId(id);
+    if (!e) return;
+    if (!openId) {
+      lastFocus = document.activeElement;
+      /* hash 直达时 activeElement 是 body，关闭后应回到该卡片 */
+      if (!lastFocus || lastFocus === document.body) {
+        var c = grid.querySelector('.fx-card[data-id="' + id + '"]');
+        lastFocus = c ? c.querySelector('.fx-preview-btn') : null;
+      }
+    }
+    openId = id;
     curSrc = '';
     curTab = 'all';
-    getSource(e).then(function (src) {
+
+    modal.hidden = false;
+    document.body.classList.add('fx-lock');
+    lockScroll(true);
+    setPageInert(true);
+    wbBox.classList.remove('notes-on');
+    notesBtn.setAttribute('aria-expanded', 'false');
+
+    renderNotes(e);
+    resetTabs(e);
+
+    wbStage.classList.remove('ready');
+    wbLoading.textContent = '加载预览…';
+    wbFrame.title = '效果预览：' + e.name;
+    wbFrame.src = demoSrc(e);
+
+    document.getElementById('wb-code').textContent = '载入源码…';
+    document.getElementById('wb-lines').textContent = '';
+    document.getElementById('wb-copy').disabled = true;
+
+    fetchSource(e).then(function (src) {
+      if (openId !== id) return;
       curSrc = src;
       setTab('all');
     }).catch(function (err) {
-      document.getElementById('cm-code').textContent = '读不到源码（' + err.message + '）。\n请用 serve.py 打开本站，file:// 会被浏览器拦截 fetch。';
+      if (openId !== id) return;
+      document.getElementById('wb-code').textContent =
+        '读不到源码（' + err.message + '）。\n请用 serve.py 打开本站，file:// 会被浏览器拦截 fetch。';
     });
 
-    if (push !== false) history.pushState({ fx: id }, '', '#' + encodeURIComponent(id));
-    setTimeout(function () { document.getElementById('cm-close').focus(); }, 30);
+    if (hasSnippet(e)) {
+      fetchSnippet(e).then(function () {
+        if (openId !== id) return;
+        var b = document.querySelector('.code-tabs button[data-tab="snippet"]');
+        if (b) { b.hidden = false; b.disabled = false; }
+        if (curTab === 'snippet') paintTab();
+      }).catch(function () {
+        if (openId !== id) return;
+        var b = document.querySelector('.code-tabs button[data-tab="snippet"]');
+        if (b) { b.disabled = true; b.title = '最小用法读取失败'; }
+        if (curTab === 'snippet') { curTab = 'all'; paintTab(); }
+        toast('最小用法读取失败');
+      });
+    }
+
+    if (push !== false) {
+      history.pushState({ fx: id }, '', (entry === 'preview' ? '#z=' : '#') + encodeURIComponent(id));
+    }
+    requestAnimationFrame(fitStage);
+    setTimeout(fitStage, 80);
+    setTimeout(function () { document.getElementById('wb-close').focus(); }, 30);
   }
 
-  function closeCode() {
+  function closeFx(cleanHash) {
     if (!openId) return;
     var id = openId;
     openId = null;
     modal.hidden = true;
-    codeBox.classList.remove('notes-on');
+    wbBox.classList.remove('notes-on');
     notesBtn.setAttribute('aria-expanded', 'false');
+    wbFrame.src = 'about:blank';
+    wbStage.classList.remove('ready');
     document.body.classList.remove('fx-lock');
     lockScroll(false);
-    if (decodeURIComponent(location.hash.slice(1)) === id) {
-      history.replaceState(null, '', location.pathname + location.search);
+    setPageInert(false);
+    if (cleanHash !== false) {
+      var h = decodeURIComponent(location.hash.slice(1));
+      if (h === id || h === 'z=' + id) {
+        history.replaceState(null, '', location.pathname + location.search);
+      }
     }
     if (lastFocus && lastFocus.focus) lastFocus.focus();
+    lastFocus = null;
   }
 
-  function copy(text, btn) {
-    var done = function () {
-      var old = btn.textContent;
-      btn.textContent = '已复制 ✓';
-      setTimeout(function () { btn.textContent = old; }, 1200);
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done, function () { fallback(text); done(); });
-    } else { fallback(text); done(); }
+  function replayWorkbench() {
+    var e = openEntry();
+    if (!e) return;
+    wbStage.classList.remove('ready');
+    wbLoading.textContent = '重新加载…';
+    wbFrame.src = demoSrc(e) + '&r=' + Date.now();
+    var b = document.getElementById('wb-replay');
+    b.classList.add('on');
+    setTimeout(function () { b.classList.remove('on'); }, 700);
+    toast('已重播');
   }
-  function fallback(text) {
-    var ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); } catch (e) {}
-    document.body.removeChild(ta);
+
+  function downloadWorkbench() {
+    var e = openEntry();
+    if (!e) return;
+    if (curSrc) { saveFile(e, curSrc); return; }
+    withSource(e, document.getElementById('wb-download'), function (src) { saveFile(e, src); });
   }
 
   /* ------------------------------------------------------------ 交互绑定 */
-  var q = document.getElementById('q'), qt = null;
-  q.addEventListener('input', function () {
+  var qt = null;
+  qInput.addEventListener('input', function () {
     clearTimeout(qt);
-    qt = setTimeout(function () { state.q = q.value.trim(); render(); }, 120);
+    qt = setTimeout(function () {
+      state.q = qInput.value.trim();
+      render();
+    }, 120);
   });
-  q.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { q.value = ''; state.q = ''; render(); }
+  qInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      qInput.value = '';
+      state.q = '';
+      render();
+    }
   });
 
   document.getElementById('random').addEventListener('click', function () {
     var e = DATA.effects[Math.floor(Math.random() * DATA.effects.length)];
     state.q = ''; state.cat = ''; state.fav = false;
-    q.value = '';
+    qInput.value = '';
     render();
     var c = grid.querySelector('.fx-card[data-id="' + e.id + '"]');
     if (!c) return;
@@ -686,61 +966,50 @@
   });
 
   document.querySelectorAll('.code-tabs button').forEach(function (b) {
-    b.addEventListener('click', function () { if (curSrc) setTab(b.dataset.tab); });
+    b.addEventListener('click', function () {
+      if (curSrc && !b.disabled) setTab(b.dataset.tab);
+    });
   });
-  document.getElementById('cm-close').addEventListener('click', closeCode);
+  document.getElementById('wb-close').addEventListener('click', function () { closeFx(); });
   notesBtn.addEventListener('click', function () {
-    var on = codeBox.classList.toggle('notes-on');
+    var on = wbBox.classList.toggle('notes-on');
     notesBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
   });
-  zoomFrame.addEventListener('load', function () {
-    if (!zoomOpenId) return;
-    zoomStage.classList.add('ready');
-    tidy(zoomFrame);
-    fitZoom();
-  });
-  document.getElementById('zm-close').addEventListener('click', closeZoom);
-  document.getElementById('zm-code').addEventListener('click', function () {
-    var id = zoomOpenId;
-    closeZoom();
-    if (id) openCode(id);
-  });
-  zoomModal.addEventListener('click', function (e) { if (e.target === zoomModal) closeZoom(); });
-  document.getElementById('cm-copy').addEventListener('click', function () {
+  document.getElementById('wb-replay').addEventListener('click', replayWorkbench);
+  document.getElementById('wb-download').addEventListener('click', downloadWorkbench);
+  document.getElementById('wb-copy').addEventListener('click', function () {
     var txt = currentText();
     if (txt) copy(txt, this);
   });
-  modal.addEventListener('click', function (e) { if (e.target === modal) closeCode(); });
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeFx(); });
+
+  wbFrame.addEventListener('load', function () {
+    if (!openId) return;
+    try {
+      var d = wbFrame.contentDocument;
+      if (d && /^error/i.test(d.title || '')) { wbLoading.textContent = '预览加载失败'; return; }
+    } catch (e) {}
+    wbStage.classList.add('ready');
+    tidy(wbFrame);
+    fitStage();
+  });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && !zoomModal.hidden) { closeZoom(); return; }
-    if (e.key === 'Tab' && !zoomModal.hidden) {
-      var zf = Array.prototype.filter.call(
-        zoomModal.querySelectorAll('a[href],button:not([disabled]),iframe,[tabindex]:not([tabindex="-1"])'),
-        function (n) { return n.offsetParent !== null; }
-      );
-      if (zf.length) {
-        var zfirst = zf[0], zlast = zf[zf.length - 1];
-        if (!zoomModal.contains(document.activeElement)) { e.preventDefault(); zfirst.focus(); }
-        else if (e.shiftKey && document.activeElement === zfirst) { e.preventDefault(); zlast.focus(); }
-        else if (!e.shiftKey && document.activeElement === zlast) { e.preventDefault(); zfirst.focus(); }
-      }
-    }
     if (e.key === 'Escape' && !modal.hidden) {
-      if (codeBox.classList.contains('notes-on')) {
-        codeBox.classList.remove('notes-on');
+      if (wbBox.classList.contains('notes-on')) {
+        wbBox.classList.remove('notes-on');
         notesBtn.setAttribute('aria-expanded', 'false');
         return;
       }
-      closeCode();
+      closeFx();
       return;
     }
-    if (e.key === '/' && document.activeElement !== q && modal.hidden) {
-      e.preventDefault(); q.focus();
+    if (e.key === '/' && document.activeElement !== qInput && (modal.hidden || !modal.contains(document.activeElement))) {
+      e.preventDefault(); qInput.focus();
     }
     if (e.key === 'Tab' && !modal.hidden) {
       var f = Array.prototype.filter.call(
-        modal.querySelectorAll('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])'),
+        modal.querySelectorAll('a[href],button:not([disabled]),iframe,[tabindex]:not([tabindex="-1"])'),
         function (n) { return n.offsetParent !== null; }
       );
       if (!f.length) return;
@@ -758,15 +1027,11 @@
   }
 
   addEventListener('popstate', function () {
+    applyUrlState();
     var t = hashTarget();
-    if (t.zoom) {
-      if (t.zoom && byId(t.zoom)) { openZoom(t.zoom, false); return; }
-      closeZoom(false);
-      closeCode();
-      return;
-    }
-    closeZoom();
-    if (t.code && byId(t.code)) openCode(t.code, false); else closeCode();
+    if (t.zoom && byId(t.zoom)) { openFx(t.zoom, 'preview', false); return; }
+    if (t.code && byId(t.code)) { openFx(t.code, 'code', false); return; }
+    closeFx(false);
   });
 
   addEventListener('resize', function () {
@@ -775,26 +1040,41 @@
       document.querySelectorAll('.fx-shot').forEach(function (s) {
         if (s.classList.contains('ready')) fitShot(s);
       });
-      if (!zoomModal.hidden) fitZoom();
+      if (!modal.hidden) fitStage();
     }, 160);
   });
 
+  addEventListener('scroll', function () {
+    clearTimeout(window.__fxs);
+    window.__fxs = setTimeout(saveUiState, 250);
+  }, { passive: true });
+
   /* ------------------------------------------------------------ 启动 */
-  fetch('effects.json').then(function (r) {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
-  }).then(function (d) {
-    DATA = d;
+  Promise.all([
+    fetch('effects.json').then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }),
+    fetch('effects-snippets.json?v=1').then(function (r) {
+      return r.ok ? r.json() : { ids: [] };
+    }).catch(function () { return { ids: [] }; })
+  ]).then(function (res) {
+    DATA = res[0];
+    SNIPPETS = new Set((res[1] && res[1].ids) || []);
     index();
 
+    restoreUiState();
+    if (state.cat && !CAT[state.cat]) state.cat = '';
+    qInput.value = state.q;
+
     var counts = {};
-    d.effects.forEach(function (e) { counts[e.cat] = (counts[e.cat] || 0) + 1; });
+    DATA.effects.forEach(function (e) { counts[e.cat] = (counts[e.cat] || 0) + 1; });
 
     var cats = document.getElementById('cats');
-    cats.appendChild(el('button', { class: 'chip', type: 'button', 'data-cat': '', 'aria-pressed': 'true' },
-      [document.createTextNode('全部'), el('small', { text: d.total })]));
-    d.cats.forEach(function (c) {
-      var b = el('button', { class: 'chip', type: 'button', 'data-cat': c.id, 'aria-pressed': 'false' },
+    cats.appendChild(el('button', { class: 'chip', type: 'button', 'data-cat': '', 'aria-pressed': state.cat ? 'false' : 'true' },
+      [document.createTextNode('全部'), el('small', { text: DATA.total })]));
+    DATA.cats.forEach(function (c) {
+      var b = el('button', { class: 'chip', type: 'button', 'data-cat': c.id, 'aria-pressed': state.cat === c.id ? 'true' : 'false' },
         [document.createTextNode(c.name), el('small', { text: counts[c.id] || 0 })]);
       b.addEventListener('click', function () {
         state.cat = state.cat === c.id ? '' : c.id;
@@ -806,7 +1086,7 @@
       state.cat = ''; render();
     });
 
-    document.getElementById('n-sub').textContent = d.total;
+    document.getElementById('n-sub').textContent = DATA.total;
     document.getElementById('n-fav').textContent = FAV.size;
 
     if ('IntersectionObserver' in window) {
@@ -819,18 +1099,18 @@
       }, { rootMargin: '500px 0px' });
       /* 离视口太远的预览主动卸载，滚回来会重新挂载 */
       ioAway = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) {
-          if (en.isIntersecting) return;
-          unmount(en.target);
-        });
+        entries.forEach(function (en) { if (!en.isIntersecting) unmount(en.target); });
       }, { rootMargin: '1400px 0px' });
     }
 
     render();
+    if (window.__fxRestoreY) window.scrollTo(0, window.__fxRestoreY);
+    uiReady = true;
 
     var t = hashTarget();
-    if (t.zoom && byId(t.zoom)) openZoom(t.zoom, false);
-    else if (t.code && byId(t.code)) openCode(t.code, false);
+    if (t.zoom && byId(t.zoom)) openFx(t.zoom, 'preview', false);
+    else if (t.code && byId(t.code)) openFx(t.code, 'code', false);
+    else if (location.hash) history.replaceState(null, '', location.pathname + location.search);
   }).catch(function (err) {
     grid.appendChild(el('div', { class: 'empty' }, [
       el('h2', { text: '读不到 effects.json（' + err.message + '）' }),

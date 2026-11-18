@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>双行跑马灯 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    min-height: 100vh; margin: 0; display: grid; place-items: center;
+    background: #0e0f12; color: #f4f1e8;
+    font: 15px/1.6 system-ui, "PingFang SC", sans-serif;
+  }
+  .marquee { width: 100%; overflow: hidden; border-block: 1px solid #2a2b31; padding: 18px 0; }
+  .track { display: flex; width: max-content; animation: slide 14s linear infinite; }
+  .group { display: flex; gap: 2.5rem; padding-right: 2.5rem; white-space: nowrap; }
+  .group span { font-size: clamp(24px, 5vw, 54px); font-weight: 700; letter-spacing: -.02em; }
+  .group span::after {
+    content: "✳"; font-size: .32em; color: #ff5c2a;
+    margin-left: 2.5rem; vertical-align: middle;
+  }
+  @keyframes slide { to { transform: translate3d(-50%, 0, 0); } }
+  .marquee:hover .track { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) {
+    .track { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="marquee">
+  <div class="track">
+    <div class="group">
+      <span>设计</span><span>动效</span><span>排版</span><span>可用性</span><span>细节</span>
+    </div>
+    <div class="group" aria-hidden="true">
+      <span>设计</span><span>动效</span><span>排版</span><span>可用性</span><span>细节</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

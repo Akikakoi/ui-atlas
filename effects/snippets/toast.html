@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>堆叠提示 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    min-height: 100vh; margin: 0; display: grid; place-items: center;
+    background: #0e1116; color: #f4f1e8;
+    font: 15px/1.6 system-ui, "PingFang SC", sans-serif;
+  }
+  .act {
+    border: 1px solid #3a3f4b; background: #1a1e26; color: inherit;
+    border-radius: 10px; padding: 11px 18px; font: inherit; cursor: pointer;
+  }
+  .act:hover { border-color: #6d7890; }
+  .wrap {
+    position: fixed; right: 16px; bottom: 16px; z-index: 10;
+    display: grid; gap: 8px; pointer-events: none;
+  }
+  .toast {
+    width: min(318px, calc(100vw - 32px)); padding: 11px 14px;
+    border-radius: 11px; background: #15171b; color: #f4f5f7;
+    box-shadow: 0 16px 38px rgba(15, 18, 24, .34);
+    font-size: 13px; line-height: 1.6;
+    transform: translateY(14px) scale(.97); opacity: 0;
+    transition: transform .34s cubic-bezier(.2, .8, .2, 1), opacity .3s ease;
+  }
+  .toast.in { transform: none; opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .toast { transition: none; }
+  }
+</style>
+</head>
+<body>
+<button class="act" id="say" type="button">显示一条提示</button>
+<div class="wrap" id="wrap" role="status" aria-live="polite"></div>
+<script>
+  const wrap = document.getElementById('wrap');
+  let n = 0;
+
+  function push(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    wrap.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('in'));
+    setTimeout(() => {
+      t.classList.remove('in');
+      setTimeout(() => t.remove(), 340);
+    }, 2800);
+  }
+
+  document.getElementById('say').addEventListener('click', () => {
+    push('第 ' + (++n) + ' 条提示：已经保存');
+  });
+</script>
+</body>
+</html>

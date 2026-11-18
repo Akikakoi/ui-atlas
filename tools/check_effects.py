@@ -14,6 +14,7 @@
     6. 样例自包含：无 <link>、无 <script src>、无外链 src/href、无 @import
     7. 样例结构：doctype、lang、viewport、title、.hint 操作提示
     8. 无障碍：必须处理 prefers-reduced-motion
+    9. 最小用法清单：effects-snippets.json 与 effects/snippets/ 一一对应
 最后打印每条效果的行数、体积、是否含 JS、是否声明 reduced-motion。
 
 退出码：0 通过；1 有错误（--strict 时含警告）。
@@ -29,6 +30,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 FX_DIR = ROOT / "effects"
 DATA = ROOT / "effects.json"
+SNIPPET_DATA = ROOT / "effects-snippets.json"
+SNIPPET_DIR = FX_DIR / "snippets"
 
 VALID_CATS = {"pointer", "scroll", "type", "layout", "feedback", "bg", "transition"}
 VALID_TRIGGERS = {"hover", "scroll", "click", "view", "load", "auto", "drag"}
@@ -188,6 +191,32 @@ def main() -> int:
             )
         )
 
+    snippet_ids: list[str] = []
+    if SNIPPET_DATA.exists():
+        sdata = json.loads(SNIPPET_DATA.read_text(encoding="utf-8"))
+        snippet_ids = sdata.get("ids") or []
+        if sdata.get("total") != len(snippet_ids):
+            fail(errors, f"effects-snippets.json total={sdata.get('total')} 与条目数 {len(snippet_ids)} 不一致")
+        for sid in snippet_ids:
+            if sid not in seen:
+                fail(errors, f"最小用法 {sid}: 在 effects.json 里找不到")
+                continue
+            sp = SNIPPET_DIR / f"{sid}.html"
+            if not sp.exists():
+                fail(errors, f"最小用法 {sid}: 缺少文件 {sp.relative_to(ROOT)}")
+                continue
+            stxt = sp.read_text(encoding="utf-8")
+            if not stxt.lstrip().lower().startswith("<!doctype html>"):
+                fail(errors, f"最小用法 {sid}: 缺少 <!doctype html>")
+            if "<style" not in stxt.lower():
+                fail(errors, f"最小用法 {sid}: 没有内联 <style>")
+            if not RE_REDUCE.search(stxt):
+                warns.append(f"最小用法 {sid}: 没有 prefers-reduced-motion 处理")
+        if SNIPPET_DIR.exists():
+            extra = {p.stem for p in SNIPPET_DIR.glob("*.html")} - set(snippet_ids)
+            for sid in sorted(extra):
+                warns.append(f"effects/snippets/{sid}.html 没有登记在 effects-snippets.json")
+
     for e in effects:
         vo = e.get("variant_of")
         if not vo:
@@ -214,6 +243,8 @@ def main() -> int:
         print(f"{eid.ljust(width)}  {cat.ljust(10)} {lines:>5} {kb:>6.1f} {has_js:>5} {motion:>6} {js_lines:>5}")
 
     print(f"\n共 {len(rows)} 条效果 · {len(cat_ids)} 个类别")
+    if snippet_ids:
+        print(f"最小用法 {len(snippet_ids)} 条")
     for w in warns:
         print(f"警告  {w}")
     for e in errors:

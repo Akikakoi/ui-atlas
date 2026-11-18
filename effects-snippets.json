@@ -1,0 +1,17 @@
+{
+  "total": 12,
+  "ids": [
+    "magnetic",
+    "spotlight",
+    "tilt",
+    "reveal",
+    "parallax",
+    "marquee",
+    "ripple",
+    "toast",
+    "skeleton",
+    "accordion",
+    "tabs",
+    "counter"
+  ]
+}

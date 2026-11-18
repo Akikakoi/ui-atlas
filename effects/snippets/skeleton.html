@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>骨架屏到内容 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    min-height: 100vh; margin: 0; display: grid; place-items: center; gap: 16px;
+    background: #eef0e8; color: #191b1f;
+    font: 15px/1.6 system-ui, "PingFang SC", sans-serif;
+  }
+  .card {
+    width: min(360px, 86vw); overflow: hidden; border-radius: 14px;
+    background: #fff; border: 1px solid #e2e0d8;
+  }
+  .sk {
+    background: linear-gradient(100deg, #e9e6dc 20%, #f6f3eb 40%, #e9e6dc 60%) 0 0 / 200% 100%;
+    animation: sh 1.2s linear infinite;
+  }
+  .sk.media { height: 160px; }
+  .sk.line { height: 12px; border-radius: 6px; margin: 14px 16px 0; }
+  .sk.line.short { width: 55%; }
+  .sk.pad { height: 18px; }
+  .real { display: none; padding-bottom: 18px; }
+  .card.done .sk { display: none; }
+  .card.done .real { display: block; animation: fade .4s ease; }
+  .real .media {
+    height: 160px;
+    background: linear-gradient(150deg, #cfdcae, #7e9a62 55%, #47603b);
+  }
+  .real h2 { margin: 14px 16px 4px; font-size: 18px; }
+  .real p { margin: 0 16px; color: #5b5e65; font-size: 13.5px; }
+  .again {
+    border: 1px solid #c9c6bc; background: #fff; color: inherit;
+    border-radius: 999px; padding: 7px 15px; font: inherit; cursor: pointer;
+  }
+  @keyframes sh { from { background-position: 110% 0; } to { background-position: -110% 0; } }
+  @keyframes fade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .sk { animation: none; }
+    .card.done .real { animation: none; }
+  }
+</style>
+</head>
+<body>
+<article class="card" id="card" aria-busy="true">
+  <div class="sk media"></div>
+  <div class="sk line"></div>
+  <div class="sk line short"></div>
+  <div class="sk pad"></div>
+  <div class="real">
+    <div class="media"></div>
+    <h2>山谷里的清晨</h2>
+    <p>骨架屏只负责占位，内容回来后再淡入。</p>
+  </div>
+</article>
+<button class="again" id="again" type="button">重新加载</button>
+<script>
+  const card = document.getElementById('card');
+  let timer = 0;
+
+  function load() {
+    card.classList.remove('done');
+    card.setAttribute('aria-busy', 'true');
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      card.classList.add('done');
+      card.setAttribute('aria-busy', 'false');
+    }, 1500);
+  }
+
+  document.getElementById('again').addEventListener('click', load);
+  load();
+</script>
+</body>
+</html>

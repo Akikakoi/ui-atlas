@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>无缝手风琴 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #f5f4ef; color: #191b1f;
+    font: 15px/1.7 system-ui, "PingFang SC", sans-serif;
+  }
+  .wrap { width: min(560px, 88vw); margin: 12vh auto; }
+  .item { border-bottom: 1px solid #ddd8cc; }
+  .item > button {
+    width: 100%; display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; padding: 16px 0; border: 0; background: none;
+    font: inherit; font-weight: 600; color: inherit; text-align: left; cursor: pointer;
+  }
+  .plus { transition: transform .25s ease; }
+  .item.open .plus { transform: rotate(45deg); }
+  .panel {
+    display: grid; grid-template-rows: 0fr;
+    transition: grid-template-rows .4s cubic-bezier(.2, .8, .2, 1);
+  }
+  .panel > div { overflow: hidden; }
+  .item.open .panel { grid-template-rows: 1fr; }
+  .panel p { margin: 0 0 16px; color: #5b5e65; font-size: 14px; }
+  @media (prefers-reduced-motion: reduce) {
+    .plus, .panel { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="item open">
+    <button type="button" aria-expanded="true" aria-controls="p1">怎么控制展开高度？<span class="plus">+</span></button>
+    <div class="panel" id="p1"><div><p>用 <code>grid-template-rows</code> 从 <code>0fr</code> 到 <code>1fr</code>，内容自然撑开，不用量像素。</p></div></div>
+  </div>
+  <div class="item">
+    <button type="button" aria-expanded="false" aria-controls="p2">同时只开一个吗？<span class="plus">+</span></button>
+    <div class="panel" id="p2"><div><p>可以。点击时先关掉其它项，再切换当前项；关闭的面板设为 <code>inert</code>，键盘不会跑进去。</p></div></div>
+  </div>
+  <div class="item">
+    <button type="button" aria-expanded="false" aria-controls="p3">减动效怎么办？<span class="plus">+</span></button>
+    <div class="panel" id="p3"><div><p>在 <code>prefers-reduced-motion</code> 下把过渡去掉，展开仍然是瞬间的，但不会动。</p></div></div>
+  </div>
+</div>
+<script>
+  const items = [...document.querySelectorAll('.item')];
+
+  function setOpen(item, on) {
+    const btn = item.querySelector('button');
+    const panel = item.querySelector('.panel');
+    item.classList.toggle('open', on);
+    btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    panel.setAttribute('aria-hidden', on ? 'false' : 'true');
+    panel.inert = !on;
+  }
+
+  items.forEach((item) => {
+    setOpen(item, item.classList.contains('open'));
+    item.querySelector('button').addEventListener('click', () => {
+      const on = !item.classList.contains('open');
+      items.forEach((other) => { if (other !== item) setOpen(other, false); });
+      setOpen(item, on);
+    });
+  });
+</script>
+</body>
+</html>

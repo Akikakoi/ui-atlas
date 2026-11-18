@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>磁吸按钮 · 最小用法</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    min-height: 100vh; margin: 0; display: grid; place-items: center;
+    background: #0e1116; font: 15px/1.6 system-ui, "PingFang SC", sans-serif;
+  }
+  .magnet {
+    position: relative; border: 0; border-radius: 14px; padding: 16px 34px;
+    font: inherit; font-weight: 600; color: #fff; cursor: pointer;
+    background: linear-gradient(135deg, #7d9cf0, #2f5fd0 58%, #1d3d8f);
+    box-shadow: 0 18px 40px rgba(47, 95, 208, .34);
+    will-change: transform;
+  }
+  .magnet span { display: inline-block; will-change: transform; }
+  @media (prefers-reduced-motion: reduce) {
+    .magnet, .magnet span { transition: none; }
+  }
+</style>
+</head>
+<body>
+<button class="magnet" type="button"><span>把光标靠近</span></button>
+<script>
+  const btn = document.querySelector('.magnet');
+  const label = btn.querySelector('span');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const R = 150;       // 吸附半径
+  const EASE = 0.16;   // 每帧跟随系数
+  let tx = 0, ty = 0, x = 0, y = 0, raf = 0;
+
+  function aim(e) {
+    if (reduce) return;
+    const r = btn.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2);
+    const dy = e.clientY - (r.top + r.height / 2);
+    const d = Math.hypot(dx, dy);
+    const f = d < R ? 1 - d / R : 0;
+    tx = dx * f * 0.34;
+    ty = dy * f * 0.34;
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+
+  function tick() {
+    x += (tx - x) * EASE;
+    y += (ty - y) * EASE;
+    btn.style.transform = `translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0)`;
+    label.style.transform = `translate3d(${(-x * 0.12).toFixed(2)}px,${(-y * 0.12).toFixed(2)}px,0)`;
+    raf = (Math.abs(tx - x) > 0.1 || Math.abs(ty - y) > 0.1) ? requestAnimationFrame(tick) : 0;
+  }
+
+  addEventListener('pointermove', aim, { passive: true });
+  addEventListener('pointerleave', () => {
+    tx = ty = 0;
+    if (!raf) raf = requestAnimationFrame(tick);
+  });
+</script>
+</body>
+</html>
