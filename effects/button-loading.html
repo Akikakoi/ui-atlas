@@ -187,7 +187,7 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
         <div class="addr">
           <span class="pin" aria-hidden="true">SH</span>
           <div><b>林一 · 138 **** 2046</b><span>上海市徐汇区安福路 246 号 1F<br>工作日 10:00–20:00 可收</span></div>
-          <button type="button">修改</button>
+          <button type="button" id="editAddr">修改</button>
         </div>
       </div>
     </section>
@@ -219,9 +219,18 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 <script>
 (function () {
   var btn = document.getElementById('btn'), label = document.getElementById('label'), msg = document.getElementById('msg');
+  var edit = document.getElementById('editAddr');
   var bag = document.querySelector('.bag b'), totalEl = document.querySelector('.total b');
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var timer = null;
+  var timer = null, editTimer = null;
+
+  /* 原先这个按钮只有 hover 样式、没有任何点击行为 */
+  edit.addEventListener('click', function () {
+    edit.textContent = '演示页只读';
+    msg.textContent = '收货地址为演示数据，暂不支持修改。';
+    clearTimeout(editTimer);
+    editTimer = setTimeout(function () { edit.textContent = '修改'; }, 1800);
+  });
 
   if (!reduce) {
     var t0 = null;
@@ -261,7 +270,7 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
       }, 2200);
     }, 1400);
   });
-  addEventListener('pagehide', function () { clearTimeout(timer); });
+  addEventListener('pagehide', function () { clearTimeout(timer); clearTimeout(editTimer); });
 })();
 </script>
 <script>

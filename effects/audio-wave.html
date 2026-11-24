@@ -40,7 +40,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .cv-mid strong{display:block;font:700 clamp(58px,7vw,92px)/.86 ui-monospace,Consolas,monospace;letter-spacing:-.06em;color:var(--accent)}
 .cv-mid small{display:block;margin-top:10px;font:600 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:rgba(242,243,238,.6)}
 .cv-wave{position:absolute;right:14px;bottom:20px;z-index:1;display:flex;align-items:flex-end;gap:3px;height:64px;opacity:.5}
-.cv-wave i{display:block;width:3px;height:var(--h);border-radius:2px;background:var(--accent);transform-origin:50% 100%;animation:cvBob 2.8s ease-in-out infinite alternate}
+.cv-wave i{display:block;width:3px;height:var(--h);border-radius:2px;background:var(--accent);transform-origin:50% 100%;animation:cvBob 2.8s ease-in-out infinite alternate;animation-play-state:paused}
+body.is-playing .cv-wave i{animation-play-state:running}
 .cv-wave i:nth-child(2n){animation-delay:-.7s}
 .cv-wave i:nth-child(3n){animation-delay:-1.3s}
 @keyframes cvBob{from{scale:1 .78}to{scale:1 1}}
@@ -50,6 +51,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .play:hover{border-color:var(--accent);background:#222b39;translate:0 -1px}
 .play:active{translate:0 1px}
 .play:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.play[disabled]{opacity:.5;cursor:progress}
+.play[disabled]:hover{border-color:rgba(255,255,255,.16);background:#1d2430;translate:none}
 .play svg{width:16px;height:16px;transition:scale .2s}
 .play:hover svg{scale:1.08}
 .play .pause{display:none}
@@ -60,12 +63,17 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .meta b{font-size:12.5px;font-weight:600}
 .meta span{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
 .wave{display:flex;align-items:center;gap:3px;height:54px;overflow:hidden}
-.bar{flex:1 1 auto;width:3px;height:var(--h,50%);border-radius:2px;background:linear-gradient(180deg,#8ef0c8,#3f8f74);opacity:.75;transform:scaleY(.55);transform-origin:50% 50%;animation:wave .9s ease-in-out infinite alternate;animation-delay:calc(var(--i) * -58ms);animation-play-state:paused}
-.player.playing .bar{animation-play-state:running;opacity:1}
-@keyframes wave{from{transform:scaleY(.32)}to{transform:scaleY(1)}}
+.bar{flex:1 1 auto;min-width:2px;height:100%;border-radius:2px;background:linear-gradient(180deg,#8ef0c8,#3f8f74);opacity:.7;transform:scaleY(var(--v,.3));transform-origin:50% 50%;transition:opacity .25s}
+.player.playing .bar{opacity:1}
 .time{margin-top:7px;display:flex;justify-content:space-between;align-items:center;gap:10px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
-.time i{display:block;flex:1;height:2px;background:rgba(255,255,255,.1);position:relative;overflow:hidden}
-.time i::after{content:"";position:absolute;inset:0;background:var(--accent);transform-origin:left;transform:scaleX(0);transition:transform .3s linear}
+.time span{white-space:nowrap}
+.seek{position:relative;flex:1;min-width:0;height:18px;display:flex;align-items:center;cursor:pointer;touch-action:none;border-radius:4px}
+.seek:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.seek i{position:relative;display:block;width:100%;height:3px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
+.seek i::after{content:"";position:absolute;inset:0;background:var(--accent);transform-origin:left;transform:scaleX(var(--p,0))}
+.seek:hover i{background:rgba(255,255,255,.2)}
+.synth{margin:7px 0 0;font:500 8.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted);opacity:.78}
+.synth b{color:var(--accent);font-weight:600}
 .after{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(28px,5vw,64px);margin-top:clamp(30px,4.4vw,48px);padding-top:24px;border-top:1px solid var(--line)}
 .sec-k{margin:0 0 14px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted)}
 .chapters ol{list-style:none;margin:0;padding:0}
@@ -82,13 +90,6 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 .about p{margin:0 0 14px;font-size:12.5px;line-height:1.95;color:var(--muted)}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
 .tags span{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 9px}
-.subform{display:flex;gap:8px}
-.subform input{flex:1;min-width:0;border:1px solid var(--line);background:#121720;color:var(--ink);border-radius:999px;padding:9px 14px;font:inherit;font-size:12px;outline:none}
-.subform input:focus{border-color:var(--accent)}
-.subform button{border:1px solid var(--accent);background:var(--accent);color:#0a0d10;border-radius:999px;padding:9px 16px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
-#submsg{margin:8px 0 0;font-size:11px;color:var(--accent);min-height:1.4em}
-#submsg.say{animation:sayIn .34s cubic-bezier(.2,.8,.2,1)}
-@keyframes sayIn{from{opacity:0;translate:0 4px}to{opacity:1;translate:0 0}}
 .foot{max-width:1120px;margin:36px auto 0;padding:20px clamp(20px,4vw,48px) 28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 .hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:3;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
@@ -114,6 +115,7 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   .meta b{font-size:11px}
   .wave{height:34px;gap:2px}
   .time{margin-top:5px;font-size:8.5px}
+  .synth{display:none}
   .after{grid-template-columns:1fr;margin-top:12px;padding-top:10px}
   .about{display:none}
   .chapters .sec-k{display:none}
@@ -140,10 +142,10 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   .foot{flex-direction:column;gap:4px;padding-left:18px;padding-right:18px}
 }
 @media (prefers-reduced-motion:reduce){
-  .bar{animation:none;transform:scaleY(.7)}
+  .bar{transition:none}
   .play{transition:none}
   .onair i{animation:none}
-  .hero,.cv-wave i,.chapters li,#submsg.say{animation:none}
+  .hero,.cv-wave i,.chapters li{animation:none}
   .head nav a::after,.cover,.player,.play,.play svg,.chapters li{transition:none}
   .cover:hover,.play:hover,.chapters li:hover{translate:none}
   .play:hover svg{scale:none}
@@ -155,7 +157,7 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   <a class="brand" href="#top"><span class="mark">B</span>SIDE B<span class="brand-sub">声音电台</span></a>
   <nav aria-label="主导航"><a href="#top">单集</a><a href="#top">专栏</a><a href="#top">关于</a></nav>
   <span class="onair"><i></i>ON AIR · 每周三</span>
-  <p class="hint">点播放，再点一次暂停</p>
+  <p class="hint">点播放；波形来自实时频谱，拖进度条可定位</p>
 </header>
 <main class="stage" id="top">
   <section class="hero">
@@ -180,7 +182,8 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
     <div class="body">
       <div class="meta"><b>04 · 动效的节奏</b><span id="state" role="status" aria-live="polite">PAUSED</span></div>
       <div class="wave" id="wave" aria-hidden="true"></div>
-      <div class="time"><span id="cur">0:00</span><i id="prog"></i><span>0:24</span></div>
+      <div class="time"><span id="cur">0:00</span><div class="seek" id="seek" role="slider" tabindex="0" aria-label="试听进度" aria-valuemin="0" aria-valuemax="24" aria-valuenow="0" aria-valuetext="0:00 / 0:24"><i id="prog"></i></div><span>0:24</span></div>
+      <p class="synth"><b>Web Audio</b> · 这段 24 秒试听由代码现场合成，不是原片录音</p>
     </div>
   </section>
 
@@ -197,11 +200,6 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
       <p class="sec-k">关于这期</p>
       <p>录制于上海一间只有 9 平方米的录音棚。林柯带来了三段未上线的动效草稿，我们逐段拆了它们的时长、曲线和停顿。</p>
       <div class="tags"><span>界面动效</span><span>节奏</span><span>声音设计</span></div>
-      <form class="subform" id="subform">
-        <input type="email" placeholder="you@studio.com" aria-label="邮箱" required>
-        <button type="submit">订阅</button>
-      </form>
-      <p id="submsg" role="status" aria-live="polite"></p>
     </aside>
   </section>
 </main>
@@ -213,62 +211,479 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 (function () {
   var player = document.getElementById('player'), play = document.getElementById('play');
   var wave = document.getElementById('wave'), state = document.getElementById('state');
-  var cur = document.getElementById('cur'), prog = document.getElementById('prog');
-  var chapters = document.querySelectorAll('.chapters li');
-  var total = 24, sec = 0, timer = null;
+  var cur = document.getElementById('cur'), seek = document.getElementById('seek'), prog = document.getElementById('prog');
+  var synth = document.querySelector('.synth');
+  var chapters = [].slice.call(document.querySelectorAll('.chapters li'));
+  var total = 24, count = 26;
+  var bars = [], peaks = [], live = [], fallback = [0.3,0.46,0.62,0.5,0.7,0.9,0.64,0.44,0.74,0.56,0.82,0.68,0.4,0.6,0.86,0.72,0.52,0.66,0.84,0.58,0.42,0.7,0.88,0.62,0.48,0.34];
+  var ctx = null, buffer = null, analyser = null, source = null, freq = null, ready = null;
+  var playing = false, loading = false, ended = false;
+  var offset = 0, startedAt = 0, raf = 0, lastSec = -1, lastChapter = -1;
+  var scrub = false, resumeAfterScrub = false;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
-  for (var i = 0; i < 26; i++) {
-    var b = document.createElement('i');
-    b.className = 'bar';
-    b.style.setProperty('--i', i);
-    b.style.setProperty('--h', (22 + Math.random() * 78).toFixed(0) + '%');
-    wave.appendChild(b);
+  for (var i = 0; i < count; i++) {
+    var barEl = document.createElement('i');
+    barEl.className = 'bar';
+    barEl.style.setProperty('--v', fallback[i]);
+    wave.appendChild(barEl);
+    bars.push(barEl);
+    peaks.push(fallback[i]);
+    live.push(fallback[i]);
   }
 
-  function paint() {
-    cur.textContent = '0:' + String(sec).padStart(2, '0');
-    prog.style.transform = 'scaleX(' + (sec / total).toFixed(3) + ')';
-    var active = Math.min(2, Math.floor(sec / 8));
-    [].forEach.call(chapters, function (li, i) {
-      li.classList.toggle('on', i === active);
-    });
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  function fmt(t) {
+    var s = Math.floor(clamp(t, 0, total));
+    return '0:' + (s < 10 ? '0' + s : s);
   }
 
-  function stop() {
-    clearInterval(timer);
-    timer = null;
-    player.classList.remove('playing');
-    play.classList.remove('playing');
-    play.setAttribute('aria-pressed', 'false');
-    play.setAttribute('aria-label', '播放试听片段');
-    state.textContent = 'PAUSED';
+  function paint(t) {
+    var sec = Math.floor(t + 0.0001);
+    if (sec !== lastSec) {
+      cur.textContent = fmt(t);
+      seek.setAttribute('aria-valuenow', String(Math.round(t * 10) / 10));
+      seek.setAttribute('aria-valuetext', fmt(t) + ' / ' + fmt(total));
+      lastSec = sec;
+    }
+    prog.style.setProperty('--p', (t / total).toFixed(4));
+    var ch = t >= total ? chapters.length - 1 : Math.min(chapters.length - 1, Math.floor(t / (total / 3)));
+    if (ch !== lastChapter) {
+      chapters.forEach(function (li, n) { li.classList.toggle('on', n === ch); });
+      lastChapter = ch;
+    }
+  }
+
+  function setBars(vals) {
+    for (var n = 0; n < count; n++) bars[n].style.transform = 'scaleY(' + vals[n].toFixed(3) + ')';
+  }
+
+  function still() {
+    live = peaks.slice();
+    setBars(peaks);
+  }
+
+  function updateUI() {
+    player.classList.toggle('playing', playing);
+    play.classList.toggle('playing', playing);
+    document.body.classList.toggle('is-playing', playing);
+    play.disabled = loading;
+    play.setAttribute('aria-pressed', playing ? 'true' : 'false');
+    play.setAttribute('aria-label', playing ? '暂停试听片段' : ended ? '重新播放试听片段' : '播放试听片段');
+    player.setAttribute('aria-busy', loading ? 'true' : 'false');
+    if (loading) state.textContent = 'SYNTH…';
+    else if (playing) state.textContent = 'PLAYING';
+    else if (ended) state.textContent = 'ENDED';
+    else state.textContent = 'PAUSED';
+  }
+
+  function stopRaf() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+  }
+
+  function now() {
+    if (!playing || !ctx) return offset;
+    return Math.min(total, offset + (ctx.currentTime - startedAt));
+  }
+
+  function killSource() {
+    if (!source) return;
+    var s = source;
+    source = null;
+    s.onended = null;
+    try { s.stop(); } catch (e) {}
+    try { s.disconnect(); } catch (e) {}
+  }
+
+  function startSource(at) {
+    killSource();
+    source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(analyser);
+    var node = source;
+    source.onended = function () {
+      if (node !== source) return;
+      finish();
+    };
+    offset = at;
+    startedAt = ctx.currentTime;
+    source.start(0, at);
+  }
+
+  function levels() {
+    analyser.getByteFrequencyData(freq);
+    var nyquist = ctx.sampleRate / 2;
+    var binHz = nyquist / freq.length;
+    var lo = 60, hi = Math.min(10000, nyquist * 0.95), ratio = hi / lo;
+    var vals = [];
+    for (var n = 0; n < count; n++) {
+      var a = lo * Math.pow(ratio, n / count);
+      var b = lo * Math.pow(ratio, (n + 1) / count);
+      var i0 = Math.max(1, Math.floor(a / binHz));
+      var i1 = Math.max(i0 + 1, Math.ceil(b / binHz));
+      var sum = 0, hits = 0, k;
+      for (k = i0; k < i1 && k < freq.length; k++) { sum += freq[k]; hits++; }
+      var v = hits ? sum / hits / 255 : 0;
+      v = Math.pow(v, .82);
+      v = clamp(v * 1.05 + .03, .06, .96);
+      live[n] += (v - live[n]) * .32;
+      vals.push(live[n]);
+    }
+    return vals;
+  }
+
+  function tick() {
+    raf = 0;
+    if (!playing) return;
+    var t = now();
+    if (t >= total - .02) { finish(); return; }
+    paint(t);
+    if (!reduce.matches) setBars(levels());
+    raf = requestAnimationFrame(tick);
+  }
+
+  function finish() {
+    if (!playing && !source) return;
+    playing = false;
+    ended = true;
+    offset = total;
+    stopRaf();
+    killSource();
+    still();
+    paint(total);
+    updateUI();
+    if (ctx && ctx.state === 'running') ctx.suspend().catch(function () {});
+  }
+
+  function pause() {
+    if (!playing) return;
+    offset = now();
+    playing = false;
+    stopRaf();
+    killSource();
+    paint(offset);
+    updateUI();
+    if (ctx && ctx.state === 'running') ctx.suspend().catch(function () {});
+  }
+
+  function fail() {
+    loading = false;
+    playing = false;
+    ended = false;
+    stopRaf();
+    killSource();
+    updateUI();
+    state.textContent = 'UNAVAILABLE';
+    play.disabled = true;
+    if (synth) synth.innerHTML = '<b>Web Audio</b> · 当前浏览器无法启动音频';
+  }
+
+  function begin() {
+    if (!ctx) { fail(); return; }
+    ctx.resume().then(startFromOffset).catch(fail);
+  }
+
+  function startFromOffset() {
+    if (!buffer) return;
+    ended = false;
+    if (offset >= total - .02) offset = 0;
+    try { startSource(offset); } catch (e) { fail(); return; }
+    playing = true;
+    lastSec = -1;
+    lastChapter = -1;
+    updateUI();
+    paint(offset);
+    stopRaf();
+    raf = requestAnimationFrame(tick);
+  }
+
+  function playTrack() {
+    if (loading || playing) return;
+    if (buffer) { begin(); return; }
+    loading = true;
+    updateUI();
+    var p = ensureBuffer();
+    if (ctx && ctx.state === 'suspended') ctx.resume().catch(function () {});
+    p.then(function () {
+      loading = false;
+      if (document.hidden) { updateUI(); return; }
+      begin();
+    }).catch(fail);
+  }
+
+  function seekTo(t) {
+    t = clamp(t, 0, total);
+    offset = t;
+    ended = t >= total - .001;
+    paint(t);
+    if (playing) {
+      if (ended) { finish(); return; }
+      try { startSource(t); } catch (e) { fail(); return; }
+      return;
+    }
+    still();
+    updateUI();
   }
 
   play.addEventListener('click', function () {
-    if (timer) { stop(); return; }
-    player.classList.add('playing');
-    play.classList.add('playing');
-    play.setAttribute('aria-pressed', 'true');
-    play.setAttribute('aria-label', '暂停试听片段');
-    state.textContent = 'PLAYING';
-    timer = setInterval(function () {
-      sec++;
-      if (sec >= total) { sec = 0; paint(); stop(); return; }
-      paint();
-    }, 1000);
-    paint();
+    if (playing) pause();
+    else playTrack();
   });
 
-  document.getElementById('subform').addEventListener('submit', function (e) {
+  function seekFromEvent(e) {
+    var r = seek.getBoundingClientRect();
+    var t = clamp((e.clientX - r.left) / r.width, 0, 1) * total;
+    offset = t;
+    ended = t >= total - .001;
+    paint(t);
+    still();
+    state.textContent = 'SEEKING';
+    seek.setAttribute('aria-valuenow', String(Math.round(t * 10) / 10));
+    seek.setAttribute('aria-valuetext', fmt(t) + ' / ' + fmt(total));
+  }
+
+  seek.addEventListener('pointerdown', function (e) {
+    if (e.button || loading) return;
     e.preventDefault();
-    var input = this.querySelector('input');
-    var submsg = document.getElementById('submsg');
-    submsg.textContent = '已订阅 · 下周三把新一期发到 ' + input.value.trim();
-    submsg.classList.remove('say');
-    void submsg.offsetWidth;
-    submsg.classList.add('say');
-    input.value = '';
+    seek.focus();
+    scrub = true;
+    resumeAfterScrub = playing;
+    if (playing) pause();
+    seek.setPointerCapture(e.pointerId);
+    seekFromEvent(e);
   });
+
+  seek.addEventListener('pointermove', function (e) {
+    if (scrub) seekFromEvent(e);
+  }, { passive: true });
+
+  function endScrub(e) {
+    if (!scrub) return;
+    scrub = false;
+    if (seek.hasPointerCapture && seek.hasPointerCapture(e.pointerId)) seek.releasePointerCapture(e.pointerId);
+    if (resumeAfterScrub && offset < total - .02) playTrack();
+    else { updateUI(); paint(offset); }
+    resumeAfterScrub = false;
+  }
+  seek.addEventListener('pointerup', endScrub);
+  seek.addEventListener('pointercancel', endScrub);
+
+  seek.addEventListener('keydown', function (e) {
+    var curT = playing ? now() : offset;
+    var step = e.shiftKey ? 5 : 1;
+    var t = null;
+    if (e.key === 'ArrowLeft') t = curT - step;
+    else if (e.key === 'ArrowRight') t = curT + step;
+    else if (e.key === 'Home') t = 0;
+    else if (e.key === 'End') t = total;
+    if (t === null) return;
+    e.preventDefault();
+    seekTo(t);
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && playing) pause();
+  });
+
+  function seeded(seed) {
+    return function () {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+  }
+
+  function readPeaks(buf) {
+    var data = buf.getChannelData(0);
+    var seg = Math.floor(data.length / count);
+    var vals = [], max = 0;
+    for (var n = 0; n < count; n++) {
+      var start = n * seg, end = Math.min(data.length, start + seg);
+      var sum = 0, hits = 0, j;
+      for (j = start; j < end; j += 8) { sum += data[j] * data[j]; hits++; }
+      var rms = Math.sqrt(sum / hits);
+      vals.push(rms);
+      if (rms > max) max = rms;
+    }
+    return vals.map(function (v) {
+      var x = max ? v / max : 0;
+      return Math.max(.18, Math.min(1, .18 + .82 * Math.pow(x, .6)));
+    });
+  }
+
+  function renderTrack(OAC) {
+    var sr = 32000;
+    var off = new OAC(2, Math.round(sr * total), sr);
+    var master = off.createGain();
+    master.gain.setValueAtTime(.0001, 0);
+    master.gain.exponentialRampToValueAtTime(.9, .6);
+    master.gain.setValueAtTime(.9, total - 1.2);
+    master.gain.exponentialRampToValueAtTime(.0001, total);
+    var comp = off.createDynamicsCompressor();
+    comp.threshold.value = -18;
+    comp.knee.value = 24;
+    comp.ratio.value = 3;
+    comp.attack.value = .01;
+    comp.release.value = .25;
+    master.connect(comp);
+    comp.connect(off.destination);
+
+    var delay = off.createDelay(1);
+    delay.delayTime.value = .36;
+    var fb = off.createGain(); fb.gain.value = .3;
+    var damp = off.createBiquadFilter(); damp.type = 'lowpass'; damp.frequency.value = 1800;
+    var wet = off.createGain(); wet.gain.value = .2;
+    delay.connect(damp); damp.connect(fb); fb.connect(delay); damp.connect(wet); wet.connect(master);
+
+    var padFilter = off.createBiquadFilter(); padFilter.type = 'lowpass'; padFilter.frequency.value = 1300; padFilter.Q.value = .5;
+    var padBus = off.createGain(); padBus.gain.value = .8;
+    padFilter.connect(padBus); padBus.connect(master);
+    var padSend = off.createGain(); padSend.gain.value = .45;
+    padBus.connect(padSend); padSend.connect(delay);
+
+    var pluckBus = off.createGain(); pluckBus.gain.value = .9;
+    pluckBus.connect(master);
+    var pluckSend = off.createGain(); pluckSend.gain.value = .5;
+    pluckBus.connect(pluckSend); pluckSend.connect(delay);
+
+    var air = off.createBuffer(2, Math.round(sr * 2), sr);
+    var airRnd = seeded(7);
+    for (var ch = 0; ch < 2; ch++) {
+      var airData = air.getChannelData(ch);
+      for (var ai = 0; ai < airData.length; ai++) airData[ai] = (airRnd() * 2 - 1) * .6;
+    }
+    var airSrc = off.createBufferSource();
+    airSrc.buffer = air;
+    airSrc.loop = true;
+    var airHP = off.createBiquadFilter();
+    airHP.type = 'highpass'; airHP.frequency.value = 2200;
+    var airGain = off.createGain(); airGain.gain.value = .014;
+    airSrc.connect(airHP); airHP.connect(airGain); airGain.connect(master);
+    airSrc.start(0); airSrc.stop(total);
+
+    var chords = [
+      [146.83, 185.00, 220.00, 277.18, 329.63],
+      [123.47, 146.83, 185.00, 220.00, 277.18],
+      [98.00, 123.47, 146.83, 185.00, 220.00],
+      [110.00, 164.81, 185.00, 220.00, 246.94],
+      [123.47, 146.83, 185.00, 220.00, 277.18],
+      [98.00, 123.47, 146.83, 185.00, 220.00]
+    ];
+    var roots = [73.42, 61.74, 49.00, 55.00, 61.74, 49.00];
+
+    function pad(freq, t, dur, pan, level) {
+      [0, 1].forEach(function (k) {
+        var osc = off.createOscillator();
+        osc.type = k ? 'sine' : 'triangle';
+        osc.frequency.value = freq;
+        osc.detune.value = k ? 6 : -4;
+        var g = off.createGain();
+        var lvl = level * (k ? .55 : 1);
+        g.gain.setValueAtTime(.0001, t);
+        g.gain.exponentialRampToValueAtTime(lvl, t + 1.1);
+        g.gain.setValueAtTime(lvl, t + dur - 1.3);
+        g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        var p = off.createStereoPanner();
+        p.pan.value = pan;
+        osc.connect(g); g.connect(p); p.connect(padFilter);
+        osc.start(t); osc.stop(t + dur + .05);
+      });
+    }
+
+    function bass(freq, t) {
+      var o = off.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = freq;
+      var f = off.createBiquadFilter();
+      f.type = 'lowpass'; f.frequency.value = 220;
+      var g = off.createGain();
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(.1, t + .08);
+      g.gain.exponentialRampToValueAtTime(.0001, t + 3.6);
+      o.connect(f); f.connect(g); g.connect(master);
+      o.start(t); o.stop(t + 3.7);
+    }
+
+    function thump(t, strong) {
+      var o = off.createOscillator();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(strong ? 96 : 80, t);
+      o.frequency.exponentialRampToValueAtTime(46, t + .28);
+      var g = off.createGain();
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(strong ? .075 : .045, t + .012);
+      g.gain.exponentialRampToValueAtTime(.0001, t + .45);
+      o.connect(g); g.connect(master);
+      o.start(t); o.stop(t + .5);
+    }
+
+    function pluck(freq, t, pan, level) {
+      var o = off.createOscillator();
+      o.type = 'sine'; o.frequency.value = freq;
+      var o2 = off.createOscillator();
+      o2.type = 'triangle'; o2.frequency.value = freq * 2; o2.detune.value = 6;
+      var g = off.createGain();
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(level, t + .008);
+      g.gain.exponentialRampToValueAtTime(.0001, t + .9);
+      var g2 = off.createGain(); g2.gain.value = .22;
+      var p = off.createStereoPanner(); p.pan.value = pan;
+      o.connect(g); o2.connect(g2); g2.connect(g); g.connect(p); p.connect(pluckBus);
+      o.start(t); o2.start(t); o.stop(t + 1); o2.stop(t + 1);
+    }
+
+    var n, c, t;
+    for (c = 0; c < chords.length; c++) {
+      t = c * 4;
+      for (n = 0; n < chords[c].length; n++) {
+        pad(chords[c][n], t, 4.7, (n - 2) * .17, .014);
+      }
+      bass(roots[c], t);
+    }
+    for (t = 0; t < total; t += 2) thump(t, Math.round(t) % 4 === 0);
+
+    var scale = [293.66, 369.99, 440.00, 554.37, 659.25, 739.99, 880.00];
+    var rnd = seeded(20261124);
+    var p = .5;
+    while (p < total - 1.2) {
+      if (rnd() < .55) {
+        var note = scale[Math.floor(rnd() * scale.length)];
+        pluck(note, p + rnd() * .08, (rnd() * 2 - 1) * .6, .03 + rnd() * .018);
+      }
+      p += .5;
+    }
+    return off.startRendering();
+  }
+
+  function ensureBuffer() {
+    if (ready) return ready;
+    ready = new Promise(function (resolve, reject) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      if (!AC || !OAC) { reject(new Error('unsupported')); return; }
+      try {
+        ctx = new AC();
+        analyser = ctx.createAnalyser();
+        analyser.fftSize = 1024;
+        analyser.smoothingTimeConstant = .72;
+        freq = new Uint8Array(analyser.frequencyBinCount);
+        analyser.connect(ctx.destination);
+      } catch (e) { reject(e); return; }
+      renderTrack(OAC).then(function (buf) {
+        buffer = buf;
+        peaks = readPeaks(buf);
+        live = peaks.slice();
+        still();
+        resolve(buf);
+      }).catch(reject);
+    });
+    return ready;
+  }
+
+  still();
+  paint(0);
+  updateUI();
 })();
 </script>
 <script>

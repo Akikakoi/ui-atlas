@@ -84,6 +84,7 @@ h2{margin:0 0 22px;font-size:clamp(22px,3vw,34px);line-height:1.12;letter-spacin
 .room h3 span{margin-left:auto;font:500 14px ui-monospace,Consolas,monospace;color:#ffe1a8}
 .room p{margin:6px 0 0;font-size:11px;color:var(--muted);line-height:1.7}
 .room .line{margin-top:12px;padding-top:10px;border-top:1px solid rgba(242,244,234,.08);display:flex;justify-content:space-between;font:9.5px ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.06em}
+#rooms,#about,#book{scroll-margin-top:84px}
 .about{padding-top:46px;padding-bottom:46px;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:46px;align-items:center;border-top:1px solid var(--line)}
 .about p{font-size:13px;line-height:1.9;color:rgba(242,244,234,.72);margin:0 0 14px;max-width:34em}
 .about .book{display:inline-flex;margin-top:8px;border-color:rgba(240,198,116,.4);padding:9px 16px}
@@ -100,8 +101,6 @@ h2{margin:0 0 22px;font-size:clamp(22px,3vw,34px);line-height:1.12;letter-spacin
   background:linear-gradient(120deg,rgba(240,198,116,.09),rgba(240,198,116,.015) 60%)}
 .inner-band h2{margin:0 0 6px;font-size:clamp(22px,3vw,30px)}
 .inner-band p{margin:0;font-size:12px;color:var(--muted);line-height:1.8}
-.inner-band .book{margin-left:auto;border-color:var(--accent);background:var(--accent);color:#191307;font-weight:600}
-.inner-band .book:hover{filter:brightness(1.05)}
 .io{opacity:0;transform:translate3d(0,20px,0);
   transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
   transition-delay:calc(var(--i,0) * 80ms)}
@@ -121,8 +120,7 @@ footer span:last-child{margin-left:auto}
   .stats{grid-template-columns:repeat(2,1fr)}
   .stat:nth-child(3){border-left:0;padding-left:0}
   .stat{padding:18px 8px}
-  .inner-band .book{margin-left:0}
-}
+  }
 @media (max-width:560px){
   .nav{height:54px;padding:0 16px}
   .brand span{display:none}
@@ -158,18 +156,17 @@ footer span:last-child{margin-left:auto}
   .cue{opacity:1!important}
   .room,.room .img::before,.nav-links a::after{transition:none}
   .io{opacity:1;transform:none;transition:none}
+  .hint{display:none}
 }
 </style>
 </head>
 <body>
 
 <header class="nav" id="nav">
-  <a class="brand" href="#">NORTH COVE<span>山林旅舍</span></a>
+  <a class="brand" href="#sec">NORTH COVE<span>山林旅舍</span></a>
   <nav class="nav-links" aria-label="主导航">
-    <a href="#">住宿</a>
-    <a href="#">体验</a>
-    <a href="#">路线</a>
-    <a href="#">日志</a>
+    <a href="#rooms">住宿</a>
+    <a href="#about">体验</a>
   </nav>
   <a class="book" href="#book">预订</a>
   <span class="nav-progress" aria-hidden="true"><i id="navBar"></i></span>
@@ -201,7 +198,7 @@ footer span:last-child{margin-left:auto}
     <div class="stat"><b data-to="12" data-suffix=" 间">12 间</b><span>木屋</span></div>
   </div>
 
-  <section class="rooms">
+  <section class="rooms" id="rooms">
     <p class="kicker2">STAY</p>
     <h2>三间房，三种潮声。</h2>
     <div class="cards">
@@ -232,13 +229,13 @@ footer span:last-child{margin-left:auto}
     </div>
   </section>
 
-  <section class="about">
+  <section class="about" id="about">
     <div>
       <p class="kicker2">ABOUT</p>
       <h2>这里没有大堂，<br>只有一间烧柴的屋子。</h2>
       <p>入住是一把钥匙和一张手绘地图。早餐是面包、鸡蛋和昨天摘的莓；晚饭看当天上岸的鱼。没有电视，也没有房卡。</p>
       <p>冬天来，路会封一半，我们到公路口接你。夏天来，潮水退到最远，可以沿着礁石走到灯塔下面。</p>
-      <a class="book" href="#">查看空房</a>
+      <a class="book" href="#book">查看空房</a>
     </div>
     <div class="figure" role="img" aria-label="北湾的山、海与落日"></div>
   </section>
@@ -247,9 +244,8 @@ footer span:last-child{margin-left:auto}
     <div class="inner-band">
       <div>
         <h2>下个月还有 4 个空位。</h2>
-        <p>写下日期，我们回信确认路线、天气和晚饭。</p>
+        <p>路线、天气和晚饭，会在确认信里写清楚。</p>
       </div>
-      <a class="book" href="#">写下日期 →</a>
     </div>
   </section>
 
@@ -338,7 +334,7 @@ footer span:last-child{margin-left:auto}
         io.unobserve(en.target);
       });
     }, { threshold: .18 });
-    [].slice.call(document.querySelectorAll('.rooms, .about, .band .inner')).forEach(function (el, i) {
+    [].slice.call(document.querySelectorAll('.rooms, .about, .band .inner-band')).forEach(function (el, i) {
       el.classList.add('io');
       el.style.setProperty('--i', i % 3);
       io.observe(el);

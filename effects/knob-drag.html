@@ -19,16 +19,13 @@ a{color:inherit}
 .proj b{font-size:12.5px;white-space:nowrap}
 .proj span{font:10.5px/1.4 ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.04em}
 .tabs{display:flex;gap:18px;margin-left:4px}
-.tabs a{font-size:12px;color:var(--muted);text-decoration:none;padding:7px 0;border-bottom:1px solid transparent}
-.tabs a:hover{color:var(--ink)}
-.tabs a.on{color:var(--ink);border-color:var(--accent)}
+.tabs span{font-size:12px;color:var(--muted);padding:7px 0;border-bottom:1px solid transparent}
+.tabs span.on{color:var(--ink);border-color:var(--accent)}
 .grow{flex:1}
 .top-actions{display:flex;align-items:center;gap:12px}
 .save{display:flex;align-items:center;gap:6px;font:10px ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.04em}
 .save i{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 7px var(--accent)}
 .avatar{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(150deg,#ffcf6e,#c98f3a);color:#171207;font-size:10px;font-weight:700}
-.export{border:0;border-radius:7px;background:var(--accent);color:#07110d;font-size:11.5px;font-weight:650;padding:7px 12px;cursor:pointer}
-.export:hover{filter:brightness(1.06)}
 .shell{display:grid;grid-template-columns:216px minmax(0,1fr);min-height:0}
 .sidebar{border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:20px;background:rgba(18,22,29,.55);overflow:auto}
 .side-k{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted);padding:0 8px;margin:0 0 8px}
@@ -76,14 +73,14 @@ button.pill[aria-pressed="true"]{color:var(--gold);border-color:rgba(255,207,110
 .val-bubble{position:absolute;left:50%;top:50%;z-index:4;transform:translate(-50%,-150%);pointer-events:none;
   font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:#07110d;background:var(--accent);
   border-radius:999px;padding:5px 8px;opacity:0;transition:opacity .15s}
-.wrap.dragging .val-bubble{opacity:1}
+.knob-wrap.dragging .val-bubble{opacity:1}
 .knob:active{cursor:grabbing}
 .knob:focus-visible{box-shadow:0 0 0 3px rgba(142,240,200,.4),0 18px 34px -20px rgba(0,0,0,.9)}
 .needle{position:absolute;left:50%;bottom:50%;width:2px;height:39%;border-radius:2px;
   background:linear-gradient(to top,rgba(142,240,200,.18),var(--accent) 55%,#eafff7);
   transform-origin:50% 100%;transform:translateX(-50%) rotate(0deg);transition:transform .12s linear;
   filter:drop-shadow(0 0 5px rgba(142,240,200,.55))}
-.wrap.dragging .needle,.wrap.dragging .ring .value{transition:none}
+.knob-wrap.dragging .needle,.knob-wrap.dragging .ring .value{transition:none}
 .num{font:600 34px/1 "SF Mono",ui-monospace,Consolas,monospace;letter-spacing:-.05em}
 .num small{font-size:.34em;color:var(--muted);margin-left:2px;letter-spacing:0}
 .ticks{position:absolute;inset:0;pointer-events:none}
@@ -163,18 +160,17 @@ td.ok{color:var(--accent)}
 <body>
 <div class="app">
   <header class="topbar">
-    <a class="brand" href="#"><i></i>AURORA</a>
+    <div class="brand"><i></i>AURORA</div>
     <div class="proj"><b>夜航 · EP</b><span>MASTER 02 · 96 kHz</span></div>
     <nav class="tabs" aria-label="工程视图">
-      <a class="on" href="#">工程</a>
-      <a href="#">母带链</a>
-      <a href="#">导出历史</a>
+      <span class="on">工程</span>
+      <span>母带链</span>
+      <span>导出历史</span>
     </nav>
     <span class="grow"></span>
     <div class="top-actions">
       <span class="save"><i></i>已保存 14:02</span>
       <span class="avatar" aria-label="账户：林一">林</span>
-      <button class="export" type="button">导出母带</button>
     </div>
   </header>
 
