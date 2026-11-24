@@ -95,10 +95,8 @@ button{font:inherit;color:inherit}
 .dot{display:inline-flex;align-items:center;gap:6px;font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--muted)}
 .dot::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
 .box p{margin:9px 0 0;font-size:10.5px;line-height:1.8;color:var(--muted)}
-.next{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--paper);transition:translate .2s,box-shadow .2s}
-.next:hover{translate:0 -2px;box-shadow:0 22px 36px -34px rgba(20,22,30,.45)}
-.next .cover{display:block;height:88px;background:radial-gradient(ellipse 70% 90% at 20% 20%,var(--glow),transparent 62%),linear-gradient(135deg,var(--sky1),var(--roof));transition:scale .35s}
-.next:hover .cover{scale:1.03}
+.next{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--paper)}
+.next .cover{display:block;height:88px;background:radial-gradient(ellipse 70% 90% at 20% 20%,var(--glow),transparent 62%),linear-gradient(135deg,var(--sky1),var(--roof))}
 .next div{padding:11px 14px 13px}
 .next small{font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
 .next b{display:block;margin:5px 0 3px;font-size:13px;letter-spacing:-.01em}
@@ -148,9 +146,8 @@ button{font:inherit;color:inherit}
   body,.toggle,.win{transition:none}
   .wipe{display:none}
   .essay .kicker,.essay h1,.essay .byline,.essay .lede,.toggle.swap .ico,.roof i,.snow,.mode-line.swap{animation:none}
-  .box,.toc li,.next,.next .cover{transition:none}
-  .toggle:hover,.toc li:hover,.next:hover{translate:none}
-  .next:hover .cover{scale:none}
+  .box,.toc li{transition:none}
+  .toggle:hover,.toc li:hover{translate:none}
 }
 </style>
 </head>
@@ -204,10 +201,10 @@ button{font:inherit;color:inherit}
         <div class="mode-line"><b id="modeName">日间纸色</b><span class="dot" id="modeDot">对比度 8.2</span></div>
         <p id="modeNote" aria-live="polite">纸张偏暖，适合白天读。夜间的底色会更深，长时间阅读不刺眼。</p>
       </section>
-      <a class="next" href="#issue">
+      <div class="next">
         <span class="cover" aria-hidden="true"></span>
         <div><small>NEXT · 第 05 期</small><b>海边邮局的最后一班船</b><span>12 月 01 日 · 已开始编辑</span></div>
-      </a>
+      </div>
     </aside>
   </main>
 

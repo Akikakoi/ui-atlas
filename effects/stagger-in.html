@@ -56,18 +56,6 @@ h1 em{font-style:italic;font-family:"Songti SC",Georgia,serif;font-weight:400;co
 .quote{max-width:1120px;margin:52px auto 0;padding-top:26px;border-top:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;gap:32px}
 .quote p{margin:0;font-family:"Songti SC",Georgia,serif;font-size:clamp(18px,2.4vw,24px);line-height:1.5;letter-spacing:-.02em}
 .quote span{flex:0 0 auto;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
-.subscribe{max-width:1120px;margin:48px auto 0;padding:26px 28px;border:1px solid var(--line);border-radius:16px;background:var(--paper);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;transition:border-color .25s,box-shadow .25s}
-.subscribe:hover{border-color:#cfc8b8;box-shadow:0 22px 40px -38px rgba(20,22,30,.5)}
-.subscribe b{display:block;font-size:16px;letter-spacing:-.01em}
-.subscribe span{display:block;margin-top:4px;font-size:11.5px;color:var(--muted)}
-.subform{display:flex;gap:8px}
-.subform input{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-size:12px;width:210px;outline:none}
-.subform input:focus{border-color:var(--accent)}
-.subform button{border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:999px;padding:8px 16px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s}
-.subform button:hover{background:var(--accent);border-color:var(--accent)}
-#submsg{margin:0 0 0 auto;font-size:11.5px;color:var(--accent)}
-#submsg.say{animation:sayIn .34s cubic-bezier(.2,.8,.2,1)}
-@keyframes sayIn{from{opacity:0;translate:0 4px}to{opacity:1;translate:0 0}}
 .foot{max-width:1120px;margin:44px auto 0;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;font:500 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
 .hint{position:absolute;left:auto;right:clamp(20px,4vw,48px);top:84px;bottom:auto;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:3;background:rgba(128,128,128,.10);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(128,128,128,.18);border-radius:999px;padding:4px 9px}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
@@ -88,7 +76,7 @@ h1 em{font-style:italic;font-family:"Songti SC",Georgia,serif;font-weight:400;co
   .card b{font-size:13px}
   .card small{display:none}
   .card::after{width:76px;height:76px;right:-18px;bottom:-28px}
-  .quote,.subscribe,.foot{display:none}
+  .quote,.foot{display:none}
   .hint{top:8px;right:14px;font-size:10px;padding:3px 8px}
 }
 @media (max-width:560px){
@@ -104,17 +92,13 @@ h1 em{font-style:italic;font-family:"Songti SC",Georgia,serif;font-weight:400;co
   .card b{font-size:16px}
   .card small{font-size:9.5px}
   .quote{flex-direction:column;gap:12px;margin-top:36px}
-  .subscribe{padding:20px;margin-top:32px}
-  .subform{width:100%}
-  .subform input{flex:1;width:auto;min-width:0}
-  #submsg{margin:0}
   .foot{flex-direction:column;gap:4px;margin-top:32px}
   .hint{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   .card{transition:none}
-  .intro .kicker,.intro h1,.intro .dek,.chip.on,#submsg.say{animation:none}
-  .head nav a::after,.chip,.card::after,.subscribe{transition:none}
+  .intro .kicker,.intro h1,.intro .dek,.chip.on{animation:none}
+  .head nav a::after,.chip,.card::after{transition:none}
   .chip:hover,.card:hover{translate:none}
   .card:hover::after{scale:none}
 }
@@ -173,14 +157,6 @@ h1 em{font-style:italic;font-family:"Songti SC",Georgia,serif;font-weight:400;co
       <p>“入场不是表演，是让视线有先后。”</p>
       <span>GRID 编辑部 · 第 042 期</span>
     </section>
-    <section class="subscribe">
-      <div><b>每周三封，六个词。</b><span>周三早上送达，随时退订。</span></div>
-      <form class="subform" id="subform">
-        <input type="email" placeholder="you@studio.com" aria-label="邮箱" required>
-        <button type="submit">订阅</button>
-      </form>
-      <p id="submsg" role="status" aria-live="polite"></p>
-    </section>
     <footer class="foot">
       <span>GRID 设计周刊 · 上海</span>
       <span>EDITOR / LIN KE · SHEN YU</span>
@@ -238,16 +214,6 @@ h1 em{font-style:italic;font-family:"Songti SC",Georgia,serif;font-weight:400;co
     });
   });
 
-  document.getElementById('subform').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var input = this.querySelector('input');
-    var submsg = document.getElementById('submsg');
-    submsg.textContent = '已记下 ' + input.value.trim() + ' ，周三见。';
-    submsg.classList.remove('say');
-    void submsg.offsetWidth;
-    submsg.classList.add('say');
-    input.value = '';
-  });
 })();
 </script>
 <script>

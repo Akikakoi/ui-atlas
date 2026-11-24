@@ -64,15 +64,14 @@ h2{margin:0;font-family:var(--serif);font-size:clamp(24px,3vw,34px);line-height:
   text-decoration:none;transition:background .2s,padding-left .25s}
 .row:hover{background:rgba(36,83,60,.045);padding-left:8px}
 .row:hover .min{color:var(--accent)}
-.row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .no{font:600 9px/1 var(--mono);letter-spacing:.1em;color:var(--muted)}
 .row:hover .no{color:var(--accent)}
 .slot{display:inline-grid;overflow:hidden;height:1.32em;line-height:1.32em;vertical-align:bottom;max-width:100%}
 .slot span{grid-area:1/1;display:block;transition:transform .5s cubic-bezier(.2,.8,.2,1);will-change:transform;white-space:nowrap}
 .slot .zh{font-family:var(--serif);font-size:19px;letter-spacing:.01em}
 .slot .en{transform:translate3d(0,110%,0);color:var(--accent);font:italic 400 .84em/1.32em Georgia,"Times New Roman",serif;letter-spacing:.01em}
-.row:hover .zh,.row:focus-visible .zh{transform:translate3d(0,-110%,0)}
-.row:hover .en,.row:focus-visible .en{transform:translate3d(0,0,0)}
+.row:hover .zh{transform:translate3d(0,-110%,0)}
+.row:hover .en{transform:translate3d(0,0,0)}
 .au{font-size:10.5px;color:var(--muted);text-align:right;white-space:nowrap}
 .min{font:600 8.5px/1 var(--mono);letter-spacing:.08em;color:var(--muted);text-align:right;transition:color .2s}
 .excerpt{max-width:1140px;margin:34px auto 0;padding:38px 22px 44px;border-top:1px solid var(--line);
@@ -80,8 +79,6 @@ h2{margin:0;font-family:var(--serif);font-size:clamp(24px,3vw,34px);line-height:
 .excerpt h2{font-size:clamp(26px,3.2vw,38px);line-height:1.35;margin-bottom:18px}
 .excerpt p.copy{margin:0 0 12px;font-size:12.5px;line-height:1.95;color:#565c54;max-width:33em}
 .excerpt p.en{margin:18px 0 0;font:italic 400 13px/1.8 Georgia,serif;color:var(--accent)}
-.text-link{display:inline-block;margin-top:20px;font-size:11.5px;text-decoration:none;border-bottom:1px solid var(--ink);padding-bottom:2px}
-.text-link:hover{color:var(--accent);border-color:var(--accent)}
 .pull{position:relative;border-left:1px solid var(--line);padding:8px 0 8px 30px}
 .pull blockquote{margin:0;font-family:var(--serif);font-size:clamp(20px,2.4vw,28px);line-height:1.6}
 .pull blockquote em{font-style:italic;color:var(--accent)}
@@ -210,36 +207,36 @@ footer span:last-child{margin-left:auto}
       <p class="hint">悬停标题，看英文换上来</p>
     </div>
     <ol class="toc">
-      <li><a class="row" href="#p1">
+      <li><div class="row">
         <span class="no">01</span>
         <span class="slot"><span class="zh">在方言里，找到自己的口音</span><span class="en">Finding My Accent in the Dialect</span></span>
         <span class="au">林岚 · 随笔</span><span class="min">8 MIN</span>
-      </a></li>
-      <li><a class="row" href="#p2">
+      </div></li>
+      <li><div class="row">
         <span class="no">02</span>
         <span class="slot"><span class="zh">翻译一首诗，失去什么</span><span class="en">What Gets Lost in a Poem</span></span>
         <span class="au">周越 · 诗歌</span><span class="min">12 MIN</span>
-      </a></li>
-      <li><a class="row" href="#p3">
+      </div></li>
+      <li><div class="row">
         <span class="no">03</span>
         <span class="slot"><span class="zh">声音的记忆，比字更久</span><span class="en">Sound Outlives the Word</span></span>
         <span class="au">阿禾 · 访谈</span><span class="min">9 MIN</span>
-      </a></li>
-      <li><a class="row" href="#p4">
+      </div></li>
+      <li><div class="row">
         <span class="no">04</span>
         <span class="slot"><span class="zh">两种语言之间，住着谁</span><span class="en">Who Lives Between Two Tongues</span></span>
         <span class="au">陈双 · 评论</span><span class="min">7 MIN</span>
-      </a></li>
-      <li><a class="row" href="#p5">
+      </div></li>
+      <li><div class="row">
         <span class="no">05</span>
         <span class="slot"><span class="zh">给母亲读一封英文信</span><span class="en">Reading Mother an English Letter</span></span>
         <span class="au">苏眠 · 散文</span><span class="min">6 MIN</span>
-      </a></li>
-      <li><a class="row" href="#p6">
+      </div></li>
+      <li><div class="row">
         <span class="no">06</span>
         <span class="slot"><span class="zh">口音练习</span><span class="en">Accent Practice</span></span>
         <span class="au">沈可 · 小说</span><span class="min">6 MIN</span>
-      </a></li>
+      </div></li>
     </ol>
   </section>
 
@@ -249,7 +246,6 @@ footer span:last-child{margin-left:auto}
       <h2>舌头记住的，<br>比字典多。</h2>
       <p class="copy">这一期我们从“口音”出发。它常常被当成需要纠正的东西，可它其实是一张地图：标着你出生的小城、第一次离家的车站、以及后来学会的每一种说法。</p>
       <p class="en">An accent is not an error. It is a record of where you have been.</p>
-      <a class="text-link" href="#p1">读卷首语 ↗</a>
     </div>
     <div class="pull">
       <blockquote>“口音不是错误，<br>是你<em>去过的地方</em><br>留下的记录。”</blockquote>

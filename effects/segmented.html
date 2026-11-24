@@ -15,17 +15,8 @@ button{font:inherit}
 .brand{display:flex;align-items:center;gap:9px;font-size:15px;letter-spacing:-.02em;font-weight:700;text-decoration:none}
 .brand i{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink);position:relative}
 .brand i::after{content:"";position:absolute;inset:4px;background:var(--accent);border-radius:50%}
-.nav{display:flex;gap:22px;font-size:12.5px;color:var(--muted)}
-.nav a{position:relative;text-decoration:none}
-.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
-  transform:scaleX(0);transform-origin:right;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
-.nav a:hover::after{transform:scaleX(1);transform-origin:left}
-.nav a:hover,.nav a.on{color:var(--ink)}
-.top-actions{margin-left:auto;display:flex;gap:12px;align-items:center}
-.link-btn{font-size:12.5px;color:var(--muted);text-decoration:none}
-.link-btn:hover{color:var(--ink)}
-.cta{border:0;background:var(--ink);color:#fff;border-radius:8px;padding:8px 13px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
-.cta:hover{opacity:.9}
+.nav{display:flex;gap:22px;margin-left:auto;font-size:12.5px;color:var(--muted)}
+.nav span.on{color:var(--ink)}
 main{padding:0}
 .hero{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:52px;align-items:start;padding:56px 22px 40px}
 .kicker{margin:0 0 12px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
@@ -60,7 +51,6 @@ h1 em{font-style:normal;color:var(--accent)}
 .plan ul{margin:0;padding:0;list-style:none;display:grid;gap:7px}
 .plan li{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.6;color:#4c4f56}
 .plan li::before{content:"";width:5px;height:5px;margin-top:7px;border-radius:50%;background:var(--accent);flex:0 0 5px}
-.plan .cta{display:flex;width:100%;margin-top:auto;height:40px;border-radius:9px;font-size:13px}
 .plan .fine{margin:10px 0 0;font-size:10.5px;line-height:1.6;color:var(--muted);text-align:center}
 .compare{max-width:1120px;margin:6px auto 0;padding:0 22px 30px}
 .compare h2,.faq h2{margin:0 0 12px;font-size:16px;letter-spacing:-.02em}
@@ -88,8 +78,6 @@ details[open] p{animation:faqIn .3s cubic-bezier(.2,.8,.2,1)}
   transition-delay:calc(var(--i,0) * 80ms)}
 .io.in{opacity:1;transform:none}
 footer{border-top:1px solid var(--line);padding:24px max(22px,calc((100vw - 1120px)/2));display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
-footer a{text-decoration:none}
-footer a:hover{color:var(--ink)}
 footer span:last-child{margin-left:auto}
 .hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:3}
 .hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
@@ -105,8 +93,7 @@ footer span:last-child{margin-left:auto}
 @media (max-width:560px){
   .hero{grid-template-columns:1fr}
   .plan{min-height:0}
-  .plan .cta{margin-top:16px}
-  .lede{font-size:13px}
+    .lede{font-size:13px}
   .tablewrap{overflow:visible}
   table{min-width:0}
   th,td{padding:7px}
@@ -130,8 +117,7 @@ footer span:last-child{margin-left:auto}
   .plan ul{gap:4px}
   .plan li{font-size:10.5px;line-height:1.5}
   .plan li::before{margin-top:5px}
-  .plan .cta{height:32px;margin-top:10px;font-size:11.5px}
-  .plan .fine{display:none}
+    .plan .fine{display:none}
   .compare{display:block;max-width:none;margin:0;padding:2px 18px 0}
   .compare h2{margin:0 0 4px;font:600 9px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
   .tablewrap{border-radius:8px;overflow:hidden}
@@ -145,7 +131,7 @@ footer span:last-child{margin-left:auto}
 @media (prefers-reduced-motion:reduce){
   .seg .thumb{transition:none}
   .plan.on{animation:none}
-  .plan,.nav a::after,tbody tr{transition:none}
+  .plan,tbody tr{transition:none}
   details[open] p{animation:none}
   .io{opacity:1;transform:none;transition:none}
 }
@@ -153,17 +139,13 @@ footer span:last-child{margin-left:auto}
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="#"><i></i>ORBIT</a>
+  <div class="brand"><i></i>ORBIT</div>
   <nav class="nav" aria-label="主导航">
-    <a href="#">产品</a>
-    <a class="on" href="#" aria-current="page">定价</a>
-    <a href="#">文档</a>
-    <a href="#">更新日志</a>
+    <span>产品</span>
+    <span class="on">定价</span>
+    <span>文档</span>
+    <span>更新日志</span>
   </nav>
-  <div class="top-actions">
-    <a class="link-btn" href="#">登录</a>
-    <a class="cta" href="#">免费开始</a>
-  </div>
 </header>
 
 <main>
@@ -195,7 +177,6 @@ footer span:last-child{margin-left:auto}
           <li>动效源码与一键复制</li>
           <li>单个工作区</li>
         </ul>
-        <a class="cta" href="#">开始 14 天试用</a>
         <p class="fine">不需要信用卡，试用结束前随时取消。</p>
       </section>
 
@@ -207,7 +188,6 @@ footer span:last-child{margin-left:auto}
           <li>提前解锁新样例</li>
           <li>导出 Tailwind / shadcn 配置</li>
         </ul>
-        <a class="cta" href="#">开始 14 天试用</a>
         <p class="fine">按年结算，30 天内可无理由退款。</p>
       </section>
 
@@ -219,7 +199,6 @@ footer span:last-child{margin-left:auto}
           <li>团队 token 预设与权限</li>
           <li>SSO、审计日志与集中开票</li>
         </ul>
-        <a class="cta" href="#">联系销售</a>
         <p class="fine">增加席位每人 ¥220 / 年，按剩余天数结算。</p>
       </section>
     </div>
@@ -261,9 +240,9 @@ footer span:last-child{margin-left:auto}
 
 <footer>
   <span>ORBIT © 2026</span>
-  <a href="#">隐私</a>
-  <a href="#">条款</a>
-  <a href="#">状态</a>
+  <span>隐私</span>
+  <span>条款</span>
+  <span>状态</span>
   <span>简体中文</span>
 </footer>
 

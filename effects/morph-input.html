@@ -134,7 +134,7 @@ input::placeholder{color:#a3a6ac}
       <input id="q" type="search" placeholder="搜功能、报错码或关键词" aria-label="搜索关键词" autocomplete="off" tabindex="-1">
       <button class="go" id="go" type="submit" tabindex="-1">搜索</button>
     </form>
-    <p class="result" id="result" role="status" aria-live="polite">搜索 132 篇文档 · 也可以点左侧圆钮展开。</p>
+    <p class="result" id="result" role="status" aria-live="polite">搜索这 7 条演示内容 · 也可以点左侧圆钮展开。</p>
     <section class="cats" aria-label="文档分类">
       <div class="cat"><span class="cno">01</span><b>快速开始</b><small>安装、导入与第一篇内容</small><span class="cn">28 篇 →</span></div>
       <div class="cat"><span class="cno">02</span><b>账户与团队</b><small>成员、权限与安全设置</small><span class="cn">31 篇 →</span></div>
@@ -159,6 +159,13 @@ input::placeholder{color:#a3a6ac}
   var bar = document.getElementById('bar'), toggle = document.getElementById('toggle');
   var q = document.getElementById('q'), result = document.getElementById('result');
   var go = document.getElementById('go');
+  var entries = [].slice.call(document.querySelectorAll('.cat, .pop')).map(function (el) {
+    var title = el.querySelector('b'), meta = el.querySelector('small');
+    return {
+      title: title ? title.textContent.trim() : '',
+      meta: meta ? meta.textContent.trim() : ''
+    };
+  });
 
   function setOpen(on) {
     bar.classList.toggle('open', on);
@@ -188,9 +195,20 @@ input::placeholder{color:#a3a6ac}
     if (!v) {
       result.appendChild(document.createTextNode('先输入一个关键词，再按搜索。'));
     } else {
-      result.appendChild(document.createTextNode('搜索「'));
-      result.appendChild(document.createTextNode(v));
-      result.appendChild(document.createTextNode('」 · 命中 ' + (3 + v.length % 7) + ' 篇'));
+      var needle = v.toLowerCase();
+      var hits = entries.filter(function (entry) {
+        return (entry.title + ' ' + entry.meta).toLowerCase().indexOf(needle) !== -1;
+      });
+      if (!hits.length) {
+        result.appendChild(document.createTextNode('演示目录里没有「' + v + '」。试试 Webhook、CSV 或工作区。'));
+      } else {
+        result.appendChild(document.createTextNode('「' + v + '」匹配 ' + hits.length + ' 条演示内容：'));
+        hits.slice(0, 3).forEach(function (hit, i) {
+          if (i) result.appendChild(document.createTextNode(' / '));
+          result.appendChild(document.createTextNode(hit.title));
+        });
+        if (hits.length > 3) result.appendChild(document.createTextNode(' 等'));
+      }
     }
     setOpen(false);
     toggle.focus();

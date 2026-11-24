@@ -89,7 +89,7 @@ h1 em{font-style:normal;color:var(--accent)}
 .note-body{grid-column:1/-1;margin:10px 0 0;font-size:12.5px;line-height:1.9;color:#4c493e;max-width:64em}
 .license{max-width:1080px;margin:clamp(48px,8vw,88px) auto 0;padding:0 22px}
 .lic-inner{background:#16150f;color:#f2eee4;border-radius:24px;padding:clamp(24px,4vw,42px);
-  display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:30px;align-items:center}
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:30px;align-items:center}
 .lic-inner .kicker{color:#e0a97c;margin:0 0 10px}
 .lic-inner h2{margin:0 0 8px;font-size:clamp(22px,2.8vw,32px);letter-spacing:-.03em}
 .lic-inner p{margin:0;font-size:11.5px;line-height:1.8;color:rgba(242,238,228,.6)}
@@ -128,7 +128,7 @@ footer span:last-child{margin-left:auto}
   .row .spec{display:none}
   .notes{display:none}
   .license{margin-top:18px;padding:0 22px 34px}
-  .lic-inner{grid-template-columns:minmax(0,1fr) auto auto;gap:16px;border-radius:14px;padding:14px 16px}
+  .lic-inner{grid-template-columns:minmax(0,1fr) auto;gap:16px;border-radius:14px;padding:14px 16px}
   .lic-inner .kicker,.lic-inner p{display:none}
   .lic-inner h2{font-size:16px;margin:0}
   .lic-right span,.lic-right small{display:none}
@@ -180,6 +180,7 @@ footer span:last-child{margin-left:auto}
   .skew-bar i{transform:none!important}
   .row,.row .no,.nav nav a::after{transition:none}
   .io{opacity:1;transform:none;transition:none}
+  .hint{display:none}
 }
 </style>
 </head>
@@ -291,7 +292,6 @@ footer span:last-child{margin-left:auto}
         <b>¥ 1,280</b>
         <small>5 台设备 · 永久使用</small>
       </div>
-      <button class="btn" type="button">获取报价</button>
     </div>
   </section>
 

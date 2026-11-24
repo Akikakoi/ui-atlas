@@ -17,15 +17,8 @@ a{color:inherit}
 .brand::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--accent);transform:translateY(-1px)}
 .brand span{font:400 9px ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
 .nav-links{display:flex;gap:20px}
-.nav-links a{position:relative;font-size:12px;color:#5f5a4f;text-decoration:none}
-.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);
-  transform:scaleX(0);transform-origin:right;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
-.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
-.nav-links a:hover{color:var(--ink)}
-.nav-links a[aria-current="page"]{color:var(--ink);font-weight:600}
-.cta{margin-left:auto;border:1px solid var(--ink);border-radius:999px;padding:7px 14px;font-size:11.5px;
-  text-decoration:none;font-weight:600;white-space:nowrap;transition:background .2s,color .2s}
-.cta:hover{background:var(--ink);color:var(--paper)}
+.nav-links span{font-size:12px;color:#5f5a4f}
+.nav-links span.on{color:var(--ink);font-weight:600}
 .stage{padding:0 22px 40px}
 .wrap{width:100%;max-width:1120px;margin:0 auto}
 .intro{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:46px;align-items:end;
@@ -102,8 +95,7 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   .nav{height:54px;padding:0 16px;gap:12px}
   .brand span{display:none}
   .nav-links{display:none}
-  .cta{padding:6px 12px;font-size:10.5px}
-  .stage{padding:0 16px 30px}
+    .stage{padding:0 16px 30px}
   .intro{padding:24px 0 16px}
   h1{font-size:clamp(26px,8vw,34px)}
   .sub{font-size:12px;line-height:1.8}
@@ -116,8 +108,7 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
   .brand{font-size:11px}
   .brand span{display:none}
   .nav-links{display:none}
-  .cta{padding:5px 11px;font-size:10px}
-  .stage{padding:0 16px 20px}
+    .stage{padding:0 16px 20px}
   .intro{grid-template-columns:1fr;gap:12px;padding:18px 0 14px}
   .kicker{display:none}
   h1{font-size:clamp(22px,4.2vw,30px)}
@@ -130,21 +121,19 @@ h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;co
 @media (prefers-reduced-motion:reduce){
   .masonry,.card,.tools button{transition:none}
   .status.flash{animation:none}
-  .nav-links a::after{transition:none}
-  .io{opacity:1;transform:none;transition:none}
+    .io{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
 <body>
 
 <header class="nav">
-  <a class="brand" href="#">材料板<span>MATERIA</span></a>
+  <div class="brand">材料板<span>MATERIA</span></div>
   <nav class="nav-links" aria-label="主导航">
-    <a href="#" aria-current="page">材料库</a>
-    <a href="#">项目</a>
-    <a href="#">关于</a>
+    <span class="on">材料库</span>
+    <span>项目</span>
+    <span>关于</span>
   </nav>
-  <a class="cta" href="#">索取样品</a>
 </header>
 
 <main class="stage">

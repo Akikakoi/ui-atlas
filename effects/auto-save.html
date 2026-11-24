@@ -25,10 +25,6 @@ button{font:inherit;color:inherit}
 .avatars{display:flex}
 .avatars i{width:21px;height:21px;margin-left:-6px;border-radius:50%;border:2px solid var(--panel);display:grid;place-items:center;font:600 8px/1 -apple-system,sans-serif;font-style:normal;background:#2a303a;color:#c9ced6}
 .avatars i:first-child{margin-left:0;background:#3a3020;color:var(--accent)}
-.export{height:30px;padding:0 11px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--muted);font-size:9.5px;cursor:pointer;transition:border-color .18s,color .18s,translate .15s}
-.export:hover{border-color:var(--accent);color:var(--accent);translate:0 -1px}
-.export:active{translate:0 1px}
-.export:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .body{flex:1;min-height:0;display:grid;grid-template-columns:232px minmax(0,1fr) 252px}
 .rail{border-right:1px solid var(--line);background:linear-gradient(180deg,#12161b,#0f1216);padding:18px 15px 14px;display:flex;flex-direction:column;gap:18px;overflow:auto}
 .kicker{margin:0;font:600 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}
@@ -101,7 +97,6 @@ button{font:inherit;color:inherit}
 @media (max-width:560px){
   .topbar{height:50px;padding:0 14px;gap:10px}
   .hint,.avatars{display:none}
-  .export{height:28px;padding:0 10px;font-size:9.5px}
   .ed-head{height:46px;padding:0 14px;gap:10px}
   .scene-name{font-size:10.5px}
   .status{font-size:9px}
@@ -115,7 +110,6 @@ button{font:inherit;color:inherit}
   .topbar{height:38px;padding:0 14px;gap:12px}
   .crumbs,.avatars{display:none}
   .hint{left:auto;right:14px;transform:translateY(-50%);font-size:9px;padding:2px 7px}
-  .export{height:25px;padding:0 9px;font-size:8.5px}
   .body{grid-template-columns:minmax(0,1fr)}
   .rail,.notes{display:none}
   .ed-head{height:34px;padding:0 14px;gap:10px}
@@ -132,10 +126,9 @@ button{font:inherit;color:inherit}
 }
 @media (prefers-reduced-motion:reduce){
   .status[data-state="saving"] i{animation:none}
-  .status i,.export,.scenes li,.chars li,.beats li{transition:none}
+  .status i,.scenes li,.chars li,.beats li{transition:none}
   .beats li,.status.swap #label,.status::after,.ver b.bump{animation:none}
-  .export:hover{translate:none}
-}
+  }
 </style>
 </head>
 <body>
@@ -146,7 +139,6 @@ button{font:inherit;color:inherit}
     <p class="hint">改几个字，看保存状态</p>
     <div class="top-right">
       <span class="avatars" aria-hidden="true"><i>林</i><i>周</i></span>
-      <button class="export" type="button">导出 PDF</button>
     </div>
   </header>
 
