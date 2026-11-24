@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>网格拖拽重排 · MOSAIC 内容看板 · UI Atlas</title>
+<style>
+:root{--bg:#f4f3ef;--panel:#fff;--ink:#15161b;--muted:#787b84;--line:#e2ded4;--accent:#5b52c9;--soft:#eeedf9;--r:16px}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+nav a{position:relative;transition:color .2s}
+nav a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+nav a:hover{color:var(--accent)}
+nav a:hover::after{transform:scaleX(1)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.head{position:sticky;top:0;z-index:8;display:flex;align-items:center;gap:22px;height:62px;padding:0 clamp(20px,4vw,46px);background:rgba(244,243,239,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:750;font-size:13px;letter-spacing:.16em;white-space:nowrap}
+.brand .mark{width:22px;height:22px;border-radius:6px;background:conic-gradient(var(--accent) 0 25%,#e8806a 0 50%,#e7b64c 0 75%,#3aa489 0);display:grid;place-items:center;color:#fff;font:700 9px/1 ui-monospace,Consolas,monospace}
+.brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.nav-links{display:flex;gap:22px;margin-left:8px;font-size:12.5px;color:var(--muted)}
+.plan{margin-left:auto;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:999px;padding:7px 15px;font-size:11.5px;font-weight:600;white-space:nowrap;transition:background .2s,border-color .2s}
+.plan:hover{background:var(--accent);border-color:var(--accent)}
+.hero{max-width:1080px;margin:0 auto;padding:clamp(32px,5vw,58px) clamp(20px,4vw,46px) 18px;display:grid;grid-template-columns:1.25fr .75fr;gap:28px;align-items:end}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;font-size:clamp(38px,5.6vw,64px);line-height:1.0;letter-spacing:-.05em;font-weight:640}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.hero p{margin:0 0 4px;font-size:12.5px;line-height:1.9;color:#5e606a;max-width:27em}
+.hero p b{color:var(--ink);font-weight:600}
+.board{max-width:1080px;margin:0 auto;padding:8px clamp(20px,4vw,46px) 10px}
+.bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:13px 0 15px;border-top:1px solid var(--line)}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:8px;padding:6px 13px;font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;transition:background .18s,color .18s,border-color .18s,box-shadow .18s}
+.tab:hover{color:var(--ink);border-color:#cdc8bc}
+.tab.on{background:var(--soft);border-color:var(--accent);color:var(--accent)}
+.reset{margin-left:2px;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:8px;padding:6px 10px;font:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:color .18s,background .18s}
+.reset:hover{color:var(--ink);background:rgba(21,22,27,.05)}
+.status{margin:0 0 0 auto;font:10.5px ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46ch}
+
+/* ── 网格本体：6 列 · 行高 92 · dense 让空位被填满 ── */
+.grid{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:92px;grid-auto-flow:row dense;gap:12px;--flip:420ms}
+
+.card{position:relative;grid-column:span 2;grid-row:span 1;display:flex;flex-direction:column;justify-content:space-between;gap:8px;padding:14px 15px;border-radius:var(--r);overflow:hidden;color:#fff;background:linear-gradient(150deg,var(--c1),var(--c2));will-change:transform;transition:box-shadow .25s,filter .25s,background .25s}
+.card::after{content:"";position:absolute;right:-56px;bottom:-64px;width:156px;height:156px;border:1px solid rgba(255,255,255,.14);border-radius:50%;pointer-events:none}
+.card>:not(.handle):not(.dim):not(.spark):not(.bars):not(.chip){position:relative;z-index:1}
+.card .tag{font:600 8.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;opacity:.62;white-space:nowrap}
+.card .val{margin:0;display:flex;align-items:baseline;gap:7px;font-size:clamp(22px,2.6vw,30px);line-height:1.05;letter-spacing:-.035em;font-weight:650;white-space:nowrap}
+.card .val.txt{font-size:clamp(15px,1.85vw,19px);line-height:1.25;letter-spacing:-.02em;white-space:normal}
+.card .val em{display:none;font-style:normal;font-size:10px;font-weight:650;letter-spacing:0;padding:3px 6px;border-radius:999px;background:rgba(255,255,255,.18);transform:translateY(-2px)}
+.card .desc{margin:6px 0 0;font-size:10.5px;line-height:1.6;opacity:.74;max-width:26em}
+.card .prog{display:block;height:4px;margin-top:9px;border-radius:2px;background:rgba(255,255,255,.2);overflow:hidden}
+.card .prog i{display:block;height:100%;border-radius:inherit;background:rgba(255,255,255,.85);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.card .chip{display:none;position:absolute;right:15px;top:14px;z-index:1;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.16);align-items:center;gap:4px}
+
+/* 尺寸自适应：变窄变小、变宽才放出附加信息 */
+.card[data-c="1"]{padding:11px 12px}
+.card[data-c="1"] .val{font-size:17px;letter-spacing:-.02em}
+.card[data-c="2"] .val.txt{font-size:clamp(14px,1.7vw,17px)}
+.card[data-c="3"] .val em,.card[data-c="4"] .val em,.card[data-c="5"] .val em,.card[data-c="6"] .val em{display:inline-block}
+.card[data-c="3"] .chip,.card[data-c="4"] .chip,.card[data-c="5"] .chip,.card[data-c="6"] .chip{display:inline-flex}
+/* 矮卡压缩成一行说明；只有 1 列宽才彻底收起文字 */
+.card[data-r="1"] .prog{display:none}
+.card[data-r="1"]{justify-content:center;gap:3px}
+.card[data-r="1"] .tag{margin-bottom:1px}
+.card[data-r="1"] .desc{display:block;margin-top:3px;font-size:10px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.card[data-r="1"][data-c="1"]{gap:4px}
+.card[data-r="1"][data-c="1"] .desc{display:none}
+
+.card .spark{position:absolute;right:14px;bottom:16px;display:flex;align-items:flex-end;gap:3px;height:30px;opacity:.72;z-index:0}
+.card .spark i{width:5px;border-radius:2px;background:rgba(255,255,255,.8)}
+.card[data-r="2"] .spark{height:64px;right:16px;bottom:56px;opacity:.34;gap:4px}
+.card[data-r="2"] .spark i{width:6px}
+.card .bars{position:absolute;right:14px;top:16px;bottom:16px;width:40%;display:flex;align-items:flex-end;gap:5px;opacity:.5;z-index:0}
+.card .bars i{flex:1;border-radius:3px 3px 0 0;background:rgba(255,255,255,.85)}
+.card[data-c="1"] .spark,.card[data-c="1"] .bars,.card[data-r="1"] .spark{display:none}
+
+/* 把手：真正的按钮，右下角斜纹抓握 */
+.handle{position:absolute;right:3px;bottom:3px;width:36px;height:36px;padding:0 8px 7px 0;border:0;border-radius:12px;background:transparent;color:#fff;display:grid;place-items:end;cursor:nwse-resize;touch-action:none;z-index:4;transition:background .18s}
+.handle::before{content:"";width:15px;height:15px;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.92) 0 1.4px,transparent 1.4px 5.2px);opacity:.42;transition:opacity .18s,transform .18s}
+.card:hover .handle::before{opacity:.72}
+.handle:hover{background:rgba(255,255,255,.15)}
+.handle:hover::before,.handle:focus-visible::before{opacity:1}
+.handle:active::before{transform:scale(.9)}
+
+/* 拖拽中 */
+.card.resizing{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55),0 28px 48px -26px rgba(20,22,30,.7);filter:brightness(1.07);z-index:6}
+.card.resizing .handle::before{opacity:1}
+body.resizing{cursor:nwse-resize;user-select:none;-webkit-user-select:none}
+.dim{position:absolute;right:12px;bottom:44px;z-index:5;font:650 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;padding:4px 6px;border-radius:6px;background:rgba(10,12,18,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transform:translateY(4px);transition:opacity .18s,transform .18s;pointer-events:none}
+.card:hover .dim{opacity:.9;transform:none}
+.card.resizing .dim{opacity:1;transform:none;background:rgba(10,12,18,.6)}
+
+.note{max-width:1080px;margin:0 auto;padding:24px clamp(20px,4vw,46px) 42px}
+.note-inner{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;border-top:1px solid var(--line);padding-top:20px}
+.note-inner article{display:flex;gap:11px;align-items:flex-start}
+.note-inner i{flex:0 0 20px;font:600 9px/1.7 ui-monospace,Consolas,monospace;font-style:normal;color:var(--accent);letter-spacing:.06em}
+.note-inner h3{margin:0 0 4px;font-size:12.5px;font-weight:600;letter-spacing:-.01em}
+.note-inner p{margin:0;font-size:11px;line-height:1.75;color:var(--muted)}
+footer{max-width:1080px;margin:0 auto;padding:0 clamp(20px,4vw,46px) 30px}
+.foot{display:flex;gap:18px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--line);font:10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--muted)}
+.foot span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:#55585f;pointer-events:none;z-index:9;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(20,22,30,.14);border-radius:999px;padding:4px 9px;box-shadow:0 8px 18px -16px rgba(0,0,0,.6)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:820px){.nav-links{display:none}.hero{grid-template-columns:1fr;gap:12px}.note-inner{grid-template-columns:1fr}}
+@media (max-width:560px){
+  .head{height:54px;padding:0 16px;gap:12px}.brand small{display:none}.plan{padding:6px 11px;font-size:10.5px}
+  .hero{padding:24px 16px 10px}h1{font-size:clamp(34px,10.5vw,46px)}h1 br{display:none}.hero p{font-size:12px;line-height:1.8}
+  .board{padding:6px 14px 8px}.bar{padding:10px 0 12px}.status{width:100%;margin:4px 0 0;order:9;max-width:none}
+  .grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:76px;gap:8px;--r:13px}
+  .card{padding:11px 12px;border-radius:13px}.card[data-c="1"]{padding:9px 10px}
+  .card .val,.card[data-c="1"] .val{font-size:18px}.card .val.txt,.card[data-c="2"] .val.txt{font-size:13px}
+  .card .desc{font-size:9.5px;line-height:1.5}.card .bars,.card .spark{display:none}
+  .card .chip{display:none!important}
+  .handle{width:30px;height:30px;padding:0 7px 6px 0}.handle::before{width:12px;height:12px}
+  .dim{right:9px;bottom:36px;font-size:9px}
+  .note{padding:18px 16px 32px}.foot{flex-direction:column;gap:4px}.foot span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .head{height:44px;padding:0 16px;gap:14px}.nav-links,.brand small{display:none}.plan{padding:5px 11px;font-size:10px}
+  .hero{padding:10px 20px 4px;grid-template-columns:1fr;gap:0}.kicker{display:none}h1{font-size:clamp(22px,4vw,30px)}h1 br{display:none}.hero p{display:none}
+  .board{padding:4px 20px 6px}.bar{padding:7px 0 9px}.tab{padding:4px 9px;font-size:10px}.reset{font-size:9.5px;padding:4px 8px}.status{font-size:9px}
+  .grid{grid-auto-rows:58px;gap:8px}.card{padding:8px 10px;border-radius:10px}.card .tag{font-size:7px}
+  .card .val{font-size:15px}.card .val.txt{font-size:11.5px}
+  /* 58px 一行放不下说明文字，用 [data-c] 提高权重压掉矮卡规则 */
+  .card[data-c] .desc,.card[data-c] .prog,.card[data-c] .bars,.card[data-c] .spark{display:none}
+  .handle{width:22px;height:22px;padding:0 5px 4px 0}.handle::before{width:10px;height:10px}
+  .dim{display:none}
+  .note,footer{display:none}
+  .hint{left:12px;bottom:10px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .card,.card .prog i,.handle::before,.dim,nav a,nav a::after,.tab,.plan{transition:none!important}
+}
+</style>
+</head>
+<body>
+<header class="head">
+  <a class="brand" href="#top"><span class="mark">M</span>MOSAIC <small>内容看板</small></a>
+  <nav class="nav-links" aria-label="主导航"><a href="#board">看板</a><a href="#how">机制</a><a href="#footer">团队</a></nav>
+  <a class="plan" href="#footer">升级团队版 ↗</a>
+</header>
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">WORKSPACE / OVERVIEW</p>
+      <h1>让信息<br><em>自己让出位置。</em></h1>
+    </div>
+    <p>在 MOSAIC，卡片的大小由你决定。按住一张卡右下角的<b>斜纹把手</b>拖动，它按整列整行伸缩，周围的卡片会<b>平滑地滑到新位置</b>，而不是生硬地跳到下一行。</p>
+  </section>
+
+  <section class="board" id="board">
+    <div class="bar" role="group" aria-label="看板视图">
+      <button class="tab on" type="button" data-preset="0" aria-pressed="true">本月概览</button>
+      <button class="tab" type="button" data-preset="1" aria-pressed="false">项目进度</button>
+      <button class="tab" type="button" data-preset="2" aria-pressed="false">团队负载</button>
+      <button class="reset" type="button" id="reset">重置布局</button>
+      <p class="status" id="status" role="status" aria-live="polite">拖动把手调整大小 · 方向键也能调</p>
+    </div>
+
+    <div class="grid" id="grid">
+      <article class="card" data-name="本周活跃" data-c="2" data-r="2" style="--c1:#2f3a51;--c2:#6a7d9c">
+        <span class="tag">01 / METRIC</span>
+        <span class="spark" aria-hidden="true"><i style="height:36%"></i><i style="height:66%"></i><i style="height:49%"></i><i style="height:88%"></i><i style="height:70%"></i></span>
+        <div>
+          <p class="val">24.8k <em>+12.6%</em></p>
+          <p class="desc">本周活跃访客 · 移动端占 63%</p>
+        </div>
+        <button class="handle" type="button" aria-label="调整「本周活跃」卡片大小"></button>
+        <span class="dim" aria-hidden="true"></span>
+      </article>
+
+      <article class="card" data-name="转化率" data-c="2" data-r="1" style="--c1:#57334e;--c2:#a3738e">
+        <span class="tag">02 / METRIC</span>
+        <div>
+          <p class="val">6.4%</p>
+          <p class="desc">目标 8%，漏斗仍在中段流失</p>
+          <span class="prog" aria-hidden="true"><i style="width:80%"></i></span>
+        </div>
+        <button class="handle" type="button" aria-label="调整「转化率」卡片大小"></button>
+        <span class="dim" aria-hidden="true"></span>
+      </article>
+
+      <article class="card" data-name="流量趋势" data-c="2" data-r="1" style="--c1:#4a3a22;--c2:#a98a55">
+        <span class="tag">03 / CHART</span>
+        <span class="bars" aria-hidden="true"><i style="height:52%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:61%"></i></span>
+        <div>
+          <p class="val txt">流量趋势</p>
+          <p class="desc">自然搜索占比首次过半</p>
+        </div>
+        <button class="handle" type="button" aria-label="调整「流量趋势」卡片大小"></button>
+        <span class="dim" aria-hidden="true"></span>
+      </article>
+
+      <article class="card" data-name="设计系统" data-c="2" data-r="2" style="--c1:#2f4b45;--c2:#5f9285">
+        <span class="tag">04 / TASK</span>
+        <span class="chip">林可 · 68%</span>
+        <div>
+          <p class="val txt">Design System v2</p>
+          <p class="desc">组件库迁移进行中，本周先落按钮与表单两套 token</p>
+          <span class="prog" aria-hidden="true"><i style="width:68%"></i></span>
+        </div>
+        <button class="handle" type="button" aria-label="调整「设计系统」卡片大小"></button>
+        <span class="dim" aria-hidden="true"></span>
+      </article>
+
+      <article class="card" data-name="落地页评审" data-c="2" data-r="1" style="--c1:#33304f;--c2:#7771a8">
+        <span class="tag">05 / TASK</span>
+        <div>
+          <p class="val txt">落地页评审</p>
+          <p class="desc">周四 15:00 · 3 条待确认意见</p>
+        </div>
+        <button class="handle" type="button" aria-label="调整「落地页评审」卡片大小"></button>
+        <span class="dim" aria-hidden="true"></span>
+      </article>
+
+      <article class="card" data-name="新增订阅" data-c="2" data-r="1" style="--c1:#2a3a3c;--c2:#5f8587">
+        <span class="tag">06 / METRIC</span>
+        <div>
+          <p class="val">+1,284 <em>41%</em></p>
+          <p class="desc">本月新增订阅 · 邮件打开率 41%</p>
+        </div>
+        <button class="handle" type="button" aria-label="调整「新增订阅」卡片大小"></button>
+        <span class="dim" aria-hidden="true"></span>
+      </article>
+
+      <article class="card" data-name="渠道分布" data-c="2" data-r="1" style="--c1:#4d2f3a;--c2:#9a6b7c">
+        <span class="tag">07 / CHART</span>
+        <span class="bars" aria-hidden="true"><i style="height:70%"></i><i style="height:38%"></i><i style="height:55%"></i><i style="height:86%"></i></span>
+        <div>
+          <p class="val txt">渠道分布</p>
+          <p class="desc">社交 41% / 搜索 34% / 直接 25%</p>
+        </div>
+        <button class="handle" type="button" aria-label="调整「渠道分布」卡片大小"></button>
+        <span class="dim" aria-hidden="true"></span>
+      </article>
+
+      <article class="card" data-name="埋点方案" data-c="6" data-r="1" style="--c1:#40351f;--c2:#9c8a5c">
+        <span class="tag">08 / TASK</span>
+        <span class="chip">2 项待确认</span>
+        <div>
+          <p class="val txt">埋点方案</p>
+          <p class="desc">事件命名待数据团队确认，影响 3 张报表口径</p>
+        </div>
+        <button class="handle" type="button" aria-label="调整「埋点方案」卡片大小"></button>
+        <span class="dim" aria-hidden="true"></span>
+      </article>
+    </div>
+  </section>
+
+  <section class="note" id="how">
+    <div class="note-inner">
+      <article><i>01</i><div><h3>先量后动</h3><p>改跨度前先记下每张卡的 left / top 与正在跑的位移；DOM 一变，旧坐标就没了。</p></div></article>
+      <article><i>02</i><div><h3>反向补差</h3><p>新位置减旧位置得到位移，用 translate 把卡片“拉回”原处，再在 420ms 内归零。</p></div></article>
+      <article><i>03</i><div><h3>键盘等价</h3><p>把手是真正的按钮，左右调宽、上下调高、回车复位，读数同步写进 aria-label。</p></div></article>
+    </div>
+  </section>
+
+  <footer id="footer">
+    <div class="foot">
+      <span>MOSAIC · 内容与数据看板</span>
+      <span>上海 / 远程</span>
+      <span>hello@mosaic.team</span>
+      <span>© 2026</span>
+    </div>
+  </footer>
+</main>
+<p class="hint">按住右下角斜纹把手拖动，看其他卡片让位</p>
+<script>
+(function () {
+  'use strict';
+
+  var grid = document.getElementById('grid');
+  var cards = [].slice.call(grid.querySelectorAll('.card'));
+  var statusEl = document.getElementById('status');
+  var resetBtn = document.getElementById('reset');
+  var tabs = [].slice.call(document.querySelectorAll('.tab'));
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  var PRESETS = [
+    { name: '本月概览', spans: [[2,2],[2,1],[2,1],[2,2],[2,1],[2,1],[2,1],[6,1]] },
+    { name: '项目进度', spans: [[3,1],[3,1],[2,2],[4,2],[2,1],[2,1],[2,1],[6,1]] },
+    { name: '团队负载', spans: [[2,1],[2,1],[2,1],[3,3],[3,1],[3,2],[2,1],[4,1]] }
+  ];
+
+  var running = new WeakMap();   // 每张卡正在跑的 FLIP 动画
+
+  function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+
+  /* 从真实布局里读列车宽、行高、列数 —— 断点变了也自动跟着变 */
+  function metrics() {
+    var cs = getComputedStyle(grid);
+    var tracks = (cs.gridTemplateColumns || '').trim().split(/\s+/).filter(Boolean);
+    var cols = tracks.length || 1;
+    var gapX = parseFloat(cs.columnGap) || 0;
+    var gapY = parseFloat(cs.rowGap) || 0;
+    var colW = parseFloat(tracks[0]) || 0;
+    var rowH = parseFloat(cs.gridAutoRows) || 0;
+    return {
+      cols: cols,
+      unitX: colW + gapX,
+      unitY: rowH + gapY,
+      maxRows: cols <= 2 ? 2 : 3
+    };
+  }
+
+  function readTranslate(el) {
+    var t = getComputedStyle(el).transform;
+    if (!t || t === 'none') return [0, 0];
+    var m = t.match(/matrix\(([^)]+)\)/);
+    if (!m) return [0, 0];
+    var p = m[1].split(',').map(parseFloat);
+    return [p[4] || 0, p[5] || 0];
+  }
+
+  /* 快照：布局坐标（不含 transform）+ 当前视觉位移 */
+  function snapshot() {
+    var map = new Map();
+    cards.forEach(function (card) {
+      var t = readTranslate(card);
+      map.set(card, [card.offsetLeft, card.offsetTop, t[0], t[1]]);
+    });
+    return map;
+  }
+
+  function flip(mutate) {
+    var first = snapshot();
+    mutate();
+    if (reduce.matches) return;
+    cards.forEach(function (card) {
+      var f = first.get(card);
+      if (!f) return;
+      var dx = f[0] + f[2] - card.offsetLeft;
+      var dy = f[1] + f[3] - card.offsetTop;
+      var prev = running.get(card);
+      if (prev) prev.cancel();
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+      var anim = card.animate(
+        [{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'translate(0,0)' }],
+        { duration: 420, easing: 'cubic-bezier(.22,.82,.2,1)' }
+      );
+      running.set(card, anim);
+      anim.addEventListener('finish', function () {
+        if (running.get(card) === anim) running.delete(card);
+      });
+    });
+  }
+
+  /* 关键修正：用 grid-column / grid-row 简写整体改写，
+     不能只写 grid-column-end —— start 与 end 同时是 span 时 end 会被规范丢弃 */
+  function setSpan(card, c, r) {
+    var m = metrics();
+    c = clamp(c | 0, 1, m.cols);
+    r = clamp(r | 0, 1, m.maxRows);
+    card.style.gridColumn = 'span ' + c;
+    card.style.gridRow = 'span ' + r;
+    card.setAttribute('data-c', c);
+    card.setAttribute('data-r', r);
+    var dim = card.querySelector('.dim');
+    if (dim) dim.textContent = c + '×' + r;
+    card.querySelector('.handle').setAttribute(
+      'aria-label',
+      '调整「' + card.dataset.name + '」卡片大小：当前宽 ' + c + ' 列、高 ' + r +
+      ' 行。左右方向键调宽，上下方向键调高，回车或空格复位'
+    );
+    return [c, r];
+  }
+
+  function spanOf(card) { return [+card.dataset.c, +card.dataset.r]; }
+
+  function say(text) { statusEl.textContent = text; }
+
+  function describe(card) {
+    var s = spanOf(card);
+    return '「' + card.dataset.name + '」' + s[0] + ' 列 × ' + s[1] + ' 行';
+  }
+
+  /* ── 初始化 ── */
+  /* 6 列下的跨度是“作者意图”；窄断点按列数等比压缩，避免所有卡都被顶成满宽 */
+  var authored = cards.map(spanOf);
+  var active = authored.map(function (s) { return s.slice(); });
+  var lastCols = 0;
+
+  function scaleSpan(s, m) {
+    return [clamp(Math.round(s[0] * m.cols / 6), 1, m.cols), clamp(s[1], 1, m.maxRows)];
+  }
+
+  function fitAll() {
+    var m = metrics();
+    lastCols = m.cols;
+    cards.forEach(function (card, k) {
+      var s = scaleSpan(active[k], m);
+      setSpan(card, s[0], s[1]);
+    });
+  }
+  fitAll();
+
+  /* ── 每张卡：拖拽 / 键盘 / 双击复位 ── */
+  cards.forEach(function (card, idx) {
+    var handle = card.querySelector('.handle');
+    var home = spanOf(card).slice();
+    var drag = null;
+
+    handle.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      e.preventDefault();
+      /* pointerdown 的 preventDefault 会挡掉默认聚焦，这里手动补上，
+         否则点完把手再按方向键没有反应 */
+      try { handle.focus({ preventScroll: true }); } catch (err) { handle.focus(); }
+      var m = metrics();
+      var s = spanOf(card);
+      drag = {
+        id: e.pointerId,
+        x: e.clientX,
+        y: e.clientY,
+        c: s[0],
+        r: s[1],
+        unitX: m.unitX || 1,
+        unitY: m.unitY || 1,
+        cols: m.cols,
+        maxRows: m.maxRows,
+        moved: false
+      };
+      try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+      /* move / up 挂在 window 上：即使 pointer capture 没生效（部分 webview、
+         或脚本合成的指针事件）也能跟手，不会出现“按住不动” */
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', endDrag);
+      window.addEventListener('pointercancel', endDrag);
+      card.classList.add('resizing');
+      document.body.classList.add('resizing');
+      say(describe(card) + ' · 松开完成');
+    });
+
+    function onMove(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var nc = clamp(drag.c + Math.round((e.clientX - drag.x) / drag.unitX), 1, drag.cols);
+      var nr = clamp(drag.r + Math.round((e.clientY - drag.y) / drag.unitY), 1, drag.maxRows);
+      var cur = spanOf(card);
+      if (nc === cur[0] && nr === cur[1]) return;
+      drag.moved = true;
+      if (drag.cols >= 6) active[idx] = [nc, nr];
+      flip(function () { setSpan(card, nc, nr); });
+      say(describe(card));
+    }
+
+    function endDrag() {
+      if (!drag) return;
+      drag = null;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('pointercancel', endDrag);
+      card.classList.remove('resizing');
+      document.body.classList.remove('resizing');
+      say(describe(card) + ' · 拖动把手继续调整');
+    }
+
+    handle.addEventListener('dblclick', function (e) {
+      e.preventDefault();
+      active[idx] = home.slice();
+      flip(function () { setSpan(card, home[0], home[1]); });
+      say(describe(card) + ' · 已复位');
+    });
+
+    handle.addEventListener('keydown', function (e) {
+      var m = metrics();
+      var s = spanOf(card);
+      var nc = s[0], nr = s[1];
+      if (e.key === 'ArrowRight') nc = Math.min(m.cols, s[0] + 1);
+      else if (e.key === 'ArrowLeft') nc = Math.max(1, s[0] - 1);
+      else if (e.key === 'ArrowDown') nr = Math.min(m.maxRows, s[1] + 1);
+      else if (e.key === 'ArrowUp') nr = Math.max(1, s[1] - 1);
+      else if (e.key === 'Enter' || e.key === ' ') { nc = home[0]; nr = home[1]; }
+      else return;
+      e.preventDefault();
+      if (nc === s[0] && nr === s[1]) {
+        say(describe(card) + ' · 已经到边界');
+        return;
+      }
+      if (m.cols >= 6) active[idx] = [nc, nr];
+      flip(function () { setSpan(card, nc, nr); });
+      say(describe(card));
+    });
+  });
+
+  /* ── 布局预设 ── */
+  function applyPreset(index) {
+    active = PRESETS[index].spans.map(function (s) { return s.slice(); });
+    var m = metrics();
+    flip(function () {
+      cards.forEach(function (card, k) {
+        var s = scaleSpan(active[k] || authored[k], m);
+        setSpan(card, s[0], s[1]);
+      });
+    });
+  }
+
+  function markTab(index) {
+    tabs.forEach(function (t, k) {
+      var on = k === index;
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  tabs.forEach(function (tab, index) {
+    tab.addEventListener('click', function () {
+      markTab(index);
+      applyPreset(index);
+      say('「' + PRESETS[index].name + '」布局已应用 · 拖动把手可继续微调');
+    });
+  });
+
+  resetBtn.addEventListener('click', function () {
+    markTab(0);
+    applyPreset(0);
+    say('已重置为「本月概览」默认布局');
+  });
+
+  /* ── 视口变化：列数变了就按新列数重算跨度 ── */
+  var resizeRaf = 0;
+  function reclamp() {
+    var m = metrics();
+    if (m.cols === lastCols) return;
+    lastCols = m.cols;
+    cards.forEach(function (card, k) {
+      var s = scaleSpan(active[k], m);
+      setSpan(card, s[0], s[1]);
+    });
+    say('列数变为 ' + m.cols + '，卡片大小已随断点重算');
+  }
+  window.addEventListener('resize', function () {
+    cancelAnimationFrame(resizeRaf);
+    resizeRaf = requestAnimationFrame(reclamp);
+  });
+  window.addEventListener('load', reclamp);
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>抖动渐变 · RETRO 像素实验室 · UI Atlas</title>
+<style>
+:root{--bg:#0d0f14;--paper:#141821;--ink:#eef1f7;--muted:#8b93a5;--line:rgba(255,255,255,.1);--accent:#ffcd75;--mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block;image-rendering:pixelated}
+.shade{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(13,15,20,.82),rgba(13,15,20,.15) 40%,rgba(13,15,20,.55) 100%),
+  radial-gradient(90% 70% at 50% 40%,transparent 45%,rgba(13,15,20,.5) 100%)}
+.wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+
+/* 顶栏 */
+.nav{position:sticky;top:0;z-index:6;background:rgba(13,15,20,.62);backdrop-filter:blur(14px) saturate(120%);-webkit-backdrop-filter:blur(14px) saturate(120%);border-bottom:1px solid var(--line)}
+.nav-in{width:min(1180px,calc(100% - 48px));margin:0 auto;height:64px;display:flex;align-items:center;gap:24px}
+.brand{display:inline-flex;align-items:center;gap:10px;font:700 14px/1 var(--mono);letter-spacing:.16em}
+.brand .mark{width:24px;height:24px;border-radius:5px;background:var(--accent);color:#1a1c2c;display:grid;place-items:center;font:800 11px/1 var(--mono)}
+.brand small{font:500 9px/1 var(--mono);letter-spacing:.22em;color:rgba(238,241,247,.45)}
+.nav nav{display:flex;gap:22px;margin-left:auto}
+.nav nav a{font-size:11.5px;letter-spacing:.04em;color:rgba(238,241,247,.6);position:relative;transition:color .2s}
+.nav nav a::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.nav nav a:hover{color:var(--ink)}
+.nav nav a:hover::after{transform:scaleX(1)}
+.hint{display:inline-flex;align-items:center;gap:6px;margin:0;padding:4px 10px;font-size:11px;color:rgba(238,241,247,.7);white-space:nowrap;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.22);border-radius:999px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:0 0 5px}
+.nav-cta{flex:0 0 auto;height:31px;padding:0 14px;display:inline-flex;align-items:center;border-radius:6px;border:1px solid rgba(255,205,117,.4);color:var(--accent);font:600 11px/1 var(--mono);background:rgba(255,205,117,.08);transition:background .2s,translate .15s}
+.nav-cta:hover{background:rgba(255,205,117,.18);translate:0 -1px}
+
+/* 首屏 */
+.page{position:relative;z-index:2}
+.hero{width:min(1180px,calc(100% - 48px));margin:0 auto;min-height:calc(100vh - 65px);padding:clamp(38px,8vh,82px) 0 26px;display:flex;flex-direction:column}
+.kicker{margin:0;font:600 10px/1.7 var(--mono);letter-spacing:.26em;color:var(--accent)}
+h1{margin:16px 0 0;font-size:clamp(40px,6.4vw,72px);line-height:1;letter-spacing:-.045em;font-weight:680;max-width:10em;text-shadow:0 3px 30px rgba(0,0,0,.55)}
+h1 em{font-style:normal;font-family:var(--mono);font-weight:500;color:var(--accent)}
+.lede{margin:20px 0 0;max-width:31em;font-size:13.5px;line-height:1.85;color:rgba(238,241,247,.7)}
+.actions{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.hero .kicker{animation:rise .5s both}
+.hero h1{animation:rise .6s .06s both}
+.hero .lede{animation:rise .6s .12s both}
+.hero .actions{animation:rise .6s .18s both}
+@keyframes rise{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+.btn{height:44px;padding:0 20px;border-radius:6px;display:inline-flex;align-items:center;font-size:12px;letter-spacing:.03em;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s,translate .15s}
+.btn:focus-visible,.nav-cta:focus-visible,.sw:focus-visible,.fchip:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.btn.solid{background:var(--accent);border-color:var(--accent);color:#1a1c2c;font-weight:700}
+.btn.solid:hover{background:#ffe0a0;border-color:#ffe0a0}
+.btn.ghost{border-color:rgba(238,241,247,.28);color:var(--ink);background:rgba(13,15,20,.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.hero-foot{margin-top:auto;padding-top:clamp(30px,8vh,66px)}
+.palette-panel{display:flex;align-items:center;gap:18px;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:14px 18px;background:rgba(13,15,20,.66);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.palette-panel .ttl{font:600 9px/1.6 var(--mono);letter-spacing:.18em;color:rgba(238,241,247,.5)}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:46px;height:46px;border-radius:7px;border:1px solid rgba(255,255,255,.18);cursor:pointer;padding:3px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px;background:#000;transition:scale .15s,border-color .2s,box-shadow .2s}
+.sw i{display:block;border-radius:1px}
+.sw:hover{scale:1.06}
+.sw.on{border-color:var(--accent);box-shadow:0 0 0 2px rgba(255,205,117,.3)}
+.sw-name{margin-left:auto;font:600 11px/1 var(--mono);color:var(--accent)}
+.term{margin:12px 0 0;font:400 9px/1.8 var(--mono);letter-spacing:.08em;color:rgba(238,241,247,.4)}
+
+/* 实底内容 */
+.solid{background:var(--bg);border-top:1px solid var(--line);padding:clamp(56px,9vh,96px) 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px}
+.eyebrow{margin:0;font:600 10px/1.6 var(--mono);letter-spacing:.24em;color:var(--accent)}
+h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spacing:-.04em;font-weight:660}
+.sec-head>p{margin:0;max-width:31em;font-size:12.5px;line-height:1.85;color:var(--muted);justify-self:end;text-align:right}
+.grid{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{border:1px solid var(--line);border-radius:12px;padding:20px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));transition:transform .25s,border-color .25s,box-shadow .25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(255,205,117,.35);box-shadow:0 28px 44px -42px rgba(255,205,117,.6)}
+.card b{font:600 10px/1.6 var(--mono);letter-spacing:.2em;color:var(--accent)}
+.card h3{margin:10px 0 0;font-size:16px;letter-spacing:-.01em}
+.card p{margin:8px 0 0;font-size:11.5px;line-height:1.85;color:var(--muted)}
+
+/* 参数表 */
+.params{background:var(--paper);border-top:1px solid var(--line);padding:clamp(56px,9vh,96px) 0}
+.ptable{margin-top:34px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.prow{display:grid;grid-template-columns:160px 1fr 130px;gap:16px;padding:14px 20px;border-bottom:1px solid var(--line);align-items:center;font-size:12px;transition:background .18s}
+.prow:last-child{border-bottom:0}
+.prow:hover{background:rgba(255,255,255,.025)}
+.prow .pk{font:600 10px/1.5 var(--mono);letter-spacing:.1em;color:var(--accent)}
+.prow .pv{color:rgba(238,241,247,.72)}
+.prow .pn{font:500 10px/1.5 var(--mono);color:var(--muted);text-align:right}
+.matrix{margin-top:26px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.matrix-grid{display:grid;grid-template-columns:repeat(4,30px);grid-template-rows:repeat(4,30px);gap:2px}
+.matrix-grid i{display:grid;place-items:center;border-radius:4px;font:600 10px/1 var(--mono);background:rgba(255,205,117,.1);color:var(--accent)}
+.matrix p{margin:0;max-width:34em;font-size:11.5px;line-height:1.85;color:var(--muted)}
+
+/* 引文、页脚 */
+.quote{background:var(--bg);border-top:1px solid var(--line);padding:clamp(58px,10vh,104px) 0}
+.quote blockquote{margin:0;max-width:22em;font:400 clamp(26px,3.7vw,46px)/1.26 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+.quote blockquote em{font-style:italic;color:var(--accent)}
+.quote .cite{margin:20px 0 0;font:400 9.5px/1.6 var(--mono);letter-spacing:.16em;color:var(--muted)}
+.cta{padding:clamp(68px,11vh,120px) 0;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(13,15,20,.5),rgba(13,15,20,.92))}
+.cta-in{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.cta h2{margin:12px 0 0;font-size:clamp(32px,5vw,58px);line-height:1.02}
+.cta .note{margin:16px 0 0;max-width:32em;font-size:12px;line-height:1.85;color:var(--muted)}
+.foot{background:#090a0e;border-top:1px solid var(--line);padding:22px 0 28px}
+.foot-in{display:flex;flex-wrap:wrap;gap:10px 22px;font:400 9.5px/1.8 var(--mono);letter-spacing:.08em;color:rgba(238,241,247,.36)}
+.foot-in span:last-child{margin-left:auto}
+
+/* 600×450 紧凑版 */
+@media (max-height:560px) and (min-width:561px){
+  .nav-in{height:44px;gap:14px}
+  .nav nav{display:none}
+  .brand small{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .nav-cta{height:27px;padding:0 11px;font-size:10.5px}
+  .hero{min-height:calc(100vh - 45px);padding:10px 0}
+  .kicker{font-size:9px}
+  h1{margin-top:7px;font-size:clamp(28px,4.7vw,38px);max-width:10em}
+  .lede{margin-top:8px;font-size:10.5px;line-height:1.6;max-width:36em}
+  .actions{margin-top:10px;gap:8px}
+  .btn{height:32px;padding:0 13px;font-size:11px}
+  .hero-foot{padding-top:10px}
+  .palette-panel{padding:9px 13px;gap:10px}
+  .sw{width:36px;height:36px}
+  .term{display:none}
+  .solid,.params,.quote,.cta,.foot{display:none}
+}
+/* 手机单列 */
+@media (max-width:560px){
+  .nav-in{width:calc(100% - 32px);height:56px;gap:12px}
+  .nav nav{display:none}
+  .brand small{display:none}
+  .hint{display:none}
+  .nav-cta{margin-left:auto;height:29px;padding:0 12px;font-size:11px}
+  .wrap,.hero{width:calc(100% - 32px)}
+  .hero{min-height:calc(100vh - 57px);padding:34px 0 20px}
+  h1{font-size:clamp(38px,11vw,48px);max-width:8em}
+  .lede{font-size:12.5px;margin-top:16px}
+  .actions{margin-top:20px}
+  .btn{height:42px;padding:0 17px}
+  .hero-foot{padding-top:24px}
+  .palette-panel{gap:12px}
+  .sw-name{margin-left:0;width:100%}
+  .sec-head{grid-template-columns:1fr;gap:12px}
+  .sec-head>p{justify-self:start;text-align:left}
+  .grid{grid-template-columns:1fr;gap:12px}
+  .prow{grid-template-columns:1fr;gap:4px;padding:12px 16px}
+  .prow .pn{text-align:left}
+  .cta-in{align-items:flex-start}
+  .foot-in span:last-child{margin-left:0}
+}
+@media (hover:none){.hint{display:none}}
+@media (prefers-reduced-motion:reduce){
+  .hero .kicker,.hero h1,.hero .lede,.hero .actions{animation:none}
+  .nav nav a::after,.nav-cta,.btn,.sw,.card,.prow{transition:none}
+  .nav-cta:hover,.btn:hover,.sw:hover,.card:hover{translate:0;transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="shade" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top" aria-label="RETRO 像素实验室"><span class="mark">8</span>RETRO<small>PIXEL LAB</small></a>
+    <nav aria-label="主导航"><a href="#how">原理</a><a href="#params">参数</a><a href="#demo">演示</a></nav>
+    <p class="hint">背景是用有序抖动画出来的流动渐变，点色板换配色</p>
+    <a class="nav-cta" href="#params">看参数 →</a>
+  </div>
+</header>
+
+<main class="page" id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">RETRO PIXEL LAB · 有限色板的无限可能</p>
+      <h1>用四种颜色，<br><em>画一整片黄昏。</em></h1>
+      <p class="lede">没有半透明，没有抗锯齿。我们把每一帧渐变量化成几档纯色，再由一张 4×4 的 Bayer 矩阵决定哪里点、哪里不点——老游戏机眼里的平滑，就是这么来的。</p>
+      <div class="actions">
+        <a class="btn solid" href="#how">看它怎么画 →</a>
+        <a class="btn ghost" href="#params">读参数表</a>
+      </div>
+    </div>
+    <div class="hero-foot">
+      <div class="palette-panel" role="group" aria-label="选择抖动配色">
+        <span class="ttl">PALETTE / 色板</span>
+        <div class="swatches" id="swatches"></div>
+        <span class="sw-name" id="swName">SUNSET DUSK</span>
+      </div>
+      <p class="term">bayer 4×4 · ordered dither · 5px cell · phase drifting · Canvas 2D · imageSmoothing off</p>
+    </div>
+  </section>
+
+  <section class="solid" id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">01 / 原理</p>
+          <h2>不混色，<br>只排点。</h2>
+        </div>
+        <p>抖动不制造新颜色。它只在相邻两档颜色之间，用一张固定阈值表决定每个像素归属，远看就像多出了中间色。</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <b>ORDER / 01</b>
+          <h3>有序抖动</h3>
+          <p>每个网格点取 Bayer 矩阵里的阈值，和当前的连续灰阶比较，决定点亮点还是暗点。规则且可预期。</p>
+        </article>
+        <article class="card">
+          <b>DRIFT / 02</b>
+          <h3>相位漂移</h3>
+          <p>两列低频正弦随时间缓慢移动，把色带推着走。没有随机闪烁，只有像呼吸一样的流动。</p>
+        </article>
+        <article class="card">
+          <b>PIXEL / 03</b>
+          <h3>整数像素</h3>
+          <p>先在小尺寸离屏画布上逐格上色，再关掉平滑放大。每个色块都是整数边界，硬朗而不模糊。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="params" id="params">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">02 / 参数</p>
+          <h2>可调的每一档。</h2>
+        </div>
+        <p>色板、阈值、网格尺寸，三处旋钮决定整张图的性格。改一档，黄昏就变成海沟。</p>
+      </div>
+      <div class="ptable" aria-label="渲染参数表">
+        <div class="prow"><span class="pk">MATRIX</span><span class="pv">Bayer 4×4 有序阈值矩阵，16 级量化</span><span class="pn">4 × 4</span></div>
+        <div class="prow"><span class="pk">CELL</span><span class="pv">每个色块的屏幕边长，越大越像素</span><span class="pn">5 px</span></div>
+        <div class="prow"><span class="pk">PALETTE</span><span class="pv">相邻色阶之间做抖动，当前 5 档</span><span class="pn">5 colors</span></div>
+        <div class="prow"><span class="pk">PHASE</span><span class="pv">两路正弦叠加驱动的渐变位移速度</span><span class="pn">0.008 / f</span></div>
+        <div class="prow"><span class="pk">DPR</span><span class="pv">设备像素比上限，兼顾清晰度与填充量</span><span class="pn">≤ 2</span></div>
+      </div>
+      <div class="matrix">
+        <div class="matrix-grid" aria-hidden="true">
+          <i>0</i><i>8</i><i>2</i><i>10</i>
+          <i>12</i><i>4</i><i>14</i><i>6</i>
+          <i>3</i><i>11</i><i>1</i><i>9</i>
+          <i>15</i><i>7</i><i>13</i><i>5</i>
+        </div>
+        <p>这就是那张阈值表：0 到 15 各出现一次。数值越小越容易点亮暗色，越大越倾向亮色。它周期性地铺满整屏，于是规则的点阵里长出了细腻的过渡。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="quote">
+    <div class="wrap">
+      <blockquote>像素不够，<br><em>就用排列来凑。</em></blockquote>
+      <p class="cite">RETRO 像素实验室 · 渲染笔记 · 第 07 则</p>
+    </div>
+  </section>
+
+  <section class="cta" id="demo">
+    <div class="wrap cta-in">
+      <div>
+        <p class="kicker">EXPORT AS PALETTE · ONE CLICK</p>
+        <h2>把这片黄昏，<br>带走。</h2>
+        <p class="note">四套配色都是手工调过的有限色板。点上方色板即时切换，减动效用户会看到一张静止的抖动图。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>RETRO PIXEL LAB · 有限色板研究所</span>
+    <span>背景抖动图由 Canvas 2D + Bayer 4×4 实时绘制</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var canvas = document.getElementById('bg'), ctx = canvas.getContext('2d');
+  var off = document.createElement('canvas'), octx = off.getContext('2d');
+  var BA = [0,8,2,10, 12,4,14,6, 3,11,1,9, 15,7,13,5];
+  var palettes = [
+    {name:'SUNSET DUSK', colors:['#1a1c2c','#5d275d','#b13e53','#ef7d57','#ffcd75']},
+    {name:'DEEP TRENCH', colors:['#081426','#124e66','#2e8b8b','#7fd1be','#e6f4ea']},
+    {name:'MOSS FIELD', colors:['#152416','#3a5a2a','#7a9a4a','#cada6a','#f4f0c0']},
+    {name:'MONOCHROME', colors:['#111318','#454a55','#7f8697','#b9bfcc','#f2f4f8']}
+  ];
+  var swWrap = document.getElementById('swatches'), swName = document.getElementById('swName');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cell = 5, cols = 0, rows = 0, dpr = Math.min(devicePixelRatio || 1, 2);
+  var phase = 0, raf = null, running = true, pal = 0, img = null;
+
+  function hex2rgb(h) { return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+  var rgbs = palettes.map(function (p) { return p.colors.map(hex2rgb); });
+
+  function size() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    canvas.width = Math.round(innerWidth * dpr);
+    canvas.height = Math.round(innerHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    cols = Math.ceil(innerWidth / cell);
+    rows = Math.ceil(innerHeight / cell);
+    off.width = cols; off.height = rows;
+    img = octx.createImageData(cols, rows);
+    if (reduce) drawStatic();
+  }
+
+  function paint() {
+    var C = rgbs[pal], n = C.length;
+    var hx = new Float32Array(cols), vy = new Float32Array(rows);
+    for (var x = 0; x < cols; x++) hx[x] = Math.sin(phase + x * 0.045) * 0.10 + Math.sin(phase * 0.6 + x * 0.017) * 0.06;
+    for (var y = 0; y < rows; y++) vy[y] = Math.sin(phase * 0.8 + y * 0.055) * 0.10;
+    var data = img.data, idx = 0;
+    for (var gy = 0; gy < rows; gy++) {
+      for (var gx = 0; gx < cols; gx++) {
+        var t = (gx / cols) * 0.62 + (gy / rows) * 0.34 + hx[gx] + vy[gy];
+        t = t < 0 ? 0 : (t > 0.999 ? 0.999 : t);
+        var v = t * (n - 1), i0 = v | 0, frac = v - i0;
+        var th = (BA[(gy & 3) * 4 + (gx & 3)] + 0.5) / 16;
+        var ci = i0 + (frac > th ? 1 : 0);
+        if (ci > n - 1) ci = n - 1;
+        var c = C[ci];
+        data[idx++] = c[0]; data[idx++] = c[1]; data[idx++] = c[2]; data[idx++] = 255;
+      }
+    }
+    octx.putImageData(img, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(off, 0, 0, cols, rows, 0, 0, cols * cell, rows * cell);
+  }
+
+  function drawStatic() { phase = 1.1; paint(); }
+
+  function frame() {
+    raf = null;
+    if (!running) return;
+    phase += 0.008;
+    paint();
+    raf = requestAnimationFrame(frame);
+  }
+
+  // 构造色板按钮
+  palettes.forEach(function (p, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'sw' + (i === 0 ? ' on' : '');
+    b.setAttribute('aria-label', '配色 ' + p.name);
+    b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    p.colors.forEach(function (c) { var s = document.createElement('i'); s.style.background = c; b.appendChild(s); });
+    b.addEventListener('click', function () {
+      pal = i;
+      swName.textContent = p.name;
+      [].slice.call(swWrap.children).forEach(function (el, j) {
+        el.classList.toggle('on', j === i);
+        el.setAttribute('aria-pressed', j === i ? 'true' : 'false');
+      });
+      if (reduce) drawStatic(); else paint();
+    });
+    swWrap.appendChild(b);
+  });
+
+  size();
+  addEventListener('resize', size);
+  document.addEventListener('visibilitychange', function () {
+    running = !document.hidden;
+    if (running && !reduce && !raf) raf = requestAnimationFrame(frame);
+    else if (!running && raf) { cancelAnimationFrame(raf); raf = null; }
+  });
+  if (!reduce) raf = requestAnimationFrame(frame);
+
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

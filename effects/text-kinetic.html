@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>动力学排字 · TYPEFORM 字体实验室 · UI Atlas</title>
+<style>
+:root{--bg:#f2f0e9;--paper:#fbfaf6;--ink:#16171b;--muted:#777a82;--line:#dedad0;--accent:#d8482f;--deep:#2a2c33}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.head{max-width:1180px;margin:0 auto;height:68px;padding:0 40px;display:flex;align-items:center;gap:30px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;letter-spacing:.06em}
+.brand .seal{width:24px;height:24px;border-radius:5px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:800 13px/1 Georgia,serif;transform:rotate(-6deg)}
+.brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+.nav{display:flex;gap:24px;font-size:12.5px;color:var(--muted)}
+.nav a{position:relative;transition:color .2s}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:right;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.nav a:hover{color:var(--ink)}
+.nav a:hover::after{transform:scaleX(1);transform-origin:left}
+.issue{margin-left:auto;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+.stage{max-width:1180px;margin:0 auto;padding:0 40px}
+.intro{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:end;padding:44px 0 24px}
+.kicker{margin:0 0 13px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--accent)}
+h1{margin:0;font-size:clamp(38px,5.2vw,62px);line-height:1.04;letter-spacing:-.045em;font-weight:800}
+h1 em{font-style:normal;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.dek{margin:0;font-size:12.5px;line-height:1.9;color:var(--muted);max-width:34em}
+.lab{border:1px solid var(--line);border-radius:16px;background:var(--paper);overflow:hidden;scroll-margin-top:24px}
+.lab-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.lab-top b{font-size:12px;letter-spacing:.02em}
+.lab-top b span{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);margin-left:9px}
+.lab-meta{display:flex;align-items:center;gap:14px;margin-left:auto;flex-wrap:wrap}
+.readout{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);display:inline-flex;align-items:center;gap:9px}
+.readout i{font-style:normal;color:var(--accent)}
+.bar{display:inline-block;width:70px;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:left}
+.state{display:inline-flex;align-items:center;gap:6px;font-style:normal;color:var(--muted);letter-spacing:.08em}
+.state::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.28;transition:opacity .2s,box-shadow .2s}
+.state[data-state="live"]{color:var(--accent)}
+.state[data-state="live"]::before{opacity:1;box-shadow:0 0 0 3px rgba(216,72,47,.14)}
+.lab-btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 13px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.lab-btn:hover{border-color:var(--accent);color:var(--accent)}
+.lab-btn:disabled{opacity:.55;cursor:default;border-color:var(--line);color:var(--muted)}
+.lab-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wordstage{position:relative;padding:44px 20px 40px;display:flex;justify-content:center;align-items:center;min-height:238px;overflow:hidden;touch-action:pan-y;background:repeating-linear-gradient(0deg,transparent,transparent 31px,rgba(20,22,30,.045) 32px)}
+.wordstage.fine{cursor:none}
+.word{margin:0;display:flex;cursor:crosshair;user-select:none;line-height:1;letter-spacing:-.045em;position:relative;z-index:1}
+.wordstage.fine .word{cursor:none}
+.slot{display:inline-block;line-height:1}
+.letter{display:inline-block;font:800 clamp(56px,11.5vw,132px)/1 -apple-system,"Segoe UI",Arial,sans-serif;color:var(--ink);will-change:transform;transform-origin:50% 60%}
+.probe{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;opacity:0;transition:opacity .18s;z-index:2;will-change:transform}
+.probe.on{opacity:1}
+.probe::before{content:"";position:absolute;left:calc(var(--r,170) * -1px);top:calc(var(--r,170) * -1px);width:calc(var(--r,170) * 2px);height:calc(var(--r,170) * 2px);border:1px dashed rgba(216,72,47,.34);border-radius:50%;background:radial-gradient(circle,rgba(216,72,47,.055),transparent 68%)}
+.probe::after{content:"";position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(216,72,47,.12)}
+.lab-foot{display:flex;justify-content:space-between;gap:16px;padding:12px 20px;border-top:1px solid var(--line);font:500 9.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted);flex-wrap:wrap}
+.lab-foot b{color:var(--deep)}
+.params{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0}
+.param{border:1px solid var(--line);border-radius:12px;padding:14px 15px;background:var(--paper)}
+.param .k{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.param .v{display:block;margin:8px 0 3px;font:700 19px/1 ui-monospace,Consolas,monospace;color:var(--deep)}
+.param p{margin:0;font-size:10px;line-height:1.6;color:var(--muted)}
+.specimens{margin:8px 0 26px;scroll-margin-top:24px}
+.specimens h2{margin:0 0 12px;font-size:14px}
+.specimens h2 span{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted);margin-left:8px}
+.specgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.spec{border:1px solid var(--line);border-radius:13px;background:var(--paper);padding:18px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+@media (hover:hover) and (pointer:fine){.spec:hover{transform:translateY(-3px);box-shadow:0 22px 40px -34px rgba(20,22,30,.5)}}
+.spec .tag{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--accent)}
+.spec .sample{margin:14px 0;font-size:22px;font-weight:700;letter-spacing:-.03em}
+.spec.display .sample{font-family:Georgia,"Songti SC",serif;font-weight:400;font-size:27px}
+.spec.mono .sample{font-family:ui-monospace,Consolas,monospace;font-size:17px;letter-spacing:0}
+.spec p{margin:0;font-size:10px;line-height:1.65;color:var(--muted)}
+.notes{margin:8px 0 28px;display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.notes h3{margin:0 0 7px;font-size:13px}
+.notes p{margin:0;font-size:11.5px;line-height:1.85;color:var(--muted)}
+.notes code{font:600 10.5px/1 ui-monospace,Consolas,monospace;color:var(--accent);background:rgba(216,72,47,.08);padding:2px 5px;border-radius:4px}
+.quote{display:flex;justify-content:space-between;align-items:baseline;gap:30px;padding:22px 0;border-top:1px solid var(--line)}
+.quote p{margin:0;font-family:"Songti SC",Georgia,serif;font-size:clamp(17px,2.2vw,22px);line-height:1.5}
+.quote span{flex:0 0 auto;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.foot{display:flex;justify-content:space-between;gap:16px;padding:18px 0 34px;border-top:1px solid var(--line);font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.hint{position:fixed;left:auto;right:clamp(16px,4vw,40px);top:80px;bottom:auto;margin:0;display:flex;align-items:center;gap:7px;font:400 10.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted);background:rgba(251,250,246,.9);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;padding:6px 12px;pointer-events:none;z-index:5;transition:opacity .35s,transform .35s}
+.hint.hide{opacity:0;transform:translateY(-7px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px) and (min-width:561px){
+  .head{height:46px;padding:0 18px;gap:16px}
+  .brand{font-size:12.5px}
+  .brand .seal{width:18px;height:18px;font-size:10px}
+  .brand small,.issue,.nav{display:none}
+  .stage{padding:0 18px}
+  .intro{grid-template-columns:1fr;gap:0;padding:16px 0 10px}
+  .kicker{margin-bottom:6px;font-size:8px}
+  h1{font-size:25px}
+  .dek{display:none}
+  .lab-top{padding:8px 12px;gap:8px}
+  .lab-top b{font-size:10px}
+  .lab-top b span,.readout{font-size:7px}
+  .lab-meta{gap:8px}
+  .bar{width:44px}
+  .lab-btn{padding:4px 8px;font-size:7px}
+  .wordstage{padding:18px 16px 16px;min-height:142px;background:repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(20,22,30,.045) 24px)}
+  .letter{font-size:66px}
+  .lab-foot{padding:7px 12px;font-size:7px}
+  .params{grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0}
+  .param{padding:8px;border-radius:9px}
+  .param .k{font-size:6.5px}
+  .param .v{font-size:12px;margin:5px 0 2px}
+  .param p{font-size:6.5px;line-height:1.4}
+  .specgrid{grid-template-columns:repeat(3,1fr);gap:8px}
+  .spec{padding:10px;min-height:96px}
+  .spec .sample{font-size:14px;margin:8px 0}
+  .spec.display .sample{font-size:17px}
+  .spec.mono .sample{font-size:11px}
+  .spec p{font-size:7px;line-height:1.4}
+  .specimens{margin:4px 0 10px}
+  .specimens h2{font-size:10px;margin-bottom:6px}
+  .notes,.quote,.foot{display:none}
+  .hint{top:54px;right:12px;font-size:8px;padding:4px 8px}
+}
+@media (max-width:560px){
+  .head{height:56px;padding:0 16px;gap:12px}
+  .brand small,.issue{display:none}
+  .nav{display:none}
+  .stage{padding:0 16px}
+  .intro{grid-template-columns:1fr;gap:12px;padding:28px 0 18px}
+  h1{font-size:clamp(34px,9.5vw,46px)}
+  .dek{font-size:11.5px}
+  .lab-top{padding:11px 14px;gap:10px}
+  .lab-meta{gap:10px}
+  .readout{font-size:8.5px}
+  .wordstage{padding:30px 12px 26px;min-height:176px}
+  .letter{font-size:clamp(46px,13vw,72px)}
+  .lab-foot{padding:10px 14px;font-size:8px}
+  .params{grid-template-columns:1fr 1fr;gap:8px}
+  .specgrid{grid-template-columns:1fr}
+  .spec{min-height:120px}
+  .notes{grid-template-columns:1fr;gap:18px}
+  .quote{flex-direction:column;gap:10px}
+  .foot{flex-direction:column;gap:4px}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .letter{transform:none!important;will-change:auto}
+  .probe{display:none}
+  .nav a::after,.spec,.state::before,.lab-btn,.hint{transition:none}
+  .spec:hover{transform:none}
+}
+</style>
+</head>
+<body>
+<header class="head">
+  <a class="brand" href="#top"><span class="seal" aria-hidden="true">T</span>TYPEFORM<small>字体实验室</small></a>
+  <nav class="nav" aria-label="主导航"><a href="#lab">实验台</a><a href="#specimens">字样</a><a href="#notes">技术</a></nav>
+  <span class="issue">TYPE LAB / SPECIMEN 09</span>
+</header>
+<main class="stage" id="top">
+  <div class="intro">
+    <div>
+      <p class="kicker">KINETIC TYPE / LIVE SPECIMEN</p>
+      <h1>让字，<br><em>被光标推开。</em></h1>
+    </div>
+    <p class="dek">TYPEFORM 字体实验室的第 09 号活字实验。字母不再钉死在基线上——它们感知指针的距离场，被轻轻推开，又在阻尼里弹回原位。循环只在受力与回弹时运行，静止就停帧。</p>
+  </div>
+
+  <section class="lab" id="lab" aria-label="动力学排字实验台">
+    <div class="lab-top">
+      <b>KINETIC <span>DISTANCE FIELD / SPRING RETURN</span></b>
+      <div class="lab-meta">
+        <span class="readout">位移 <i id="dispText">0.0</i>px <span class="bar" aria-hidden="true"><i id="dispBar"></i></span><em class="state" id="stateText" data-state="idle">静止</em></span>
+        <button class="lab-btn" id="demoBtn" type="button">自动推演</button>
+      </div>
+    </div>
+    <div class="wordstage" id="stage">
+      <h2 class="word" id="word" aria-label="KINETIC，动力学排字样张"></h2>
+      <span class="probe" id="probe" aria-hidden="true"></span>
+    </div>
+    <div class="lab-foot"><span>CURSOR <b>距离场斥力</b> · LEAVE / BLUR <b>归位</b></span><span>rAF 仅在<b>受力与回弹</b>时运行</span></div>
+  </section>
+
+  <section class="params" aria-label="实验参数">
+    <div class="param"><span class="k">SIZE / 字号</span><span class="v">132px</span><p>展示字样峰值字号，随视口缩放。</p></div>
+    <div class="param"><span class="k">WEIGHT / 字重</span><span class="v">800</span><p>Extra Bold，保证位移时字形不散。</p></div>
+    <div class="param"><span class="k">RADIUS / 半径</span><span class="v">170px</span><p>桌面峰值，按字号与宽度自动收窄。</p></div>
+    <div class="param"><span class="k">DAMPING / 阻尼</span><span class="v">0.82</span><p>速度衰减系数，决定回弹的手感。</p></div>
+  </section>
+
+  <section class="specimens" id="specimens" aria-label="字体样式展示">
+    <h2>字样 Specimens <span>3 STYLES</span></h2>
+    <div class="specgrid">
+      <div class="spec display"><span class="tag">01 / DISPLAY</span><div class="sample">活字在呼吸</div><p>衬线展示体，用于标题与诗句。高对比笔画，适合大字号慢读。</p></div>
+      <div class="spec"><span class="tag">02 / TEXT</span><div class="sample">排版的力学</div><p>无衬线正文体，中性而克制。作为实验室的默认工作字体。</p></div>
+      <div class="spec mono"><span class="tag">03 / MONO</span><div class="sample">0123456789</div><p>等宽字体，数字对齐。参数表与读数全部采用这一套字。</p></div>
+    </div>
+  </section>
+
+  <section class="notes" id="notes">
+    <div>
+      <h3>距离场与衰减</h3>
+      <p>字心坐标取自未被 transform 的 <code>slot</code>，所以字母被推走时参考点不会跟着漂。每一帧算出指针到各字母的向量，力随距离平方衰减（<code>1 − d/R</code> 的平方），越近推得越远，超过半径就归零。方向永远背离指针，于是字被“挤开”而不是被“吸走”。位移上限与探针半径按字距、字号自适应，实际位移再限制在上限的 1.22 倍内，快速划动也不会把字甩出字距。</p>
+    </div>
+    <div>
+      <h3>停帧与归位</h3>
+      <p>物理按固定 <code>60Hz</code> 步长积分，回弹手感不随屏幕刷新率变化。指针离开实验台、窗口失焦或按 <code>Esc</code> 时，目标立刻归零；所有字母的速度与目标差都低于阈值后，最后一帧落地并取消 rAF，直到下一次指针移动才重新唤醒。</p>
+    </div>
+  </section>
+
+  <section class="quote">
+    <p>“好的动效让人先感到舒服，再意识到那是设计。”</p>
+    <span>TYPEFORM 实验札记 · 第 09 号</span>
+  </section>
+
+  <footer class="foot"><span>TYPEFORM 字体实验室 · 上海</span><span>LAB NOTE / SPECIMEN 09 · 2026</span></footer>
+</main>
+<p class="hint" id="hint">把指针移进实验台，字母被推开；静止后循环自动停帧</p>
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var word = document.getElementById('word');
+  var probe = document.getElementById('probe');
+  var dispText = document.getElementById('dispText');
+  var dispBar = document.getElementById('dispBar');
+  var stateText = document.getElementById('stateText');
+  var demoBtn = document.getElementById('demoBtn');
+  var hint = document.getElementById('hint');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+  var TEXT = 'KINETIC';
+  var RADIUS = 170, STRENGTH = 46, K = 0.14, DAMP = 0.82;
+  var MAXX = 24, MAXY = 7, RADMIN = 112;
+  var radius = RADIUS, maxX = MAXX, maxY = MAXY;
+  var STEP = 1000 / 60, DEMO_DUR = 1500;
+  var items = [];
+  var pointer = { x: 0, y: 0, on: false };
+  var demoActive = false, demoStart = 0, demoFrom = 0, demoTo = 0, demoY = 0;
+  var raf = 0, last = 0, acc = 0, hidden = false;
+  var stageRect = null;
+
+  Array.from(TEXT).forEach(function (ch) {
+    var slot = document.createElement('span');
+    slot.className = 'slot';
+    var letter = document.createElement('span');
+    letter.className = 'letter';
+    letter.textContent = ch;
+    letter.setAttribute('aria-hidden', 'true');
+    slot.appendChild(letter);
+    word.appendChild(slot);
+    items.push({ slot: slot, el: letter, cx: 0, cy: 0, x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, col: '' });
+  });
+
+  if (fine && !reduce) stage.classList.add('fine');
+  probe.style.setProperty('--r', RADIUS);
+  if (hint) hint.textContent = fine
+    ? '把指针移进实验台，字母被推开；静止后循环自动停帧'
+    : '按住字母拖动，或点「自动推演」看一次';
+
+  function hideHint() { if (hint) hint.classList.add('hide'); }
+  addEventListener('scroll', function () { if (scrollY > 60) hideHint(); }, { passive: true });
+  document.addEventListener('pointerdown', hideHint, { passive: true });
+  document.addEventListener('keydown', hideHint);
+  if (scrollY > 60) hideHint();
+
+  function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+
+  function setState(label, live) {
+    if (stateText.textContent === label && (stateText.getAttribute('data-state') === 'live') === !!live) return;
+    stateText.textContent = label;
+    stateText.setAttribute('data-state', live ? 'live' : 'idle');
+  }
+
+  function setProbe(x, y, on) {
+    if (on) {
+      stageRect = stage.getBoundingClientRect();
+      probe.style.transform = 'translate3d(' + (x - stageRect.left).toFixed(1) + 'px,' + (y - stageRect.top).toFixed(1) + 'px,0)';
+      probe.classList.add('on');
+    } else {
+      probe.classList.remove('on');
+    }
+  }
+
+  function measure() {
+    stageRect = stage.getBoundingClientRect();
+    items.forEach(function (it) {
+      var b = it.slot.getBoundingClientRect();
+      it.cx = b.left + b.width / 2;
+      it.cy = b.top + b.height / 2;
+    });
+    var wordW = word.getBoundingClientRect().width;
+    var slotW = wordW / (items.length || 1);
+    maxX = clamp(slotW * 0.42, 10, MAXX);
+    maxY = maxX * 0.30;
+    radius = clamp(wordW * 0.6, RADMIN, RADIUS);
+    probe.style.setProperty('--r', Math.round(radius));
+  }
+
+  function insideStage(x, y) {
+    if (!stageRect) stageRect = stage.getBoundingClientRect();
+    return x >= stageRect.left && x <= stageRect.right && y >= stageRect.top && y <= stageRect.bottom;
+  }
+
+  function clearPointer() {
+    if (!pointer.on) return;
+    pointer.on = false;
+    setProbe(0, 0, false);
+    kick();
+  }
+
+  function integrate() {
+    var has = pointer.on;
+    items.forEach(function (it) {
+      var tx = 0, ty = 0;
+      if (has) {
+        var dx = pointer.x - it.cx, dy = pointer.y - it.cy;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < radius) {
+          var falloff = 1 - dist / radius;
+          var force = STRENGTH * falloff * falloff;
+          var inv = dist > 0.5 ? 1 / dist : 0;
+          tx = clamp(-dx * inv * force, -maxX, maxX);
+          ty = clamp(-dy * inv * force * 0.38, -maxY, maxY);
+        }
+      }
+      it.tx = tx; it.ty = ty;
+      it.vx = (it.vx + (tx - it.x) * K) * DAMP;
+      it.vy = (it.vy + (ty - it.y) * K) * DAMP;
+      it.x += it.vx;
+      it.y += it.vy;
+      var lx = maxX * 1.22, ly = maxY * 1.6;
+      if (it.x > lx) { it.x = lx; if (it.vx > 0) it.vx *= 0.35; }
+      else if (it.x < -lx) { it.x = -lx; if (it.vx < 0) it.vx *= 0.35; }
+      if (it.y > ly) { it.y = ly; if (it.vy > 0) it.vy *= 0.35; }
+      else if (it.y < -ly) { it.y = -ly; if (it.vy < 0) it.vy *= 0.35; }
+    });
+  }
+
+  function settled() {
+    return items.every(function (it) {
+      return Math.abs(it.vx) < 0.02 && Math.abs(it.vy) < 0.02 &&
+             Math.abs(it.tx - it.x) < 0.05 && Math.abs(it.ty - it.y) < 0.05;
+    });
+  }
+
+  function render() {
+    var maxShift = 0;
+    items.forEach(function (it) {
+      var rot = clamp(it.x / maxX * 9, -9, 9);
+      it.el.style.transform = 'translate3d(' + it.x.toFixed(2) + 'px,' + it.y.toFixed(2) + 'px,0) rotate(' + rot.toFixed(2) + 'deg)';
+      var mag = Math.abs(it.x);
+      if (mag > maxShift) maxShift = mag;
+      var heat = Math.min(1, mag / maxX * 1.35);
+      var r = Math.round(22 + (216 - 22) * heat);
+      var g = Math.round(23 + (72 - 23) * heat);
+      var b = Math.round(27 + (47 - 27) * heat);
+      var col = 'rgb(' + r + ',' + g + ',' + b + ')';
+      if (it.col !== col) { it.el.style.color = col; it.col = col; }
+    });
+    dispText.textContent = maxShift.toFixed(1);
+    dispBar.style.transform = 'scaleX(' + Math.max(0, Math.min(1, maxShift / maxX)).toFixed(3) + ')';
+  }
+
+  function finalize() {
+    if (pointer.on || demoActive) return;
+    items.forEach(function (it) {
+      it.x = 0; it.y = 0; it.vx = 0; it.vy = 0; it.tx = 0; it.ty = 0;
+      it.el.style.transform = 'translate3d(0,0,0)';
+      it.el.style.color = '';
+      it.col = '';
+    });
+    dispText.textContent = '0.0';
+    dispBar.style.transform = 'scaleX(0)';
+  }
+
+  function updateDemo(now) {
+    if (!demoActive) return;
+    var p = Math.min(1, (now - demoStart) / DEMO_DUR);
+    var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    pointer.x = demoFrom + (demoTo - demoFrom) * e;
+    pointer.y = demoY - Math.sin(p * Math.PI) * 12;
+    pointer.on = true;
+    setProbe(pointer.x, pointer.y, true);
+    if (p >= 1) {
+      demoActive = false;
+      pointer.on = false;
+      setProbe(0, 0, false);
+      demoBtn.disabled = false;
+      demoBtn.textContent = '自动推演';
+      setState('回弹', true);
+    }
+  }
+
+  function loop(now) {
+    raf = 0;
+    if (hidden) return;
+    var delta = last ? Math.min(50, now - last) : STEP;
+    last = now;
+    updateDemo(now);
+    acc += delta;
+    var steps = 0;
+    while (acc >= STEP && steps < 4) { integrate(); acc -= STEP; steps++; }
+    if (acc >= STEP) acc = 0;
+    render();
+
+    if (!demoActive && settled()) {
+      acc = 0; last = 0;
+      finalize();
+      setState(pointer.on ? '停帧' : '静止', false);
+      return;
+    }
+    if (demoActive) setState('推演', true);
+    else if (pointer.on) setState('受力', true);
+    else setState('回弹', true);
+    raf = requestAnimationFrame(loop);
+  }
+
+  function kick() {
+    if (reduce || hidden || raf) return;
+    last = 0;
+    acc = 0;
+    setState(demoActive ? '推演' : pointer.on ? '受力' : '回弹', true);
+    raf = requestAnimationFrame(loop);
+  }
+
+  function beginDemo() {
+    if (reduce || hidden || demoActive) return;
+    measure();
+    var b = word.getBoundingClientRect();
+    demoFrom = b.left + b.width * 0.04;
+    demoTo = b.left + b.width * 0.96;
+    demoY = b.top + b.height / 2;
+    demoStart = performance.now();
+    demoActive = true;
+    demoBtn.disabled = true;
+    demoBtn.textContent = '推演中…';
+    setState('推演', true);
+    kick();
+  }
+
+  function endDemo() {
+    if (!demoActive) return;
+    demoActive = false;
+    demoBtn.disabled = false;
+    demoBtn.textContent = '自动推演';
+    pointer.on = false;
+    setProbe(0, 0, false);
+    kick();
+  }
+
+  measure();
+  addEventListener('resize', function () {
+    measure();
+    if (demoActive) endDemo();
+    if (pointer.on) {
+      if (insideStage(pointer.x, pointer.y)) kick();
+      else clearPointer();
+    }
+  }, { passive: true });
+  addEventListener('scroll', function () {
+    measure();
+    if (demoActive) endDemo();
+    if (pointer.on) {
+      if (insideStage(pointer.x, pointer.y)) kick();
+      else clearPointer();
+    }
+  }, { passive: true });
+  addEventListener('load', measure);
+
+  stage.addEventListener('pointerenter', function (e) {
+    if (demoActive) endDemo();
+    pointer.x = e.clientX; pointer.y = e.clientY; pointer.on = true;
+    setProbe(pointer.x, pointer.y, true);
+    kick();
+  });
+  stage.addEventListener('pointermove', function (e) {
+    if (demoActive) endDemo();
+    pointer.x = e.clientX; pointer.y = e.clientY; pointer.on = true;
+    setProbe(pointer.x, pointer.y, true);
+    kick();
+  }, { passive: true });
+  stage.addEventListener('pointerdown', function (e) {
+    if (demoActive) endDemo();
+    pointer.x = e.clientX; pointer.y = e.clientY; pointer.on = true;
+    setProbe(pointer.x, pointer.y, true);
+    kick();
+  }, { passive: true });
+  stage.addEventListener('pointerleave', function (e) {
+    if (e.pointerType === 'mouse') clearPointer();
+  });
+  stage.addEventListener('pointerup', function (e) {
+    if (e.pointerType !== 'mouse') clearPointer();
+  });
+  document.addEventListener('pointerup', function (e) {
+    if (e.pointerType !== 'mouse') clearPointer();
+  });
+  stage.addEventListener('pointercancel', clearPointer);
+  document.addEventListener('pointerleave', clearPointer);
+  addEventListener('blur', clearPointer);
+
+  demoBtn.addEventListener('click', beginDemo);
+  addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    endDemo();
+    clearPointer();
+  });
+  document.addEventListener('visibilitychange', function () {
+    hidden = document.hidden;
+    if (hidden) {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      last = 0;
+      endDemo();
+      clearPointer();
+      return;
+    }
+    if (pointer.on || demoActive || !settled()) kick();
+  });
+
+  if (reduce) {
+    demoBtn.disabled = true;
+    demoBtn.textContent = '静态模式';
+    setState('减动效', false);
+    if (hint) hint.textContent = '已按系统设置关闭位移动效';
+  } else {
+    setState('静止', false);
+  }
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

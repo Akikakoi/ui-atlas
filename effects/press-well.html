@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>按压强反馈 · KINETIC 交互实验室 · UI Atlas</title>
+<style>
+:root{--bg:#101319;--paper:#171b23;--ink:#eef1f6;--muted:#8b93a3;--line:#2b313d;--accent:#f0c14b;--cyan:#59d3d0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.head{display:flex;align-items:center;gap:24px;padding:15px clamp(20px,4vw,48px);border-bottom:1px solid var(--line);background:rgba(16,19,25,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:sticky;top:0;z-index:6}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:14px;letter-spacing:.16em;white-space:nowrap}
+.brand .mark{width:24px;height:24px;border-radius:7px;background:var(--accent);color:#101319;display:grid;place-items:center;font:700 12px/1 ui-monospace,Consolas,monospace}
+.brand-sub{font-size:10px;letter-spacing:.08em;color:var(--muted);font-weight:500;margin-left:2px}
+.head nav{display:flex;gap:20px;margin-left:auto;font-size:12px;color:var(--muted)}
+.head nav a{position:relative;transition:color .18s}
+.head nav a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.head nav a:hover{color:var(--ink)}
+.head nav a:hover::after{transform:scaleX(1)}
+.head nav a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.issue{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted);padding-left:20px;border-left:1px solid var(--line)}
+.stage{padding:clamp(30px,5vw,58px) clamp(20px,4vw,48px) 0}
+.wrap{max-width:1140px;margin:0 auto}
+.intro{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:end;margin-bottom:24px}
+.kicker{margin:0 0 12px;font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.22em;color:var(--muted)}
+h1{margin:0;font-size:clamp(42px,5.6vw,66px);line-height:1.02;letter-spacing:-.045em;font-weight:680}
+h1 em{font-style:italic;font-family:"Songti SC",Georgia,serif;font-weight:400;color:var(--accent)}
+.dek{margin:0 0 6px;font-size:13px;line-height:1.95;color:var(--muted);max-width:36em}
+.exhibit{display:grid;grid-template-columns:1.15fr .85fr;gap:20px}
+.rig{position:relative;min-height:430px;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:
+  radial-gradient(circle at 50% 42%,rgba(240,193,75,.09),transparent 55%),
+  repeating-linear-gradient(0deg,transparent 0 27px,rgba(255,255,255,.022) 27px 28px),
+  repeating-linear-gradient(90deg,transparent 0 27px,rgba(255,255,255,.022) 27px 28px),
+  var(--paper);display:grid;place-items:center}
+.rig::before{content:"";position:absolute;width:280px;height:280px;border-radius:50%;border:1px dashed rgba(240,193,75,.22)}
+.rig::after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;border:1px solid rgba(255,255,255,.035)}
+.well{position:relative;z-index:2;width:172px;height:172px;border-radius:50%;border:1px solid rgba(240,193,75,.55);cursor:pointer;touch-action:none;user-select:none;
+  background:radial-gradient(circle at 38% 30%,#ffdf8a,#f0c14b 52%,#b98a1e);
+  color:#2a2008;display:grid;place-items:center;align-content:center;gap:6px;
+  box-shadow:0 22px 30px rgba(0,0,0,.55),inset 0 2px 6px rgba(255,255,255,.5);
+  transform:translateY(0) scale(1);will-change:transform,box-shadow}
+.well:focus-visible{outline:2px solid var(--cyan);outline-offset:7px}
+.well b{font:800 15px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em}
+.well small{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;opacity:.65}
+.well .ring{position:absolute;inset:12px;border-radius:50%;border:1px solid rgba(42,32,8,.25)}
+.readout{align-self:stretch;border:1px solid var(--line);border-radius:20px;background:var(--paper);padding:24px;display:flex;flex-direction:column;justify-content:center}
+.readout .pt{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--cyan)}
+.readout .big{margin:14px 0 2px;font:500 clamp(52px,7vw,80px)/1 ui-monospace,Consolas,monospace;letter-spacing:-.06em;color:var(--accent)}
+.readout .big span{font-size:22px;letter-spacing:0;color:var(--muted)}
+.readout .phase{margin:6px 0 20px;font-size:12.5px;color:var(--muted)}
+.gauge{height:8px;border-radius:999px;background:#262c36;overflow:hidden}
+.gauge i{display:block;height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--accent));transition:none}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+.metrics div{border-top:1px solid var(--line);padding-top:10px}
+.metrics b{display:block;font:600 13px/1 ui-monospace,Consolas,monospace;color:var(--ink)}
+.metrics span{display:block;margin-top:5px;font-size:10.5px;color:var(--muted)}
+.rig-note{margin:12px 2px 0;font:500 10.5px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted)}
+.rig-note b{color:var(--accent)}
+.params{margin-top:56px;padding-top:26px;border-top:1px solid var(--line)}
+.params h2,.principle h2,.exhibits h2{margin:0 0 18px;font-size:clamp(24px,3vw,34px);line-height:1.1;letter-spacing:-.04em;font-weight:620}
+.table{width:100%;border-collapse:collapse;font-size:12.5px}
+.table th,.table td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--line)}
+.table th{font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);font-weight:600}
+.table td:last-child{font:600 11.5px/1 ui-monospace,Consolas,monospace;color:var(--accent)}
+.table td small{display:block;color:var(--muted);font-size:10.5px;margin-top:4px}
+.principle{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:56px;padding-top:26px;border-top:1px solid var(--line)}
+.principle p{margin:0 0 12px;font-size:12.5px;line-height:1.9;color:var(--muted)}
+.principle b{color:var(--ink);font-weight:600}
+.principle code{font:600 11px ui-monospace,Consolas,monospace;background:rgba(89,211,208,.1);color:var(--cyan);padding:1px 5px;border-radius:4px}
+.exhibits{margin-top:56px;padding-top:26px;border-top:1px solid var(--line)}
+.ex-list{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ex-list article{border:1px solid var(--line);border-radius:14px;padding:20px 18px;background:var(--paper)}
+.ex-list span{display:block;margin-bottom:12px;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--cyan)}
+.ex-list h3{margin:0 0 8px;font-size:14px;letter-spacing:-.01em}
+.ex-list p{margin:0;font-size:11.5px;line-height:1.75;color:var(--muted)}
+.foot{max-width:1140px;margin:44px auto 0;padding:20px 0 28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;font:500 10px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:var(--muted);pointer-events:none;z-index:9;background:rgba(128,128,128,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(128,128,128,.24);border-radius:999px;padding:4px 9px}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px) and (min-width:561px){
+  .head{padding:9px 20px;gap:16px}
+  .head nav,.issue{display:none}
+  .stage{padding:14px 20px 0}
+  .intro{grid-template-columns:1fr;gap:0;margin-bottom:8px}
+  .intro .dek{display:none}
+  .kicker{margin-bottom:5px;font-size:9px}
+  h1{font-size:25px}
+  .exhibit{grid-template-columns:1fr 200px;gap:12px}
+  .rig{min-height:212px;border-radius:12px}
+  .rig::before{width:150px;height:150px}
+  .rig::after{width:200px;height:200px}
+  .well{width:112px;height:112px}
+  .well b{font-size:11px}
+  .well small{font-size:8px}
+  .readout{padding:14px;border-radius:12px}
+  .readout .big{font-size:42px}
+  .readout .big span{font-size:16px}
+  .phase{margin-bottom:10px;font-size:10px}
+  .metrics{margin-top:12px;gap:6px}
+  .metrics span{display:none}
+  .rig-note,.params,.principle,.exhibits{display:none}
+  .foot{display:none}
+  .hint{left:auto;right:12px;bottom:9px;font-size:9.5px;padding:3px 8px}
+}
+@media (max-width:560px){
+  .head nav,.issue{display:none}
+  .brand-sub{display:none}
+  .stage{padding:26px 16px 0}
+  .intro{grid-template-columns:1fr;gap:12px;margin-bottom:18px}
+  h1{font-size:clamp(38px,10.5vw,50px)}
+  .dek{font-size:12px;line-height:1.8}
+  .exhibit{grid-template-columns:1fr;gap:12px}
+  .rig{min-height:320px}
+  .readout{padding:20px}
+  .principle{grid-template-columns:1fr;gap:6px}
+  .ex-list{grid-template-columns:1fr}
+  .table th,.table td{padding:10px 6px;font-size:11.5px}
+  .foot{flex-direction:column;gap:4px}
+  .hint{left:12px;bottom:10px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .gauge i,.head nav a::after{transition:none}
+}
+</style>
+</head>
+<body>
+<header class="head">
+  <a class="brand" href="#top"><span class="mark">K</span>KINETIC<span class="brand-sub">交互实验室</span></a>
+  <nav aria-label="主导航"><a href="#exhibit">展品</a><a href="#params">参数</a><a href="#about">关于</a></nav>
+  <span class="issue">LAB NOTE · 014</span>
+</header>
+<main class="stage" id="top">
+  <div class="wrap">
+    <div class="intro">
+      <div>
+        <p class="kicker">KINETIC LAB / EXHIBIT 014</p>
+        <h1>按得越久，<br><em>陷得越深。</em></h1>
+      </div>
+      <p class="dek">这是实验室的第 14 号展品。它只有一个动作：按住，然后松开。下陷深度跟按压时长绑在一起，松手的瞬间用一点过弹回到原位——把「用力」这件模糊的事，变成能看见的量。</p>
+    </div>
+
+    <section class="exhibit" id="exhibit">
+      <div>
+        <div class="rig">
+          <button class="well" id="well" type="button" aria-label="按压装置：按住使其下陷，松开回弹">
+            <span class="ring" aria-hidden="true"></span>
+            <b>PRESS</b>
+            <small>HOLD ME</small>
+          </button>
+        </div>
+        <p class="rig-note"><b>操作：</b> 鼠标按住 / 触屏长按 / 聚焦后按住 Space 或 Enter。右侧读数实时反映下陷深度。</p>
+      </div>
+      <aside class="readout" aria-label="装置读数">
+        <span class="pt">LIVE DEPTH / 实时读数</span>
+        <div class="big"><span id="depthNum">0</span><span>%</span></div>
+        <p class="phase" id="phase" role="status" aria-live="polite">待机 · 等待按压</p>
+        <div class="gauge"><i id="gaugeFill"></i></div>
+        <div class="metrics">
+          <div><b id="holdMs">0 ms</b><span>按压时长</span></div>
+          <div><b>900 ms</b><span>下陷封顶</span></div>
+          <div><b>0.18 / 0.76</b><span>回弹刚度 / 阻尼</span></div>
+          <div><b>172 px</b><span>装置直径</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="params" id="params">
+      <p class="kicker">DEVICE SPEC</p>
+      <h2>装置参数表。</h2>
+      <table class="table">
+        <thead><tr><th>参数</th><th>说明</th><th>取值</th></tr></thead>
+        <tbody>
+          <tr><td>下陷映射</td><td>按压时长线性映射到 0—100% <small>到顶后不再加深</small></td><td>0 → 900ms</td></tr>
+          <tr><td>最大缩放</td><td>压到底时的视觉收缩 <small>配合下沉让「陷入」更可信</small></td><td>scale 0.915</td></tr>
+          <tr><td>最大下沉</td><td>压到底时的纵向位移 <small>与内阴影方向一致</small></td><td>translateY 11px</td></tr>
+          <tr><td>内阴影</td><td>越陷越深的暗部 <small>模拟装置被压进基座</small></td><td>0.18 → 0.68</td></tr>
+          <tr><td>外阴影</td><td>越陷越收敛的投影 <small>靠近基座时投影收紧</small></td><td>22px → 3px</td></tr>
+          <tr><td>回弹</td><td>松手后的弹簧过冲 <small>允许短暂越过 0 再归位</small></td><td>k 0.18 / d 0.76</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="principle" id="about">
+      <div>
+        <h2>手感从哪里来。</h2>
+        <p><b>不是一段固定动画。</b> 按住的时候，每帧都用「已经按了多久」重新算一次深度，所以按 200ms 和按住 2 秒，停下来的位置完全不同。到 900ms 封顶，是给等待一个明确的终点。</p>
+        <p><b>阴影一起动。</b> 缩放、下沉、内阴影、外阴影四个量绑同一个深度参数，才像同一个物体在运动，而不是几个特效各演各的。</p>
+      </div>
+      <div>
+        <h2>松手的那一下。</h2>
+        <p>回弹用同一个弹簧积分：<code>v += (0 - d) × k</code>，<code>v *= 0.76</code>，<code>d += v</code>。因为速度可以累积成负值，深度会短暂穿过 0，于是装置轻轻弹出一点，再稳稳停住。</p>
+        <p>键盘用户按 <code>Space</code> 或 <code>Enter</code> 走完全相同的路径；若系统开启「减少动态效果」，按下直接到 100%、松开直接回 0，不做补间与过冲。</p>
+      </div>
+    </section>
+
+    <section class="exhibits">
+      <p class="kicker">MORE EXHIBITS</p>
+      <h2>实验室里的其他装置。</h2>
+      <div class="ex-list">
+        <article><span>07 / TOGGLE</span><h3>阻尼开关</h3><p>拨动后手柄带着两段减速落位，用不同阻尼区分「已开」和「已关」的手感。</p></article>
+        <article><span>09 / SLIDER</span><h3>刻度滑块</h3><p>每跨过一个刻度给一次极短的身份确认，让精确调节不必一直盯着数字。</p></article>
+        <article><span>11 / RIPPLE</span><h3>压力涟漪</h3><p>按压位置决定涟漪起点，力度决定扩散范围，是同一族反馈的空间版本。</p></article>
+      </div>
+    </section>
+    <footer class="foot">
+      <span>KINETIC 交互实验室 · 上海</span>
+      <span>LAB NOTE 014 / 2026</span>
+    </footer>
+  </div>
+</main>
+<p class="hint">按住圆形按钮，按得越久陷得越深，松开回弹</p>
+<script>
+(function () {
+  var well = document.getElementById('well');
+  if (!well) return;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var depth = 0, vel = 0, start = 0, active = false, mode = 'idle', raf = 0;
+  var MAX = 900;
+  var num = document.getElementById('depthNum');
+  var phase = document.getElementById('phase');
+  var gauge = document.getElementById('gaugeFill');
+  var hold = document.getElementById('holdMs');
+
+  function render() {
+    var d = depth, ds = Math.max(0, d);
+    well.style.transform = 'translateY(' + (d * 11).toFixed(2) + 'px) scale(' + (1 - d * .085).toFixed(4) + ')';
+    well.style.boxShadow =
+      'inset 0 ' + (ds * 16).toFixed(1) + 'px ' + (ds * 26).toFixed(1) + 'px rgba(42,32,8,' + (.18 + ds * .5).toFixed(3) + '),' +
+      '0 ' + ((1 - ds) * 20 + 3).toFixed(1) + 'px ' + ((1 - ds) * 24 + 6).toFixed(1) + 'px rgba(0,0,0,' + (.55 - ds * .16).toFixed(3) + ')';
+    var pct = Math.round(ds * 100);
+    num.textContent = pct;
+    gauge.style.width = pct + '%';
+  }
+
+  function setPhase(text) { if (phase) phase.textContent = text; }
+
+  function pressFrame(now) {
+    if (!active || mode !== 'press') return;
+    depth = Math.min(1, (now - start) / MAX);
+    hold.textContent = Math.round(Math.min(now - start, MAX)) + ' ms';
+    setPhase('下陷中 · ' + Math.round(depth * 100) + '%');
+    render();
+    if (depth < 1) raf = requestAnimationFrame(pressFrame);
+    else { setPhase('已到底 · 100%'); raf = 0; }
+  }
+
+  function reboundFrame() {
+    if (mode !== 'release') return;
+    vel += (0 - depth) * .18;
+    vel *= .76;
+    depth += vel;
+    render();
+    if (Math.abs(depth) > .002 || Math.abs(vel) > .002) raf = requestAnimationFrame(reboundFrame);
+    else {
+      depth = 0; vel = 0; render(); raf = 0;
+      setPhase('待机 · 已回位');
+      hold.textContent = '0 ms';
+    }
+  }
+
+  function begin() {
+    if (active) return;
+    if (raf) cancelAnimationFrame(raf);
+    active = true;
+    mode = 'press';
+    vel = 0;
+    start = performance.now();
+    if (reduce) {
+      depth = 1;
+      hold.textContent = MAX + ' ms';
+      setPhase('已到底 · 100%');
+      render();
+      raf = 0;
+    } else {
+      raf = requestAnimationFrame(pressFrame);
+    }
+  }
+
+  function end() {
+    if (!active) return;
+    active = false;
+    mode = 'release';
+    if (raf) cancelAnimationFrame(raf);
+    if (reduce) {
+      depth = 0; vel = 0; render(); raf = 0;
+      setPhase('待机 · 已回位');
+      hold.textContent = '0 ms';
+    } else {
+      vel = 0;
+      setPhase('回弹中 · 过冲归位');
+      raf = requestAnimationFrame(reboundFrame);
+    }
+  }
+
+  well.addEventListener('pointerdown', function (e) {
+    if (e.button) return;
+    e.preventDefault();
+    try { well.setPointerCapture(e.pointerId); } catch (err) {}
+    begin();
+  });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (t) {
+    well.addEventListener(t, function () { if (active) end(); });
+  });
+  well.addEventListener('keydown', function (e) {
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    e.preventDefault();
+    begin();
+  });
+  well.addEventListener('keyup', function (e) {
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    e.preventDefault();
+    end();
+  });
+  well.addEventListener('blur', function () { if (active) end(); });
+  render();
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

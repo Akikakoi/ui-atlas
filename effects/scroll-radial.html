@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>径向波次揭示 · ORBIT 天文台 · UI Atlas</title>
+<style>
+:root{--bg:#070a12;--paper:#0d1422;--ink:#eaf0fb;--muted:#8792ab;--line:rgba(150,175,220,.15);--accent:#63d6ff;--gold:#ffcb70}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(900px 620px at 50% -8%,#132039,#070a12 68%) fixed;color:var(--ink);font:14px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.head{max-width:1180px;margin:0 auto;height:68px;padding:0 40px;display:flex;align-items:center;gap:30px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;letter-spacing:.08em}
+.mark{width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#fff,var(--accent) 55%,#1d6a95);box-shadow:0 0 14px rgba(99,214,255,.5);display:grid;place-items:center;position:relative}
+.mark::after{content:"";position:absolute;inset:-5px;border:1px solid rgba(99,214,255,.35);border-radius:50%}
+.brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--muted)}
+.nav{display:flex;gap:24px;font-size:12.5px;color:var(--muted)}
+.nav a{position:relative;transition:color .2s}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:right;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.nav a:hover{color:var(--ink)}
+.nav a:hover::after{transform:scaleX(1);transform-origin:left}
+.issue{margin-left:auto;font:600 9.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+.stage{max-width:1180px;margin:0 auto;padding:0 40px}
+.intro{display:grid;grid-template-columns:1.15fr .85fr;gap:30px;align-items:end;padding:44px 0 22px}
+.kicker{margin:0 0 13px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:var(--accent)}
+h1{margin:0;font-size:clamp(38px,5.2vw,62px);line-height:1.04;letter-spacing:-.04em;font-weight:650}
+h1 em{font-style:normal;color:var(--gold)}
+.dek{margin:0;font-size:12.5px;line-height:1.9;color:var(--muted);max-width:34em}
+.tools{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.replay{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:8px 16px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color .2s,background .2s,transform .15s}
+.replay:hover{border-color:var(--accent);background:rgba(99,214,255,.08)}
+.replay:active{transform:scale(.97)}
+.replay:focus-visible,.nav a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.replay b{font:700 12px/1 ui-monospace,Consolas,monospace;color:var(--accent)}
+.status{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.chart{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(99,214,255,.045),transparent 42%);padding:22px 26px 18px;position:relative;overflow:hidden;scroll-margin-top:24px}
+.chart::before{content:"";position:absolute;inset:0;background:radial-gradient(440px 260px at 50% 46%,rgba(99,214,255,.10),transparent 72%);pointer-events:none}
+.chart-top{position:relative;display:flex;justify-content:space-between;gap:20px;align-items:baseline;margin-bottom:14px}
+.chart-top b{font-size:13px;letter-spacing:.02em}
+.chart-top span{font:600 9px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.gridwrap{position:relative;display:flex;justify-content:center;align-items:center;min-height:330px}
+.grid{display:grid;grid-template-columns:repeat(11,var(--cell,27px));grid-auto-rows:var(--cell,27px);gap:4px;place-content:center}
+.node{position:relative;border-radius:50%;background:var(--dot,rgba(120,160,210,.35));opacity:0;transform:scale(.2);transition:opacity .45s ease var(--delay,0ms),transform .5s cubic-bezier(.2,.9,.2,1) var(--delay,0ms)}
+.grid.in .node{opacity:1;transform:scale(1)}
+.node.core{background:radial-gradient(circle at 40% 36%,#fff,var(--gold) 60%,#a8651f);box-shadow:0 0 16px rgba(255,203,112,.6);z-index:2}
+.node.core::after{content:"";position:absolute;inset:-7px;border:1px solid rgba(255,203,112,.5);border-radius:50%;animation:ping 2.4s ease-out infinite}
+@keyframes ping{0%{transform:scale(.7);opacity:.8}100%{transform:scale(1.7);opacity:0}}
+.chart-foot{position:relative;display:flex;justify-content:space-between;gap:16px;margin-top:14px;padding-top:13px;border-top:1px solid var(--line);font:500 9.5px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.chart-foot b{color:var(--accent)}
+.data{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0;scroll-margin-top:24px}
+.metric{border:1px solid var(--line);border-radius:13px;padding:16px 16px 14px;background:var(--paper)}
+.metric b{display:block;font:600 22px/1 ui-monospace,Consolas,monospace;color:var(--gold);letter-spacing:-.02em}
+.metric b small{font-size:10px;color:var(--muted);margin-left:3px;letter-spacing:.1em}
+.metric h3{margin:9px 0 3px;font-size:12px}
+.metric p{margin:0;font-size:10px;line-height:1.65;color:var(--muted)}
+.catalog{margin:8px 0 26px;border:1px solid var(--line);border-radius:14px;overflow:hidden;scroll-margin-top:24px}
+.catalog h2{margin:0;padding:16px 20px;font-size:14px;border-bottom:1px solid var(--line);background:var(--paper)}
+.catalog h2 span{font:600 9px/1 ui-monospace,Consolas,monospace;color:var(--muted);letter-spacing:.16em;margin-left:8px}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th,td{text-align:left;padding:11px 20px;border-bottom:1px solid rgba(150,175,220,.08)}
+th{font:600 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+td{color:var(--ink)}
+td.num{font-family:ui-monospace,Consolas,monospace;color:var(--accent)}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .2s}
+tbody tr:hover{background:rgba(99,214,255,.05)}
+.quote{display:flex;justify-content:space-between;align-items:baseline;gap:30px;padding:22px 0;border-top:1px solid var(--line)}
+.quote p{margin:0;font-family:"Songti SC",Georgia,serif;font-size:clamp(17px,2.2vw,22px);line-height:1.5}
+.quote span{flex:0 0 auto;font:600 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.foot{display:flex;justify-content:space-between;gap:16px;padding:18px 0 34px;border-top:1px solid var(--line);font:500 9.5px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.hint{position:fixed;left:auto;right:clamp(16px,4vw,40px);top:80px;bottom:auto;margin:0;display:flex;align-items:center;gap:7px;font:400 10.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--muted);background:rgba(13,20,34,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;padding:6px 12px;pointer-events:none;z-index:5}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-height:560px) and (min-width:561px){
+  .head{height:46px;padding:0 18px;gap:16px}
+  .brand{font-size:12.5px}
+  .mark{width:18px;height:18px}
+  .brand small,.issue,.nav{display:none}
+  .stage{padding:0 18px}
+  .intro{grid-template-columns:1fr;gap:0;padding:16px 0 10px}
+  .kicker{margin-bottom:6px;font-size:8px}
+  h1{font-size:25px}
+  .dek{display:none}
+  .tools{margin-bottom:8px}
+  .replay{padding:5px 11px;font-size:10px}
+  .status{font-size:8px}
+  .chart{padding:10px 14px;border-radius:11px}
+  .chart-top{margin-bottom:6px}
+  .chart-top b{font-size:10px}
+  .chart-top span{font-size:7px}
+  .gridwrap{min-height:212px}
+  .grid{--cell:17px;gap:3px}
+  .chart-foot{margin-top:7px;padding-top:7px;font-size:7px}
+  .data,.catalog,.quote,.foot{display:none}
+  .hint{top:54px;right:12px;font-size:8px;padding:4px 8px}
+}
+@media (max-width:560px){
+  .head{height:56px;padding:0 16px;gap:12px}
+  .brand small,.issue{display:none}
+  .nav{display:none}
+  .stage{padding:0 16px}
+  .intro{grid-template-columns:1fr;gap:12px;padding:28px 0 18px}
+  h1{font-size:clamp(34px,9.5vw,46px)}
+  .dek{font-size:11.5px}
+  .chart{padding:16px 12px}
+  .grid{--cell:20px;gap:3px}
+  .gridwrap{min-height:250px}
+  .data{grid-template-columns:1fr 1fr}
+  table{font-size:10px}
+  th,td{padding:9px 10px}
+  .quote{flex-direction:column;gap:10px}
+  .foot{flex-direction:column;gap:4px}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .node{opacity:1!important;transform:none!important;transition:none!important}
+  .node.core::after{animation:none}
+  .nav a::after,.replay,tbody tr{transition:none}
+}
+</style>
+</head>
+<body>
+<header class="head">
+  <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span>ORBIT<small>天文台</small></a>
+  <nav class="nav" aria-label="主导航"><a href="#chart">图谱</a><a href="#data">观测数据</a><a href="#catalog">星表</a></nav>
+  <span class="issue">NIGHT LOG 2026.11.11</span>
+</header>
+<main class="stage" id="top">
+  <div class="intro">
+    <div>
+      <p class="kicker">DEEP SKY SURVEY / AUTUMN 2026</p>
+      <h1>从中心，<br><em>一圈圈点亮。</em></h1>
+    </div>
+    <p class="dek">ORBIT 天文台秋季巡天图谱。每个节点是一次测光采样，越靠近视场中心，曝光越深、信噪比越高。把页面滚到图谱区，看观测波次自视场中心向外一圈圈扩散。</p>
+  </div>
+
+  <div class="tools">
+    <button class="replay" id="replay" type="button"><b>↻</b> 重播波次</button>
+    <span class="status" id="status" role="status" aria-live="polite">正在布置测光节点…</span>
+  </div>
+
+  <section class="chart" id="chart" aria-label="径向测光图谱">
+    <div class="chart-top"><b>M31 视场 · 径向测光图</b><span>RA 00h42m / DEC +41°16′ / FOV 11×11</span></div>
+    <div class="gridwrap"><div class="grid" id="grid" aria-hidden="true"></div></div>
+    <div class="chart-foot"><span>中心 <b>核球区</b> · 外缘 <b>暗星等极限</b></span><span>波次延迟 = 到中心距离 × 62ms</span></div>
+  </section>
+
+  <section class="data" id="data" aria-label="观测数据">
+    <div class="metric"><b>0.68<small>″</small></b><h3>视宁度 Seeing</h3><p>今夜大气稳定度，优于同期 80% 观测夜。</p></div>
+    <div class="metric"><b>21.4<small>mag</small></b><h3>极限星等</h3><p>暗端探测能力，可分辨微弱背景星系。</p></div>
+    <div class="metric"><b>38<small>帧</small></b><h3>有效曝光</h3><p>剔除星轨与宇宙线后用于叠加的子帧。</p></div>
+    <div class="metric"><b>3.2<small>°</small></b><h3>视场半径</h3><p>单次巡天覆盖的天区半径。</p></div>
+  </section>
+
+  <section class="catalog" id="catalog" aria-label="本次巡天星表">
+    <h2>本次巡天星表 <span>CATALOG / 6 OBJECTS</span></h2>
+    <table>
+      <thead><tr><th>编号</th><th>名称</th><th>赤经</th><th>赤纬</th><th>星等</th><th>类型</th></tr></thead>
+      <tbody>
+        <tr><td class="num">M31</td><td>仙女座星系</td><td class="num">00h42m</td><td class="num">+41°16′</td><td class="num">3.4</td><td>旋涡星系</td></tr>
+        <tr><td class="num">M13</td><td>武仙座球状星团</td><td class="num">16h41m</td><td class="num">+36°27′</td><td class="num">5.8</td><td>球状星团</td></tr>
+        <tr><td class="num">M42</td><td>猎户座大星云</td><td class="num">05h35m</td><td class="num">−05°23′</td><td class="num">4.0</td><td>发射星云</td></tr>
+        <tr><td class="num">NGC 7000</td><td>北美洲星云</td><td class="num">20h58m</td><td class="num">+44°20′</td><td class="num">4.0</td><td>发射星云</td></tr>
+        <tr><td class="num">M45</td><td>昴星团</td><td class="num">03h47m</td><td class="num">+24°07′</td><td class="num">1.6</td><td>疏散星团</td></tr>
+        <tr><td class="num">NGC 253</td><td>玉夫座星系</td><td class="num">00h47m</td><td class="num">−25°17′</td><td class="num">7.1</td><td>旋涡星系</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="quote">
+    <p>“波次不是装饰，它把『中心更深』这件事，说给了眼睛听。”</p>
+    <span>ORBIT 观测手册 · 第 3 章</span>
+  </section>
+
+  <footer class="foot"><span>ORBIT 天文台 · 兴隆观测站</span><span>OBSERVATORY LOG / 2026.11.11</span></footer>
+</main>
+<p class="hint">滚动到图谱区，或点重播，看节点从中心一圈圈亮起来</p>
+<script>
+(function () {
+  var grid = document.getElementById('grid');
+  var replay = document.getElementById('replay');
+  var status = document.getElementById('status');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var SIZE = 11, mid = (SIZE - 1) / 2, R = 5.4;
+  var count = 0;
+
+  for (var r = 0; r < SIZE; r++) {
+    for (var c = 0; c < SIZE; c++) {
+      var dr = r - mid, dc = c - mid;
+      var d = Math.sqrt(dr * dr + dc * dc);
+      if (d > R) continue;
+      var node = document.createElement('i');
+      node.className = 'node' + (d < 0.4 ? ' core' : '');
+      node.style.gridColumn = (c + 1);
+      node.style.gridRow = (r + 1);
+      node.style.setProperty('--delay', Math.round(d * 62) + 'ms');
+      if (d >= 0.4) {
+        var t = d / R;
+        var alpha = (0.28 + (1 - t) * 0.5).toFixed(2);
+        var rr = Math.round(150 + 50 * t);
+        var gg = Math.round(180 + 35 * t);
+        node.style.setProperty('--dot', 'rgba(' + rr + ',' + gg + ',235,' + alpha + ')');
+      }
+      grid.appendChild(node);
+      count++;
+    }
+  }
+  status.textContent = count + ' 个测光节点 · 半径 ' + R.toFixed(1) + '°';
+
+  function play() {
+    grid.classList.remove('in');
+    void grid.offsetWidth;
+    grid.classList.add('in');
+  }
+  replay.addEventListener('click', play);
+
+  if (reduce) {
+    grid.classList.add('in');
+    status.textContent = count + ' 个测光节点 · 已就位';
+    return;
+  }
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { play(); io.disconnect(); }
+      });
+    }, { threshold: 0.2 });
+    io.observe(document.getElementById('chart'));
+  } else {
+    play();
+  }
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

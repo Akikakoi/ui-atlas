@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>点阵地形 · TOPO 地形可视化 · UI Atlas</title>
+<style>
+:root{--bg:#070d11;--paper:#0c141a;--ink:#e6f5f1;--muted:#7f9a98;--line:rgba(143,245,224,.14);--accent:#8ff5e0;--mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block}
+.shade{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(7,13,17,.86),rgba(7,13,17,.18) 42%,rgba(7,13,17,.62) 100%),
+  radial-gradient(120% 85% at 50% 45%,transparent 40%,rgba(7,13,17,.55) 100%)}
+.wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+
+/* 顶栏 */
+.nav{position:sticky;top:0;z-index:6;background:rgba(7,13,17,.55);backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);border-bottom:1px solid rgba(143,245,224,.12)}
+.nav-in{width:min(1180px,calc(100% - 48px));margin:0 auto;height:64px;display:flex;align-items:center;gap:24px}
+.brand{display:inline-flex;align-items:center;gap:10px;font:600 13px/1 var(--mono);letter-spacing:.2em}
+.brand svg{width:20px;height:20px;display:block}
+.brand small{font:500 9px/1 var(--mono);letter-spacing:.28em;color:rgba(230,245,241,.42)}
+.nav nav{display:flex;gap:22px;margin-left:auto}
+.nav nav a{font-size:11.5px;letter-spacing:.04em;color:rgba(230,245,241,.6);position:relative;transition:color .2s}
+.nav nav a::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.nav nav a:hover{color:var(--ink)}
+.nav nav a:hover::after{transform:scaleX(1)}
+.hint{display:inline-flex;align-items:center;gap:6px;margin:0;padding:4px 10px;font-size:11px;color:rgba(230,245,241,.68);white-space:nowrap;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.22);border-radius:999px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:0 0 5px}
+.nav-cta{flex:0 0 auto;height:31px;padding:0 14px;display:inline-flex;align-items:center;border-radius:6px;border:1px solid rgba(143,245,224,.36);color:var(--accent);text-decoration:none;font:600 11px/1 var(--mono);background:rgba(143,245,224,.07);transition:background .2s,translate .15s}
+.nav-cta:hover{background:rgba(143,245,224,.16);translate:0 -1px}
+
+/* 首屏 */
+.page{position:relative;z-index:2}
+.hero{width:min(1180px,calc(100% - 48px));margin:0 auto;min-height:calc(100vh - 65px);padding:clamp(38px,8vh,82px) 0 26px;display:flex;flex-direction:column}
+.kicker{margin:0;font:600 10px/1.7 var(--mono);letter-spacing:.26em;color:var(--accent)}
+h1{margin:16px 0 0;font-size:clamp(40px,6.4vw,72px);line-height:1;letter-spacing:-.045em;font-weight:680;max-width:10em;text-shadow:0 3px 30px rgba(0,0,0,.6)}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:20px 0 0;max-width:31em;font-size:13.5px;line-height:1.85;color:rgba(230,245,241,.7)}
+.actions{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.hero .kicker{animation:rise .5s both}
+.hero h1{animation:rise .6s .06s both}
+.hero .lede{animation:rise .6s .12s both}
+.hero .actions{animation:rise .6s .18s both}
+@keyframes rise{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+.btn{height:44px;padding:0 20px;border-radius:6px;display:inline-flex;align-items:center;font-size:12px;letter-spacing:.03em;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s,translate .15s}
+.btn:focus-visible,.nav-cta:focus-visible,.layer:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.btn.solid{background:var(--accent);border-color:var(--accent);color:#07201c;font-weight:700}
+.btn.solid:hover{background:#b6ffee;border-color:#b6ffee}
+.btn.ghost{border-color:rgba(230,245,241,.28);color:var(--ink);background:rgba(7,13,17,.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.hero-foot{margin-top:auto;padding-top:clamp(30px,8vh,66px)}
+.statline{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;background:rgba(12,20,26,.6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.stat{padding:14px 18px;border-left:1px solid rgba(143,245,224,.1);transition:background .2s,translate .2s}
+.stat:hover{background:rgba(143,245,224,.05);translate:0 -1px}
+.stat:first-child{border-left:0}
+.stat span{display:block;font:600 8.5px/1.6 var(--mono);letter-spacing:.2em;color:rgba(230,245,241,.4)}
+.stat b{display:flex;align-items:baseline;gap:5px;margin-top:4px;font:600 21px/1.2 var(--mono);letter-spacing:-.02em}
+.stat b small{font-size:10px;font-weight:500;color:rgba(230,245,241,.48)}
+.stat p{margin:3px 0 0;font-size:9.5px;line-height:1.5;color:rgba(230,245,241,.38)}
+.term{margin:12px 0 0;font:400 9px/1.8 var(--mono);letter-spacing:.08em;color:rgba(230,245,241,.36)}
+
+/* 实底内容 */
+.solid{background:var(--bg);border-top:1px solid var(--line);padding:clamp(56px,9vh,96px) 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px}
+.eyebrow{margin:0;font:600 10px/1.6 var(--mono);letter-spacing:.24em;color:var(--accent)}
+h2{margin:14px 0 0;font-size:clamp(28px,3.7vw,44px);line-height:1.08;letter-spacing:-.04em;font-weight:660}
+.sec-head>p{margin:0;max-width:31em;font-size:12.5px;line-height:1.85;color:var(--muted);justify-self:end;text-align:right}
+.layers{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.layer{border:1px solid var(--line);border-radius:12px;padding:20px;background:linear-gradient(180deg,rgba(143,245,224,.03),transparent);transition:border-color .25s,transform .25s,box-shadow .25s}
+.layer:hover{border-color:rgba(143,245,224,.35);transform:translateY(-3px);box-shadow:0 28px 44px -42px rgba(143,245,224,.5)}
+.layer b{font:600 10px/1.6 var(--mono);letter-spacing:.2em;color:var(--accent)}
+.layer h3{margin:10px 0 0;font-size:16px;letter-spacing:-.01em}
+.layer p{margin:8px 0 0;font-size:11.5px;line-height:1.85;color:var(--muted)}
+.layer .meta{margin-top:16px;padding-top:10px;border-top:1px dashed rgba(143,245,224,.16);font:400 9px/1.8 var(--mono);letter-spacing:.08em;color:rgba(230,245,241,.4)}
+
+/* 参数表 */
+.params{background:var(--paper);border-top:1px solid var(--line);padding:clamp(56px,9vh,96px) 0}
+.ptable{margin-top:34px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.prow{display:grid;grid-template-columns:170px 1fr 140px;gap:16px;padding:14px 20px;border-bottom:1px solid var(--line);align-items:center;font-size:12px;transition:background .18s}
+.prow:last-child{border-bottom:0}
+.prow:hover{background:rgba(143,245,224,.03)}
+.prow .pk{font:600 10px/1.5 var(--mono);letter-spacing:.1em;color:var(--accent)}
+.prow .pv{color:rgba(230,245,241,.72)}
+.prow .pn{font:500 10px/1.5 var(--mono);color:var(--muted);text-align:right}
+
+/* 引文、页脚 */
+.quote{background:var(--bg);border-top:1px solid var(--line);padding:clamp(58px,10vh,104px) 0}
+.quote blockquote{margin:0;max-width:22em;font:400 clamp(26px,3.7vw,46px)/1.26 Georgia,"Songti SC",serif;letter-spacing:-.02em}
+.quote blockquote em{font-style:italic;color:var(--accent)}
+.quote .cite{margin:20px 0 0;font:400 9.5px/1.6 var(--mono);letter-spacing:.16em;color:var(--muted)}
+.cta{padding:clamp(68px,11vh,120px) 0;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(7,13,17,.5),rgba(7,13,17,.92))}
+.cta-in{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.cta h2{margin:12px 0 0;font-size:clamp(32px,5vw,58px);line-height:1.02}
+.cta .note{margin:16px 0 0;max-width:32em;font-size:12px;line-height:1.85;color:var(--muted)}
+.foot{background:#05090c;border-top:1px solid var(--line);padding:22px 0 28px}
+.foot-in{display:flex;flex-wrap:wrap;gap:10px 22px;font:400 9.5px/1.8 var(--mono);letter-spacing:.08em;color:rgba(230,245,241,.36)}
+.foot-in span:last-child{margin-left:auto}
+
+/* 600×450 紧凑版 */
+@media (max-height:560px) and (min-width:561px){
+  .nav-in{height:44px;gap:14px}
+  .nav nav{display:none}
+  .brand small{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+  .nav-cta{height:27px;padding:0 11px;font-size:10.5px}
+  .hero{min-height:calc(100vh - 45px);padding:10px 0}
+  .kicker{font-size:9px}
+  h1{margin-top:7px;font-size:clamp(28px,4.7vw,38px);max-width:10em}
+  .lede{margin-top:8px;font-size:10.5px;line-height:1.6;max-width:36em}
+  .actions{margin-top:10px;gap:8px}
+  .btn{height:32px;padding:0 13px;font-size:11px}
+  .hero-foot{padding-top:10px}
+  .statline{border-radius:10px}
+  .stat{padding:8px 12px}
+  .stat span{font-size:7.5px}
+  .stat b{font-size:15px;margin-top:2px}
+  .stat b small{font-size:8px}
+  .stat p{font-size:8px;margin-top:1px}
+  .term{display:none}
+  .solid,.params,.quote,.cta,.foot{display:none}
+}
+/* 手机单列 */
+@media (max-width:560px){
+  .nav-in{width:calc(100% - 32px);height:56px;gap:12px}
+  .nav nav{display:none}
+  .brand small{display:none}
+  .hint{display:none}
+  .nav-cta{margin-left:auto;height:29px;padding:0 12px;font-size:11px}
+  .wrap,.hero{width:calc(100% - 32px)}
+  .hero{min-height:calc(100vh - 57px);padding:34px 0 20px}
+  h1{font-size:clamp(38px,11vw,48px);max-width:8em}
+  .lede{font-size:12.5px;margin-top:16px}
+  .actions{margin-top:20px}
+  .btn{height:42px;padding:0 17px}
+  .hero-foot{padding-top:24px}
+  .statline{grid-template-columns:1fr 1fr}
+  .stat{border-top:1px solid rgba(143,245,224,.1)}
+  .stat:nth-child(odd){border-left:0}
+  .stat:nth-child(-n+2){border-top:0}
+  .stat b{font-size:18px}
+  .sec-head{grid-template-columns:1fr;gap:12px}
+  .sec-head>p{justify-self:start;text-align:left}
+  .layers{grid-template-columns:1fr;gap:12px}
+  .prow{grid-template-columns:1fr;gap:4px;padding:12px 16px}
+  .prow .pn{text-align:left}
+  .cta-in{align-items:flex-start}
+  .foot-in span:last-child{margin-left:0}
+}
+@media (hover:none){.hint{display:none}}
+@media (prefers-reduced-motion:reduce){
+  .hero .kicker,.hero h1,.hero .lede,.hero .actions{animation:none}
+  .nav nav a::after,.nav-cta,.btn,.layer,.stat,.prow{transition:none}
+  .nav-cta:hover,.btn:hover,.layer:hover,.stat:hover{translate:0;transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="terrain" aria-hidden="true"></canvas>
+<div class="shade" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top" aria-label="TOPO 地形可视化">
+      <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="#8ff5e0" stroke-width="1.2">
+        <path d="M1 13c3-6 5 2 8-3s5 4 10-3" opacity=".7"/>
+        <path d="M1 16c3-6 5 2 8-3s5 4 10-3"/>
+      </svg>
+      TOPO<small>TERRAIN LAB</small>
+    </a>
+    <nav aria-label="主导航"><a href="#layers">图层</a><a href="#params">参数</a><a href="#demo">演示</a></nav>
+    <p class="hint">鼠标移过点阵地形，会隆起一团，像等高线上的山</p>
+    <a class="nav-cta" href="#params">看参数 →</a>
+  </div>
+</header>
+
+<main class="page" id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">TOPO · 点阵地形可视化 · 实时高度场</p>
+      <h1>把数据，<br><em>摊成一片山。</em></h1>
+      <p class="lede">正交排列的点，被几层正弦波顶起高低。越高的点越亮、越大；鼠标扫过的地方额外隆起一座小山丘，像等高线忽然睁开的一只眼。</p>
+      <div class="actions">
+        <a class="btn solid" href="#layers">看图层拆解 →</a>
+        <a class="btn ghost" href="#params">读参数表</a>
+      </div>
+    </div>
+    <div class="hero-foot">
+      <div class="statline" aria-label="地形场参数">
+        <div class="stat"><span>GRID / 网格</span><b>55<small>× 55</small></b><p>正交采样点</p></div>
+        <div class="stat"><span>WAVES / 波形</span><b>4<small>层</small></b><p>正弦叠加</p></div>
+        <div class="stat"><span>BUMP / 隆起</span><b>1.0<small>×</small></b><p>鼠标距离场</p></div>
+        <div class="stat"><span>DPR / 像素比</span><b>≤ 2<small>×</small></b><p>清晰度上限</p></div>
+      </div>
+      <p class="term">orthographic dot grid · layered sine height field · 2.5D oblique projection · distance-field bump · Canvas 2D</p>
+    </div>
+  </section>
+
+  <section class="solid" id="layers">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">01 / 图层</p>
+          <h2>一座山，<br>分三层画。</h2>
+        </div>
+        <p>高度来自多层波形的叠加，投影负责把它压成 2.5D，指针的距离场再叠一座临时的小丘。三层互不干扰。</p>
+      </div>
+      <div class="layers">
+        <article class="layer">
+          <b>FIELD / 01</b>
+          <h3>高度场</h3>
+          <p>四层低频正弦沿不同方向流动，叠加出连绵起伏。每一层的相位独立漂移，山脊因此一直在缓慢改形。</p>
+          <div class="meta">z = sin(u+t) + sin(v+0.8t) + …</div>
+        </article>
+        <article class="layer">
+          <b>PROJECT / 02</b>
+          <h3>2.5D 投影</h3>
+          <p>正交网格经斜投影压扁成菱形平面，高度再沿屏幕纵轴抬起。于是平铺的点变成有纵深的地表。</p>
+          <div class="meta">px = (u−v)·sx · py = (u+v)·sy − z·hz</div>
+        </article>
+        <article class="layer">
+          <b>INTERACT / 03</b>
+          <h3>指针隆起</h3>
+          <p>计算每个点到光标的屏幕距离，落在半径内就按平方衰减抬起。越靠近中心越高，形成一团柔软的鼓包。</p>
+          <div class="meta">bump = (1 − d/R)² × 1.0</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="params" id="params">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">02 / 参数</p>
+          <h2>调一调山脉。</h2>
+        </div>
+        <p>网格密度、层数、隆起半径、像素比——四个旋钮决定这片地形是细腻还是粗犷。</p>
+      </div>
+      <div class="ptable" aria-label="地形渲染参数表">
+        <div class="prow"><span class="pk">GRID</span><span class="pv">u/v 双向采样点数，越密点越细</span><span class="pn">55 × 55</span></div>
+        <div class="prow"><span class="pk">WAVES</span><span class="pv">沿不同轴叠加的正弦层数</span><span class="pn">4 layers</span></div>
+        <div class="prow"><span class="pk">BUMP_R</span><span class="pv">鼠标隆起的作用半径（屏幕像素）</span><span class="pn">130 px</span></div>
+        <div class="prow"><span class="pk">SCALE</span><span class="pv">高度抬升系数，越大山越陡</span><span class="pn">18 px</span></div>
+        <div class="prow"><span class="pk">DPR</span><span class="pv">设备像素比上限，兼顾清晰度与填充量</span><span class="pn">≤ 2</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="quote">
+    <div class="wrap">
+      <blockquote>等高线不会说话，<br><em>但点会呼吸。</em></blockquote>
+      <p class="cite">TOPO 地形可视化 · 渲染笔记 · 第 12 则</p>
+    </div>
+  </section>
+
+  <section class="cta" id="demo">
+    <div class="wrap cta-in">
+      <div>
+        <p class="kicker">HEIGHT FIELD · LIVE PREVIEW</p>
+        <h2>让数据，<br>长出地形。</h2>
+        <p class="note">背景是真时绘制的高度场。触屏设备不叠加鼠标隆起；减动效用户会看到一帧静止的地形。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>TOPO TERRAIN LAB · 空间数据组</span>
+    <span>背景点阵地形由 Canvas 2D 高度场实时绘制</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var canvas = document.getElementById('terrain'), ctx = canvas.getContext('2d');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var noHover = matchMedia('(hover: none)').matches;
+  var dpr = Math.min(devicePixelRatio || 1, 2);
+  var N = 27, step = 1, sx = 13, sy = 7, hz = 18, bumpR = 130, bumpH = 46;
+  var pts = [], t = 0, raf = null, running = true;
+  var mx = -9999, my = -9999;
+  var colors = [];
+
+  for (var i = 0; i < 16; i++) {
+    var k = i / 15;
+    var r = Math.round(24 + k * 119), g = Math.round(58 + k * 187), b = Math.round(75 + k * 149);
+    colors.push('rgba(' + r + ',' + g + ',' + b + ',' + (0.35 + k * 0.65).toFixed(2) + ')');
+  }
+
+  function build() {
+    pts = [];
+    for (var u = -N; u <= N; u++) {
+      for (var v = -N; v <= N; v++) {
+        pts.push([u * step, v * step]);
+      }
+    }
+  }
+
+  function size() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    canvas.width = Math.round(innerWidth * dpr);
+    canvas.height = Math.round(innerHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    sx = Math.max(9, innerWidth / 78);
+    sy = sx * 0.52;
+    hz = Math.max(14, innerWidth / 90);
+    bumpR = Math.min(160, Math.max(90, innerWidth / 10));
+    if (reduce) drawStatic();
+  }
+
+  function height(u, v) {
+    return Math.sin(u * 0.42 + t) +
+           Math.sin(v * 0.48 + t * 0.82) +
+           0.6 * Math.sin((u + v) * 0.3 - t * 0.6) +
+           0.4 * Math.sin(Math.sqrt(u * u + v * v) * 0.5 - t * 1.1);
+  }
+
+  function paint() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    var cx = innerWidth / 2, cy = innerHeight * 0.54;
+    var useMouse = !noHover;
+    for (var i = 0; i < pts.length; i++) {
+      var u = pts[i][0], v = pts[i][1];
+      var z = height(u, v);
+      var px = cx + (u - v) * sx;
+      var py = cy + (u + v) * sy - z * hz;
+      var bump = 0;
+      if (useMouse) {
+        var dx = px - mx, dy = py - my;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < bumpR) { var f = 1 - d / bumpR; bump = f * f * bumpH; py -= bump; }
+      }
+      var lvl = Math.max(0, Math.min(1, (z + 2.6) / 5.2 + bump / 120));
+      var ci = (lvl * 15) | 0;
+      var s = 1.5 + lvl * 2.6 + (bump / bumpH) * 1.4;
+      ctx.fillStyle = colors[ci];
+      ctx.fillRect(px, py, s, s);
+    }
+  }
+
+  function drawStatic() { t = 0.9; paint(); }
+
+  function frame() {
+    raf = null;
+    if (!running) return;
+    t += 0.012;
+    paint();
+    raf = requestAnimationFrame(frame);
+  }
+
+  if (!noHover) {
+    addEventListener('pointermove', function (e) { mx = e.clientX; my = e.clientY; }, { passive: true });
+    addEventListener('pointerleave', function () { mx = my = -9999; });
+    addEventListener('blur', function () { mx = my = -9999; });
+  }
+
+  build();
+  size();
+  addEventListener('resize', size);
+  document.addEventListener('visibilitychange', function () {
+    running = !document.hidden;
+    if (running && !reduce && !raf) raf = requestAnimationFrame(frame);
+    else if (!running && raf) { cancelAnimationFrame(raf); raf = null; }
+  });
+  if (!reduce) raf = requestAnimationFrame(frame);
+
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

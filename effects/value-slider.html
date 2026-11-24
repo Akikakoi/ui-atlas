@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滑块数值 · TONE 调色台 · UI Atlas</title>
+<style>
+:root{--bg:#f1f2ee;--panel:#fff;--ink:#191c1a;--muted:#7d837c;--line:#dfe2da;--accent:#d98a3f;--accent2:#eab56d}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.head{position:sticky;top:0;z-index:8;display:flex;align-items:center;gap:22px;height:62px;padding:0 clamp(20px,4vw,46px);background:rgba(241,242,238,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:750;font-size:13px;letter-spacing:.16em;white-space:nowrap}
+.brand .mark{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--accent),#c25cc0);color:#fff;display:grid;place-items:center;font:700 11px/1 ui-monospace,Consolas,monospace}
+.brand small{font:500 9px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--muted)}
+.nav-links{display:flex;gap:22px;margin-left:8px;font-size:12.5px;color:var(--muted)}
+.nav-links a{position:relative;transition:color .2s}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a:hover::after{transform:scaleX(1)}
+.reset{margin-left:auto;border:1px solid var(--ink);background:transparent;border-radius:999px;padding:7px 15px;font:600 11.5px inherit;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
+.reset:hover{background:var(--ink);color:#fff}
+.hero{max-width:1040px;margin:0 auto;padding:clamp(30px,4.8vw,56px) clamp(20px,4vw,46px) 16px;display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:end}
+.kicker{margin:0 0 14px;font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.24em;color:var(--muted)}
+h1{margin:0;font-size:clamp(38px,5.6vw,62px);line-height:1.0;letter-spacing:-.05em;font-weight:640}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.hero p{margin:0 0 4px;font-size:12.5px;line-height:1.9;color:#5e645c;max-width:28em}
+.hero p b{color:var(--ink);font-weight:600}
+.studio{max-width:1040px;margin:0 auto;padding:8px clamp(20px,4vw,46px) 6px;display:grid;grid-template-columns:1fr 260px;gap:18px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 22px 10px}
+.ctrl{padding:12px 0 18px;border-bottom:1px solid var(--line)}
+.ctrl:last-child{border-bottom:0}
+.ctrl .lab{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.ctrl .lab b{font-size:12.5px;font-weight:600}
+.ctrl .lab small{margin-left:auto;font:10px ui-monospace,Consolas,monospace;color:var(--muted)}
+.slider{position:relative;height:26px;touch-action:none;cursor:pointer;--v:.5;--sk:0deg;--sc:1}
+.track{position:absolute;left:0;right:0;top:50%;height:5px;transform:translateY(-50%);background:#e4e7e0;border-radius:99px}
+.fill{position:absolute;left:0;top:50%;width:100%;height:5px;transform:translateY(-50%) scaleX(var(--v));transform-origin:left;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px}
+.thumb{position:absolute;top:50%;left:calc(var(--v) * 100%);width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--accent);transform:translate(-50%,-50%);box-shadow:0 2px 6px -2px rgba(20,24,20,.45);transition:box-shadow .2s}
+.slider.active .thumb{box-shadow:0 0 0 6px rgba(217,138,63,.16),0 2px 6px -2px rgba(20,24,20,.45)}
+.bubble{position:absolute;left:calc(var(--v) * 100%);bottom:24px;transform:translateX(-50%) skewX(var(--sk)) scale(var(--sc));transform-origin:center bottom;background:var(--ink);color:#fff;font:600 11px ui-monospace,Consolas,monospace;padding:3px 8px;border-radius:6px;white-space:nowrap;opacity:0;transition:opacity .18s;pointer-events:none}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-4px;width:8px;height:8px;background:var(--ink);transform:translateX(-50%) rotate(45deg);border-radius:1px}
+.slider.active .bubble{opacity:1}
+.side{display:flex;flex-direction:column;gap:14px}
+.preview-card{background:#1d2226;border:1px solid #1d2226;border-radius:14px;overflow:hidden;color:#fff}
+.preview{height:170px;position:relative;background:
+  radial-gradient(circle at 30% 28%,#ffd9a8,transparent 45%),
+  radial-gradient(circle at 72% 55%,#8fd3c7,transparent 48%),
+  linear-gradient(135deg,#7a5cc9,#c45c8a 55%,#e09a4f);
+  transition:filter .12s linear}
+.preview::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,12,14,.5),transparent 55%)}
+/* 锐化：增强局部细节层，滑块 0—100 映射到 --sh，避免成为无反应的假控件 */
+.preview::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:overlay;
+  background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.34) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(10,12,16,.28) 0 1px,transparent 1px 3px);
+  opacity:var(--sh,0);transition:opacity .12s linear}
+.preview-card .cap{padding:12px 14px;display:flex;justify-content:space-between;font:10px ui-monospace,Consolas,monospace;color:#aeb5bc}
+.presets{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.presets h3{margin:0 0 10px;font:600 10px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.preset{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 11px;margin-bottom:7px;font:inherit;font-size:11.5px;cursor:pointer;transition:border-color .2s,background .2s}
+.preset:last-child{margin-bottom:0}
+.preset:hover{border-color:var(--accent);background:#fff8ee}
+.note{max-width:1040px;margin:0 auto;padding:26px clamp(20px,4vw,46px) 44px}
+.note-inner{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;border-top:1px solid var(--line);padding-top:20px}
+.note-inner article{display:flex;gap:11px;align-items:flex-start}
+.note-inner i{flex:0 0 20px;font:600 9px/1.7 ui-monospace,Consolas,monospace;font-style:normal;color:var(--accent)}
+.note-inner h3{margin:0 0 4px;font-size:12.5px;font-weight:600}
+.note-inner p{margin:0;font-size:11px;line-height:1.75;color:var(--muted)}
+footer{max-width:1040px;margin:0 auto;padding:0 clamp(20px,4vw,46px) 30px}
+.foot{display:flex;gap:18px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--line);font:10px ui-monospace,Consolas,monospace;color:var(--muted)}
+.foot span:last-child{margin-left:auto}
+.hint{position:fixed;left:16px;bottom:14px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.04em;color:#555a53;pointer-events:none;z-index:9;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(20,24,20,.14);border-radius:999px;padding:4px 9px;box-shadow:0 8px 18px -16px rgba(0,0,0,.5)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media (max-width:820px){.nav-links{display:none}.hero{grid-template-columns:1fr;gap:12px}.note-inner{grid-template-columns:1fr}.studio{grid-template-columns:1fr}.side{flex-direction:row}.side>*{flex:1}}
+@media (max-width:560px){
+  .head{height:54px;padding:0 16px;gap:12px}.brand small{display:none}.reset{padding:6px 11px;font-size:10.5px}
+  .hero{padding:22px 16px 10px}h1{font-size:clamp(34px,10.5vw,46px)}h1 br{display:none}.hero p{font-size:12px;line-height:1.8}
+  .studio{padding:6px 14px}.panel{padding:14px}.side{flex-direction:column}
+  .note{padding:18px 16px 32px}.foot{flex-direction:column;gap:4px}.foot span:last-child{margin-left:0}
+  .hint{display:none}
+}
+@media (max-height:560px) and (min-width:561px){
+  .head{height:44px;padding:0 16px;gap:14px}.nav-links,.brand small{display:none}.reset{padding:5px 11px;font-size:10px}
+  .hero{padding:10px 20px 4px;grid-template-columns:1fr;gap:0}.kicker{display:none}h1{font-size:clamp(22px,4vw,30px)}h1 br{display:none}.hero p{display:none}
+  .studio{padding:4px 20px 6px;grid-template-columns:1fr 200px;gap:10px}.panel{padding:8px 14px 4px}
+  .ctrl{padding:5px 0 8px}.ctrl .lab{margin-bottom:5px}.ctrl .lab b{font-size:10.5px}.ctrl .lab small{font-size:9px}
+  .bubble{bottom:20px;font-size:9px}.preview{height:110px}.presets{padding:8px}.preset{font-size:10px;padding:5px 8px;margin-bottom:4px}
+  .note,footer{display:none}
+  .hint{left:12px;bottom:10px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .slider .bubble{opacity:1!important;transform:translateX(-50%)!important;transition:none}
+  .thumb,.reset,.preset,nav a,nav a::after,.preview{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<header class="head">
+  <a class="brand" href="#top"><span class="mark">T</span>TONE <small>调色台</small></a>
+  <nav class="nav-links" aria-label="主导航"><a href="#console">调色台</a><a href="#how">机制</a><a href="#footer">关于</a></nav>
+  <button class="reset" id="reset" type="button">重置参数</button>
+</header>
+<main id="top">
+  <section class="hero">
+    <div>
+      <p class="kicker">STUDIO / COLOR GRADE</p>
+      <h1>拖动之间，<br><em>数值活了起来。</em></h1>
+    </div>
+    <p>拖动任意滑块，一枚数值气泡会紧贴拇指移动，并随拖动<b>速度倾斜、缩放</b>；一松手就弹回正位。已填充的轨道用 scaleX 延展，预览实时跟着变。</p>
+  </section>
+
+  <section class="studio" id="console">
+    <div class="panel" id="panel">
+      <div class="ctrl">
+        <div class="lab"><b>色温</b><small>WARM — COOL</small></div>
+        <div class="slider" tabindex="0" role="slider" aria-label="色温" aria-valuemin="2000" aria-valuemax="9000" aria-valuenow="5600" data-min="2000" data-max="9000" data-value="5600" data-fmt="k" data-key="temp">
+          <div class="track"></div><div class="fill"></div><div class="thumb"></div><div class="bubble">5600K</div>
+        </div>
+      </div>
+      <div class="ctrl">
+        <div class="lab"><b>饱和度</b><small>0 — 200%</small></div>
+        <div class="slider" tabindex="0" role="slider" aria-label="饱和度" aria-valuemin="0" aria-valuemax="200" aria-valuenow="110" data-min="0" data-max="200" data-value="110" data-fmt="%" data-key="sat">
+          <div class="track"></div><div class="fill"></div><div class="thumb"></div><div class="bubble">110%</div>
+        </div>
+      </div>
+      <div class="ctrl">
+        <div class="lab"><b>对比度</b><small>0 — 200%</small></div>
+        <div class="slider" tabindex="0" role="slider" aria-label="对比度" aria-valuemin="0" aria-valuemax="200" aria-valuenow="104" data-min="0" data-max="200" data-value="104" data-fmt="%" data-key="con">
+          <div class="track"></div><div class="fill"></div><div class="thumb"></div><div class="bubble">104%</div>
+        </div>
+      </div>
+      <div class="ctrl">
+        <div class="lab"><b>亮度</b><small>−100 — +100</small></div>
+        <div class="slider" tabindex="0" role="slider" aria-label="亮度" aria-valuemin="-100" aria-valuemax="100" aria-valuenow="6" data-min="-100" data-max="100" data-value="6" data-fmt="signed" data-key="bright">
+          <div class="track"></div><div class="fill"></div><div class="thumb"></div><div class="bubble">+6</div>
+        </div>
+      </div>
+      <div class="ctrl">
+        <div class="lab"><b>锐化</b><small>0 — 100</small></div>
+        <div class="slider" tabindex="0" role="slider" aria-label="锐化" aria-valuemin="0" aria-valuemax="100" aria-valuenow="30" data-min="0" data-max="100" data-value="30" data-fmt="" data-key="sharp">
+          <div class="track"></div><div class="fill"></div><div class="thumb"></div><div class="bubble">30</div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="preview-card">
+        <div class="preview" id="preview"></div>
+        <div class="cap"><span>LIVE PREVIEW</span><span id="readout">5600K · 110%</span></div>
+      </div>
+      <div class="presets">
+        <h3>风格预设</h3>
+        <button class="preset" type="button" data-preset="natural">自然光 · 干净通透</button>
+        <button class="preset" type="button" data-preset="warm">暖调 · 午后胶片</button>
+        <button class="preset" type="button" data-preset="cool">冷调 · 都市夜景</button>
+      </div>
+    </aside>
+  </section>
+
+  <section class="note" id="how">
+    <div class="note-inner">
+      <article><i>01</i><div><h3>速度决定角度</h3><p>用相邻两帧的数值差估算拖动速度，越快气泡的 skew 越大，松手后指数衰减回正。</p></div></article>
+      <article><i>02</i><div><h3>rAF 驱动</h3><p>指针采样与回弹动画都走 requestAnimationFrame，填充层只改 scaleX，不触发重排。</p></div></article>
+      <article><i>03</i><div><h3>键盘等价</h3><p>滑块是可聚焦的 ARIA slider，方向键微调、PageUp/Down 大步进、Home/End 直达端点。</p></div></article>
+    </div>
+  </section>
+
+  <footer id="footer">
+    <div class="foot">
+      <span>TONE · 轻量在线调色</span>
+      <span>所有参数仅本地预览</span>
+      <span>hello@tone.studio</span>
+      <span>© 2026</span>
+    </div>
+  </footer>
+</main>
+<p class="hint">拖动滑块，数值气泡会跟着跑、还会随速度倾斜</p>
+<script>
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var panel = document.getElementById('panel');
+  var sliders = [].slice.call(panel.querySelectorAll('.slider'));
+  var preview = document.getElementById('preview');
+  var readout = document.getElementById('readout');
+  var VALS = {};
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  function fmt(v, kind) {
+    if (kind === 'k') return Math.round(v) + 'K';
+    if (kind === '%') return Math.round(v) + '%';
+    if (kind === 'signed') return (v >= 0 ? '+' : '') + Math.round(v);
+    return String(Math.round(v));
+  }
+
+  function makeSlider(root) {
+    var min = parseFloat(root.dataset.min);
+    var max = parseFloat(root.dataset.max);
+    var kind = root.dataset.fmt;
+    var key = root.dataset.key;
+    var bubble = root.querySelector('.bubble');
+    var v = parseFloat(root.dataset.value);
+    var sk = 0, sc = 1, raf = 0, dragging = false;
+    var lastV = v, lastT = (performance && performance.now) ? performance.now() : Date.now();
+
+    function ratio() { return (v - min) / (max - min); }
+    function render() {
+      root.style.setProperty('--v', ratio().toFixed(4));
+      root.style.setProperty('--sk', sk.toFixed(2) + 'deg');
+      root.style.setProperty('--sc', sc.toFixed(3));
+      var txt = fmt(v, kind);
+      bubble.textContent = txt;
+      root.setAttribute('aria-valuenow', Math.round(v));
+      root.setAttribute('aria-valuetext', txt);
+      VALS[key] = v;
+      updatePreview();
+    }
+    function tick() {
+      sk *= 0.84;
+      sc += (1 - sc) * 0.16;
+      if (Math.abs(sk) < 0.06) sk = 0;
+      if (Math.abs(sc - 1) < 0.004) sc = 1;
+      render();
+      if (dragging || sk !== 0 || sc !== 1) raf = requestAnimationFrame(tick);
+      else raf = 0;
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(tick); }
+    function setV(nv, fromDrag) {
+      nv = clamp(nv, min, max);
+      if (fromDrag && !reduce) {
+        var now = (performance && performance.now) ? performance.now() : Date.now();
+        var dt = Math.max(8, now - lastT);
+        var speed = (nv - lastV) / dt * 16;
+        sk = clamp(-speed * 1.5, -20, 20);
+        sc = 1 + Math.min(0.2, Math.abs(speed) * 0.02);
+        lastT = now;
+        lastV = nv;
+        kick();
+      } else {
+        lastV = nv;
+      }
+      v = nv;
+      render();
+    }
+    function fromPointer(x) {
+      var r = root.querySelector('.track').getBoundingClientRect();
+      var p = clamp((x - r.left) / r.width, 0, 1);
+      setV(min + p * (max - min), dragging);
+    }
+
+    root.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      dragging = true;
+      root.classList.add('active');
+      lastT = (performance && performance.now) ? performance.now() : Date.now();
+      lastV = v;
+      try { root.setPointerCapture(e.pointerId); } catch (err) {}
+      fromPointer(e.clientX);
+    });
+    root.addEventListener('pointermove', function (e) { if (dragging) fromPointer(e.clientX); });
+    function end() { dragging = false; root.classList.remove('active'); kick(); }
+    root.addEventListener('pointerup', end);
+    root.addEventListener('pointercancel', end);
+
+    root.addEventListener('keydown', function (e) {
+      var step = (max - min) / 100;
+      var nv = v;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') nv += step;
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') nv -= step;
+      else if (e.key === 'PageUp') nv += step * 10;
+      else if (e.key === 'PageDown') nv -= step * 10;
+      else if (e.key === 'Home') nv = min;
+      else if (e.key === 'End') nv = max;
+      else return;
+      e.preventDefault();
+      setV(nv, false);
+    });
+
+    root._setV = function (n) { setV(n, false); };
+    render();
+  }
+
+  function updatePreview() {
+    var t = VALS.temp || 5600;
+    var s = VALS.sat == null ? 110 : VALS.sat;
+    var c = VALS.con == null ? 104 : VALS.con;
+    var b = VALS.bright == null ? 6 : VALS.bright;
+    var sh = VALS.sharp == null ? 30 : VALS.sharp;
+    preview.style.setProperty('--sh', (sh / 100).toFixed(3));
+    var hue = (t - 6500) / 70;
+    var warm = (6500 - t) / 6500;
+    preview.style.filter =
+      'saturate(' + (s / 100).toFixed(2) + ') ' +
+      'contrast(' + (c / 100).toFixed(2) + ') ' +
+      'brightness(' + (1 + b / 100).toFixed(2) + ') ' +
+      'hue-rotate(' + hue.toFixed(1) + 'deg) ' +
+      'sepia(' + Math.max(0, warm).toFixed(2) + ')';
+    readout.textContent = Math.round(t) + 'K · ' + Math.round(s) + '%';
+  }
+
+  sliders.forEach(makeSlider);
+  updatePreview();
+
+  var PRESETS = {
+    natural: { temp: 6200, sat: 100, con: 102, bright: 8, sharp: 22 },
+    warm: { temp: 3600, sat: 128, con: 108, bright: 4, sharp: 34 },
+    cool: { temp: 8200, sat: 92, con: 112, bright: -6, sharp: 44 }
+  };
+  function applyMap(map) {
+    sliders.forEach(function (s) {
+      if (map[s.dataset.key] != null) s._setV(map[s.dataset.key]);
+    });
+  }
+  document.querySelectorAll('.preset').forEach(function (b) {
+    b.addEventListener('click', function () { applyMap(PRESETS[b.dataset.preset]); });
+  });
+  document.getElementById('reset').addEventListener('click', function () {
+    applyMap({ temp: 5600, sat: 110, con: 104, bright: 6, sharp: 30 });
+  });
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

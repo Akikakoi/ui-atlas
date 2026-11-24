@@ -1,6 +1,6 @@
 {
-  "total": 100,
-  "demoV": "20261112",
+  "total": 120,
+  "demoV": "20261124f",
   "cats": [
     { "id": "pointer", "name": "指针", "en": "Pointer" },
     { "id": "scroll", "name": "滚动", "en": "Scroll" },
@@ -711,8 +711,8 @@
       "family": "text-sequence",
       "trigger": "auto",
       "level": 1,
-      "tech": ["@keyframes", "translateX(-50%)", "mask"],
-      "features": ["两条方向相反、时长不同", "内容复制一份，-50% 无缝循环", "悬停暂停，边缘用遮罩淡出", "阵容卡与日程卡悬停高亮，购票按钮掠光", "阵容/日程/票务区进入视口时上浮", "导航下划线展开"],
+      "tech": ["@keyframes", "translateX(-50%)", "overflow hidden"],
+      "features": ["两条方向相反、时长不同", "内容复制一份，-50% 无缝循环", "悬停暂停，轨道两端硬裁切不溢出", "阵容卡与日程卡悬停高亮，购票按钮掠光", "阵容/日程/票务区进入视口时上浮", "导航下划线展开"],
       "how": "轨道里放两份相同内容，动画从 0 到 -50%；两条轨道错开 duration 与 direction，画面就不整齐划一。",
       "watch": "两份内容必须完全等宽；用 max-content 防止被压缩，暂停用 animation-play-state。",
       "tags": ["跑马灯", "marquee", "循环", "滚动字幕", "文字"],
@@ -1121,7 +1121,7 @@
       "trigger": "scroll",
       "level": 1,
       "tech": ["position: fixed", "scrollY", "rAF", "CSS 变量"],
-      "features": ["滚过 40px，高度 64 → 46", "品牌字与按钮同步收紧", "底部细线用 scaleX 显示进度", "首屏标题与署名错峰入场，太阳缓慢呼吸", "配图、章节与相关阅读进入视口时上浮", "导航下划线展开"],
+      "features": ["滚过 40px，高度 72 → 48", "品牌字与按钮同步收紧", "底部细线用 scaleX 显示进度", "首屏标题与署名错峰入场，太阳缓慢呼吸", "配图、章节与相关阅读进入视口时上浮", "导航下划线展开"],
       "how": "scroll 只排一帧 rAF，回调里切换 compact class 并写 --p；顶栏是 fixed，高度变化不影响正文，进度线只动 transform。",
       "watch": "正文 padding-top 要一次写死，别让顶栏高度参与文档流；backdrop-filter 在低端机上要降级。",
       "tags": ["顶栏", "导航", "收缩", "sticky", "header", "进度"],
@@ -1904,9 +1904,9 @@
       "family": "layout-reflow",
       "trigger": "click",
       "level": 2,
-      "tech": ["width transition", "focus 管理", "aria-expanded", "Esc"],
-      "features": ["圆按钮展开成 380px 搜索条，宽度先动、输入框后淡入", "展开后焦点自动进输入框，Esc 收回并还给按钮", "aria-expanded / aria-controls 跟着开合同步", "分类卡悬停上浮，热门条目悬停右移", "搜索结果出现时有短促淡入", "分类与热门区进入视口时上浮"],
-      "how": "容器宽度从 56px 过渡到 380px，输入框在 60ms 后再淡入；展开后移入焦点，Esc 关闭并把焦点还给触发按钮；关闭态把输入框与提交按钮移出 Tab 序列。",
+      "tech": ["width transition", "focus 管理", "aria-expanded", "Esc", "客户端过滤"],
+      "features": ["圆按钮展开成 380px 搜索条，宽度先动、输入框后淡入", "展开后焦点自动进输入框，Esc 收回并还给按钮", "aria-expanded / aria-controls 跟着开合同步", "搜索按页面可见的 7 条演示条目匹配，命中数量与标题真实返回", "分类卡悬停上浮，热门条目悬停右移", "搜索结果出现时有短促淡入", "分类与热门区进入视口时上浮"],
+      "how": "容器宽度从 56px 过渡到 380px，输入框在 60ms 后再淡入；输入关键词后按可见条目标题与摘要做子串匹配，返回真实命中条数；Esc 关闭并把焦点还给触发按钮；关闭态把输入框与提交按钮移出 Tab 序列。",
       "watch": "输入框在关闭态不能留在 Tab 序列里，只靠透明和宽度收掉不够，要同步 tabindex。",
       "tags": ["展开", "搜索", "morph", "变形", "输入框", "伸缩"],
       "demo": "effects/morph-input.html",
@@ -2935,7 +2935,7 @@
       "level": 1,
       "tech": ["translateX", "aria-current", "页面显隐", "焦点保留"],
       "features": ["滑块按索引平移，宽度固定四等分", "内容只做淡入与 8px 上浮", "aria-current 跟着选中项切换", "故事卡与收藏行悬停抬升，导航下划线展开", "产品特点区进入视口时上浮", "页面切换时内容仍逐页淡入"],
-      "how": "点击项后把滑块 translateX 设为索引乘 100%；页面用 hidden 与 on 类切换，不重建 DOM，滚动位置各自保留。",
+      "how": "点击项后把滑块 translateX 设为索引乘 100%；页面用 .on 类切换 opacity / translateY / pointer-events，不重建 DOM，滚动位置各自保留。",
       "watch": "滑块宽度别按文字长度算，否则文案变了会歪；退出页要立刻 pointer-events:none。",
       "tags": ["底部导航", "tabbar", "导航", "滑块", "移动端"],
       "demo": "effects/bottom-nav.html",
@@ -2943,7 +2943,7 @@
         "anatomy": [
           "滑块：绝对定位，宽度固定为四分之一",
           "平移：translateX(索引 × 100%)",
-          "内容：hidden 切换 + 淡入上浮 8px"
+          "内容：.on 类切换显隐 + 淡入上浮 8px"
         ],
         "params": [
           ["项数", "4"],
@@ -3245,9 +3245,9 @@
       "variant_of": "accordion",
       "trigger": "click",
       "level": 2,
-      "tech": ["grid-template-rows", "aria-expanded", "colspan", "0fr → 1fr"],
-      "features": ["展开的是下一行的 0fr → 1fr", "不用测量内容高度", "同一时间只开一行", "项目行悬停高亮，筛选标签按下回弹", "展开内容淡入上浮，侧栏概览卡悬停轻抬", "概览侧卡进入视口时上浮"],
-      "how": "每行下面跟一条 colspan 的详情行，内部 grid 的行高从 0fr 过渡到 1fr；按钮同步 aria-expanded，点其他行时先收起旧的。",
+      "tech": ["grid-template-rows", "aria-expanded", "colspan", "0fr → 1fr", "客户端搜索"],
+      "features": ["展开的是下一行的 0fr → 1fr", "不用测量内容高度", "同一时间只开一行", "搜索框按项目名或成员过滤，与状态 tab 叠加", "项目行悬停高亮，筛选标签按下回弹", "展开内容淡入上浮，侧栏概览卡悬停轻抬", "概览侧卡进入视口时上浮"],
+      "how": "每行下面跟一条 colspan 的详情行，内部 grid 的行高从 0fr 过渡到 1fr；按钮同步 aria-expanded，点其他行时先收起旧的；搜索框按项目行文本做子串过滤，并与状态筛选叠加，分页文案跟着更新。",
       "watch": "详情行里不要放可聚焦元素却保持收起，否则键盘会跳到看不见的地方；虚拟滚动表格要额外处理行高。",
       "tags": ["表格", "展开", "table", "行", "详情", "aria-expanded"],
       "demo": "effects/table-row-expand.html",
@@ -3348,30 +3348,31 @@
       "family": "state-feedback",
       "trigger": "click",
       "level": 1,
-      "tech": ["animation-play-state", "CSS 变量", "setInterval", "aria-pressed"],
-      "features": ["26 根柱子，各自延迟与高度不同", "暂停时 animation-play-state 一起停", "计时与进度条共用同一个秒数", "当前章节随播放进度自动高亮", "封面小波形持续轻微起伏", "播放时播放器描边泛出薄荷光"],
-      "how": "每根柱子用同一个 wave 关键帧，靠 --i 错开负延迟；播放时切 running 并启动秒表，暂停时同时停掉两者。",
-      "watch": "没有真实音频时别假装在播；减动效下只停波形，计时仍可工作。",
-      "tags": ["音频", "波形", "播放", "audio", "wave", "声音"],
+      "tech": ["OfflineAudioContext", "AudioContext", "AnalyserNode", "Pointer Events", "role=slider"],
+      "features": ["24 秒双声道试听由 OfflineAudioContext 现场合成，无外链音频", "播放时 AnalyserNode 读取实时频谱，驱动 26 根柱子", "进度条可拖动，方向键 ±1s、Shift ±5s、Home/End 定位", "计时以 AudioContext.currentTime 为准，章节随进度高亮", "首次点播显示 SYNTH… 并禁用按钮，失败明确显示 UNAVAILABLE", "减少动效下波形静止，音频与进度继续；页面隐藏自动暂停"],
+      "how": "首次点播创建 AudioContext 与 AnalyserNode，用 32kHz OfflineAudioContext 渲染 24 秒双声道 buffer；AudioBufferSourceNode 从 offset 播放，rAF 按 currentTime 推进进度，并按对数频段取频谱写 scaleY；seek 时重建 source 并同步 offset。",
+      "watch": "AudioContext 必须由用户手势启动；离线渲染约几百毫秒，期间别假装在播；暂停要 suspend 并保留最后一帧波形，减弱动效时别把音频也停掉。",
+      "tags": ["音频", "波形", "频谱", "Web Audio", "audio", "seek"],
       "demo": "effects/audio-wave.html",
       "depth": {
         "anatomy": [
-          "建柱：26 根，随机高度，--i 做延迟",
-          "播放：切换 running 与 play 状态",
-          "计时：1 秒一跳，进度条同步 scaleX"
+          "合成：离线上下文渲染和弦、bass、pluck 与空气噪声，得到 24 秒 buffer",
+          "播放：source → analyser → destination，点击播放才 resume",
+          "频谱：rAF 按 60Hz–10kHz 对数分频，平滑后写每根柱的 scaleY",
+          "定位：拖动或键盘修改 offset，重建 source 从新位置继续"
         ],
         "params": [
-          ["柱数", "26"],
-          ["周期", "900ms"],
-          ["错峰", "−58ms/根"],
-          ["时长", "24s"]
+          ["时长", "24s"],
+          ["采样 / 声道", "32000Hz / 2"],
+          ["柱数 / fftSize", "26 / 1024"],
+          ["键盘步进", "1s / Shift 5s"]
         ],
         "variants": [
-          ["真实音频", "接 AnalyserNode 读频谱"],
-          ["语音消息", "柱数减少，加一条播放线"]
+          ["真实录音", "换成外链音频，保留同一套频谱与 seek"],
+          ["语音消息", "减少柱数，收窄进度条与播放键"]
         ],
-        "cost": { "tier": "低", "note": "26 条 scaleY 动画；暂停即停。" },
-        "avoid": "没有声音时别做播放态；减动效时只保留计时与进度。"
+        "cost": { "tier": "中", "note": "一次离线合成约几百毫秒；播放期每帧一次 FFT 与 26 条 transform。" },
+        "avoid": "没有声音时别显示 PLAYING；首次渲染期间禁用按钮并明示合成；移动端音频必须由手势启动。"
       }
     },
     {
@@ -3419,7 +3420,7 @@
       "trigger": "click",
       "level": 1,
       "tech": ["transition-delay", "CSS 变量", "reflow 重播", "scale"],
-      "features": ["六张卡片按序号延后 60ms", "位移只有 14px，缩放 .985", "整组入场控制在 440ms 内", "标题与说明错峰入场，筛选按钮回弹", "卡片悬停轻抬，装饰圆环放大", "订阅卡悬停提亮，成功提示上浮"],
+      "features": ["六张卡片按序号延后 60ms", "位移只有 14px，缩放 .985", "整组入场控制在 440ms 内", "标题与说明错峰入场，筛选按钮回弹", "卡片悬停轻抬，装饰圆环放大"],
       "how": "每张卡写入 --i，入场时 transition-delay 等于序号乘 60ms；重播先移除 in、等退场结束再强制 reflow 加回。",
       "watch": "延迟别超过 80ms，否则最后一张像卡住；不要每次滚动都重播。",
       "tags": ["错峰", "入场", "stagger", "列表", "延迟", "网格"],
@@ -3442,6 +3443,749 @@
         ],
         "cost": { "tier": "低", "note": "六条 transform / opacity。" },
         "avoid": "不要让用户每次滚动都等一遍；首屏总时长别超过 600ms。"
+      }
+    },
+{
+      "id": "spring-tag",
+      "name": "弹簧标签群",
+      "name_en": "Spring Tag",
+      "cat": "pointer",
+      "family": "pointer-field",
+      "trigger": "hover",
+      "level": 2,
+      "tech": ["pointermove", "弹簧阻尼", "requestAnimationFrame", "translate3d"],
+      "features": ["每个标签有不同刚度，跟随时自然错峰", "弹簧位移会过冲再回弹，不是线性插值", "光标离开后编队依次归位", "标签区悬停备用色轻微上浮"],
+      "how": "对每个标签维护 position / velocity：pointermove 更新目标点，逐帧 velocity += (target - pos) * k、velocity *= damping、pos += velocity；k 按序号微调制造错峰。",
+      "watch": "刚度太高会抖，阻尼别低于 0.7；rAF 在全部标签静止后停，别常驻。触屏无 hover 直接平铺。",
+      "tags": ["弹簧", "标签", "跟随", "编队", "spring", "标签云"],
+      "demo": "effects/spring-tag.html",
+      "depth": {
+        "anatomy": [
+          "进入：pointermove 把光标位置设为所有标签的共同目标",
+          "跟随：每个标签按自己的 k 与 damping 积分弹簧，产生错峰与过冲",
+          "归位：目标回到初始格点，同一套弹簧把编队拉回"
+        ],
+        "params": [
+          ["刚度 k", "0.08–0.16"],
+          ["阻尼", "0.76"],
+          ["错峰", "按序号 ±0.02"],
+          ["静止阈值", "0.3px"]
+        ],
+        "variants": [
+          ["只动一行", "把标签排成一行、刚度统一，做导航的弹性指示"],
+          ["重力回位", "归位时加一个向下加速度，像标签掉回原位"]
+        ],
+        "cost": {
+          "tier": "中",
+          "note": "rAF 里逐个更新 transform；标签数控制在 30 以内，静止即停帧。"
+        },
+        "avoid": "首屏几十个标签一起弹会晕；别用在需要精确点击的导航上，位移会让点击目标漂移。"
+      }
+    },
+{
+      "id": "edge-snap",
+      "name": "边缘磁吸",
+      "name_en": "Edge Snap",
+      "cat": "pointer",
+      "family": "direct-drag",
+      "trigger": "drag",
+      "level": 3,
+      "tech": ["pointerdown/move/up", "setPointerCapture", "touch-action:none", "requestAnimationFrame", "translate3d"],
+      "features": ["指针距边小于 80px 时出现吸附预览", "左右吸附为半宽全高，上下吸附为通栏 320px", "预览与最终落位共用同一矩形，尺寸和坐标一致", "拖动直接跟手，松手才缓动落位；窄屏侧栏保底 260px", "键盘 48px / Shift 12px，已吸附时朝外方向键保持不动", "减少动效下直接跳转落位"],
+      "how": "pointerdown 捕获指针并按面板偏移直接 translate3d；move 用指针到四边的距离判定吸附边，并按 dockRect 画同几何虚线预览；up 时设成落位尺寸，再用 rAF 缓动到相同坐标；键盘也走 setDock / undock，但朝吸附边方向不重复触发。",
+      "watch": "吸附判定看指针而不是面板中心；预览必须和最终落位同几何；窄屏侧板别低于 260px；键盘要防止吸附与自由态来回切换。",
+      "tags": ["边缘", "吸附", "分屏", "拖拽", "snap", "键盘"],
+      "demo": "effects/edge-snap.html",
+      "depth": {
+        "anatomy": [
+          "拖拽：指针偏移直接映射 translate，跟手不缓动",
+          "预览：指针距边小于 80px 时按落位矩形画虚线",
+          "落下：面板设成落位尺寸并缓动到同一坐标",
+          "键盘：方向键从自由位累加，到边界吸附；朝外键保持，反向键离开"
+        ],
+        "params": [
+          ["吸附阈值", "80px"],
+          ["侧栏宽度", "50%，最小 260px"],
+          ["通栏高度", "320px"],
+          ["键盘步进", "48px / Shift 12px"]
+        ],
+        "variants": [
+          ["只吸左右", "上下边不参与，适合抽屉式面板"],
+          ["四角吸附", "把四角也作为吸附点，做画板工具"]
+        ],
+        "cost": {
+          "tier": "中",
+          "note": "命中检测是四次距离比较；落位只写 transform，拖动期间不加过渡。"
+        },
+        "avoid": "移动端别让整页都能拖；预览与落位不一致会让人失去信任。"
+      }
+    },
+{
+      "id": "press-well",
+      "name": "按压强反馈",
+      "name_en": "Press Well",
+      "cat": "pointer",
+      "family": "state-feedback",
+      "trigger": "click",
+      "level": 1,
+      "tech": ["pointerdown/up", "rAF", "scale + translateY", "box-shadow"],
+      "features": ["按得越久陷得越深，深度有上限", "下陷时内阴影加深、外阴影收缩", "松开用弹簧回弹，带轻微过冲", "键盘按住空格/回车同样生效"],
+      "how": "pointerdown 起计时，rAF 里按按住时长推进 press 值（0→1 封顶），把 depth 映射到 scale、translateY 与两组阴影；pointerup 用同一条弹簧回到 0。",
+      "watch": "按压上限要低（scale 不低于 0.9），否则像按钮被吞掉；pointercancel 也要回位，别卡在按下态。",
+      "tags": ["按压", "反馈", "下陷", "弹簧", "press", "按钮"],
+      "demo": "effects/press-well.html",
+      "depth": {
+        "anatomy": [
+          "按下：pointerdown 开始累加按压时长",
+          "加深：depth 映射到缩放、位移与阴影，越按越深",
+          "回弹：松开后弹簧把 depth 拉回 0，带一次过冲"
+        ],
+        "params": [
+          ["最大缩放", "0.92"],
+          ["最大下沉", "8px"],
+          ["压满时长", "600ms"],
+          ["回弹时间", "约 420ms"]
+        ],
+        "variants": [
+          ["轻按即压满", "缩短压满时间到 160ms，做普通按钮的按压"],
+          ["压力感应", "有 PointerEvent.pressure 时改用真实压力值"]
+        ],
+        "cost": {
+          "tier": "低",
+          "note": "rAF 只在按压与回弹期间运行；只动 transform 与阴影。"
+        },
+        "avoid": "不要让按压变成计数或长按触发别的操作，会和 tap 语义冲突；触屏要处理 pointercancel。"
+      }
+    },
+{
+      "id": "scroll-morph",
+      "name": "滚动形变",
+      "name_en": "Scroll Morph",
+      "cat": "scroll",
+      "family": "scroll-progress",
+      "trigger": "scroll",
+      "level": 3,
+      "tech": ["scroll 进度", "SVG path 插值", "sticky", "requestAnimationFrame"],
+      "features": ["滚动进度驱动圆→方→三角连续形变", "路径用等长顶点逐点插值，不变形抖动", "颜色与旋转跟进度一起过渡", "阶段标注随进度高亮"],
+      "how": "把滚动位置归一成 0–1，分两段在三条等长 path 的顶点间 lerp，写进 d；同一进度驱动 fill 色相与旋转角。用 rAF 节流滚动回调。",
+      "watch": "三条路径顶点数必须一致且对应，否则插值会扭；sticky 高度给够，滚动条别太短。",
+      "tags": ["滚动", "形变", "morph", "svg", "路径", "形状"],
+      "demo": "effects/scroll-morph.html",
+      "depth": {
+        "anatomy": [
+          "取样：scroll 位置除以可滚距离得到进度",
+          "插值：三段进度在两组等长顶点间逐点 lerp 写回 path",
+          "同步：颜色、旋转、阶段标注共用同一进度"
+        ],
+        "params": [
+          ["滚动行程", "260vh"],
+          ["分段", "2 段（圆→方→三角）"],
+          ["顶点数", "各 64"],
+          ["旋转", "0–90°"]
+        ],
+        "variants": [
+          ["只变圆角", "用 border-radius 插值，成本更低"],
+          ["多形循环", "加回圆形成闭环，滚动到尾又变回起点"]
+        ],
+        "cost": {
+          "tier": "高",
+          "note": "每帧重算 64 个顶点并改 path；移动端可降到 32 个。"
+        },
+        "avoid": "顶点不对应会翻面；别在低端机上叠多层 path 形变，会掉帧。"
+      }
+    },
+{
+      "id": "scroll-split",
+      "name": "分屏对比擦除",
+      "name_en": "Before After",
+      "cat": "scroll",
+      "family": "scroll-progress",
+      "trigger": "scroll",
+      "level": 2,
+      "tech": ["clip-path: inset", "scroll 进度", "pointer 拖动", "CSS 渐变"],
+      "features": ["滚动控制前后对比的分割位置", "中间分隔线可直接拖动", "百分比数值实时显示", "两侧色块表现改造前后差异"],
+      "how": "滚动进度映射到 0–100，after 层用 clip-path:inset(0 0 0 X%) 露出；分隔线与百分比共用同一变量；拖动分隔线时反写滚动进度，两条路径同源。",
+      "watch": "拖动与滚动同时改一个值时要用标志位防抖，别互相打架；移动端拖动要给够触控区。",
+      "tags": ["对比", "擦除", "before", "after", "分割线", "滚动"],
+      "demo": "effects/scroll-split.html",
+      "depth": {
+        "anatomy": [
+          "映射：滚动进度换算成 0–100 的分割位置",
+          "裁切：after 层用 inset 从左露出，before 层垫底",
+          "同步：分隔线与百分比读同一个变量，拖动时反向写回"
+        ],
+        "params": [
+          ["初始位置", "50%"],
+          ["滚动行程", "200vh"],
+          ["分隔线宽", "2px"],
+          ["手柄直径", "38px"]
+        ],
+        "variants": [
+          ["纵向对比", "改成 inset(0 0 X% 0)，上下对比"],
+          ["自动演示", "进入视口后自动来回擦一次，再交给用户"]
+        ],
+        "cost": {
+          "tier": "低",
+          "note": "只改一个 clip-path 与一条文本；无重排。"
+        },
+        "avoid": "别把 before/after 做成两张真照片还叠复杂滤镜，滚动时会掉帧；语义上要给读屏说明这是对比图。"
+      }
+    },
+{
+      "id": "scroll-radial",
+      "name": "径向波次揭示",
+      "name_en": "Radial Reveal",
+      "cat": "scroll",
+      "family": "entrance-stagger",
+      "trigger": "scroll",
+      "level": 2,
+      "tech": ["IntersectionObserver", "transition-delay", "距离场", "scale + opacity"],
+      "features": ["节点按到中心的距离一圈圈亮起", "延迟由距离算，不是写死的序号", "点重播可再看一次", "中心与外圈分辨清晰"],
+      "how": "布局时给每个节点写入 --d（到中心的格数），进入视口后加 .on；CSS 里 transition-delay: calc(var(--d) * 80ms)，逐个从 scale(.6)/opacity 0 到位。",
+      "watch": "ring 数太多会让最后一圈等太久，总延迟控制在 800ms 内；重播要先移除类再 reflow。",
+      "tags": ["径向", "波次", "揭示", "错峰", "observer", "网格"],
+      "demo": "effects/scroll-radial.html",
+      "depth": {
+        "anatomy": [
+          "测量：布局阶段算每个节点到中心的格数",
+          "触发：IntersectionObserver 看到图谱区就加类",
+          "扩散：delay 按距离递增，节点从中心一圈圈亮起"
+        ],
+        "params": [
+          ["每圈延迟", "80ms"],
+          ["总延迟上限", "800ms"],
+          ["起始缩放", "0.6"],
+          ["节点数", "约 60"]
+        ],
+        "variants": [
+          ["从边缘往里", "把距离倒过来，像收拢"],
+          ["鼠标定点扩散", "以光标所在节点为原点算距离"]
+        ],
+        "cost": {
+          "tier": "低",
+          "note": "一次性 opacity/scale 过渡，之后不再运行。"
+        },
+        "avoid": "超大同心圆会让外圈等太久；别在真实数据表格上用，读数据的节奏会被动画打断。"
+      }
+    },
+{
+      "id": "text-kinetic",
+      "name": "动力学排字",
+      "name_en": "Kinetic Type",
+      "cat": "type",
+      "family": "text-sequence",
+      "trigger": "hover",
+      "level": 3,
+      "tech": ["pointermove", "距离场斥力", "阻尼弹簧", "固定步长积分", "requestAnimationFrame", "自适应限幅"],
+      "features": ["字母按光标距离被推开，越近越狠", "位移带旋转与颜色升温，回弹允许少量过冲", "指针离开、失焦或 Esc 后弹簧归位", "静止后 rAF 停帧，自动推演支持触屏与键盘"],
+      "how": "pointerenter/pointermove 记录光标；rAF 用固定 60Hz 步长积分每个字母的阻尼弹簧，半径内按 (1−d/R)² 给反向位移与旋转。字心取自未被 transform 的 slot，位移上限与半径按字距、字号自适应，实际位移再限幅在目标上限的 1.22 倍内。",
+      "watch": "量字心要量未位移的 slot，不能量被 transform 的字母；积分必须固定步长，首帧也要走一步；静止/页面隐藏时取消 rAF，pointerleave/blur/Esc 立即清目标。",
+      "tags": ["动力学", "排字", "斥力", "字母", "kinetic", "hover", "触屏"],
+      "demo": "effects/text-kinetic.html",
+      "depth": {
+        "anatomy": [
+          "测距：pointerenter/move 记录光标，字心取未位移的 slot",
+          "推开：半径内按距离平方衰减给反向位移，字距小则限幅收窄",
+          "回位：目标归零后阻尼弹簧积分，首帧也走一步，静止即停帧"
+        ],
+        "params": [
+          ["桌面半径", "170px"],
+          ["目标位移", "≤ 24px，按字距收窄"],
+          ["固定步长", "60Hz"],
+          ["阻尼", "0.82"]
+        ],
+        "variants": [
+          ["只推一行", "作用半径压小，做标题的轻交互"],
+          ["吸引版", "把斥力取反，字母朝光标聚拢"]
+        ],
+        "cost": {
+          "tier": "中",
+          "note": "逐字母写 transform；只有受力与回弹时跑 rAF，静止立即停帧。"
+        },
+        "avoid": "正文段落别用，会把阅读节奏打乱；字距小的时候要同步收窄位移上限，否则字母会叠在一起。"
+      }
+    },
+{
+      "id": "text-vertical",
+      "name": "竖排落字",
+      "name_en": "Vertical Drop",
+      "cat": "type",
+      "family": "text-sequence",
+      "trigger": "load",
+      "level": 2,
+      "tech": ["writing-mode: vertical-rl", "逐字拆分", "transition-delay", "重播"],
+      "features": ["诗句竖排，从右向左成列", "每个字从上方落下就位", "字与列双向错峰", "点重播可再看一次"],
+      "how": "用 writing-mode: vertical-rl 排成竖列，每个字包一层 span 并写入列号与字序；加载后加 .on，translateY(-40px)→0、opacity 0→1，delay 由列号×120ms + 字序×55ms 组成。",
+      "watch": "竖排的行高和标点位置要单独调；delay 别太长，一首短诗控制在 1.5 秒内落完。",
+      "tags": ["竖排", "落字", "诗", "铅字", "vertical", "逐字"],
+      "demo": "effects/text-vertical.html",
+      "depth": {
+        "anatomy": [
+          "排布：writing-mode 把文字转成竖列，从右往左",
+          "拆字：每个字包 span，写入列号与字序",
+          "落下：translateY 从 −40px 归零，按列+字序错峰"
+        ],
+        "params": [
+          ["落距", "40px"],
+          ["字序延迟", "55ms"],
+          ["列延迟", "120ms"],
+          ["时长", "620ms"]
+        ],
+        "variants": [
+          ["从下往上", "起点改为 +40px，像字被提起"],
+          ["整列同落", "去掉字序延迟，只按列错峰"]
+        ],
+        "cost": {
+          "tier": "低",
+          "note": "一次性 transform/opacity 过渡，之后不再运行。"
+        },
+        "avoid": "长文竖排会显著降低可读性；标点要单独微调位置，别直接套横排样式。"
+      }
+    },
+{
+      "id": "text-echo",
+      "name": "文字残影",
+      "name_en": "Text Echo",
+      "cat": "type",
+      "family": "text-sequence",
+      "trigger": "click",
+      "level": 2,
+      "tech": ["CSS 变量", "克隆文本层", "文字转写回放", "rAF 时间轴", "pointer capture", "aria-live"],
+      "features": ["点 ▶ 回放整段文字，当前词自动触发残影", "划过标题或词句，拖出三层彩色残影", "进度可拖动、键盘可定位，支持 1× / 1.5× / 2×", "明确标注为文字回放，不含音频"],
+      "how": "三层 .ghost 克隆文本按 --echo 的 0.55 / 0.5 / 1.05 倍 translateX，颜色各异、透明度递减；回放器把转写按标点切块，rAF 推进真实时间，按进度给当前块加 .now 并触发一次残影；暂停、拖动、倍速都写回同一条时间轴。",
+      "watch": "回放必须真的推进时间，别用 setTimeout 假装进度；拖动用 pointer capture，键盘处理 Arrow / Home / End；状态变化用 aria-live 播报，别每一帧都念。",
+      "tags": ["残影", "回响", "色差", "文字", "echo", "文字回放", "播放器"],
+      "demo": "effects/text-echo.html",
+      "depth": {
+        "anatomy": [
+          "残影：三层克隆文本按 --echo 倍数位移，透明度递减",
+          "切块：转写按标点拆成块，建立可回放的文本时间轴",
+          "回放：rAF 推进真实时间，当前块点亮并触发一次残影",
+          "定位：拖动/键盘写回同一时间，暂停与倍速不改轴"
+        ],
+        "params": [
+          ["残影层数", "3"],
+          ["回放时长", "12–19s，按条目"],
+          ["倍速", "1× / 1.5× / 2×"],
+          ["残影动画", "0.8s"]
+        ],
+        "variants": [
+          ["单色残影", "三层同色，只靠透明度分层，更克制"],
+          ["逐字上色", "把切块缩到单字，做卡拉 OK 式回放"]
+        ],
+        "cost": {
+          "tier": "中",
+          "note": "只在播放时跑 rAF；暂停/隐藏立即取消，残影只在当前块脉冲。"
+        },
+        "avoid": "别把它伪装成音频播放器，没有音频就明确写文字回放；正文小字别用残影，高频闪烁会像加载失败。"
+      }
+    },
+{
+      "id": "deck-spread",
+      "name": "层叠散开",
+      "name_en": "Deck Spread",
+      "cat": "layout",
+      "family": "layout-reflow",
+      "trigger": "click",
+      "level": 2,
+      "tech": ["transform 插值", "aria-pressed", "FLIP", "grid"],
+      "features": ["初始卡片像扑克牌叠在一起", "散开后变成规则网格", "收起时回到层叠角度", "按钮状态用 aria-pressed 表达"],
+      "how": "卡片统一用 transform 描述两种状态：叠放是 rotate(i×4deg)+translateY(i×8px)，散开是 transform:none；切换只改根类名，transition 完成 FLIP 式过渡。",
+      "watch": "叠放时卡片要有明确 z-index 顺序；容器高度要预留在散开态，否则切换时页面跳动。",
+      "tags": ["层叠", "散开", "卡片", "网格", "deck", "flip"],
+      "demo": "effects/deck-spread.html",
+      "depth": {
+        "anatomy": [
+          "叠放：每张卡按序号旋转与下移，z-index 递增",
+          "散开：切类后 transform 归零，落回网格格点",
+          "收起：再切类，卡片按原角度叠回"
+        ],
+        "params": [
+          ["旋转步长", "4°"],
+          ["下移步长", "8px"],
+          ["过渡时长", "460ms"],
+          ["卡片数", "6"]
+        ],
+        "variants": [
+          ["扇形展开", "散开态改成沿圆弧排布"],
+          ["抽牌", "点最上层卡把它移走，下面依次补上"]
+        ],
+        "cost": {
+          "tier": "低",
+          "note": "只动 transform，容器高度固定，不触发重排。"
+        },
+        "avoid": "卡片超过 8 张会叠成一坨；叠放态要点最上层才有效，别让下层看起来可点。"
+      }
+    },
+{
+      "id": "grid-resize",
+      "name": "网格拖拽重排",
+      "name_en": "Grid Resize",
+      "cat": "layout",
+      "family": "direct-drag",
+      "trigger": "drag",
+      "level": 3,
+      "tech": ["pointer 事件", "FLIP", "grid-column / grid-row", "dense 自动填充", "方向键"],
+      "features": ["拖把手按整列整行伸缩卡片", "其他卡片用 FLIP 平滑让位，不跳行", "把手是真实按钮，方向键也能调", "三套布局预设一键重排", "窄断点按列数等比压缩跨度"],
+      "how": "pointerdown 记起点与当前跨度，move 时用位移除以「列宽 + 间隙」换算出新跨度，再用 grid-column / grid-row 简写整体写回；改跨度前先快照每张卡的 offsetLeft / offsetTop 与正在跑的 translate，改完取新坐标算出差值，translate 反向抵消后 420ms 归零，完成 FLIP。",
+      "watch": "只写 grid-column-end: span N 是无效的——start 与 end 同时为 span 时规范会丢弃 end，跨度根本不会变，必须用简写整体覆盖；FLIP 要用 offsetLeft / offsetTop 这类不含 transform 的坐标，否则会测到动画中途的位置，越拖越抖。",
+      "tags": ["网格", "重排", "调整大小", "flip", "拖拽", "bento"],
+      "demo": "effects/grid-resize.html",
+      "depth": {
+        "anatomy": [
+          "抓取：pointerdown 在把手上记起点与当前跨度，move 挂到 window 上，capture 没生效也能跟手",
+          "改跨：位移除以列宽 + 间隙得出整列数，简写整体写回 grid-column / grid-row",
+          "让位：改前快照布局坐标，改后算差值反向 translate，420ms 内归零"
+        ],
+        "params": [
+          ["列数", "6"],
+          ["跨度范围", "1–6 列 / 1–3 行"],
+          ["FLIP 时长", "420ms"],
+          ["把手尺寸", "36px"]
+        ],
+        "variants": [
+          ["纵向调节", "只改行跨度，做瀑布流"],
+          ["双击复位", "双击把手回到默认跨度"]
+        ],
+        "cost": {
+          "tier": "中",
+          "note": "每次改跨度触发一次栅格重排，但只有一次 FLIP 过渡。"
+        },
+        "avoid": "别让卡片内容随跨度拉伸变形，要按宽度切换内容密度（矮卡收说明、宽卡才放图表）；跨度上限别超过列数。"
+      }
+    },
+{
+      "id": "kanban",
+      "name": "看板跨列拖拽",
+      "name_en": "Kanban Drag",
+      "cat": "layout",
+      "family": "direct-drag",
+      "trigger": "drag",
+      "level": 3,
+      "tech": ["pointer 事件", "占位符", "命中检测", "FLIP"],
+      "features": ["卡片跨列拖动", "原地留虚线占位符", "经过的列实时插入占位位置", "Ctrl + 方向键可键盘搬卡"],
+      "how": "pointerdown 后把卡片设为 fixed 跟手，原位插一个虚线占位；move 时用 elementFromPoint 找目标列与插入点，移动占位符并用 FLIP 让其他卡让位；up 时卡片落到占位符位置。",
+      "watch": "拖动元素要 setPointerCapture 并加 pointer-events:none 才能正确命中下方列；键盘路径单独维护 DOM 顺序。",
+      "tags": ["看板", "跨列", "拖拽", "占位符", "kanban", "任务"],
+      "demo": "effects/kanban.html",
+      "depth": {
+        "anatomy": [
+          "起拖：卡片脱离文档流跟手，原地留占位符",
+          "寻位：elementFromPoint 找到目标列与最近卡片",
+          "落位：占位符决定最终 DOM 位置，其余卡 FLIP 让位"
+        ],
+        "params": [
+          ["列数", "3"],
+          ["占位符样式", "虚线 + 淡背景"],
+          ["让位时长", "300ms"],
+          ["命中余量", "12px"]
+        ],
+        "variants": [
+          ["只拖同列", "取消跨列，做单列排序"],
+          ["拖到即完成", "拖到最右列直接标记完成并打勾"]
+        ],
+        "cost": {
+          "tier": "中",
+          "note": "移动占位符才触发重排，拖动本身只改 transform。"
+        },
+        "avoid": "列多时 elementFromPoint 每帧调用有成本，可节流；一定要给键盘和读屏的搬卡路径。"
+      }
+    },
+{
+      "id": "toggle-switch",
+      "name": "开关切换",
+      "name_en": "Toggle Switch",
+      "cat": "feedback",
+      "family": "state-feedback",
+      "trigger": "click",
+      "level": 1,
+      "tech": ["cubic-bezier 过冲", "role=switch", "aria-checked", "粒子"],
+      "features": ["滑块用带过冲的弹簧曲线滑到另一端", "轨道颜色随状态变化", "切换时迸出几个小粒子", "role=switch 与 aria-checked 完整"],
+      "how": "按钮带 role=switch，点击切换 aria-checked 与类名；滑块 translateX 用 cubic-bezier(.34,1.56,.64,1) 过冲；切类名时生成 3–5 个粒子做短距离飞散并自动移除。",
+      "watch": "过冲曲线别用在轨道颜色上，会闪；粒子数少、时间短，别抢焦点。",
+      "tags": ["开关", "切换", "设置", "switch", "弹簧", "反馈"],
+      "demo": "effects/toggle-switch.html",
+      "depth": {
+        "anatomy": [
+          "切换：点击翻 aria-checked 与状态类",
+          "滑动：滑块沿过冲曲线到达另一端",
+          "点缀：生成少量粒子飞散后移除，轨道换色"
+        ],
+        "params": [
+          ["滑块时长", "340ms"],
+          ["过冲曲线", "cubic-bezier(.34,1.56,.64,1)"],
+          ["粒子数", "4"],
+          ["轨道色", "灰 / 主色"]
+        ],
+        "variants": [
+          ["无粒子", "去掉粒子只留滑动，适合设置密集页"],
+          ["加载态", "切换时先转一下再落位，用于要请求接口的开关"]
+        ],
+        "cost": {
+          "tier": "低",
+          "note": "一次 transform 过渡 + 几个一次性粒子。"
+        },
+        "avoid": "设置项非常多时不要每个都放粒子；开关必须是真的 button，别用 div 冒充。"
+      }
+    },
+{
+      "id": "value-slider",
+      "name": "滑块数值",
+      "name_en": "Value Slider",
+      "cat": "feedback",
+      "family": "direct-drag",
+      "trigger": "drag",
+      "level": 2,
+      "tech": ["pointer 事件", "scaleX 填充", "rAF", "skew 速度"],
+      "features": ["数值气泡跟随拇指", "气泡随拖动速度倾斜并缩放", "填充轨道用 scaleX，不动 width", "方向键可精确调节"],
+      "how": "pointermove 把 X 换算成 0–100 的值，写进 --v；轨道填充 scaleX(v%)，拇指 translateX；气泡记录上一帧值算速度，skew = clamp(speed×k)，松手回 0。",
+      "watch": "气泡 skew 要限幅，不然数字看不清；键盘调节时不要触发速度倾斜。",
+      "tags": ["滑块", "数值", "气泡", "range", "拖拽", "调色"],
+      "demo": "effects/value-slider.html",
+      "depth": {
+        "anatomy": [
+          "取值：pointermove 把 X 归一成 0–100",
+          "呈现：填充用 scaleX、拇指用 translateX、气泡写数值",
+          "速度：相邻帧差值换算 skew 与轻微缩放，松手归零"
+        ],
+        "params": [
+          ["值域", "0–100"],
+          ["速度系数", "0.6"],
+          ["最大倾斜", "8°"],
+          ["回正时长", "220ms"]
+        ],
+        "variants": [
+          ["阶梯吸附", "值吸附到 5 的倍数，做档位调节"],
+          ["双端手柄", "改成区间选择，两个拇指夹出范围"]
+        ],
+        "cost": {
+          "tier": "低",
+          "note": "只写 transform 与文本，rAF 仅在拖动时运行。"
+        },
+        "avoid": "气泡别挡住拇指本身；触屏上气泡要往上抬一点，免得被手指盖住。"
+      }
+    },
+{
+      "id": "progress-ring",
+      "name": "环形进度",
+      "name_en": "Progress Ring",
+      "cat": "feedback",
+      "family": "state-feedback",
+      "trigger": "click",
+      "level": 2,
+      "tech": ["SVG stroke-dashoffset", "rAF 缓动", "aria-valuenow", "粒子"],
+      "features": ["进度环从 0 走到 100%", "中心数字同步计数", "完成后描边变绿并画对勾", "进度语义用 role=progressbar"],
+      "how": "点击后用 rAF 把 progress 从 0 缓动到 100，dashoffset = C × (1 - p/100)，中心数字同步；到 100 时切成功态，显示对勾描边并迸出粒子。",
+      "watch": "周长要用 getTotalLength 或 2πr 算准；进度条别来回倒着走，失败要显式重置。",
+      "tags": ["环形", "进度", "上传", "svg", "dashoffset", "完成"],
+      "demo": "effects/progress-ring.html",
+      "depth": {
+        "anatomy": [
+          "启动：点击后记录起始时间，rAF 推进 progress",
+          "绘制：dashoffset 按进度写回，中心数字同步",
+          "收尾：到 100 切成功色，描出对勾并放粒子"
+        ],
+        "params": [
+          ["总时长", "2200ms"],
+          ["环半径", "54px"],
+          ["描边宽", "8px"],
+          ["缓动", "ease-out"]
+        ],
+        "variants": [
+          ["真实进度", "由上传回调写入 progress，而不是定时"],
+          ["分段环", "把环切成几段表示多个文件"]
+        ],
+        "cost": {
+          "tier": "低",
+          "note": "每帧改一个 dashoffset 与一段文本，无重排。"
+        },
+        "avoid": "别用环形进度表达不确定时长，那种情况用不确定态；数字跳动太快要节流。"
+      }
+    },
+{
+      "id": "rating",
+      "name": "星级评分",
+      "name_en": "Rating Stars",
+      "cat": "feedback",
+      "family": "state-feedback",
+      "trigger": "hover",
+      "level": 2,
+      "tech": ["pointermove", "半星命中", "aria-label", "粒子"],
+      "features": ["悬停预览评分，移开恢复已选值", "左半颗算半星", "点击锁定评分并迸出小粒子", "方向键可改评分"],
+      "how": "pointermove 取光标在每颗星内的相对 X，<50% 记半星；hover 值只作预览显示，点击写入选中值；键盘 left/right 增减 0.5 星，aria-label 读出当前值。",
+      "watch": "预览与选中要分开存，别用同一个变量；半星的视觉要用裁剪或渐变，不能只靠颜色深浅。",
+      "tags": ["评分", "星级", "半星", "预览", "rating", "评价"],
+      "demo": "effects/rating.html",
+      "depth": {
+        "anatomy": [
+          "预览：hover 时按光标在星内的位置算出 0.5 粒度的值",
+          "锁定：点击把预览值写成选中值并放粒子",
+          "回退：移开鼠标恢复选中值，键盘操作同步更新"
+        ],
+        "params": [
+          ["星数", "5"],
+          ["粒度", "0.5"],
+          ["粒子数", "6"],
+          ["点亮时长", "180ms"]
+        ],
+        "variants": [
+          ["整星", "去掉半星判定，做简单五星"],
+          ["表情评分", "把星星换成表情，按位置选"]
+        ],
+        "cost": {
+          "tier": "低",
+          "note": "几次 class 切换 + 一次性粒子。"
+        },
+        "avoid": "评分结果要能清楚读出，别只靠颜色；半星在触屏上很难点，触屏改用整星。"
+      }
+    },
+{
+      "id": "dither-gradient",
+      "name": "抖动渐变",
+      "name_en": "Dither Gradient",
+      "cat": "bg",
+      "family": "ambient-bg",
+      "trigger": "auto",
+      "level": 2,
+      "tech": ["canvas 2d", "Bayer 矩阵", "有序抖动", "visibilitychange"],
+      "features": ["用 4×4 Bayer 矩阵把渐变量化成点阵", "流动相位缓慢移动", "点色板切换配色", "DPR 限制在 2 以内"],
+      "how": "每帧对像素算一个缓慢流动的渐变值，与 Bayer 4×4 阈值比较后取两种色；用低分辨率 canvas 放大保持颗粒感；visibilitychange 暂停 rAF，resize 重建尺寸。",
+      "watch": "别按物理像素铺满全屏，用 1/3 分辨率再放大；减动效只画一帧，别让 canvas 空转。",
+      "tags": ["抖动", "渐变", "像素", "canvas", "复古", "背景"],
+      "demo": "effects/dither-gradient.html",
+      "depth": {
+        "anatomy": [
+          "取样：低分辨率 canvas 上按坐标与时间算渐变值",
+          "量化：与 Bayer 阈值比较，落到两档颜色之一",
+          "呈现：放大绘制保持颗粒，切色板换调色"
+        ],
+        "params": [
+          ["Bayer", "4×4"],
+          ["渲染倍率", "1/3"],
+          ["相位速度", "0.004/帧"],
+          ["DPR 上限", "2"]
+        ],
+        "variants": [
+          ["三色抖动", "多一档阈值，做出中间色"],
+          ["静态纹样", "固定相位，当背景贴图用"]
+        ],
+        "cost": {
+          "tier": "中",
+          "note": "每帧写 ImageData；低分辨率 + DPR 上限是关键。"
+        },
+        "avoid": "全屏高分辨率逐像素会烧 CPU；别在多个预览里同时跑，切标签页要暂停。"
+      }
+    },
+{
+      "id": "dot-terrain",
+      "name": "点阵地形",
+      "name_en": "Dot Terrain",
+      "cat": "bg",
+      "family": "ambient-bg",
+      "trigger": "auto",
+      "level": 3,
+      "tech": ["canvas 2d", "多层正弦叠加", "距离场", "伪 3D 投影", "visibilitychange"],
+      "features": ["点阵按地形高度起伏", "鼠标靠近时局部隆起", "点的大小与亮度随高度变化", "触屏无 hover 时不加隆起"],
+      "how": "对每个网格点用几组不同频率的正弦波叠加算高度，随时间相位流动；鼠标位置作为额外高斯隆起加到高度上；高度映射成 y 偏移、点半径与透明度。",
+      "watch": "点数控制在几千以内；DPR≤2，离屏暂停 rAF；触屏别加鼠标隆起，否则永远停在一处。",
+      "tags": ["点阵", "地形", "等高线", "canvas", "距离场", "背景"],
+      "demo": "effects/dot-terrain.html",
+      "depth": {
+        "anatomy": [
+          "采样：网格点用多层正弦叠加算基础高度",
+          "扰动：鼠标位置加一个高斯隆起，随距离衰减",
+          "绘制：高度映射成 y 偏移、半径与透明度"
+        ],
+        "params": [
+          ["网格间距", "18px"],
+          ["波层数", "3"],
+          ["隆起半径", "160px"],
+          ["DPR 上限", "2"]
+        ],
+        "variants": [
+          ["纯自动", "去掉鼠标隆起，做成纯环境背景"],
+          ["连线成网", "相邻点按高度差连短线，变成等高线"]
+        ],
+        "cost": {
+          "tier": "高",
+          "note": "每帧遍历数千点；移动端要降采样，离屏必须暂停。"
+        },
+        "avoid": "点太密会变成一张灰图；别同时跑多个 canvas 动画，画廊里要控制挂载数。"
+      }
+    },
+{
+      "id": "page-flip",
+      "name": "翻页转场",
+      "name_en": "Page Flip",
+      "cat": "transition",
+      "family": "view-transition",
+      "trigger": "click",
+      "level": 3,
+      "tech": ["CSS 3D transform", "perspective", "backface-visibility", "preserve-3d", "rotateY"],
+      "features": ["左右跨页，书脊居中", "右页绕书脊翻向左边，下一章在底下等着", "翻过去的纸背停在左页，显示同一页的背面", "书脊投影、翻页明暗与右下折角"],
+      "how": "一张纸做正反两面：正面是本章右页，背面是同一张纸的背面，下一章先铺在纸底下。翻动时纸绕书脊 left center 从 0 转到 −179.9°，下一章从底下露出来；落定后纸背就是新的左页，再把纸无过渡地重置。往回翻则把左页重新抬回右边。",
+      "watch": "别把下一页画在纸背上——纸背是同一张纸的背面，下一页要垫在底下；翻页时锁住点击，落定后用无过渡重置纸张，否则文字会发虚。",
+      "tags": ["翻页", "3d", "书本", "转场", "rotateY", "阅读"],
+      "demo": "effects/page-flip.html",
+      "depth": {
+        "anatomy": [
+          "搭台：书分左右两页，右页上叠一张可翻的纸，纸背面写同一页的背面",
+          "垫底：翻页前把下一章铺到纸下面，翻过去就能露出来",
+          "翻动：纸绕 left center 转 −179.9°，正面压暗、背面提亮，书脊投影跟着走",
+          "落定：纸背成为新的左页，重置纸张并换上下一张；往回翻反向抬页"
+        ],
+        "params": [
+          ["翻页时长", "840ms / 680ms"],
+          ["perspective", "2200px"],
+          ["旋转轴", "left center"],
+          ["旋转角", "179.9°"]
+        ],
+        "variants": [
+          ["手机单页", "≤560px 只留右页，翻过去的纸移出视野"],
+          ["拖拽翻页", "跟手控制 rotateY，松手再补间落定"]
+        ],
+        "cost": {
+          "tier": "中",
+          "note": "3D 变换在合成层上跑；每帧变化的是阴影层，页面内容只在翻完时换一次。"
+        },
+        "avoid": "别用单张纸假装整本书：没有底页也没有纸背，翻到一半就露馅；别让翻页中的文字重新排版。"
+      }
+    },
+{
+      "id": "crossfade",
+      "name": "模糊交叉转场",
+      "name_en": "Crossfade",
+      "cat": "transition",
+      "family": "view-transition",
+      "trigger": "click",
+      "level": 2,
+      "tech": ["View Transitions API", "filter: blur", "opacity", "退化方案"],
+      "features": ["旧图模糊淡出、新图由模糊转清晰", "支持 View Transitions 时走原生", "不支持时退化为 CSS 交叉淡入", "缩略图与图注同步"],
+      "how": "支持 startViewTransition 时包一层切换并给新旧快照写 blur/opacity 动画；否则两层图片叠放，旧层 blur 0→12px + opacity 1→0，新层反向，用同一时长交叉。",
+      "watch": "blur 是昂贵的 filter，别叠太多层；一定要写不支持时的退化路径；读屏要能知道图已切换。",
+      "tags": ["交叉", "模糊", "转场", "画廊", "view transition", "淡入"],
+      "demo": "effects/crossfade.html",
+      "depth": {
+        "anatomy": [
+          "触发：点缩略图确定目标图与编号",
+          "过渡：原生走 View Transition，退化走两层 blur/opacity 交叉",
+          "同步：标题、图注、当前缩略图一起更新"
+        ],
+        "params": [
+          ["过渡时长", "480ms"],
+          ["最大模糊", "12px"],
+          ["交叉曲线", "ease-in-out"],
+          ["层级", "2 层"]
+        ],
+        "variants": [
+          ["只淡入", "去掉 blur，做干净的交叉淡入"],
+          ["缩放交叉", "把 blur 换成轻微 scale，成本更低"]
+        ],
+        "cost": {
+          "tier": "中",
+          "note": "filter 动画开销较高；两层图、短时长可控。"
+        },
+        "avoid": "大图全屏 blur 在低端机容易掉帧；别和滚动缩放叠加，转场里一次只做一个主运动。"
       }
     }
   ]

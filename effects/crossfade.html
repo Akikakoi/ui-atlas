@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>模糊交叉转场 · GALLERY 影像画廊 · UI Atlas</title>
+<style>
+:root{--bg:#101013;--paper:#17171c;--ink:#f4f2ee;--muted:#94909a;--line:rgba(255,255,255,.1);--accent:#d8b4fe;--mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 -apple-system,"Segoe UI","PingFang SC",sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+
+/* 顶栏 */
+.head{position:sticky;top:0;z-index:6;background:rgba(16,16,19,.72);backdrop-filter:blur(14px) saturate(120%);-webkit-backdrop-filter:blur(14px) saturate(120%);border-bottom:1px solid var(--line)}
+.head-in{width:min(1180px,calc(100% - 48px));margin:0 auto;height:62px;display:flex;align-items:center;gap:22px}
+.brand{display:inline-flex;align-items:center;gap:10px;font:700 13px/1 var(--mono);letter-spacing:.2em}
+.brand .mark{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#d8b4fe,#f0abfc);color:#1a0b1c;display:grid;place-items:center;font:800 10px/1 var(--mono)}
+.brand small{font:500 9px/1 var(--mono);letter-spacing:.24em;color:rgba(244,242,238,.42)}
+.head nav{display:flex;gap:20px;margin-left:auto;font-size:12px;color:rgba(244,242,238,.6)}
+.head nav a{position:relative;transition:color .18s}
+.head nav a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.head nav a:hover{color:var(--ink)}
+.head nav a:hover::after{transform:scaleX(1)}
+.hint{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 4px;padding:4px 10px;font-size:11px;color:rgba(244,242,238,.66);white-space:nowrap;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.22);border-radius:999px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:0 0 5px}
+
+/* 首屏 */
+.hero{padding:clamp(34px,5vw,58px) 0 24px}
+.kicker{margin:0;font:600 10px/1.7 var(--mono);letter-spacing:.24em;color:var(--accent)}
+h1{margin:12px 0 0;font-size:clamp(38px,5.6vw,64px);line-height:1.03;letter-spacing:-.045em;font-weight:660;max-width:12em}
+h1 em{font-style:italic;font-family:Georgia,"Songti SC",serif;font-weight:400;color:var(--accent)}
+.lede{margin:14px 0 0;max-width:36em;font-size:13px;line-height:1.9;color:var(--muted)}
+.hero .kicker{animation:rise .5s both}
+.hero h1{animation:rise .6s .06s both}
+.hero .lede{animation:rise .6s .12s both}
+@keyframes rise{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+
+/* 画廊 */
+.gallery{padding-bottom:clamp(48px,7vw,80px)}
+.gallery-shell{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:22px;align-items:start}
+.viewer{position:relative;width:100%;aspect-ratio:16/10;max-height:560px;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 40px 80px -50px rgba(0,0,0,.9);view-transition-name:galleryart}
+.slide{position:absolute;inset:0;opacity:0;filter:blur(20px);transform:scale(1.05);pointer-events:none;transition:opacity .62s ease,filter .62s cubic-bezier(.2,.7,.2,1),transform .62s cubic-bezier(.2,.7,.2,1)}
+.slide.active{opacity:1;filter:blur(0);transform:none;pointer-events:auto}
+.art{position:absolute;inset:0;background-size:cover;background-position:center}
+.art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.5));pointer-events:none}
+.viewer-cap{position:absolute;left:20px;bottom:18px;z-index:2;display:flex;align-items:flex-end;gap:12px}
+.viewer-cap .num{font:700 clamp(40px,6vw,72px)/.85 var(--mono);letter-spacing:-.06em;color:rgba(255,255,255,.92);text-shadow:0 2px 18px rgba(0,0,0,.5)}
+.cap-text b{display:block;font-size:15px;letter-spacing:-.01em;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.cap-text span{display:block;margin-top:2px;font:500 10.5px/1.6 var(--mono);letter-spacing:.08em;color:rgba(255,255,255,.72)}
+.viewer-badge{position:absolute;right:18px;top:16px;z-index:2;font:600 9px/1 var(--mono);letter-spacing:.18em;color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:5px 10px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.viewer.vt .slide{transition:none}
+
+.thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:12px}
+.thumb{position:relative;aspect-ratio:1;border-radius:9px;border:2px solid transparent;background:#000; cursor:pointer;padding:0;overflow:hidden;transition:border-color .2s,transform .18s,box-shadow .2s}
+.thumb i{position:absolute;inset:0;background-size:cover;background-position:center;transition:filter .25s,transform .25s}
+.thumb span{position:absolute;left:5px;bottom:4px;z-index:1;font:700 10px/1 var(--mono);color:#fff;text-shadow:0 1px 4px #000}
+.thumb:hover{transform:translateY(-2px)}
+.thumb:hover i{transform:scale(1.06)}
+.thumb:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.thumb.on{border-color:var(--accent);box-shadow:0 0 0 3px rgba(216,180,254,.18)}
+
+.info{border:1px solid var(--line);border-radius:14px;padding:22px;background:var(--paper)}
+.info .eyebrow2{margin:0;font:600 9px/1.6 var(--mono);letter-spacing:.2em;color:var(--accent)}
+.info h3{margin:8px 0 0;font-family:Georgia,"Songti SC",serif;font-size:24px;font-weight:400;letter-spacing:-.02em}
+.info .author{margin:6px 0 0;font-size:11.5px;color:var(--muted)}
+.info .rule{height:1px;background:var(--line);margin:18px 0}
+.info .cap{font-size:12.5px;line-height:1.9;color:rgba(244,242,238,.72)}
+.meta-list{margin:18px 0 0;display:grid;gap:9px}
+.meta-row{display:flex;justify-content:space-between;gap:10px;font:500 10px/1.6 var(--mono);color:var(--muted)}
+.meta-row b{color:var(--ink);font-weight:600;text-align:right}
+.kbd{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);font:400 10px/1.7 var(--mono);color:var(--muted)}
+.kbd kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font:inherit;color:var(--ink)}
+.meta-swap{animation:swapIn .42s cubic-bezier(.2,.8,.2,1)}
+@keyframes swapIn{from{opacity:0;translate:0 6px;filter:blur(6px)}to{opacity:1;translate:0;filter:blur(0)}}
+
+/* 内容区 */
+.solid{background:var(--paper);border-top:1px solid var(--line);padding:clamp(52px,7vw,88px) 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px;margin-bottom:28px}
+.sec-head h2{margin:10px 0 0;font-size:clamp(26px,3.4vw,40px);line-height:1.1;letter-spacing:-.035em;font-weight:660}
+.sec-head>p{margin:0;max-width:28em;font-size:12.5px;line-height:1.8;color:var(--muted);justify-self:end;text-align:right}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.fcard{border:1px solid var(--line);border-radius:12px;padding:20px;transition:border-color .25s,transform .25s}
+.fcard:hover{border-color:rgba(216,180,254,.4);transform:translateY(-3px)}
+.fcard b{font:600 10px/1.6 var(--mono);letter-spacing:.2em;color:var(--accent)}
+.fcard h3{margin:8px 0 0;font-size:16px}
+.fcard p{margin:8px 0 0;font-size:11.5px;line-height:1.85;color:var(--muted)}
+
+.quote{max-width:1180px;margin:0 auto;padding:clamp(48px,6vw,76px) 0;border-top:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;gap:32px}
+.quote p{margin:0;font-family:Georgia,"Songti SC",serif;font-size:clamp(18px,2.5vw,26px);line-height:1.5;letter-spacing:-.02em}
+.quote span{flex:0 0 auto;font:600 9.5px/1.6 var(--mono);letter-spacing:.12em;color:var(--muted)}
+.foot{max-width:1180px;margin:40px auto 0;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;font:500 10px/1.6 var(--mono);letter-spacing:.1em;color:var(--muted)}
+
+/* View Transition 模糊交叉 */
+::view-transition-old(galleryart){animation:vOld .55s cubic-bezier(.2,.7,.2,1) both}
+::view-transition-new(galleryart){animation:vNew .55s cubic-bezier(.2,.7,.2,1) both}
+@keyframes vOld{from{opacity:1;filter:blur(0);transform:scale(1)}to{opacity:0;filter:blur(18px);transform:scale(1.04)}}
+@keyframes vNew{from{opacity:0;filter:blur(18px);transform:scale(1.04)}to{opacity:1;filter:blur(0);transform:scale(1)}}
+
+/* 600×450 紧凑版 */
+@media (max-height:560px) and (min-width:561px){
+  .head-in{height:46px;gap:14px}
+  .head nav{display:none}
+  .brand small{display:none}
+  .hero{padding:16px 0 10px}
+  .kicker{font-size:9px}
+  h1{margin-top:7px;font-size:25px;max-width:none}
+  .lede{display:none}
+  .gallery{padding-bottom:18px}
+  .gallery-shell{grid-template-columns:minmax(0,1fr) 190px;gap:12px}
+  .viewer{aspect-ratio:16/9;max-height:260px;border-radius:10px}
+  .viewer-cap{left:12px;bottom:10px}
+  .viewer-cap .num{font-size:36px}
+  .cap-text b{font-size:12px}
+  .thumbs{gap:5px;margin-top:8px}
+  .info{padding:13px;border-radius:10px}
+  .info h3{font-size:17px;margin-top:5px}
+  .info .rule{margin:10px 0}
+  .info .cap{font-size:10.5px;line-height:1.6}
+  .meta-list,.kbd{display:none}
+  .solid,.quote,.foot{display:none}
+  .hint{font-size:9.5px;padding:3px 8px}
+}
+/* 手机单列 */
+@media (max-width:560px){
+  .head nav{display:none}
+  .head-in{width:calc(100% - 32px);height:54px;gap:8px}
+  .brand small{display:none}
+  .hint{display:none}
+  .wrap{width:calc(100% - 32px)}
+  .hero{padding:26px 0 18px}
+  h1{font-size:clamp(34px,9vw,46px)}
+  .gallery-shell{grid-template-columns:1fr;gap:14px}
+  .viewer{aspect-ratio:4/3;max-height:none}
+  .thumbs{grid-template-columns:repeat(5,1fr);gap:6px}
+  .sec-head{grid-template-columns:1fr;gap:10px}
+  .sec-head>p{justify-self:start;text-align:left}
+  .fgrid{grid-template-columns:1fr;gap:12px}
+  .quote{flex-direction:column;gap:12px}
+  .foot{flex-direction:column;gap:4px}
+}
+@media (hover:none){.hint{display:none}}
+@media (prefers-reduced-motion:reduce){
+  .hero .kicker,.hero h1,.hero .lede,.meta-swap{animation:none}
+  .head nav a,.head nav a::after,.thumb,.thumb i,.fcard{transition:none}
+  .slide{transition:none !important;filter:none !important;transform:none !important}
+  ::view-transition-old(galleryart),::view-transition-new(galleryart){animation:none}
+}
+</style>
+</head>
+<body>
+<header class="head">
+  <div class="head-in">
+    <a class="brand" href="#top"><span class="mark">G</span>GALLERY<small>影像画廊</small></a>
+    <nav aria-label="主导航"><a href="#gallery">展厅</a><a href="#features">特性</a><a href="#about">关于</a></nav>
+    <p class="hint">点下面的缩略图，看图片带模糊地交叉切换</p>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <p class="kicker">GALLERY · 当代影像线上展厅 · 第 09 回</p>
+      <h1>换一幅画，<br><em>像推开一扇雾门。</em></h1>
+      <p class="lede">旧的那张先虚化、退后，新的那张从雾里一点点浮出来。两层交叠的瞬间，目光自然被牵到画面中央——不是瞬切，是一次呼吸。</p>
+    </div>
+  </section>
+
+  <section class="gallery" id="gallery">
+    <div class="wrap gallery-shell">
+      <div>
+        <div class="viewer" id="viewer">
+          <div class="slide active" id="slideA"><div class="art" id="artA"></div></div>
+          <div class="slide" id="slideB"><div class="art" id="artB"></div></div>
+          <span class="viewer-badge" id="viewerBadge">NO. 01 / 05</span>
+          <div class="viewer-cap">
+            <span class="num" id="viewerNum">01</span>
+            <span class="cap-text"><b id="viewerTitle">潮汐 №1</b><span id="viewerArtist">林可 · 2026</span></span>
+          </div>
+        </div>
+        <div class="thumbs" id="thumbs" role="group" aria-label="作品缩略图，方向键切换"></div>
+      </div>
+      <aside class="info" id="infoBox" aria-live="polite">
+        <p class="eyebrow2">SELECTED WORK / 当前作品</p>
+        <h3 id="infoTitle">潮汐 №1</h3>
+        <p class="author" id="infoAuthor">林可 · 2026</p>
+        <div class="rule"></div>
+        <p class="cap" id="infoCap">海面在退潮时露出它的纹理，像一页被反复翻阅的旧书。光圈收得很小，远处的雾才留得住。</p>
+        <div class="meta-list">
+          <div class="meta-row"><span>媒介 / MEDIUM</span><b id="infoMedium">数字微喷</b></div>
+          <div class="meta-row"><span>尺寸 / SIZE</span><b id="infoSize">120 × 80 cm</b></div>
+          <div class="meta-row"><span>馆藏 / EDITION</span><b id="infoEdition">1 / 5</b></div>
+        </div>
+        <p class="kbd">聚焦缩略图后按 <kbd>←</kbd> <kbd>→</kbd> 切换作品</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="solid" id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow" style="color:var(--accent)">CRAFT / 细节</p>
+          <h2>雾里来，雾里去。</h2>
+        </div>
+        <p>两层叠放、一进一退。旧的虚化淡出，新的从虚到实，交叉的那几百毫秒才是转场的全部。</p>
+      </div>
+      <div class="fgrid">
+        <article class="fcard"><b>LAYER / 01</b><h3>双层叠放</h3><p>当前图与 incoming 图绝对定位重叠，两者各自控制 filter:blur 与 opacity，过渡互不干扰。</p></article>
+        <article class="fcard"><b>SYNC / 02</b><h3>信息同步</h3><p>编号、标题、作者、图注一起换，切换完成时图与字仍是同一件作品。</p></article>
+        <article class="fcard"><b>VT / 03</b><h3>渐进增强</h3><p>支持 startViewTransition 的浏览器走原生快照动画；不支持时自动退回纯 CSS 交叉淡入。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="quote" id="about">
+    <p>“切换不是打断，<br>是一次轻轻的聚焦。”</p>
+    <span>GALLERY 影像画廊 · 策展札记</span>
+  </section>
+  <footer class="foot">
+    <span>GALLERY 影像画廊 · 上海</span>
+    <span>EXHIBITION / LIN KE · SHEN YU</span>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var works = [
+    { no:'01', title:'潮汐 №1', author:'林可', year:'2026', medium:'数字微喷', size:'120 × 80 cm', edition:'1 / 5',
+      cap:'海面在退潮时露出它的纹理，像一页被反复翻阅的旧书。光圈收得很小，远处的雾才留得住。',
+      grad:'radial-gradient(circle at 28% 30%, rgba(255,214,165,.95), transparent 46%), radial-gradient(circle at 74% 66%, rgba(110,180,255,.55), transparent 50%), linear-gradient(135deg,#ff8a5b 0%,#c2410c 48%,#241036 100%)' },
+    { no:'02', title:'雾中塔', author:'沈瑜', year:'2025', medium:'银盐胶片', size:'90 × 120 cm', edition:'2 / 5',
+      cap:'灯塔每十二秒亮一次。快门开得更久，光就在底片上叠成一条虚线——那是时间被拍下来的样子。',
+      grad:'radial-gradient(circle at 62% 26%, rgba(216,180,254,.9), transparent 44%), linear-gradient(160deg,#5b6cff 0%,#2a2a6e 55%,#0b0b1a 100%)' },
+    { no:'03', title:'等高线', author:'周舟', year:'2026', medium:'航拍数字', size:'150 × 100 cm', edition:'1 / 3',
+      cap:'从空中看，梯田是一圈圈的等高线。人在其中走，像在读一张巨大而缓慢展开的地图。',
+      grad:'repeating-radial-gradient(circle at 40% 60%, #3f8f5f 0 14px, #2d7049 14px 28px, #1c4a33 28px 42px), linear-gradient(180deg,#bfe3a0,#2d7049)' },
+    { no:'04', title:'未寄', author:'许言', year:'2024', medium:'综合材料', size:'60 × 60 cm', edition:'3 / 8',
+      cap:'旧便签、褪色的邮戳与折过很多次的纸角。有些话写完就已经完成，寄不寄出反而不重要了。',
+      grad:'radial-gradient(circle at 35% 40%, rgba(255,240,200,.8), transparent 40%), repeating-linear-gradient(45deg, rgba(180,120,80,.25) 0 6px, transparent 6px 14px), linear-gradient(135deg,#c98a5a,#5a2f3d)' },
+    { no:'05', title:'四点街角', author:'林可', year:'2026', medium:'夜景数码', size:'100 × 70 cm', edition:'1 / 5',
+      cap:'凌晨四点的便利店把光洒在湿柏油上，拉出很长的影子。整条街只剩值夜的人和还没睡的人。',
+      grad:'radial-gradient(circle at 70% 35%, rgba(255,224,150,.85), transparent 42%), linear-gradient(180deg,#12304a 0%,#0d1b2a 55%,#05080f 100%)' }
+  ];
+  var viewer = document.getElementById('viewer');
+  var slideA = document.getElementById('slideA'), slideB = document.getElementById('slideB');
+  var artA = document.getElementById('artA'), artB = document.getElementById('artB');
+  var thumbs = document.getElementById('thumbs');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var active = slideA, idle = slideB, current = 0, busy = false;
+
+  var f = {
+    num: document.getElementById('viewerNum'), title: document.getElementById('viewerTitle'),
+    artist: document.getElementById('viewerArtist'), badge: document.getElementById('viewerBadge'),
+    iTitle: document.getElementById('infoTitle'), iAuthor: document.getElementById('infoAuthor'),
+    iCap: document.getElementById('infoCap'), iMedium: document.getElementById('infoMedium'),
+    iSize: document.getElementById('infoSize'), iEdition: document.getElementById('infoEdition'),
+    infoBox: document.getElementById('infoBox')
+  };
+
+  works.forEach(function (w, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'thumb' + (i === 0 ? ' on' : '');
+    b.setAttribute('aria-label', '查看作品 ' + w.no + ' ' + w.title);
+    b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.innerHTML = '<i style="background:' + w.grad + '"></i><span>' + w.no + '</span>';
+    b.addEventListener('click', function () { go(i); });
+    thumbs.appendChild(b);
+  });
+  var thumbBtns = [].slice.call(thumbs.querySelectorAll('.thumb'));
+
+  function updateInfo(i) {
+    var w = works[i];
+    f.num.textContent = w.no;
+    f.title.textContent = w.title;
+    f.artist.textContent = w.author + ' · ' + w.year;
+    f.badge.textContent = 'NO. ' + w.no + ' / 05';
+    f.iTitle.textContent = w.title;
+    f.iAuthor.textContent = w.author + ' · ' + w.year;
+    f.iCap.textContent = w.cap;
+    f.iMedium.textContent = w.medium;
+    f.iSize.textContent = w.size;
+    f.iEdition.textContent = w.edition;
+    thumbBtns.forEach(function (b, j) {
+      b.classList.toggle('on', j === i);
+      b.setAttribute('aria-pressed', j === i ? 'true' : 'false');
+    });
+    if (!reduce) {
+      f.infoBox.classList.remove('meta-swap');
+      void f.infoBox.offsetWidth;
+      f.infoBox.classList.add('meta-swap');
+    }
+  }
+
+  function commit(i) {
+    var incomingArt = active === slideA ? artB : artA;
+    var incomingSlide = active === slideA ? slideB : slideA;
+    incomingArt.style.background = works[i].grad;
+    active.classList.remove('active');
+    incomingSlide.classList.add('active');
+    var old = active; active = incomingSlide; idle = old;
+    current = i;
+    updateInfo(i);
+  }
+
+  function go(i) {
+    if (i === current || busy) return;
+    if (reduce) { commit(i); return; }
+    if (document.startViewTransition) {
+      busy = true;
+      viewer.classList.add('vt');
+      var t = document.startViewTransition(function () { commit(i); });
+      t.finished.finally(function () { viewer.classList.remove('vt'); busy = false; });
+    } else {
+      busy = true;
+      commit(i);
+      setTimeout(function () { busy = false; }, 640);
+    }
+  }
+
+  thumbs.addEventListener('keydown', function (e) {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+    var idx = thumbBtns.indexOf(document.activeElement);
+    if (idx < 0) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      var next = idx + (e.key === 'ArrowRight' ? 1 : -1);
+      if (next < 0) next = thumbBtns.length - 1;
+      if (next >= thumbBtns.length) next = 0;
+      thumbBtns[next].focus();
+      go(next);
+    }
+  });
+
+  artA.style.background = works[0].grad;
+  updateInfo(0);
+
+})();
+</script>
+<script>
+/* 页内锚点：点击后平滑滚到对应区块；减动效用户仍直接跳转 */
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var raf = 0;
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    if (root.style.scrollBehavior) root.style.scrollBehavior = '';
+    if (root.style.scrollSnapType) root.style.scrollSnapType = '';
+  }
+  function run(y) {
+    var from = window.pageYOffset;
+    var delta = y - from;
+    if (!delta) return;
+    root.style.scrollBehavior = 'auto';
+    if (getComputedStyle(root).scrollSnapType !== 'none') root.style.scrollSnapType = 'none';
+    var dur = Math.min(900, Math.max(320, Math.abs(delta) * 0.5));
+    var t0 = 0;
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else stop();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el || !el.getClientRects().length) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    var gap = (parseFloat(getComputedStyle(el).scrollMarginTop) || 0) +
+              (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0);
+    var max = root.scrollHeight - window.innerHeight;
+    var y = Math.max(0, Math.min(max, el.getBoundingClientRect().top + window.pageYOffset - gap));
+    stop();
+    run(y);
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  });
+  ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+    addEventListener(t, stop, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>
