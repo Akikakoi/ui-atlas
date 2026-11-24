@@ -131,6 +131,11 @@
     var f = shot.querySelector('iframe');
     if (!f || f.dataset.mounted) return;
     f.dataset.mounted = '1';
+    /* 超时只在真正挂载后才计时：懒加载的卡片在滚动到之前不算失败 */
+    clearTimeout(shot.__failTimer);
+    shot.__failTimer = setTimeout(function () {
+      if (f.dataset.mounted && !shot.classList.contains('ready')) shot.classList.add('failed');
+    }, 8000);
     f.src = f.dataset.src;
     fitShot(shot);
   }
@@ -247,9 +252,16 @@
       el('a', { class: 'fb', href: s.demo, target: '_blank', rel: 'noopener', text: '预览加载失败 · 点这里打开 →' })
     ]);
     f.addEventListener('load', function () {
-      if (f.dataset.mounted) shot.classList.add('ready');
+      if (!f.dataset.mounted) return;
+      clearTimeout(shot.__failTimer);
+      /* 404 也会触发 load：同源时查文档标题，识别成错误页 */
+      try {
+        var d = f.contentDocument;
+        if (d && /^error/i.test(d.title || '')) return;
+      } catch (err) {}
+      shot.classList.add('ready');
+      shot.classList.remove('failed');
     });
-    setTimeout(function () { if (!shot.classList.contains('ready')) shot.classList.add('failed'); }, 8000);
     shot.addEventListener('click', function (e) {
       if (e.target.classList && e.target.classList.contains('fb')) return;
       goDetail(s.id);
